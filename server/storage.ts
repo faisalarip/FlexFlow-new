@@ -1,6 +1,7 @@
 import { 
   type User, 
   type InsertUser,
+  type UpsertUser,
   type Exercise,
   type InsertExercise,
   type Workout,
@@ -47,8 +48,9 @@ import {
 import { randomUUID } from "crypto";
 
 export interface IStorage {
-  // Users
+  // Users (IMPORTANT) these user operations are mandatory for Replit Auth.
   getUser(id: string): Promise<User | undefined>;
+  upsertUser(user: UpsertUser): Promise<User>;
   getUsers(): Promise<User[]>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
@@ -285,13 +287,21 @@ export class MemStorage implements IStorage {
       const { services, ...trainerInfo } = trainerData;
       
       // Create user first
+      const now = new Date();
+      const isYogaTrainer = trainerInfo.specialties[0] === "yoga";
       const user: User = {
         id: trainerInfo.userId,
-        username: `trainer_${trainerInfo.id.slice(0, 8)}`,
-        password: "demo",
-        name: trainerInfo.specialties[0] === "yoga" ? "Sarah Johnson" : "Mike Thompson",
+        email: isYogaTrainer ? "sarah@yogastudio.com" : "mike@fitnessclub.com",
+        firstName: isYogaTrainer ? "Sarah" : "Mike",
+        lastName: isYogaTrainer ? "Johnson" : "Thompson",
+        profileImageUrl: null,
         streak: 0,
-        createdAt: new Date()
+        subscriptionStatus: "free_trial",
+        subscriptionStartDate: now,
+        lastPaymentDate: null,
+        subscriptionExpiresAt: new Date(now.getTime() + (30 * 24 * 60 * 60 * 1000)),
+        createdAt: now,
+        updatedAt: now,
       };
       this.users.set(user.id, user);
 
@@ -322,9 +332,42 @@ export class MemStorage implements IStorage {
     });
   }
 
-  // Users
+  // Users (IMPORTANT) these user operations are mandatory for Replit Auth.
   async getUser(id: string): Promise<User | undefined> {
     return this.users.get(id);
+  }
+
+  async upsertUser(userData: UpsertUser): Promise<User> {
+    const existingUser = this.users.get(userData.id!);
+    if (existingUser) {
+      const updatedUser = {
+        ...existingUser,
+        ...userData,
+        updatedAt: new Date(),
+      };
+      this.users.set(userData.id!, updatedUser);
+      return updatedUser;
+    } else {
+      const now = new Date();
+      const freeTrialExpiry = new Date(now.getTime() + (30 * 24 * 60 * 60 * 1000)); // 30 days from now
+      
+      const user: User = {
+        id: userData.id!,
+        email: userData.email || null,
+        firstName: userData.firstName || null,
+        lastName: userData.lastName || null,
+        profileImageUrl: userData.profileImageUrl || null,
+        streak: userData.streak || 0,
+        subscriptionStatus: userData.subscriptionStatus || "free_trial",
+        subscriptionStartDate: userData.subscriptionStartDate || now,
+        lastPaymentDate: userData.lastPaymentDate || null,
+        subscriptionExpiresAt: userData.subscriptionExpiresAt || freeTrialExpiry,
+        createdAt: userData.createdAt || now,
+        updatedAt: now,
+      };
+      this.users.set(user.id, user);
+      return user;
+    }
   }
 
   async getUsers(): Promise<User[]> {
@@ -332,7 +375,8 @@ export class MemStorage implements IStorage {
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(user => user.username === username);
+    // Since we don't have username anymore, search by email
+    return Array.from(this.users.values()).find(user => user.email === username);
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
@@ -344,11 +388,12 @@ export class MemStorage implements IStorage {
       ...insertUser,
       id,
       streak: insertUser.streak || 0,
-      subscriptionStatus: "free_trial",
-      subscriptionStartDate: now,
-      lastPaymentDate: null,
-      subscriptionExpiresAt: freeTrialExpiry,
-      createdAt: now
+      subscriptionStatus: insertUser.subscriptionStatus || "free_trial",
+      subscriptionStartDate: insertUser.subscriptionStartDate || now,
+      lastPaymentDate: insertUser.lastPaymentDate || null,
+      subscriptionExpiresAt: insertUser.subscriptionExpiresAt || freeTrialExpiry,
+      createdAt: now,
+      updatedAt: now,
     };
     this.users.set(id, user);
     return user;

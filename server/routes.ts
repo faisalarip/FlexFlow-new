@@ -19,21 +19,28 @@ import {
 import { z } from "zod";
 import { ObjectStorageService } from "./objectStorage";
 import { analyzeFoodImage } from "./foodRecognition";
+import { setupAuth, isAuthenticated } from "./replitAuth";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Mock current user - in real app this would come from auth
-  const CURRENT_USER_ID = "mock-user-1";
+  // Auth middleware
+  await setupAuth(app);
 
-  // Initialize mock user if doesn't exist
-  const existingUser = await storage.getUserByUsername("demo");
-  if (!existingUser) {
-    await storage.createUser({
-      username: "demo",
-      password: "demo",
-      name: "John Doe",
-      streak: 7
-    });
-  }
+  // Auth routes
+  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      res.json(user);
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      res.status(500).json({ message: "Failed to fetch user" });
+    }
+  });
+
+  // Helper function to get current user ID from request
+  const getCurrentUserId = (req: any): string | null => {
+    return req.user?.claims?.sub || null;
+  };
 
   // Get exercises
   app.get("/api/exercises", async (req, res) => {

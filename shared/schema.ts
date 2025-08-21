@@ -1,19 +1,35 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, integer, timestamp, boolean } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, integer, timestamp, boolean, jsonb, index } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
+// Session storage table.
+// (IMPORTANT) This table is mandatory for Replit Auth, don't drop it.
+export const sessions = pgTable(
+  "sessions",
+  {
+    sid: varchar("sid").primaryKey(),
+    sess: jsonb("sess").notNull(),
+    expire: timestamp("expire").notNull(),
+  },
+  (table) => [index("IDX_session_expire").on(table.expire)],
+);
+
+// User storage table.
+// (IMPORTANT) This table is mandatory for Replit Auth, don't drop it.
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  username: text("username").notNull().unique(),
-  password: text("password").notNull(),
-  name: text("name").notNull(),
+  email: varchar("email").unique(),
+  firstName: varchar("first_name"),
+  lastName: varchar("last_name"),
+  profileImageUrl: varchar("profile_image_url"),
   streak: integer("streak").notNull().default(0),
   subscriptionStatus: varchar("subscription_status").default("free_trial"), // free_trial, active, inactive, expired
   subscriptionStartDate: timestamp("subscription_start_date"),
   lastPaymentDate: timestamp("last_payment_date"),
   subscriptionExpiresAt: timestamp("subscription_expires_at"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 export const exercises = pgTable("exercises", {
@@ -115,10 +131,13 @@ export const trainerReviews = pgTable("trainer_reviews", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+export type UpsertUser = typeof users.$inferInsert;
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
   createdAt: true,
+  updatedAt: true,
 });
 
 export const insertExerciseSchema = createInsertSchema(exercises).omit({
@@ -200,17 +219,17 @@ export type WorkoutWithExercises = Workout & {
 
 export type TrainerWithServices = Trainer & {
   services: TrainerService[];
-  user: Pick<User, "name" | "username">;
+  user: Pick<User, "firstName" | "lastName" | "email">;
 };
 
 export type BookingWithDetails = Booking & {
   trainer: Pick<Trainer, "id" | "userId" | "bio" | "rating" | "totalReviews">;
   service: TrainerService;
-  user: Pick<User, "name" | "username">;
+  user: Pick<User, "firstName" | "lastName" | "email">;
 };
 
 export type TrainerReviewWithUser = TrainerReview & {
-  user: Pick<User, "name" | "username">;
+  user: Pick<User, "firstName" | "lastName" | "email">;
 };
 
 // Food entries for nutrition tracking
@@ -251,8 +270,9 @@ export type UserStats = {
 
 export type LeaderboardEntry = {
   userId: string;
-  username: string;
-  name: string;
+  firstName: string;
+  lastName: string;
+  email: string;
   totalReps: number;
   rank: number;
 };
@@ -329,8 +349,9 @@ export type CommunityPost = typeof communityPosts.$inferSelect;
 export type CommunityPostWithUser = CommunityPost & {
   user: {
     id: string;
-    name: string;
-    username: string;
+    firstName: string;
+    lastName: string;
+    email: string;
     streak: number;
   };
   workout?: {
