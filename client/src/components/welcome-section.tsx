@@ -16,7 +16,7 @@ export default function WelcomeSection() {
         </div>
         <div className="relative z-10">
           <h2 className="text-2xl md:text-3xl font-bold mb-2">
-            {greeting}, John!
+            {greeting}!
           </h2>
           <p className="text-lg opacity-90 mb-4">Ready to crush your fitness goals today?</p>
           <div className="flex flex-col sm:flex-row gap-4">
