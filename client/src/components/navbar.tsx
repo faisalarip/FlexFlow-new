@@ -18,11 +18,6 @@ export default function Navbar() {
       path: "/", 
       label: "Dashboard", 
       icon: Home 
-    },
-    { 
-      path: "/trainers", 
-      label: "Trainers", 
-      icon: Users 
     }
   ];
 
@@ -105,23 +100,34 @@ export default function Navbar() {
               );
             })}
 
-            {/* Dropdown menu for additional items */}
+            {/* Trainers dropdown menu */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button 
                   variant="ghost" 
                   className={`flex items-center space-x-2 px-3 py-2 text-sm font-medium transition-colors ${
-                    isDropdownActive
+                    location === "/trainers" || location.startsWith("/trainers") || isDropdownActive
                       ? "text-primary bg-primary/10"
                       : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800"
                   }`}
                 >
-                  <Menu size={18} />
-                  <span>More</span>
+                  <Users size={18} />
+                  <span>Trainers</span>
                   <ChevronDown size={14} />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuItem asChild>
+                  <Link 
+                    href="/trainers"
+                    className={`flex items-center space-x-3 px-2 py-2 w-full cursor-pointer ${
+                      location === "/trainers" ? "bg-primary/10 text-primary" : ""
+                    }`}
+                  >
+                    <Users size={16} />
+                    <span>Find Trainers</span>
+                  </Link>
+                </DropdownMenuItem>
                 {dropdownItems.map((item) => {
                   const Icon = item.icon;
                   const isActive = location === item.path;
