@@ -121,6 +121,15 @@ export default function Landing() {
           </Button>
         </div>
       </main>
+
+      {/* Footer */}
+      <footer className="border-t bg-white/80 dark:bg-gray-800/80 backdrop-blur py-6">
+        <div className="container mx-auto px-4 text-center">
+          <p className="text-gray-600 dark:text-gray-400">
+            CEO Steven Bates Jr
+          </p>
+        </div>
+      </footer>
     </div>
   );
 }
