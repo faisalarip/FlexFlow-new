@@ -29,7 +29,10 @@ import {
   type MileTrackerSplit,
   type MileTrackerSessionWithSplits,
   type InsertMileTrackerSession,
-  type InsertMileTrackerSplit
+  type InsertMileTrackerSplit,
+  type CommunityPost,
+  type CommunityPostWithUser,
+  type InsertCommunityPost
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 
@@ -106,6 +109,11 @@ export interface IStorage {
   updateMileTrackerSession(id: string, updates: Partial<MileTrackerSession>): Promise<MileTrackerSession | undefined>;
   createMileTrackerSplit(split: InsertMileTrackerSplit): Promise<MileTrackerSplit>;
   getMileTrackerSplits(sessionId: string): Promise<MileTrackerSplit[]>;
+  
+  // Community Posts
+  getCommunityPosts(limit?: number): Promise<CommunityPostWithUser[]>;
+  createCommunityPost(post: InsertCommunityPost): Promise<CommunityPost>;
+  likeCommunityPost(postId: string): Promise<CommunityPost | undefined>;
 }
 
 export class MemStorage implements IStorage {
@@ -121,6 +129,7 @@ export class MemStorage implements IStorage {
   private foodEntries: Map<string, FoodEntry> = new Map();
   private mileTrackerSessions: Map<string, MileTrackerSession> = new Map();
   private mileTrackerSplits: Map<string, MileTrackerSplit> = new Map();
+  private communityPosts: Map<string, CommunityPost> = new Map();
 
   constructor() {
     this.seedExercises();
@@ -881,6 +890,68 @@ export class MemStorage implements IStorage {
     return Array.from(this.mileTrackerSplits.values())
       .filter(split => split.sessionId === sessionId)
       .sort((a, b) => a.mileNumber - b.mileNumber);
+  }
+
+  // Community Posts
+  async getCommunityPosts(limit: number = 50): Promise<CommunityPostWithUser[]> {
+    const posts = Array.from(this.communityPosts.values())
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .slice(0, limit);
+
+    const postsWithUsers: CommunityPostWithUser[] = [];
+    for (const post of posts) {
+      const user = this.users.get(post.userId);
+      if (user) {
+        const postWithUser: CommunityPostWithUser = {
+          ...post,
+          user: {
+            id: user.id,
+            name: user.name,
+            username: user.username,
+            streak: user.streak,
+          }
+        };
+
+        // Add workout info if it's a workout progress post
+        if (post.workoutId) {
+          const workout = this.workouts.get(post.workoutId);
+          if (workout) {
+            postWithUser.workout = {
+              id: workout.id,
+              name: workout.name,
+              category: workout.category,
+              duration: workout.duration,
+              caloriesBurned: workout.caloriesBurned,
+            };
+          }
+        }
+
+        postsWithUsers.push(postWithUser);
+      }
+    }
+
+    return postsWithUsers;
+  }
+
+  async createCommunityPost(post: InsertCommunityPost): Promise<CommunityPost> {
+    const newPost: CommunityPost = {
+      id: randomUUID(),
+      ...post,
+      likes: 0,
+      createdAt: new Date(),
+    };
+    
+    this.communityPosts.set(newPost.id, newPost);
+    return newPost;
+  }
+
+  async likeCommunityPost(postId: string): Promise<CommunityPost | undefined> {
+    const post = this.communityPosts.get(postId);
+    if (!post) return undefined;
+
+    const updatedPost = { ...post, likes: post.likes + 1 };
+    this.communityPosts.set(postId, updatedPost);
+    return updatedPost;
   }
 }
 

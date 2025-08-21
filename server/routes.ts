@@ -11,7 +11,8 @@ import {
   insertTrainerReviewSchema,
   insertFoodEntrySchema,
   insertMileTrackerSessionSchema,
-  insertMileTrackerSplitSchema
+  insertMileTrackerSplitSchema,
+  insertCommunityPostSchema
 } from "@shared/schema";
 import { z } from "zod";
 import { ObjectStorageService } from "./objectStorage";
@@ -592,6 +593,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       console.error("Error creating mile split:", error);
       res.status(500).json({ message: "Failed to create split" });
+    }
+  });
+
+  // Community Routes
+
+  // Get all community posts
+  app.get("/api/community/posts", async (req, res) => {
+    try {
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : undefined;
+      const posts = await storage.getCommunityPosts(limit);
+      res.json(posts);
+    } catch (error) {
+      console.error("Error fetching community posts:", error);
+      res.status(500).json({ message: "Failed to fetch community posts" });
+    }
+  });
+
+  // Create new community post
+  app.post("/api/community/posts", async (req, res) => {
+    try {
+      const data = insertCommunityPostSchema.parse({
+        ...req.body,
+        userId: CURRENT_USER_ID
+      });
+      
+      const post = await storage.createCommunityPost(data);
+      res.status(201).json(post);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid post data", errors: error.errors });
+      }
+      console.error("Error creating community post:", error);
+      res.status(500).json({ message: "Failed to create post" });
+    }
+  });
+
+  // Like a community post
+  app.post("/api/community/posts/:id/like", async (req, res) => {
+    try {
+      const post = await storage.likeCommunityPost(req.params.id);
+      if (!post) {
+        return res.status(404).json({ message: "Post not found" });
+      }
+      res.json(post);
+    } catch (error) {
+      console.error("Error liking community post:", error);
+      res.status(500).json({ message: "Failed to like post" });
     }
   });
 

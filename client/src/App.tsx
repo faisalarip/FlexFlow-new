@@ -10,6 +10,7 @@ import Bookings from "@/pages/bookings";
 import FoodScanner from "@/pages/food-scanner";
 import Leaderboard from "@/pages/leaderboard";
 import MileTracker from "@/pages/mile-tracker";
+import Community from "@/pages/community";
 import NotFound from "@/pages/not-found";
 import Navbar from "@/components/navbar";
 
@@ -25,6 +26,7 @@ function Router() {
         <Route path="/food-scanner" component={FoodScanner} />
         <Route path="/leaderboard" component={Leaderboard} />
         <Route path="/mile-tracker" component={MileTracker} />
+        <Route path="/community" component={Community} />
         <Route component={NotFound} />
       </Switch>
     </div>

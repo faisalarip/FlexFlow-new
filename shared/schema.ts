@@ -290,3 +290,42 @@ export type MileTrackerSplit = typeof mileTrackerSplits.$inferSelect;
 export type MileTrackerSessionWithSplits = MileTrackerSession & {
   splits: MileTrackerSplit[];
 };
+
+// Community Posts
+export const communityPosts = pgTable("community_posts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  content: text("content").notNull(),
+  postType: text("post_type").notNull().default("message"), // message, workout_progress, goal_achievement
+  workoutId: varchar("workout_id").references(() => workouts.id), // optional, for workout progress posts
+  likes: integer("likes").notNull().default(0),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// Community Posts insert schemas
+export const insertCommunityPostSchema = createInsertSchema(communityPosts).omit({
+  id: true,
+  likes: true,
+  createdAt: true,
+});
+
+// Community Posts types
+export type InsertCommunityPost = z.infer<typeof insertCommunityPostSchema>;
+export type CommunityPost = typeof communityPosts.$inferSelect;
+
+// Extended types for API responses
+export type CommunityPostWithUser = CommunityPost & {
+  user: {
+    id: string;
+    name: string;
+    username: string;
+    streak: number;
+  };
+  workout?: {
+    id: string;
+    name: string;
+    category: string;
+    duration: number;
+    caloriesBurned: number;
+  };
+};

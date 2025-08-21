@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Home, Users, Calendar, Trophy, Activity, Camera, Award, MapPin } from "lucide-react";
+import { Home, Users, Calendar, Trophy, Activity, Camera, Award, MapPin, MessageSquare } from "lucide-react";
 
 export default function Navbar() {
   const [location] = useLocation();
@@ -34,6 +34,11 @@ export default function Navbar() {
       path: "/mile-tracker", 
       label: "Mile Tracker", 
       icon: MapPin 
+    },
+    { 
+      path: "/community", 
+      label: "Community", 
+      icon: MessageSquare 
     }
   ];
 
