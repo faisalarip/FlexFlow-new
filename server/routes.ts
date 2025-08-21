@@ -12,7 +12,9 @@ import {
   insertFoodEntrySchema,
   insertMileTrackerSessionSchema,
   insertMileTrackerSplitSchema,
-  insertCommunityPostSchema
+  insertCommunityPostSchema,
+  insertMealPlanSchema,
+  insertUserMealPlanSchema
 } from "@shared/schema";
 import { z } from "zod";
 import { ObjectStorageService } from "./objectStorage";
@@ -640,6 +642,81 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error liking community post:", error);
       res.status(500).json({ message: "Failed to like post" });
+    }
+  });
+
+  // Meal Plan Routes
+
+  // Get all meal plans (optionally filtered by goal)
+  app.get("/api/meal-plans", async (req, res) => {
+    try {
+      const { goal } = req.query;
+      const mealPlans = await storage.getMealPlans(goal as string);
+      res.json(mealPlans);
+    } catch (error) {
+      console.error("Error fetching meal plans:", error);
+      res.status(500).json({ message: "Failed to fetch meal plans" });
+    }
+  });
+
+  // Get specific meal plan by ID
+  app.get("/api/meal-plans/:id", async (req, res) => {
+    try {
+      const mealPlan = await storage.getMealPlan(req.params.id);
+      if (!mealPlan) {
+        return res.status(404).json({ message: "Meal plan not found" });
+      }
+      res.json(mealPlan);
+    } catch (error) {
+      console.error("Error fetching meal plan:", error);
+      res.status(500).json({ message: "Failed to fetch meal plan" });
+    }
+  });
+
+  // Create a new meal plan
+  app.post("/api/meal-plans", async (req, res) => {
+    try {
+      const data = insertMealPlanSchema.parse(req.body);
+      const mealPlan = await storage.createMealPlan(data);
+      res.status(201).json(mealPlan);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid meal plan data", errors: error.errors });
+      }
+      console.error("Error creating meal plan:", error);
+      res.status(500).json({ message: "Failed to create meal plan" });
+    }
+  });
+
+  // Get current user's meal plan
+  app.get("/api/user-meal-plan", async (req, res) => {
+    try {
+      const userMealPlan = await storage.getUserMealPlan(CURRENT_USER_ID);
+      if (!userMealPlan) {
+        return res.status(404).json({ message: "No active meal plan found" });
+      }
+      res.json(userMealPlan);
+    } catch (error) {
+      console.error("Error fetching user meal plan:", error);
+      res.status(500).json({ message: "Failed to fetch user meal plan" });
+    }
+  });
+
+  // Assign a meal plan to the current user
+  app.post("/api/user-meal-plan", async (req, res) => {
+    try {
+      const data = insertUserMealPlanSchema.parse({
+        ...req.body,
+        userId: CURRENT_USER_ID
+      });
+      const userMealPlan = await storage.assignMealPlan(data);
+      res.status(201).json(userMealPlan);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid assignment data", errors: error.errors });
+      }
+      console.error("Error assigning meal plan:", error);
+      res.status(500).json({ message: "Failed to assign meal plan" });
     }
   });
 

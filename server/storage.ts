@@ -32,7 +32,17 @@ import {
   type InsertMileTrackerSplit,
   type CommunityPost,
   type CommunityPostWithUser,
-  type InsertCommunityPost
+  type InsertCommunityPost,
+  type MealPlan,
+  type MealPlanWithDetails,
+  type InsertMealPlan,
+  type MealPlanDay,
+  type InsertMealPlanDay,
+  type MealPlanMeal,
+  type InsertMealPlanMeal,
+  type UserMealPlan,
+  type UserMealPlanWithDetails,
+  type InsertUserMealPlan
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 
@@ -114,6 +124,13 @@ export interface IStorage {
   getCommunityPosts(limit?: number): Promise<CommunityPostWithUser[]>;
   createCommunityPost(post: InsertCommunityPost): Promise<CommunityPost>;
   likeCommunityPost(postId: string): Promise<CommunityPost | undefined>;
+
+  // Meal Plans
+  getMealPlans(goal?: string): Promise<MealPlanWithDetails[]>;
+  getMealPlan(id: string): Promise<MealPlanWithDetails | undefined>;
+  createMealPlan(mealPlan: InsertMealPlan): Promise<MealPlan>;
+  getUserMealPlan(userId: string): Promise<UserMealPlanWithDetails | undefined>;
+  assignMealPlan(userMealPlan: InsertUserMealPlan): Promise<UserMealPlan>;
 }
 
 export class MemStorage implements IStorage {
@@ -130,10 +147,15 @@ export class MemStorage implements IStorage {
   private mileTrackerSessions: Map<string, MileTrackerSession> = new Map();
   private mileTrackerSplits: Map<string, MileTrackerSplit> = new Map();
   private communityPosts: Map<string, CommunityPost> = new Map();
+  private mealPlans: Map<string, MealPlan> = new Map();
+  private mealPlanDays: Map<string, MealPlanDay> = new Map();
+  private mealPlanMeals: Map<string, MealPlanMeal> = new Map();
+  private userMealPlans: Map<string, UserMealPlan> = new Map();
 
   constructor() {
     this.seedExercises();
     this.seedTrainers();
+    this.seedMealPlans();
   }
 
   private seedExercises() {
@@ -952,6 +974,292 @@ export class MemStorage implements IStorage {
     const updatedPost = { ...post, likes: post.likes + 1 };
     this.communityPosts.set(postId, updatedPost);
     return updatedPost;
+  }
+
+  // Meal Plans
+  async getMealPlans(goal?: string): Promise<MealPlanWithDetails[]> {
+    const plans = Array.from(this.mealPlans.values())
+      .filter(plan => plan.isActive && (!goal || plan.goal === goal));
+    
+    const plansWithDetails: MealPlanWithDetails[] = [];
+    for (const plan of plans) {
+      const days = Array.from(this.mealPlanDays.values())
+        .filter(day => day.mealPlanId === plan.id)
+        .sort((a, b) => a.dayNumber - b.dayNumber);
+      
+      const daysWithMeals = [];
+      for (const day of days) {
+        const meals = Array.from(this.mealPlanMeals.values())
+          .filter(meal => meal.mealPlanDayId === day.id);
+        daysWithMeals.push({ ...day, meals });
+      }
+      
+      plansWithDetails.push({ ...plan, days: daysWithMeals });
+    }
+    
+    return plansWithDetails;
+  }
+
+  async getMealPlan(id: string): Promise<MealPlanWithDetails | undefined> {
+    const plan = this.mealPlans.get(id);
+    if (!plan) return undefined;
+    
+    const days = Array.from(this.mealPlanDays.values())
+      .filter(day => day.mealPlanId === plan.id)
+      .sort((a, b) => a.dayNumber - b.dayNumber);
+    
+    const daysWithMeals = [];
+    for (const day of days) {
+      const meals = Array.from(this.mealPlanMeals.values())
+        .filter(meal => meal.mealPlanDayId === day.id);
+      daysWithMeals.push({ ...day, meals });
+    }
+    
+    return { ...plan, days: daysWithMeals };
+  }
+
+  async createMealPlan(mealPlan: InsertMealPlan): Promise<MealPlan> {
+    const newPlan: MealPlan = {
+      id: randomUUID(),
+      ...mealPlan,
+      createdAt: new Date(),
+    };
+    
+    this.mealPlans.set(newPlan.id, newPlan);
+    return newPlan;
+  }
+
+  async getUserMealPlan(userId: string): Promise<UserMealPlanWithDetails | undefined> {
+    const userPlan = Array.from(this.userMealPlans.values())
+      .find(up => up.userId === userId && up.isActive);
+    
+    if (!userPlan) return undefined;
+    
+    const mealPlan = await this.getMealPlan(userPlan.mealPlanId);
+    if (!mealPlan) return undefined;
+    
+    return { ...userPlan, mealPlan };
+  }
+
+  async assignMealPlan(userMealPlan: InsertUserMealPlan): Promise<UserMealPlan> {
+    // Deactivate any existing active meal plan for this user
+    for (const [id, plan] of this.userMealPlans.entries()) {
+      if (plan.userId === userMealPlan.userId && plan.isActive) {
+        this.userMealPlans.set(id, { ...plan, isActive: false });
+      }
+    }
+    
+    const newUserPlan: UserMealPlan = {
+      id: randomUUID(),
+      ...userMealPlan,
+      createdAt: new Date(),
+    };
+    
+    this.userMealPlans.set(newUserPlan.id, newUserPlan);
+    return newUserPlan;
+  }
+
+  private seedMealPlans() {
+    // Weight Loss Meal Plan
+    const weightLossPlan = this.createMealPlanSync({
+      name: "7-Day Weight Loss Plan",
+      description: "A balanced meal plan designed to create a caloric deficit while maintaining proper nutrition.",
+      goal: "weight_loss",
+      dailyCalories: 1500,
+      dailyProtein: 120,
+      dailyCarbs: 150,
+      dailyFat: 50,
+      duration: 7,
+      isActive: true,
+    });
+
+    // Weight Gain Meal Plan  
+    const weightGainPlan = this.createMealPlanSync({
+      name: "7-Day Weight Gain Plan",
+      description: "A nutrient-dense meal plan to support healthy weight gain and muscle building.",
+      goal: "weight_gain",
+      dailyCalories: 2800,
+      dailyProtein: 150,
+      dailyCarbs: 350,
+      dailyFat: 100,
+      duration: 7,
+      isActive: true,
+    });
+
+    // Add days and meals for Weight Loss Plan
+    this.seedWeightLossMealPlan(weightLossPlan.id);
+    
+    // Add days and meals for Weight Gain Plan
+    this.seedWeightGainMealPlan(weightGainPlan.id);
+  }
+
+  private createMealPlanSync(mealPlan: InsertMealPlan): MealPlan {
+    const newPlan: MealPlan = {
+      id: randomUUID(),
+      ...mealPlan,
+      createdAt: new Date(),
+    };
+    
+    this.mealPlans.set(newPlan.id, newPlan);
+    return newPlan;
+  }
+
+  private seedWeightLossMealPlan(planId: string) {
+    for (let day = 1; day <= 7; day++) {
+      const dayId = randomUUID();
+      const mealPlanDay: MealPlanDay = {
+        id: dayId,
+        mealPlanId: planId,
+        dayNumber: day,
+        name: `Day ${day}`,
+      };
+      this.mealPlanDays.set(dayId, mealPlanDay);
+
+      // Sample meals for weight loss
+      const meals = [
+        {
+          mealType: "breakfast",
+          name: "Greek Yogurt Bowl",
+          description: "Low-fat Greek yogurt with berries and almonds",
+          calories: 300,
+          protein: 20,
+          carbs: 30,
+          fat: 8,
+          ingredients: ["Greek yogurt (1 cup)", "Mixed berries (1/2 cup)", "Sliced almonds (1 tbsp)", "Honey (1 tsp)"],
+          instructions: ["Mix yogurt with honey", "Top with berries and almonds"],
+          prepTime: 5,
+          servings: 1,
+        },
+        {
+          mealType: "lunch",
+          name: "Grilled Chicken Salad",
+          description: "Mixed greens with grilled chicken and light dressing",
+          calories: 400,
+          protein: 35,
+          carbs: 15,
+          fat: 20,
+          ingredients: ["Grilled chicken breast (4oz)", "Mixed greens (2 cups)", "Cherry tomatoes (1/2 cup)", "Cucumber (1/2 cup)", "Olive oil dressing (2 tbsp)"],
+          instructions: ["Grill chicken breast", "Mix greens and vegetables", "Top with chicken and dressing"],
+          prepTime: 15,
+          servings: 1,
+        },
+        {
+          mealType: "dinner",
+          name: "Baked Salmon with Vegetables",
+          description: "Herb-crusted salmon with roasted vegetables",
+          calories: 450,
+          protein: 40,
+          carbs: 25,
+          fat: 18,
+          ingredients: ["Salmon fillet (5oz)", "Broccoli (1 cup)", "Sweet potato (1/2 medium)", "Olive oil (1 tbsp)", "Herbs and spices"],
+          instructions: ["Season salmon with herbs", "Roast vegetables at 400°F", "Bake salmon for 15 minutes"],
+          prepTime: 25,
+          servings: 1,
+        },
+        {
+          mealType: "snack",
+          name: "Apple with Almond Butter",
+          description: "Fresh apple slices with natural almond butter",
+          calories: 200,
+          protein: 6,
+          carbs: 25,
+          fat: 8,
+          ingredients: ["Apple (1 medium)", "Almond butter (1 tbsp)"],
+          instructions: ["Slice apple", "Serve with almond butter for dipping"],
+          prepTime: 2,
+          servings: 1,
+        },
+      ];
+
+      meals.forEach(meal => {
+        const mealId = randomUUID();
+        const mealPlanMeal: MealPlanMeal = {
+          id: mealId,
+          mealPlanDayId: dayId,
+          ...meal,
+        };
+        this.mealPlanMeals.set(mealId, mealPlanMeal);
+      });
+    }
+  }
+
+  private seedWeightGainMealPlan(planId: string) {
+    for (let day = 1; day <= 7; day++) {
+      const dayId = randomUUID();
+      const mealPlanDay: MealPlanDay = {
+        id: dayId,
+        mealPlanId: planId,
+        dayNumber: day,
+        name: `Day ${day}`,
+      };
+      this.mealPlanDays.set(dayId, mealPlanDay);
+
+      // Sample meals for weight gain
+      const meals = [
+        {
+          mealType: "breakfast",
+          name: "Protein Pancakes",
+          description: "High-protein pancakes with peanut butter and banana",
+          calories: 550,
+          protein: 30,
+          carbs: 45,
+          fat: 20,
+          ingredients: ["Oat flour (1/2 cup)", "Protein powder (1 scoop)", "Banana (1 large)", "Eggs (2 whole)", "Peanut butter (2 tbsp)", "Milk (1/4 cup)"],
+          instructions: ["Mix dry ingredients", "Blend wet ingredients", "Cook pancakes on medium heat", "Top with peanut butter"],
+          prepTime: 15,
+          servings: 1,
+        },
+        {
+          mealType: "lunch",
+          name: "Quinoa Power Bowl",
+          description: "Quinoa with grilled chicken, avocado, and nuts",
+          calories: 650,
+          protein: 35,
+          carbs: 50,
+          fat: 28,
+          ingredients: ["Quinoa (1 cup cooked)", "Grilled chicken (4oz)", "Avocado (1/2 medium)", "Mixed nuts (1/4 cup)", "Olive oil (1 tbsp)", "Vegetables (1 cup)"],
+          instructions: ["Cook quinoa according to package", "Grill chicken breast", "Assemble bowl with all ingredients"],
+          prepTime: 20,
+          servings: 1,
+        },
+        {
+          mealType: "dinner",
+          name: "Steak with Sweet Potato",
+          description: "Lean beef with roasted sweet potato and vegetables",
+          calories: 700,
+          protein: 45,
+          carbs: 40,
+          fat: 30,
+          ingredients: ["Lean beef steak (6oz)", "Sweet potato (1 large)", "Green beans (1 cup)", "Butter (1 tbsp)", "Olive oil (1 tbsp)"],
+          instructions: ["Season and grill steak", "Roast sweet potato at 425°F", "Sauté green beans", "Serve together"],
+          prepTime: 30,
+          servings: 1,
+        },
+        {
+          mealType: "snack",
+          name: "Protein Smoothie",
+          description: "High-calorie smoothie with protein powder and fruits",
+          calories: 400,
+          protein: 25,
+          carbs: 35,
+          fat: 15,
+          ingredients: ["Protein powder (1 scoop)", "Banana (1 large)", "Peanut butter (2 tbsp)", "Oats (1/4 cup)", "Milk (1 cup)", "Honey (1 tbsp)"],
+          instructions: ["Add all ingredients to blender", "Blend until smooth", "Serve immediately"],
+          prepTime: 5,
+          servings: 1,
+        },
+      ];
+
+      meals.forEach(meal => {
+        const mealId = randomUUID();
+        const mealPlanMeal: MealPlanMeal = {
+          id: mealId,
+          mealPlanDayId: dayId,
+          ...meal,
+        };
+        this.mealPlanMeals.set(mealId, mealPlanMeal);
+      });
+    }
   }
 }
 

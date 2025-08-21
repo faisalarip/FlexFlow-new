@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Home, Users, Calendar, Trophy, Activity, Camera, Award, MapPin, MessageSquare, Moon, Sun } from "lucide-react";
+import { Home, Users, Calendar, Trophy, Activity, Camera, Award, MapPin, MessageSquare, Moon, Sun, ChefHat } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/hooks/useTheme";
 
@@ -42,6 +42,11 @@ export default function Navbar() {
       path: "/community", 
       label: "Community", 
       icon: MessageSquare 
+    },
+    { 
+      path: "/meal-plans", 
+      label: "Meal Plans", 
+      icon: ChefHat 
     }
   ];
 

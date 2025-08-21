@@ -329,3 +329,94 @@ export type CommunityPostWithUser = CommunityPost & {
     caloriesBurned: number;
   };
 };
+
+// Meal Plans
+export const mealPlans = pgTable("meal_plans", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  description: text("description").notNull(),
+  goal: text("goal").notNull(), // weight_loss, weight_gain, maintenance
+  dailyCalories: integer("daily_calories").notNull(),
+  dailyProtein: integer("daily_protein").notNull(), // grams
+  dailyCarbs: integer("daily_carbs").notNull(), // grams
+  dailyFat: integer("daily_fat").notNull(), // grams
+  duration: integer("duration").notNull().default(7), // days
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const mealPlanDays = pgTable("meal_plan_days", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  mealPlanId: varchar("meal_plan_id").references(() => mealPlans.id).notNull(),
+  dayNumber: integer("day_number").notNull(), // 1, 2, 3, etc.
+  name: text("name").notNull(), // e.g., "Day 1", "Monday"
+});
+
+export const mealPlanMeals = pgTable("meal_plan_meals", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  mealPlanDayId: varchar("meal_plan_day_id").references(() => mealPlanDays.id).notNull(),
+  mealType: text("meal_type").notNull(), // breakfast, lunch, dinner, snack
+  name: text("name").notNull(),
+  description: text("description"),
+  calories: integer("calories").notNull(),
+  protein: integer("protein").notNull(),
+  carbs: integer("carbs").notNull(),
+  fat: integer("fat").notNull(),
+  ingredients: text("ingredients").array().notNull(),
+  instructions: text("instructions").array(),
+  prepTime: integer("prep_time"), // minutes
+  servings: integer("servings").notNull().default(1),
+});
+
+export const userMealPlans = pgTable("user_meal_plans", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  mealPlanId: varchar("meal_plan_id").references(() => mealPlans.id).notNull(),
+  startDate: timestamp("start_date").notNull(),
+  endDate: timestamp("end_date"),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// Meal Plan insert schemas
+export const insertMealPlanSchema = createInsertSchema(mealPlans).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertMealPlanDaySchema = createInsertSchema(mealPlanDays).omit({
+  id: true,
+});
+
+export const insertMealPlanMealSchema = createInsertSchema(mealPlanMeals).omit({
+  id: true,
+});
+
+export const insertUserMealPlanSchema = createInsertSchema(userMealPlans).omit({
+  id: true,
+  createdAt: true,
+});
+
+// Meal Plan types
+export type InsertMealPlan = z.infer<typeof insertMealPlanSchema>;
+export type MealPlan = typeof mealPlans.$inferSelect;
+
+export type InsertMealPlanDay = z.infer<typeof insertMealPlanDaySchema>;
+export type MealPlanDay = typeof mealPlanDays.$inferSelect;
+
+export type InsertMealPlanMeal = z.infer<typeof insertMealPlanMealSchema>;
+export type MealPlanMeal = typeof mealPlanMeals.$inferSelect;
+
+export type InsertUserMealPlan = z.infer<typeof insertUserMealPlanSchema>;
+export type UserMealPlan = typeof userMealPlans.$inferSelect;
+
+// Extended types for API responses
+export type MealPlanWithDetails = MealPlan & {
+  days: (MealPlanDay & {
+    meals: MealPlanMeal[];
+  })[];
+};
+
+export type UserMealPlanWithDetails = UserMealPlan & {
+  mealPlan: MealPlanWithDetails;
+};
