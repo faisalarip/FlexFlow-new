@@ -7,6 +7,7 @@ import Dashboard from "@/pages/dashboard";
 import Trainers from "@/pages/trainers";
 import TrainerProfile from "@/pages/trainer-profile";
 import Bookings from "@/pages/bookings";
+import FoodScanner from "@/pages/food-scanner";
 import NotFound from "@/pages/not-found";
 import Navbar from "@/components/navbar";
 
@@ -19,6 +20,7 @@ function Router() {
         <Route path="/trainers" component={Trainers} />
         <Route path="/trainers/:id" component={TrainerProfile} />
         <Route path="/bookings" component={Bookings} />
+        <Route path="/food-scanner" component={FoodScanner} />
         <Route component={NotFound} />
       </Switch>
     </div>

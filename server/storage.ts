@@ -21,7 +21,9 @@ import {
   type TrainerWithServices,
   type BookingWithDetails,
   type TrainerReviewWithUser,
-  type UserStats
+  type UserStats,
+  type FoodEntry,
+  type InsertFoodEntry
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 
@@ -80,6 +82,12 @@ export interface IStorage {
   getTrainerReviews(trainerId: string): Promise<TrainerReviewWithUser[]>;
   createTrainerReview(review: InsertTrainerReview): Promise<TrainerReview>;
   updateTrainerRating(trainerId: string): Promise<void>;
+
+  // Food entries
+  getFoodEntries(userId: string, date?: Date): Promise<FoodEntry[]>;
+  createFoodEntry(foodEntry: InsertFoodEntry): Promise<FoodEntry>;
+  updateFoodEntry(id: string, updates: Partial<FoodEntry>): Promise<FoodEntry | undefined>;
+  deleteFoodEntry(id: string): Promise<boolean>;
 }
 
 export class MemStorage implements IStorage {
@@ -92,6 +100,7 @@ export class MemStorage implements IStorage {
   private trainerServices: Map<string, TrainerService> = new Map();
   private bookings: Map<string, Booking> = new Map();
   private trainerReviews: Map<string, TrainerReview> = new Map();
+  private foodEntries: Map<string, FoodEntry> = new Map();
 
   constructor() {
     this.seedExercises();
@@ -682,6 +691,67 @@ export class MemStorage implements IStorage {
       };
       this.trainers.set(trainerId, updatedTrainer);
     }
+  }
+
+  // Food entries
+  async getFoodEntries(userId: string, date?: Date): Promise<FoodEntry[]> {
+    const entries = Array.from(this.foodEntries.values())
+      .filter(entry => {
+        if (entry.userId !== userId) return false;
+        
+        if (date) {
+          const entryDate = entry.loggedAt ? new Date(entry.loggedAt) : new Date();
+          const targetDate = new Date(date);
+          return (
+            entryDate.getFullYear() === targetDate.getFullYear() &&
+            entryDate.getMonth() === targetDate.getMonth() &&
+            entryDate.getDate() === targetDate.getDate()
+          );
+        }
+        
+        return true;
+      })
+      .sort((a, b) => (b.loggedAt ? new Date(b.loggedAt) : new Date()).getTime() - (a.loggedAt ? new Date(a.loggedAt) : new Date()).getTime());
+
+    return entries;
+  }
+
+  async createFoodEntry(insertEntry: InsertFoodEntry): Promise<FoodEntry> {
+    const id = randomUUID();
+    const entry: FoodEntry = {
+      id,
+      userId: insertEntry.userId,
+      name: insertEntry.name,
+      description: insertEntry.description || null,
+      calories: insertEntry.calories,
+      protein: insertEntry.protein || null,
+      carbs: insertEntry.carbs || null,
+      fat: insertEntry.fat || null,
+      fiber: insertEntry.fiber || null,
+      sugar: insertEntry.sugar || null,
+      sodium: insertEntry.sodium || null,
+      servingSize: insertEntry.servingSize || null,
+      imageUrl: insertEntry.imageUrl || null,
+      confidence: insertEntry.confidence || null,
+      loggedAt: insertEntry.loggedAt || new Date(),
+      createdAt: new Date()
+    };
+    this.foodEntries.set(id, entry);
+    return entry;
+  }
+
+  async updateFoodEntry(id: string, updates: Partial<FoodEntry>): Promise<FoodEntry | undefined> {
+    const entry = this.foodEntries.get(id);
+    if (entry) {
+      const updatedEntry = { ...entry, ...updates };
+      this.foodEntries.set(id, updatedEntry);
+      return updatedEntry;
+    }
+    return undefined;
+  }
+
+  async deleteFoodEntry(id: string): Promise<boolean> {
+    return this.foodEntries.delete(id);
   }
 }
 

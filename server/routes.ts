@@ -8,9 +8,12 @@ import {
   insertTrainerSchema,
   insertTrainerServiceSchema,
   insertBookingSchema,
-  insertTrainerReviewSchema 
+  insertTrainerReviewSchema,
+  insertFoodEntrySchema 
 } from "@shared/schema";
 import { z } from "zod";
+import { ObjectStorageService } from "./objectStorage";
+import { analyzeFoodImage } from "./foodRecognition";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Mock current user - in real app this would come from auth
@@ -336,6 +339,97 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid review data", errors: error.errors });
       }
       res.status(500).json({ message: "Failed to create review" });
+    }
+  });
+
+  // Food Routes
+
+  // Get food entries for user
+  app.get("/api/food-entries", async (req, res) => {
+    try {
+      const { date } = req.query;
+      const targetDate = date ? new Date(date as string) : undefined;
+      
+      const entries = await storage.getFoodEntries(CURRENT_USER_ID, targetDate);
+      res.json(entries);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch food entries" });
+    }
+  });
+
+  // Get upload URL for food image
+  app.post("/api/food/upload-url", async (req, res) => {
+    try {
+      const objectStorageService = new ObjectStorageService();
+      const uploadURL = await objectStorageService.getObjectEntityUploadURL();
+      res.json({ uploadURL });
+    } catch (error) {
+      console.error("Error getting upload URL:", error);
+      res.status(500).json({ message: "Failed to get upload URL" });
+    }
+  });
+
+  // Analyze food image
+  app.post("/api/food/analyze", async (req, res) => {
+    try {
+      const { imageData } = req.body;
+      
+      if (!imageData) {
+        return res.status(400).json({ message: "Image data is required" });
+      }
+
+      // Remove data URL prefix if present
+      const base64Data = imageData.replace(/^data:image\/[a-z]+;base64,/, "");
+      
+      const analysis = await analyzeFoodImage(base64Data);
+      res.json(analysis);
+    } catch (error) {
+      console.error("Error analyzing food:", error);
+      res.status(500).json({ message: error.message || "Failed to analyze food image" });
+    }
+  });
+
+  // Create food entry
+  app.post("/api/food-entries", async (req, res) => {
+    try {
+      const data = insertFoodEntrySchema.parse({
+        ...req.body,
+        userId: CURRENT_USER_ID
+      });
+      
+      const entry = await storage.createFoodEntry(data);
+      res.status(201).json(entry);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid food entry data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create food entry" });
+    }
+  });
+
+  // Update food entry
+  app.patch("/api/food-entries/:id", async (req, res) => {
+    try {
+      const entry = await storage.updateFoodEntry(req.params.id, req.body);
+      if (!entry) {
+        return res.status(404).json({ message: "Food entry not found" });
+      }
+      res.json(entry);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update food entry" });
+    }
+  });
+
+  // Delete food entry
+  app.delete("/api/food-entries/:id", async (req, res) => {
+    try {
+      const deleted = await storage.deleteFoodEntry(req.params.id);
+      if (!deleted) {
+        return res.status(404).json({ message: "Food entry not found" });
+      }
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete food entry" });
     }
   });
 
