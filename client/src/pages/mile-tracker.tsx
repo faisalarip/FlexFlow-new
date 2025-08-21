@@ -375,7 +375,7 @@ export default function MileTracker() {
                     </Badge>
                   </div>
                   
-                  <div className="text-6xl font-bold text-primary mb-2">
+                  <div className="text-8xl font-bold text-primary mb-2 font-mono tracking-wider">
                     {formatTime(currentTime)}
                   </div>
                   
