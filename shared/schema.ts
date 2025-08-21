@@ -114,8 +114,8 @@ export const bookings = pgTable("bookings", {
   scheduledAt: timestamp("scheduled_at").notNull(),
   status: text("status").notNull().default("pending"), // pending, confirmed, completed, cancelled, paid
   totalPrice: integer("total_price").notNull(), // in cents
-  trainerEarnings: integer("trainer_earnings"), // in cents - what trainer gets after 35% commission
-  platformCommission: integer("platform_commission"), // in cents - 35% commission for platform
+  trainerEarnings: integer("trainer_earnings"), // in cents - what trainer gets after 15% commission
+  platformCommission: integer("platform_commission"), // in cents - 15% commission for platform
   stripePaymentIntentId: text("stripe_payment_intent_id"),
   notes: text("notes"),
   createdAt: timestamp("created_at").defaultNow().notNull(),

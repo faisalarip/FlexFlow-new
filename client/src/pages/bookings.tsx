@@ -156,7 +156,7 @@ export default function Bookings() {
                       </div>
                       <div className="text-center">
                         <div className="text-lg font-semibold text-blue-600">
-                          {commissionData.commissionRate || 35}%
+                          {commissionData.commissionRate || 15}%
                         </div>
                         <div className="text-xs text-gray-600 dark:text-gray-400">Commission Rate</div>
                       </div>
@@ -326,7 +326,7 @@ export default function Bookings() {
                                     </span>
                                   </div>
                                   <div className="flex justify-between">
-                                    <span className="text-gray-600 dark:text-gray-400">Platform Commission (35%):</span>
+                                    <span className="text-gray-600 dark:text-gray-400">Platform Commission (15%):</span>
                                     <span className="font-medium text-primary">
                                       {formatPrice(booking.platformCommission)}
                                     </span>
@@ -414,7 +414,7 @@ export default function Bookings() {
                                     </span>
                                   </div>
                                   <div className="flex justify-between">
-                                    <span className="text-gray-600 dark:text-gray-400">Platform Commission (35%):</span>
+                                    <span className="text-gray-600 dark:text-gray-400">Platform Commission (15%):</span>
                                     <span className="font-medium text-primary">
                                       {formatPrice(booking.platformCommission)}
                                     </span>

@@ -763,7 +763,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({
         totalCommissions: commissionData.totalCommissions / 100, // Convert to dollars
         totalBookings: commissionData.totalBookings,
-        commissionRate: 35, // 35% commission rate
+        commissionRate: 15, // 15% commission rate
       });
     } catch (error) {
       console.error("Error fetching commission data:", error);

@@ -214,7 +214,7 @@ export default function TrainerSubscription() {
               </div>
               <div className="flex items-center">
                 <CheckCircle size={16} className="text-green-600 mr-3" />
-                <span className="text-gray-700 dark:text-gray-300">Receive 65% of booking payments (35% platform fee)</span>
+                <span className="text-gray-700 dark:text-gray-300">Receive 85% of booking payments (15% platform fee)</span>
               </div>
               <div className="flex items-center">
                 <CheckCircle size={16} className="text-green-600 mr-3" />

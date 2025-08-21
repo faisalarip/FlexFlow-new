@@ -1355,8 +1355,8 @@ export class MemStorage implements IStorage {
     const booking = this.bookings.get(bookingId);
     if (!booking) return undefined;
 
-    // Calculate 35% commission for platform
-    const platformCommission = Math.round(totalPrice * 0.35);
+    // Calculate 15% commission for platform
+    const platformCommission = Math.round(totalPrice * 0.15);
     const trainerEarnings = totalPrice - platformCommission;
 
     const updatedBooking: Booking = {
