@@ -1,7 +1,15 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertWorkoutSchema, insertWorkoutExerciseSchema, insertGoalSchema } from "@shared/schema";
+import { 
+  insertWorkoutSchema, 
+  insertWorkoutExerciseSchema, 
+  insertGoalSchema,
+  insertTrainerSchema,
+  insertTrainerServiceSchema,
+  insertBookingSchema,
+  insertTrainerReviewSchema 
+} from "@shared/schema";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -160,6 +168,174 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(workouts);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch workouts for date range" });
+    }
+  });
+
+  // Trainer Routes
+
+  // Get all trainers with optional filtering
+  app.get("/api/trainers", async (req, res) => {
+    try {
+      const { specialties, location, maxRate } = req.query;
+      
+      const filters: any = {};
+      if (specialties) {
+        filters.specialties = Array.isArray(specialties) ? specialties : [specialties];
+      }
+      if (location) filters.location = location as string;
+      if (maxRate) filters.maxRate = parseInt(maxRate as string);
+      
+      const trainers = await storage.getTrainers(Object.keys(filters).length > 0 ? filters : undefined);
+      res.json(trainers);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch trainers" });
+    }
+  });
+
+  // Get trainer by ID
+  app.get("/api/trainers/:id", async (req, res) => {
+    try {
+      const trainer = await storage.getTrainer(req.params.id);
+      if (!trainer) {
+        return res.status(404).json({ message: "Trainer not found" });
+      }
+      res.json(trainer);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch trainer" });
+    }
+  });
+
+  // Create trainer profile
+  app.post("/api/trainers", async (req, res) => {
+    try {
+      const data = insertTrainerSchema.parse({
+        ...req.body,
+        userId: CURRENT_USER_ID
+      });
+      
+      const trainer = await storage.createTrainer(data);
+      res.status(201).json(trainer);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid trainer data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create trainer profile" });
+    }
+  });
+
+  // Update trainer profile
+  app.patch("/api/trainers/:id", async (req, res) => {
+    try {
+      const trainer = await storage.updateTrainer(req.params.id, req.body);
+      if (!trainer) {
+        return res.status(404).json({ message: "Trainer not found" });
+      }
+      res.json(trainer);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update trainer" });
+    }
+  });
+
+  // Get trainer reviews
+  app.get("/api/trainers/:id/reviews", async (req, res) => {
+    try {
+      const reviews = await storage.getTrainerReviews(req.params.id);
+      res.json(reviews);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch trainer reviews" });
+    }
+  });
+
+  // Create trainer service
+  app.post("/api/trainers/:trainerId/services", async (req, res) => {
+    try {
+      const data = insertTrainerServiceSchema.parse({
+        ...req.body,
+        trainerId: req.params.trainerId
+      });
+      
+      const service = await storage.createTrainerService(data);
+      res.status(201).json(service);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid service data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create service" });
+    }
+  });
+
+  // Booking Routes
+
+  // Get user bookings
+  app.get("/api/bookings", async (req, res) => {
+    try {
+      const bookings = await storage.getBookings(CURRENT_USER_ID);
+      res.json(bookings);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch bookings" });
+    }
+  });
+
+  // Get booking by ID
+  app.get("/api/bookings/:id", async (req, res) => {
+    try {
+      const booking = await storage.getBooking(req.params.id);
+      if (!booking) {
+        return res.status(404).json({ message: "Booking not found" });
+      }
+      res.json(booking);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch booking" });
+    }
+  });
+
+  // Create booking
+  app.post("/api/bookings", async (req, res) => {
+    try {
+      const data = insertBookingSchema.parse({
+        ...req.body,
+        userId: CURRENT_USER_ID,
+        scheduledAt: new Date(req.body.scheduledAt)
+      });
+      
+      const booking = await storage.createBooking(data);
+      res.status(201).json(booking);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid booking data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create booking" });
+    }
+  });
+
+  // Update booking status
+  app.patch("/api/bookings/:id", async (req, res) => {
+    try {
+      const booking = await storage.updateBooking(req.params.id, req.body);
+      if (!booking) {
+        return res.status(404).json({ message: "Booking not found" });
+      }
+      res.json(booking);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update booking" });
+    }
+  });
+
+  // Create review for trainer
+  app.post("/api/reviews", async (req, res) => {
+    try {
+      const data = insertTrainerReviewSchema.parse({
+        ...req.body,
+        userId: CURRENT_USER_ID
+      });
+      
+      const review = await storage.createTrainerReview(data);
+      res.status(201).json(review);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid review data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create review" });
     }
   });
 

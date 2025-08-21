@@ -9,7 +9,18 @@ import {
   type InsertWorkoutExercise,
   type Goal,
   type InsertGoal,
+  type Trainer,
+  type InsertTrainer,
+  type TrainerService,
+  type InsertTrainerService,
+  type Booking,
+  type InsertBooking,
+  type TrainerReview,
+  type InsertTrainerReview,
   type WorkoutWithExercises,
+  type TrainerWithServices,
+  type BookingWithDetails,
+  type TrainerReviewWithUser,
   type UserStats
 } from "@shared/schema";
 import { randomUUID } from "crypto";
@@ -45,6 +56,30 @@ export interface IStorage {
   
   // Stats
   getUserStats(userId: string): Promise<UserStats>;
+  
+  // Trainers
+  getTrainers(filters?: { specialties?: string[], location?: string, maxRate?: number }): Promise<TrainerWithServices[]>;
+  getTrainer(id: string): Promise<TrainerWithServices | undefined>;
+  getTrainerByUserId(userId: string): Promise<Trainer | undefined>;
+  createTrainer(trainer: InsertTrainer): Promise<Trainer>;
+  updateTrainer(id: string, updates: Partial<Trainer>): Promise<Trainer | undefined>;
+  
+  // Trainer Services
+  getTrainerServices(trainerId: string): Promise<TrainerService[]>;
+  createTrainerService(service: InsertTrainerService): Promise<TrainerService>;
+  updateTrainerService(id: string, updates: Partial<TrainerService>): Promise<TrainerService | undefined>;
+  
+  // Bookings
+  getBookings(userId: string): Promise<BookingWithDetails[]>;
+  getTrainerBookings(trainerId: string): Promise<BookingWithDetails[]>;
+  getBooking(id: string): Promise<BookingWithDetails | undefined>;
+  createBooking(booking: InsertBooking): Promise<Booking>;
+  updateBooking(id: string, updates: Partial<Booking>): Promise<Booking | undefined>;
+  
+  // Reviews
+  getTrainerReviews(trainerId: string): Promise<TrainerReviewWithUser[]>;
+  createTrainerReview(review: InsertTrainerReview): Promise<TrainerReview>;
+  updateTrainerRating(trainerId: string): Promise<void>;
 }
 
 export class MemStorage implements IStorage {
@@ -53,9 +88,14 @@ export class MemStorage implements IStorage {
   private workouts: Map<string, Workout> = new Map();
   private workoutExercises: Map<string, WorkoutExercise> = new Map();
   private goals: Map<string, Goal> = new Map();
+  private trainers: Map<string, Trainer> = new Map();
+  private trainerServices: Map<string, TrainerService> = new Map();
+  private bookings: Map<string, Booking> = new Map();
+  private trainerReviews: Map<string, TrainerReview> = new Map();
 
   constructor() {
     this.seedExercises();
+    this.seedTrainers();
   }
 
   private seedExercises() {
@@ -113,6 +153,105 @@ export class MemStorage implements IStorage {
         muscleGroups: exercise.muscleGroups || null,
         equipment: exercise.equipment || null,
         createdAt: new Date()
+      });
+    });
+  }
+
+  private seedTrainers() {
+    const defaultTrainers: (InsertTrainer & { id: string; services: Omit<InsertTrainerService, 'trainerId'>[] })[] = [
+      {
+        id: randomUUID(),
+        userId: randomUUID(),
+        bio: "Certified personal trainer with 8 years of experience specializing in strength training and weight loss.",
+        specialties: ["strength", "weight-loss", "bodybuilding"],
+        certifications: ["NASM-CPT", "Precision Nutrition Level 1"],
+        experience: 8,
+        hourlyRate: 8000, // $80/hour
+        location: "Downtown Gym, City Center",
+        isActive: true,
+        services: [
+          {
+            name: "Personal Training Session",
+            description: "One-on-one strength training and fitness coaching",
+            duration: 60,
+            price: 8000,
+            isActive: true
+          },
+          {
+            name: "Group Training Session",
+            description: "Small group fitness training (2-4 people)",
+            duration: 45,
+            price: 5000,
+            isActive: true
+          }
+        ]
+      },
+      {
+        id: randomUUID(),
+        userId: randomUUID(),
+        bio: "Yoga instructor and wellness coach focused on flexibility, mindfulness, and stress relief.",
+        specialties: ["yoga", "flexibility", "mindfulness"],
+        certifications: ["RYT-500", "Mindfulness-Based Stress Reduction"],
+        experience: 5,
+        hourlyRate: 6000, // $60/hour
+        location: "Zen Yoga Studio",
+        isActive: true,
+        services: [
+          {
+            name: "Yoga Session",
+            description: "Personalized yoga practice focusing on flexibility and mindfulness",
+            duration: 75,
+            price: 7500,
+            isActive: true
+          },
+          {
+            name: "Meditation Coaching",
+            description: "Guided meditation and mindfulness techniques",
+            duration: 30,
+            price: 3500,
+            isActive: true
+          }
+        ]
+      }
+    ];
+
+    defaultTrainers.forEach(trainerData => {
+      const { services, ...trainerInfo } = trainerData;
+      
+      // Create user first
+      const user: User = {
+        id: trainerInfo.userId,
+        username: `trainer_${trainerInfo.id.slice(0, 8)}`,
+        password: "demo",
+        name: trainerInfo.specialties[0] === "yoga" ? "Sarah Johnson" : "Mike Thompson",
+        streak: 0,
+        createdAt: new Date()
+      };
+      this.users.set(user.id, user);
+
+      // Create trainer
+      const trainer: Trainer = {
+        ...trainerInfo,
+        certifications: trainerInfo.certifications || null,
+        location: trainerInfo.location || null,
+        isActive: trainerInfo.isActive !== undefined ? trainerInfo.isActive : true,
+        rating: 450, // 4.5 stars * 100
+        totalReviews: 12,
+        createdAt: new Date()
+      };
+      this.trainers.set(trainer.id, trainer);
+
+      // Create services
+      services.forEach(serviceData => {
+        const serviceId = randomUUID();
+        const service: TrainerService = {
+          ...serviceData,
+          id: serviceId,
+          trainerId: trainer.id,
+          isActive: serviceData.isActive !== undefined ? serviceData.isActive : true,
+          createdAt: new Date()
+        };
+        this.trainerServices.set(serviceId, service);
       });
     });
   }
@@ -298,6 +437,251 @@ export class MemStorage implements IStorage {
       caloriesBurned,
       personalRecords
     };
+  }
+
+  // Trainers
+  async getTrainers(filters?: { specialties?: string[], location?: string, maxRate?: number }): Promise<TrainerWithServices[]> {
+    let trainers = Array.from(this.trainers.values()).filter(t => t.isActive);
+    
+    if (filters?.specialties?.length) {
+      trainers = trainers.filter(t => 
+        filters.specialties!.some(specialty => t.specialties.includes(specialty))
+      );
+    }
+    
+    if (filters?.location) {
+      trainers = trainers.filter(t => 
+        t.location?.toLowerCase().includes(filters.location!.toLowerCase())
+      );
+    }
+    
+    if (filters?.maxRate) {
+      trainers = trainers.filter(t => t.hourlyRate <= filters.maxRate!);
+    }
+
+    return Promise.all(trainers.map(async trainer => {
+      const services = await this.getTrainerServices(trainer.id);
+      const user = await this.getUser(trainer.userId);
+      return {
+        ...trainer,
+        services,
+        user: { name: user!.name, username: user!.username }
+      };
+    }));
+  }
+
+  async getTrainer(id: string): Promise<TrainerWithServices | undefined> {
+    const trainer = this.trainers.get(id);
+    if (!trainer) return undefined;
+
+    const services = await this.getTrainerServices(id);
+    const user = await this.getUser(trainer.userId);
+    return {
+      ...trainer,
+      services,
+      user: { name: user!.name, username: user!.username }
+    };
+  }
+
+  async getTrainerByUserId(userId: string): Promise<Trainer | undefined> {
+    return Array.from(this.trainers.values()).find(t => t.userId === userId);
+  }
+
+  async createTrainer(insertTrainer: InsertTrainer): Promise<Trainer> {
+    const id = randomUUID();
+    const trainer: Trainer = {
+      ...insertTrainer,
+      id,
+      certifications: insertTrainer.certifications || null,
+      location: insertTrainer.location || null,
+      isActive: insertTrainer.isActive !== undefined ? insertTrainer.isActive : true,
+      rating: null,
+      totalReviews: null,
+      createdAt: new Date()
+    };
+    this.trainers.set(id, trainer);
+    return trainer;
+  }
+
+  async updateTrainer(id: string, updates: Partial<Trainer>): Promise<Trainer | undefined> {
+    const trainer = this.trainers.get(id);
+    if (trainer) {
+      const updatedTrainer = { ...trainer, ...updates };
+      this.trainers.set(id, updatedTrainer);
+      return updatedTrainer;
+    }
+    return undefined;
+  }
+
+  // Trainer Services
+  async getTrainerServices(trainerId: string): Promise<TrainerService[]> {
+    return Array.from(this.trainerServices.values())
+      .filter(s => s.trainerId === trainerId && s.isActive);
+  }
+
+  async createTrainerService(insertService: InsertTrainerService): Promise<TrainerService> {
+    const id = randomUUID();
+    const service: TrainerService = {
+      ...insertService,
+      id,
+      isActive: insertService.isActive !== undefined ? insertService.isActive : true,
+      createdAt: new Date()
+    };
+    this.trainerServices.set(id, service);
+    return service;
+  }
+
+  async updateTrainerService(id: string, updates: Partial<TrainerService>): Promise<TrainerService | undefined> {
+    const service = this.trainerServices.get(id);
+    if (service) {
+      const updatedService = { ...service, ...updates };
+      this.trainerServices.set(id, updatedService);
+      return updatedService;
+    }
+    return undefined;
+  }
+
+  // Bookings
+  async getBookings(userId: string): Promise<BookingWithDetails[]> {
+    const bookings = Array.from(this.bookings.values())
+      .filter(b => b.userId === userId)
+      .sort((a, b) => b.scheduledAt.getTime() - a.scheduledAt.getTime());
+
+    return Promise.all(bookings.map(async booking => {
+      const trainer = this.trainers.get(booking.trainerId)!;
+      const service = this.trainerServices.get(booking.serviceId)!;
+      const user = this.users.get(booking.userId)!;
+      
+      return {
+        ...booking,
+        trainer: {
+          id: trainer.id,
+          userId: trainer.userId,
+          bio: trainer.bio,
+          rating: trainer.rating,
+          totalReviews: trainer.totalReviews
+        },
+        service,
+        user: { name: user.name, username: user.username }
+      };
+    }));
+  }
+
+  async getTrainerBookings(trainerId: string): Promise<BookingWithDetails[]> {
+    const bookings = Array.from(this.bookings.values())
+      .filter(b => b.trainerId === trainerId)
+      .sort((a, b) => b.scheduledAt.getTime() - a.scheduledAt.getTime());
+
+    return Promise.all(bookings.map(async booking => {
+      const trainer = this.trainers.get(booking.trainerId)!;
+      const service = this.trainerServices.get(booking.serviceId)!;
+      const user = this.users.get(booking.userId)!;
+      
+      return {
+        ...booking,
+        trainer: {
+          id: trainer.id,
+          userId: trainer.userId,
+          bio: trainer.bio,
+          rating: trainer.rating,
+          totalReviews: trainer.totalReviews
+        },
+        service,
+        user: { name: user.name, username: user.username }
+      };
+    }));
+  }
+
+  async getBooking(id: string): Promise<BookingWithDetails | undefined> {
+    const booking = this.bookings.get(id);
+    if (!booking) return undefined;
+
+    const trainer = this.trainers.get(booking.trainerId)!;
+    const service = this.trainerServices.get(booking.serviceId)!;
+    const user = this.users.get(booking.userId)!;
+    
+    return {
+      ...booking,
+      trainer: {
+        id: trainer.id,
+        userId: trainer.userId,
+        bio: trainer.bio,
+        rating: trainer.rating,
+        totalReviews: trainer.totalReviews
+      },
+      service,
+      user: { name: user.name, username: user.username }
+    };
+  }
+
+  async createBooking(insertBooking: InsertBooking): Promise<Booking> {
+    const id = randomUUID();
+    const booking: Booking = {
+      ...insertBooking,
+      id,
+      status: insertBooking.status || "pending",
+      stripePaymentIntentId: insertBooking.stripePaymentIntentId || null,
+      notes: insertBooking.notes || null,
+      createdAt: new Date()
+    };
+    this.bookings.set(id, booking);
+    return booking;
+  }
+
+  async updateBooking(id: string, updates: Partial<Booking>): Promise<Booking | undefined> {
+    const booking = this.bookings.get(id);
+    if (booking) {
+      const updatedBooking = { ...booking, ...updates };
+      this.bookings.set(id, updatedBooking);
+      return updatedBooking;
+    }
+    return undefined;
+  }
+
+  // Reviews
+  async getTrainerReviews(trainerId: string): Promise<TrainerReviewWithUser[]> {
+    const reviews = Array.from(this.trainerReviews.values())
+      .filter(r => r.trainerId === trainerId)
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+
+    return reviews.map(review => {
+      const user = this.users.get(review.userId)!;
+      return {
+        ...review,
+        user: { name: user.name, username: user.username }
+      };
+    });
+  }
+
+  async createTrainerReview(insertReview: InsertTrainerReview): Promise<TrainerReview> {
+    const id = randomUUID();
+    const review: TrainerReview = {
+      ...insertReview,
+      id,
+      comment: insertReview.comment || null,
+      createdAt: new Date()
+    };
+    this.trainerReviews.set(id, review);
+    
+    // Update trainer rating
+    await this.updateTrainerRating(insertReview.trainerId);
+    
+    return review;
+  }
+
+  async updateTrainerRating(trainerId: string): Promise<void> {
+    const reviews = Array.from(this.trainerReviews.values()).filter(r => r.trainerId === trainerId);
+    const trainer = this.trainers.get(trainerId);
+    
+    if (trainer && reviews.length > 0) {
+      const avgRating = reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length;
+      const updatedTrainer = {
+        ...trainer,
+        rating: Math.round(avgRating * 100), // Store as integer (rating * 100)
+        totalReviews: reviews.length
+      };
+      this.trainers.set(trainerId, updatedTrainer);
+    }
   }
 }
 
