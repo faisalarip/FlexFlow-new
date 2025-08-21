@@ -49,9 +49,11 @@ import { randomUUID } from "crypto";
 export interface IStorage {
   // Users
   getUser(id: string): Promise<User | undefined>;
+  getUsers(): Promise<User[]>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUserStreak(id: string, streak: number): Promise<User | undefined>;
+  updateUser(id: string, updates: Partial<User>): Promise<User | undefined>;
   
   // Exercises
   getExercises(): Promise<Exercise[]>;
@@ -325,17 +327,28 @@ export class MemStorage implements IStorage {
     return this.users.get(id);
   }
 
+  async getUsers(): Promise<User[]> {
+    return Array.from(this.users.values());
+  }
+
   async getUserByUsername(username: string): Promise<User | undefined> {
     return Array.from(this.users.values()).find(user => user.username === username);
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = randomUUID();
+    const now = new Date();
+    const freeTrialExpiry = new Date(now.getTime() + (30 * 24 * 60 * 60 * 1000)); // 30 days from now
+    
     const user: User = {
       ...insertUser,
       id,
       streak: insertUser.streak || 0,
-      createdAt: new Date()
+      subscriptionStatus: "free_trial",
+      subscriptionStartDate: now,
+      lastPaymentDate: null,
+      subscriptionExpiresAt: freeTrialExpiry,
+      createdAt: now
     };
     this.users.set(id, user);
     return user;
@@ -345,6 +358,16 @@ export class MemStorage implements IStorage {
     const user = this.users.get(id);
     if (user) {
       const updatedUser = { ...user, streak };
+      this.users.set(id, updatedUser);
+      return updatedUser;
+    }
+    return undefined;
+  }
+
+  async updateUser(id: string, updates: Partial<User>): Promise<User | undefined> {
+    const user = this.users.get(id);
+    if (user) {
+      const updatedUser = { ...user, ...updates };
       this.users.set(id, updatedUser);
       return updatedUser;
     }

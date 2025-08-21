@@ -830,6 +830,120 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // User Subscription Routes
+
+  // Get user subscription status
+  app.get("/api/user/subscription", async (req, res) => {
+    try {
+      const user = await storage.getUser(CURRENT_USER_ID);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const now = new Date();
+      const isExpired = user.subscriptionExpiresAt && user.subscriptionExpiresAt < now;
+      
+      let effectiveStatus = user.subscriptionStatus;
+      if (isExpired && user.subscriptionStatus !== "inactive") {
+        effectiveStatus = "expired";
+      }
+
+      const subscriptionInfo = {
+        subscriptionStatus: effectiveStatus,
+        subscriptionStartDate: user.subscriptionStartDate,
+        lastPaymentDate: user.lastPaymentDate,
+        subscriptionExpiresAt: user.subscriptionExpiresAt,
+        isActive: effectiveStatus === "free_trial" || effectiveStatus === "active",
+        isFreeTrialActive: effectiveStatus === "free_trial" && !isExpired,
+        daysRemaining: user.subscriptionExpiresAt 
+          ? Math.max(0, Math.ceil((user.subscriptionExpiresAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)))
+          : 0,
+        monthlyFee: 15 // $15 per month for users
+      };
+
+      res.json(subscriptionInfo);
+    } catch (error) {
+      console.error("Error fetching user subscription:", error);
+      res.status(500).json({ message: "Failed to fetch subscription status" });
+    }
+  });
+
+  // Activate paid subscription (after free trial or to reactivate)
+  app.post("/api/user/subscription/activate", async (req, res) => {
+    try {
+      const user = await storage.getUser(CURRENT_USER_ID);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const now = new Date();
+      const nextExpiry = new Date(now.getTime() + (30 * 24 * 60 * 60 * 1000)); // 30 days from now
+
+      const updatedUser = await storage.updateUser(CURRENT_USER_ID, {
+        subscriptionStatus: "active",
+        lastPaymentDate: now,
+        subscriptionExpiresAt: nextExpiry
+      });
+
+      if (!updatedUser) {
+        return res.status(500).json({ message: "Failed to update subscription" });
+      }
+
+      res.json({
+        message: "Subscription activated successfully",
+        subscriptionStatus: "active",
+        lastPaymentDate: now,
+        subscriptionExpiresAt: nextExpiry,
+        monthlyFee: 15
+      });
+    } catch (error) {
+      console.error("Error activating user subscription:", error);
+      res.status(500).json({ message: "Failed to activate subscription" });
+    }
+  });
+
+  // Cancel user subscription
+  app.post("/api/user/subscription/cancel", async (req, res) => {
+    try {
+      const updatedUser = await storage.updateUser(CURRENT_USER_ID, {
+        subscriptionStatus: "inactive"
+      });
+
+      if (!updatedUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      res.json({ message: "Subscription cancelled successfully" });
+    } catch (error) {
+      console.error("Error cancelling user subscription:", error);
+      res.status(500).json({ message: "Failed to cancel subscription" });
+    }
+  });
+
+  // Get user subscription revenue (admin endpoint)
+  app.get("/api/admin/user-subscription-revenue", async (req, res) => {
+    try {
+      const users = await storage.getUsers();
+      const activeUsers = users.filter(user => 
+        user.subscriptionStatus === "active" && 
+        user.subscriptionExpiresAt && 
+        user.subscriptionExpiresAt > new Date()
+      );
+      
+      const totalMonthlyRevenue = activeUsers.length * 15; // $15 per user
+
+      res.json({
+        totalMonthlyRevenue: totalMonthlyRevenue,
+        activeUsers: activeUsers.length,
+        monthlyFeePerUser: 15, // $15 per user per month
+        usersInFreeTrial: users.filter(user => user.subscriptionStatus === "free_trial").length
+      });
+    } catch (error) {
+      console.error("Error fetching user subscription revenue:", error);
+      res.status(500).json({ message: "Failed to fetch user subscription revenue" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

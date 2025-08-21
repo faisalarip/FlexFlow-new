@@ -22,9 +22,15 @@ export default function Bookings() {
     retry: false,
   });
 
-  // Subscription revenue query
-  const { data: subscriptionData } = useQuery({
+  // Trainer subscription revenue query
+  const { data: trainerSubscriptionData } = useQuery({
     queryKey: ["/api/admin/subscription-revenue"],
+    retry: false,
+  });
+
+  // User subscription revenue query
+  const { data: userSubscriptionData } = useQuery({
+    queryKey: ["/api/admin/user-subscription-revenue"],
     retry: false,
   });
 
@@ -122,8 +128,8 @@ export default function Bookings() {
         </div>
 
         {/* Platform Revenue Summary Cards */}
-        {(commissionData || subscriptionData) && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        {(commissionData || trainerSubscriptionData || userSubscriptionData) && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
             {/* Commission Summary Card */}
             {commissionData && (
               <Card className="border-green-200 dark:border-green-800">
@@ -160,35 +166,71 @@ export default function Bookings() {
               </Card>
             )}
 
-            {/* Subscription Revenue Card */}
-            {subscriptionData && (
+            {/* Trainer Subscription Revenue Card */}
+            {trainerSubscriptionData && (
               <Card className="border-blue-200 dark:border-blue-800">
                 <CardHeader>
                   <CardTitle className="flex items-center text-blue-700 dark:text-blue-300">
                     <DollarSign className="mr-2" size={20} />
-                    Trainer Subscription Revenue
+                    Trainer Subscriptions
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
                     <div className="text-center">
                       <div className="text-3xl font-bold text-blue-600">
-                        ${subscriptionData.totalMonthlyRevenue?.toFixed(2) || '0.00'}
+                        ${trainerSubscriptionData.totalMonthlyRevenue?.toFixed(2) || '0.00'}
                       </div>
-                      <div className="text-sm text-gray-600 dark:text-gray-400">Monthly Subscription Revenue</div>
+                      <div className="text-sm text-gray-600 dark:text-gray-400">Monthly Trainer Revenue</div>
                     </div>
                     <div className="grid grid-cols-2 gap-4 pt-2 border-t">
                       <div className="text-center">
                         <div className="text-lg font-semibold text-primary">
-                          {subscriptionData.activeTrainers || 0}
+                          {trainerSubscriptionData.activeTrainers || 0}
                         </div>
                         <div className="text-xs text-gray-600 dark:text-gray-400">Active Trainers</div>
                       </div>
                       <div className="text-center">
                         <div className="text-lg font-semibold text-green-600">
-                          ${subscriptionData.monthlyFeePerTrainer || 25}
+                          $25
                         </div>
-                        <div className="text-xs text-gray-600 dark:text-gray-400">Per Trainer/Month</div>
+                        <div className="text-xs text-gray-600 dark:text-gray-400">Per Trainer</div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* User Subscription Revenue Card */}
+            {userSubscriptionData && (
+              <Card className="border-purple-200 dark:border-purple-800">
+                <CardHeader>
+                  <CardTitle className="flex items-center text-purple-700 dark:text-purple-300">
+                    <Star className="mr-2" size={20} />
+                    User Premium Subscriptions
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="text-center">
+                      <div className="text-3xl font-bold text-purple-600">
+                        ${userSubscriptionData.totalMonthlyRevenue?.toFixed(2) || '0.00'}
+                      </div>
+                      <div className="text-sm text-gray-600 dark:text-gray-400">Monthly User Revenue</div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4 pt-2 border-t">
+                      <div className="text-center">
+                        <div className="text-lg font-semibold text-primary">
+                          {userSubscriptionData.activeUsers || 0}
+                        </div>
+                        <div className="text-xs text-gray-600 dark:text-gray-400">Premium Users</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-lg font-semibold text-green-600">
+                          $15
+                        </div>
+                        <div className="text-xs text-gray-600 dark:text-gray-400">Per User</div>
                       </div>
                     </div>
                   </div>

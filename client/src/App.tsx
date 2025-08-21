@@ -9,6 +9,7 @@ import Trainers from "@/pages/trainers";
 import TrainerProfile from "@/pages/trainer-profile";
 import Bookings from "@/pages/bookings";
 import TrainerSubscription from "@/pages/trainer-subscription";
+import UserSubscription from "@/pages/user-subscription";
 import FoodScanner from "@/pages/food-scanner";
 import Leaderboard from "@/pages/leaderboard";
 import MileTracker from "@/pages/mile-tracker";
@@ -27,6 +28,7 @@ function Router() {
         <Route path="/trainers/:id" component={TrainerProfile} />
         <Route path="/bookings" component={Bookings} />
         <Route path="/trainer-subscription" component={TrainerSubscription} />
+        <Route path="/subscription" component={UserSubscription} />
         <Route path="/food-scanner" component={FoodScanner} />
         <Route path="/leaderboard" component={Leaderboard} />
         <Route path="/mile-tracker" component={MileTracker} />

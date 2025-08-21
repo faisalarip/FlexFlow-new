@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Home, Users, Calendar, Trophy, Activity, Camera, Award, MapPin, MessageSquare, Moon, Sun, ChefHat, CreditCard } from "lucide-react";
+import { Home, Users, Calendar, Trophy, Activity, Camera, Award, MapPin, MessageSquare, Moon, Sun, ChefHat, CreditCard, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/hooks/useTheme";
 
@@ -27,6 +27,11 @@ export default function Navbar() {
       path: "/trainer-subscription", 
       label: "Trainer Plan", 
       icon: CreditCard 
+    },
+    { 
+      path: "/subscription", 
+      label: "Premium", 
+      icon: Star 
     },
     { 
       path: "/food-scanner", 

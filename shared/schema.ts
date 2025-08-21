@@ -9,6 +9,10 @@ export const users = pgTable("users", {
   password: text("password").notNull(),
   name: text("name").notNull(),
   streak: integer("streak").notNull().default(0),
+  subscriptionStatus: varchar("subscription_status").default("free_trial"), // free_trial, active, inactive, expired
+  subscriptionStartDate: timestamp("subscription_start_date"),
+  lastPaymentDate: timestamp("last_payment_date"),
+  subscriptionExpiresAt: timestamp("subscription_expires_at"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
