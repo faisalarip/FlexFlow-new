@@ -228,8 +228,8 @@ export default function MileTracker() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">Activity History</h1>
-              <p className="text-gray-600">Your completed mile tracking sessions</p>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Activity History</h1>
+              <p className="text-gray-600 dark:text-gray-400">Your completed mile tracking sessions</p>
             </div>
             <Button onClick={() => setShowHistory(false)}>
               Back to Tracker
@@ -310,12 +310,12 @@ export default function MileTracker() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Mile Tracker</h1>
-            <p className="text-gray-600">Track your running, walking, and biking miles with precision timing</p>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Mile Tracker</h1>
+            <p className="text-gray-600 dark:text-gray-400">Track your running, walking, and biking miles with precision timing</p>
           </div>
           <Button variant="outline" onClick={() => setShowHistory(true)}>
             <History className="mr-2" size={16} />

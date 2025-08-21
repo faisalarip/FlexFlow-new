@@ -12,7 +12,7 @@ import FloatingActionButton from "@/components/floating-action-button";
 
 export default function Dashboard() {
   return (
-    <div className="font-inter bg-gray-50 text-gray-800 min-h-screen">
+    <div className="font-inter bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 min-h-screen">
       <NavigationHeader />
       <MobileNavigation />
       

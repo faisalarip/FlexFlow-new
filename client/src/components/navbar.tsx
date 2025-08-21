@@ -1,8 +1,11 @@
 import { Link, useLocation } from "wouter";
-import { Home, Users, Calendar, Trophy, Activity, Camera, Award, MapPin, MessageSquare } from "lucide-react";
+import { Home, Users, Calendar, Trophy, Activity, Camera, Award, MapPin, MessageSquare, Moon, Sun } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useTheme } from "@/hooks/useTheme";
 
 export default function Navbar() {
   const [location] = useLocation();
+  const { theme, toggleTheme } = useTheme();
 
   const navItems = [
     { 
@@ -43,13 +46,13 @@ export default function Navbar() {
   ];
 
   return (
-    <nav className="bg-white shadow-sm border-b border-gray-200">
+    <nav className="bg-white dark:bg-gray-900 shadow-sm border-b border-gray-200 dark:border-gray-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <div className="flex items-center space-x-2">
               <Activity className="text-primary" size={32} />
-              <h1 className="text-xl font-bold text-gray-900">FlexFlow</h1>
+              <h1 className="text-xl font-bold text-gray-900 dark:text-white">FlexFlow</h1>
             </div>
           </div>
 
@@ -66,7 +69,7 @@ export default function Navbar() {
                   className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                     isActive
                       ? "text-primary bg-primary/10"
-                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                      : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800"
                   }`}
                 >
                   <Icon size={18} />
@@ -77,9 +80,18 @@ export default function Navbar() {
           </div>
 
           <div className="flex items-center">
-            <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-              <span className="text-white font-medium text-sm">U</span>
-            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={toggleTheme}
+              className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
+            >
+              {theme === 'light' ? (
+                <Moon size={20} />
+              ) : (
+                <Sun size={20} />
+              )}
+            </Button>
           </div>
         </div>
       </div>
