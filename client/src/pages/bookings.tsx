@@ -22,6 +22,12 @@ export default function Bookings() {
     retry: false,
   });
 
+  // Subscription revenue query
+  const { data: subscriptionData } = useQuery({
+    queryKey: ["/api/admin/subscription-revenue"],
+    retry: false,
+  });
+
   // Mutation to mark booking as paid
   const markPaidMutation = useMutation({
     mutationFn: async ({ bookingId, totalPrice }: { bookingId: string; totalPrice: number }) => {
@@ -115,38 +121,81 @@ export default function Bookings() {
           <p className="text-gray-600 dark:text-gray-400">Manage your trainer sessions</p>
         </div>
 
-        {/* Commission Summary Card */}
-        {commissionData && (
-          <Card className="mb-6 border-primary dark:border-primary">
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <TrendingUp className="mr-2 text-green-600" size={20} />
-                Platform Commission Summary
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-green-600">
-                    ${commissionData.totalCommissions?.toFixed(2) || '0.00'}
+        {/* Platform Revenue Summary Cards */}
+        {(commissionData || subscriptionData) && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            {/* Commission Summary Card */}
+            {commissionData && (
+              <Card className="border-green-200 dark:border-green-800">
+                <CardHeader>
+                  <CardTitle className="flex items-center text-green-700 dark:text-green-300">
+                    <TrendingUp className="mr-2" size={20} />
+                    Booking Commission Revenue
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="text-center">
+                      <div className="text-3xl font-bold text-green-600">
+                        ${commissionData.totalCommissions?.toFixed(2) || '0.00'}
+                      </div>
+                      <div className="text-sm text-gray-600 dark:text-gray-400">Total Commission Earned</div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4 pt-2 border-t">
+                      <div className="text-center">
+                        <div className="text-lg font-semibold text-primary">
+                          {commissionData.totalBookings || 0}
+                        </div>
+                        <div className="text-xs text-gray-600 dark:text-gray-400">Paid Bookings</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-lg font-semibold text-blue-600">
+                          {commissionData.commissionRate || 35}%
+                        </div>
+                        <div className="text-xs text-gray-600 dark:text-gray-400">Commission Rate</div>
+                      </div>
+                    </div>
                   </div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400">Total Earnings</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-primary">
-                    {commissionData.totalBookings || 0}
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Subscription Revenue Card */}
+            {subscriptionData && (
+              <Card className="border-blue-200 dark:border-blue-800">
+                <CardHeader>
+                  <CardTitle className="flex items-center text-blue-700 dark:text-blue-300">
+                    <DollarSign className="mr-2" size={20} />
+                    Trainer Subscription Revenue
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="text-center">
+                      <div className="text-3xl font-bold text-blue-600">
+                        ${subscriptionData.totalMonthlyRevenue?.toFixed(2) || '0.00'}
+                      </div>
+                      <div className="text-sm text-gray-600 dark:text-gray-400">Monthly Subscription Revenue</div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4 pt-2 border-t">
+                      <div className="text-center">
+                        <div className="text-lg font-semibold text-primary">
+                          {subscriptionData.activeTrainers || 0}
+                        </div>
+                        <div className="text-xs text-gray-600 dark:text-gray-400">Active Trainers</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-lg font-semibold text-green-600">
+                          ${subscriptionData.monthlyFeePerTrainer || 25}
+                        </div>
+                        <div className="text-xs text-gray-600 dark:text-gray-400">Per Trainer/Month</div>
+                      </div>
+                    </div>
                   </div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400">Paid Bookings</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-blue-600">
-                    {commissionData.commissionRate || 35}%
-                  </div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400">Commission Rate</div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+                </CardContent>
+              </Card>
+            )}
+          </div>
         )}
 
         {/* Quick Stats */}

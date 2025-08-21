@@ -764,6 +764,72 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Trainer subscription management routes
+
+  // Get current trainer subscription status
+  app.get("/api/trainer/subscription", async (req, res) => {
+    try {
+      const subscriptionStatus = await storage.getTrainerSubscriptionStatus(CURRENT_USER_ID);
+      if (!subscriptionStatus) {
+        return res.status(404).json({ message: "Trainer not found" });
+      }
+      res.json(subscriptionStatus);
+    } catch (error) {
+      console.error("Error fetching trainer subscription:", error);
+      res.status(500).json({ message: "Failed to fetch subscription status" });
+    }
+  });
+
+  // Activate trainer subscription (pay $25)
+  app.post("/api/trainer/subscription/activate", async (req, res) => {
+    try {
+      const updatedTrainer = await storage.activateTrainerSubscription(CURRENT_USER_ID);
+      if (!updatedTrainer) {
+        return res.status(404).json({ message: "Trainer not found" });
+      }
+      
+      const subscriptionStatus = await storage.getTrainerSubscriptionStatus(CURRENT_USER_ID);
+      res.json({
+        message: "Subscription activated successfully",
+        ...subscriptionStatus,
+        monthlyFee: 25 // $25 per month
+      });
+    } catch (error) {
+      console.error("Error activating subscription:", error);
+      res.status(500).json({ message: "Failed to activate subscription" });
+    }
+  });
+
+  // Cancel trainer subscription
+  app.post("/api/trainer/subscription/cancel", async (req, res) => {
+    try {
+      const updatedTrainer = await storage.cancelTrainerSubscription(CURRENT_USER_ID);
+      if (!updatedTrainer) {
+        return res.status(404).json({ message: "Trainer not found" });
+      }
+      
+      res.json({ message: "Subscription cancelled successfully" });
+    } catch (error) {
+      console.error("Error cancelling subscription:", error);
+      res.status(500).json({ message: "Failed to cancel subscription" });
+    }
+  });
+
+  // Get total subscription revenue (admin endpoint)
+  app.get("/api/admin/subscription-revenue", async (req, res) => {
+    try {
+      const revenueData = await storage.getTotalSubscriptionRevenue();
+      res.json({
+        totalMonthlyRevenue: revenueData.totalRevenue / 100, // Convert to dollars
+        activeTrainers: revenueData.activeTrainers,
+        monthlyFeePerTrainer: 25, // $25 per trainer per month
+      });
+    } catch (error) {
+      console.error("Error fetching subscription revenue:", error);
+      res.status(500).json({ message: "Failed to fetch subscription revenue" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

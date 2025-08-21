@@ -69,6 +69,9 @@ export const trainers = pgTable("trainers", {
   isActive: boolean("is_active").notNull().default(true),
   rating: integer("rating").default(0), // average rating * 100 (for precision)
   totalReviews: integer("total_reviews").default(0),
+  subscriptionStatus: varchar("subscription_status").default("inactive"), // active, inactive, expired, grace_period
+  lastPaymentDate: timestamp("last_payment_date"),
+  subscriptionExpiresAt: timestamp("subscription_expires_at"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -137,6 +140,9 @@ export const insertTrainerSchema = createInsertSchema(trainers).omit({
   id: true,
   rating: true,
   totalReviews: true,
+  subscriptionStatus: true,
+  lastPaymentDate: true,
+  subscriptionExpiresAt: true,
   createdAt: true,
 });
 

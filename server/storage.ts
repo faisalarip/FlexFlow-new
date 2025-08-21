@@ -561,6 +561,9 @@ export class MemStorage implements IStorage {
       isActive: insertTrainer.isActive !== undefined ? insertTrainer.isActive : true,
       rating: null,
       totalReviews: null,
+      subscriptionStatus: "inactive",
+      lastPaymentDate: null,
+      subscriptionExpiresAt: null,
       createdAt: new Date()
     };
     this.trainers.set(id, trainer);
@@ -1298,6 +1301,78 @@ export class MemStorage implements IStorage {
 
     this.bookings.set(bookingId, updatedBooking);
     return updatedBooking;
+  }
+
+  // Trainer subscription methods
+  async getTrainerSubscriptionStatus(userId: string): Promise<{
+    subscriptionStatus: string;
+    lastPaymentDate?: Date;
+    subscriptionExpiresAt?: Date;
+    isActive: boolean;
+  } | null> {
+    const trainer = Array.from(this.trainers.values())
+      .find(t => t.userId === userId);
+    
+    if (!trainer) return null;
+
+    const now = new Date();
+    const isExpired = trainer.subscriptionExpiresAt && now > trainer.subscriptionExpiresAt;
+
+    return {
+      subscriptionStatus: trainer.subscriptionStatus || "inactive",
+      lastPaymentDate: trainer.lastPaymentDate,
+      subscriptionExpiresAt: trainer.subscriptionExpiresAt,
+      isActive: trainer.subscriptionStatus === "active" && !isExpired
+    };
+  }
+
+  async activateTrainerSubscription(userId: string): Promise<Trainer | undefined> {
+    const trainer = Array.from(this.trainers.values())
+      .find(t => t.userId === userId);
+    
+    if (!trainer) return undefined;
+
+    const now = new Date();
+    const subscriptionExpiresAt = new Date(now);
+    subscriptionExpiresAt.setMonth(subscriptionExpiresAt.getMonth() + 1); // Add 1 month
+
+    const updatedTrainer: Trainer = {
+      ...trainer,
+      subscriptionStatus: "active",
+      lastPaymentDate: now,
+      subscriptionExpiresAt,
+    };
+
+    this.trainers.set(trainer.id, updatedTrainer);
+    return updatedTrainer;
+  }
+
+  async cancelTrainerSubscription(userId: string): Promise<Trainer | undefined> {
+    const trainer = Array.from(this.trainers.values())
+      .find(t => t.userId === userId);
+    
+    if (!trainer) return undefined;
+
+    const updatedTrainer: Trainer = {
+      ...trainer,
+      subscriptionStatus: "inactive",
+    };
+
+    this.trainers.set(trainer.id, updatedTrainer);
+    return updatedTrainer;
+  }
+
+  async getTotalSubscriptionRevenue(): Promise<{ totalRevenue: number; activeTrainers: number }> {
+    const activeTrainers = Array.from(this.trainers.values())
+      .filter(trainer => trainer.subscriptionStatus === "active");
+    
+    // Each active trainer pays $25/month, calculate estimated monthly revenue
+    const totalRevenue = activeTrainers.length * 25; // $25 per trainer per month
+
+    return {
+      totalRevenue: totalRevenue * 100, // Convert to cents for consistency
+      activeTrainers: activeTrainers.length
+    };
   }
 }
 
