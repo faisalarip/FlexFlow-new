@@ -1,17 +1,39 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { Search, MapPin, DollarSign, Star, User, Clock } from "lucide-react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Search, MapPin, DollarSign, Star, User, Clock, Plus, Award } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import type { TrainerWithServices } from "@shared/schema";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
+import type { TrainerWithServices, Trainer } from "@shared/schema";
+
+const trainerSignupSchema = z.object({
+  bio: z.string().min(50, "Bio must be at least 50 characters"),
+  specialties: z.array(z.string()).min(1, "Select at least one specialty"),
+  experience: z.string().min(1, "Experience is required"),
+  hourlyRate: z.string().min(1, "Hourly rate is required"),
+  location: z.string().optional(),
+  certifications: z.array(z.string()).optional(),
+});
 
 export default function Trainers() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedSpecialty, setSelectedSpecialty] = useState("all");
   const [maxRate, setMaxRate] = useState("");
+  const [showSignupDialog, setShowSignupDialog] = useState(false);
+  
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const { data: trainers, isLoading } = useQuery<TrainerWithServices[]>({
     queryKey: ["/api/trainers", { 
@@ -19,6 +41,51 @@ export default function Trainers() {
       ...(maxRate && { maxRate: parseInt(maxRate) * 100 }),
       ...(searchQuery && { location: searchQuery })
     }],
+  });
+
+  const { data: currentUserTrainer } = useQuery<Trainer>({
+    queryKey: ["/api/trainers/me"],
+    retry: false,
+  });
+
+  const form = useForm<z.infer<typeof trainerSignupSchema>>({
+    resolver: zodResolver(trainerSignupSchema),
+    defaultValues: {
+      bio: "",
+      specialties: [],
+      experience: "",
+      hourlyRate: "",
+      location: "",
+      certifications: [],
+    },
+  });
+
+  const createTrainerMutation = useMutation({
+    mutationFn: async (data: z.infer<typeof trainerSignupSchema>) => {
+      const response = await apiRequest("POST", "/api/trainers", {
+        bio: data.bio,
+        specialties: data.specialties,
+        experience: parseInt(data.experience),
+        hourlyRate: parseInt(data.hourlyRate) * 100, // Convert to cents
+        location: data.location || null,
+        certifications: data.certifications || [],
+      });
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({ title: "Success!", description: "You're now registered as a trainer!" });
+      queryClient.invalidateQueries({ queryKey: ["/api/trainers"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/trainers/me"] });
+      setShowSignupDialog(false);
+      form.reset();
+    },
+    onError: () => {
+      toast({ 
+        title: "Error", 
+        description: "Failed to register as trainer", 
+        variant: "destructive" 
+      });
+    }
   });
 
   const specialties = [
@@ -66,8 +133,185 @@ export default function Trainers() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Find Your Perfect Trainer</h1>
-          <p className="text-gray-600">Connect with certified personal trainers in your area</p>
+          <div className="flex justify-between items-start">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">Find Your Perfect Trainer</h1>
+              <p className="text-gray-600">Connect with certified personal trainers in your area</p>
+            </div>
+            
+            {!currentUserTrainer && (
+              <Dialog open={showSignupDialog} onOpenChange={setShowSignupDialog}>
+                <DialogTrigger asChild>
+                  <Button className="flex items-center space-x-2">
+                    <Award size={16} />
+                    <span>Become a Trainer</span>
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl">
+                  <DialogHeader>
+                    <DialogTitle>Become a Certified Trainer</DialogTitle>
+                  </DialogHeader>
+                  
+                  <Form {...form}>
+                    <form onSubmit={form.handleSubmit((data) => createTrainerMutation.mutate(data))} className="space-y-4">
+                      <FormField
+                        control={form.control}
+                        name="bio"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Professional Bio</FormLabel>
+                            <FormControl>
+                              <Textarea 
+                                placeholder="Tell clients about your training philosophy, experience, and what makes you unique..."
+                                className="min-h-[100px]"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="experience"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Years of Experience</FormLabel>
+                              <FormControl>
+                                <Input type="number" min="0" placeholder="5" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="hourlyRate"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Hourly Rate ($)</FormLabel>
+                              <FormControl>
+                                <Input type="number" min="0" placeholder="75" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      <FormField
+                        control={form.control}
+                        name="location"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Location (Optional)</FormLabel>
+                            <FormControl>
+                              <Input placeholder="New York, NY" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="specialties"
+                        render={() => (
+                          <FormItem>
+                            <FormLabel>Specialties</FormLabel>
+                            <div className="grid grid-cols-2 gap-3">
+                              {specialties.slice(1).map((specialty) => (
+                                <FormField
+                                  key={specialty.value}
+                                  control={form.control}
+                                  name="specialties"
+                                  render={({ field }) => {
+                                    return (
+                                      <FormItem
+                                        key={specialty.value}
+                                        className="flex flex-row items-start space-x-3 space-y-0"
+                                      >
+                                        <FormControl>
+                                          <Checkbox
+                                            checked={field.value?.includes(specialty.value)}
+                                            onCheckedChange={(checked) => {
+                                              return checked
+                                                ? field.onChange([...field.value, specialty.value])
+                                                : field.onChange(
+                                                    field.value?.filter(
+                                                      (value) => value !== specialty.value
+                                                    )
+                                                  )
+                                            }}
+                                          />
+                                        </FormControl>
+                                        <FormLabel className="font-normal">
+                                          {specialty.label}
+                                        </FormLabel>
+                                      </FormItem>
+                                    )
+                                  }}
+                                />
+                              ))}
+                            </div>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="certifications"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Certifications (Optional)</FormLabel>
+                            <FormControl>
+                              <Textarea 
+                                placeholder="List your certifications, one per line (e.g., ACSM-CPT, NASM-CPT)"
+                                {...field}
+                                onChange={(e) => field.onChange(e.target.value.split('\n').filter(cert => cert.trim()))}
+                                value={field.value?.join('\n') || ''}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <div className="flex justify-end space-x-3">
+                        <Button 
+                          type="button" 
+                          variant="outline" 
+                          onClick={() => setShowSignupDialog(false)}
+                        >
+                          Cancel
+                        </Button>
+                        <Button 
+                          type="submit" 
+                          disabled={createTrainerMutation.isPending}
+                        >
+                          {createTrainerMutation.isPending ? "Creating..." : "Become a Trainer"}
+                        </Button>
+                      </div>
+                    </form>
+                  </Form>
+                </DialogContent>
+              </Dialog>
+            )}
+
+            {currentUserTrainer && (
+              <div className="text-right">
+                <Badge variant="secondary" className="mb-2">
+                  <Award className="mr-1" size={14} />
+                  Trainer
+                </Badge>
+                <p className="text-sm text-gray-600">You're already a registered trainer!</p>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Search and Filters */}

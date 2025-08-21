@@ -446,6 +446,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get current user's trainer profile
+  app.get("/api/trainers/me", async (req, res) => {
+    try {
+      const trainer = await storage.getTrainerByUserId(CURRENT_USER_ID);
+      if (!trainer) {
+        return res.status(404).json({ message: "User is not a trainer" });
+      }
+      res.json(trainer);
+    } catch (error) {
+      console.error("Error fetching user trainer profile:", error);
+      res.status(500).json({ message: "Failed to fetch trainer profile" });
+    }
+  });
+
+  // Create trainer profile for current user
+  app.post("/api/trainers", async (req, res) => {
+    try {
+      // Check if user is already a trainer
+      const existingTrainer = await storage.getTrainerByUserId(CURRENT_USER_ID);
+      if (existingTrainer) {
+        return res.status(400).json({ message: "User is already a trainer" });
+      }
+
+      const data = insertTrainerSchema.parse({
+        ...req.body,
+        userId: CURRENT_USER_ID
+      });
+      
+      const trainer = await storage.createTrainer(data);
+      res.status(201).json(trainer);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid trainer data", errors: error.errors });
+      }
+      console.error("Error creating trainer:", error);
+      res.status(500).json({ message: "Failed to create trainer" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
