@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Home, Users, Calendar, Trophy, Activity, Camera, Award, MapPin, MessageSquare, Moon, Sun, ChefHat, CreditCard, Star, ChevronDown, Menu } from "lucide-react";
+import { Home, Users, Calendar, Trophy, Activity, Camera, Award, MapPin, MessageSquare, Moon, Sun, ChefHat, CreditCard, Star, ChevronDown, Menu, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -144,7 +144,7 @@ export default function Navbar() {
             </DropdownMenu>
           </div>
 
-          <div className="flex items-center">
+          <div className="flex items-center space-x-2">
             <Button
               variant="ghost"
               size="sm"
@@ -156,6 +156,17 @@ export default function Navbar() {
               ) : (
                 <Sun size={20} />
               )}
+            </Button>
+            
+            <Button
+              variant="ghost"
+              size="sm"
+              asChild
+              className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
+            >
+              <a href="/api/logout">
+                <LogOut size={20} />
+              </a>
             </Button>
           </div>
         </div>
