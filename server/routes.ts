@@ -720,6 +720,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Commission tracking routes
+
+  // Mark booking as paid and calculate commission
+  app.post("/api/bookings/:id/mark-paid", async (req, res) => {
+    try {
+      const bookingId = req.params.id;
+      const { totalPrice } = req.body;
+      
+      if (!totalPrice || typeof totalPrice !== "number" || totalPrice <= 0) {
+        return res.status(400).json({ message: "Valid total price is required" });
+      }
+      
+      const updatedBooking = await storage.markBookingAsPaid(bookingId, Math.round(totalPrice * 100)); // Convert to cents
+      if (!updatedBooking) {
+        return res.status(404).json({ message: "Booking not found" });
+      }
+      
+      res.json({
+        ...updatedBooking,
+        totalPrice: updatedBooking.totalPrice / 100, // Convert back to dollars for response
+        trainerEarnings: (updatedBooking.trainerEarnings || 0) / 100,
+        platformCommission: (updatedBooking.platformCommission || 0) / 100,
+      });
+    } catch (error) {
+      console.error("Error marking booking as paid:", error);
+      res.status(500).json({ message: "Failed to process payment" });
+    }
+  });
+
+  // Get total platform commission earnings
+  app.get("/api/admin/commissions", async (req, res) => {
+    try {
+      const commissionData = await storage.getTotalCommissions();
+      res.json({
+        totalCommissions: commissionData.totalCommissions / 100, // Convert to dollars
+        totalBookings: commissionData.totalBookings,
+        commissionRate: 35, // 35% commission rate
+      });
+    } catch (error) {
+      console.error("Error fetching commission data:", error);
+      res.status(500).json({ message: "Failed to fetch commission data" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

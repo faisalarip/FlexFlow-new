@@ -131,6 +131,10 @@ export interface IStorage {
   createMealPlan(mealPlan: InsertMealPlan): Promise<MealPlan>;
   getUserMealPlan(userId: string): Promise<UserMealPlanWithDetails | undefined>;
   assignMealPlan(userMealPlan: InsertUserMealPlan): Promise<UserMealPlan>;
+
+  // Commission tracking
+  getTotalCommissions(): Promise<{ totalCommissions: number; totalBookings: number }>;
+  markBookingAsPaid(bookingId: string, totalPrice: number): Promise<Booking | undefined>;
 }
 
 export class MemStorage implements IStorage {
@@ -1260,6 +1264,40 @@ export class MemStorage implements IStorage {
         this.mealPlanMeals.set(mealId, mealPlanMeal);
       });
     }
+  }
+
+  // Commission tracking methods
+  async getTotalCommissions(): Promise<{ totalCommissions: number; totalBookings: number }> {
+    const paidBookings = Array.from(this.bookings.values())
+      .filter(booking => booking.status === "paid" && booking.platformCommission);
+    
+    const totalCommissions = paidBookings.reduce((total, booking) => 
+      total + (booking.platformCommission || 0), 0);
+    
+    return {
+      totalCommissions,
+      totalBookings: paidBookings.length
+    };
+  }
+
+  async markBookingAsPaid(bookingId: string, totalPrice: number): Promise<Booking | undefined> {
+    const booking = this.bookings.get(bookingId);
+    if (!booking) return undefined;
+
+    // Calculate 35% commission for platform
+    const platformCommission = Math.round(totalPrice * 0.35);
+    const trainerEarnings = totalPrice - platformCommission;
+
+    const updatedBooking: Booking = {
+      ...booking,
+      status: "paid",
+      totalPrice,
+      platformCommission,
+      trainerEarnings,
+    };
+
+    this.bookings.set(bookingId, updatedBooking);
+    return updatedBooking;
   }
 }
 
