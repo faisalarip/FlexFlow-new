@@ -1,8 +1,8 @@
-# FitTracker - Fitness Tracking Application
+# FlexFlow - Fitness and Wellness Application
 
 ## Overview
 
-FitTracker is a modern fitness tracking web application built with React and Express. It allows users to log workouts, track progress, set goals, and visualize their fitness journey through an intuitive dashboard. The application features a comprehensive exercise database, workout logging capabilities, progress visualization, and goal management system.
+FlexFlow is a comprehensive fitness and wellness application built with React and Express. It combines workout tracking, trainer marketplace, and AI-powered food scanning into a unified platform. Users can log workouts, track progress, set goals, book personal trainers, and monitor nutrition through an intuitive dashboard.
 
 ## User Preferences
 
