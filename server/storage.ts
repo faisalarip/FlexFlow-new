@@ -24,7 +24,12 @@ import {
   type UserStats,
   type FoodEntry,
   type InsertFoodEntry,
-  type LeaderboardEntry
+  type LeaderboardEntry,
+  type MileTrackerSession,
+  type MileTrackerSplit,
+  type MileTrackerSessionWithSplits,
+  type InsertMileTrackerSession,
+  type InsertMileTrackerSplit
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 
@@ -92,6 +97,15 @@ export interface IStorage {
   createFoodEntry(foodEntry: InsertFoodEntry): Promise<FoodEntry>;
   updateFoodEntry(id: string, updates: Partial<FoodEntry>): Promise<FoodEntry | undefined>;
   deleteFoodEntry(id: string): Promise<boolean>;
+
+  // Mile Tracker
+  getMileTrackerSessions(userId: string): Promise<MileTrackerSessionWithSplits[]>;
+  getMileTrackerSession(id: string): Promise<MileTrackerSessionWithSplits | undefined>;
+  getActiveMileTrackerSession(userId: string): Promise<MileTrackerSessionWithSplits | undefined>;
+  createMileTrackerSession(session: InsertMileTrackerSession): Promise<MileTrackerSession>;
+  updateMileTrackerSession(id: string, updates: Partial<MileTrackerSession>): Promise<MileTrackerSession | undefined>;
+  createMileTrackerSplit(split: InsertMileTrackerSplit): Promise<MileTrackerSplit>;
+  getMileTrackerSplits(sessionId: string): Promise<MileTrackerSplit[]>;
 }
 
 export class MemStorage implements IStorage {
@@ -105,6 +119,8 @@ export class MemStorage implements IStorage {
   private bookings: Map<string, Booking> = new Map();
   private trainerReviews: Map<string, TrainerReview> = new Map();
   private foodEntries: Map<string, FoodEntry> = new Map();
+  private mileTrackerSessions: Map<string, MileTrackerSession> = new Map();
+  private mileTrackerSplits: Map<string, MileTrackerSplit> = new Map();
 
   constructor() {
     this.seedExercises();
@@ -794,6 +810,77 @@ export class MemStorage implements IStorage {
     });
 
     return leaderboardEntries;
+  }
+
+  // Mile Tracker Sessions
+  async getMileTrackerSessions(userId: string): Promise<MileTrackerSessionWithSplits[]> {
+    const sessions = Array.from(this.mileTrackerSessions.values())
+      .filter(session => session.userId === userId)
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+    const sessionsWithSplits: MileTrackerSessionWithSplits[] = [];
+    for (const session of sessions) {
+      const splits = await this.getMileTrackerSplits(session.id);
+      sessionsWithSplits.push({ ...session, splits });
+    }
+
+    return sessionsWithSplits;
+  }
+
+  async getMileTrackerSession(id: string): Promise<MileTrackerSessionWithSplits | undefined> {
+    const session = this.mileTrackerSessions.get(id);
+    if (!session) return undefined;
+
+    const splits = await this.getMileTrackerSplits(session.id);
+    return { ...session, splits };
+  }
+
+  async getActiveMileTrackerSession(userId: string): Promise<MileTrackerSessionWithSplits | undefined> {
+    const activeSession = Array.from(this.mileTrackerSessions.values())
+      .find(session => session.userId === userId && session.status === "active");
+    
+    if (!activeSession) return undefined;
+
+    const splits = await this.getMileTrackerSplits(activeSession.id);
+    return { ...activeSession, splits };
+  }
+
+  async createMileTrackerSession(session: InsertMileTrackerSession): Promise<MileTrackerSession> {
+    const newSession: MileTrackerSession = {
+      id: randomUUID(),
+      ...session,
+      createdAt: new Date(),
+      startedAt: session.startedAt || new Date(),
+    };
+    
+    this.mileTrackerSessions.set(newSession.id, newSession);
+    return newSession;
+  }
+
+  async updateMileTrackerSession(id: string, updates: Partial<MileTrackerSession>): Promise<MileTrackerSession | undefined> {
+    const session = this.mileTrackerSessions.get(id);
+    if (!session) return undefined;
+
+    const updatedSession = { ...session, ...updates };
+    this.mileTrackerSessions.set(id, updatedSession);
+    return updatedSession;
+  }
+
+  async createMileTrackerSplit(split: InsertMileTrackerSplit): Promise<MileTrackerSplit> {
+    const newSplit: MileTrackerSplit = {
+      id: randomUUID(),
+      ...split,
+      completedAt: split.completedAt || new Date(),
+    };
+    
+    this.mileTrackerSplits.set(newSplit.id, newSplit);
+    return newSplit;
+  }
+
+  async getMileTrackerSplits(sessionId: string): Promise<MileTrackerSplit[]> {
+    return Array.from(this.mileTrackerSplits.values())
+      .filter(split => split.sessionId === sessionId)
+      .sort((a, b) => a.mileNumber - b.mileNumber);
   }
 }
 

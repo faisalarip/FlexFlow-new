@@ -244,3 +244,49 @@ export type LeaderboardEntry = {
   totalReps: number;
   rank: number;
 };
+
+// Mile Tracker tables
+export const mileTrackerSessions = pgTable("mile_tracker_sessions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  activityType: text("activity_type").notNull(), // run, walk, bike
+  totalDistance: integer("total_distance").notNull(), // distance in miles * 1000 (for precision)
+  totalTime: integer("total_time").notNull(), // total time in seconds
+  averagePace: integer("average_pace"), // average seconds per mile
+  status: text("status").notNull().default("active"), // active, completed, paused
+  startedAt: timestamp("started_at").defaultNow().notNull(),
+  completedAt: timestamp("completed_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const mileTrackerSplits = pgTable("mile_tracker_splits", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  sessionId: varchar("session_id").references(() => mileTrackerSessions.id).notNull(),
+  mileNumber: integer("mile_number").notNull(), // 1, 2, 3, etc.
+  splitTime: integer("split_time").notNull(), // time for this mile in seconds
+  cumulativeTime: integer("cumulative_time").notNull(), // total time up to this mile
+  pace: integer("pace").notNull(), // seconds per mile for this split
+  completedAt: timestamp("completed_at").defaultNow().notNull(),
+});
+
+// Mile Tracker insert schemas
+export const insertMileTrackerSessionSchema = createInsertSchema(mileTrackerSessions).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertMileTrackerSplitSchema = createInsertSchema(mileTrackerSplits).omit({
+  id: true,
+});
+
+// Mile Tracker types
+export type InsertMileTrackerSession = z.infer<typeof insertMileTrackerSessionSchema>;
+export type MileTrackerSession = typeof mileTrackerSessions.$inferSelect;
+
+export type InsertMileTrackerSplit = z.infer<typeof insertMileTrackerSplitSchema>;
+export type MileTrackerSplit = typeof mileTrackerSplits.$inferSelect;
+
+// Extended types for API responses
+export type MileTrackerSessionWithSplits = MileTrackerSession & {
+  splits: MileTrackerSplit[];
+};

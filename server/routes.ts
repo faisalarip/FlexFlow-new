@@ -9,7 +9,9 @@ import {
   insertTrainerServiceSchema,
   insertBookingSchema,
   insertTrainerReviewSchema,
-  insertFoodEntrySchema 
+  insertFoodEntrySchema,
+  insertMileTrackerSessionSchema,
+  insertMileTrackerSplitSchema
 } from "@shared/schema";
 import { z } from "zod";
 import { ObjectStorageService } from "./objectStorage";
@@ -482,6 +484,114 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       console.error("Error creating trainer:", error);
       res.status(500).json({ message: "Failed to create trainer" });
+    }
+  });
+
+  // Mile Tracker Routes
+
+  // Get all mile tracker sessions for user
+  app.get("/api/mile-tracker/sessions", async (req, res) => {
+    try {
+      const sessions = await storage.getMileTrackerSessions(CURRENT_USER_ID);
+      res.json(sessions);
+    } catch (error) {
+      console.error("Error fetching mile tracker sessions:", error);
+      res.status(500).json({ message: "Failed to fetch sessions" });
+    }
+  });
+
+  // Get active mile tracker session
+  app.get("/api/mile-tracker/sessions/active", async (req, res) => {
+    try {
+      const activeSession = await storage.getActiveMileTrackerSession(CURRENT_USER_ID);
+      if (!activeSession) {
+        return res.status(404).json({ message: "No active session found" });
+      }
+      res.json(activeSession);
+    } catch (error) {
+      console.error("Error fetching active mile tracker session:", error);
+      res.status(500).json({ message: "Failed to fetch active session" });
+    }
+  });
+
+  // Get specific mile tracker session
+  app.get("/api/mile-tracker/sessions/:id", async (req, res) => {
+    try {
+      const session = await storage.getMileTrackerSession(req.params.id);
+      if (!session) {
+        return res.status(404).json({ message: "Session not found" });
+      }
+      res.json(session);
+    } catch (error) {
+      console.error("Error fetching mile tracker session:", error);
+      res.status(500).json({ message: "Failed to fetch session" });
+    }
+  });
+
+  // Start new mile tracker session
+  app.post("/api/mile-tracker/sessions", async (req, res) => {
+    try {
+      // Check if there's already an active session
+      const activeSession = await storage.getActiveMileTrackerSession(CURRENT_USER_ID);
+      if (activeSession) {
+        return res.status(400).json({ message: "There's already an active session" });
+      }
+
+      const data = insertMileTrackerSessionSchema.parse({
+        ...req.body,
+        userId: CURRENT_USER_ID,
+        status: "active"
+      });
+      
+      const session = await storage.createMileTrackerSession(data);
+      res.status(201).json(session);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid session data", errors: error.errors });
+      }
+      console.error("Error creating mile tracker session:", error);
+      res.status(500).json({ message: "Failed to create session" });
+    }
+  });
+
+  // Update mile tracker session (for completing, pausing, etc.)
+  app.patch("/api/mile-tracker/sessions/:id", async (req, res) => {
+    try {
+      const session = await storage.updateMileTrackerSession(req.params.id, req.body);
+      if (!session) {
+        return res.status(404).json({ message: "Session not found" });
+      }
+      res.json(session);
+    } catch (error) {
+      console.error("Error updating mile tracker session:", error);
+      res.status(500).json({ message: "Failed to update session" });
+    }
+  });
+
+  // Add mile split to session
+  app.post("/api/mile-tracker/sessions/:sessionId/splits", async (req, res) => {
+    try {
+      const sessionId = req.params.sessionId;
+      
+      // Verify session exists and belongs to user
+      const session = await storage.getMileTrackerSession(sessionId);
+      if (!session || session.userId !== CURRENT_USER_ID) {
+        return res.status(404).json({ message: "Session not found" });
+      }
+
+      const data = insertMileTrackerSplitSchema.parse({
+        ...req.body,
+        sessionId
+      });
+      
+      const split = await storage.createMileTrackerSplit(data);
+      res.status(201).json(split);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid split data", errors: error.errors });
+      }
+      console.error("Error creating mile split:", error);
+      res.status(500).json({ message: "Failed to create split" });
     }
   });
 
