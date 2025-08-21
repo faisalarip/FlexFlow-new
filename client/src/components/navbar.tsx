@@ -1,13 +1,19 @@
 import { Link, useLocation } from "wouter";
-import { Home, Users, Calendar, Trophy, Activity, Camera, Award, MapPin, MessageSquare, Moon, Sun, ChefHat, CreditCard, Star } from "lucide-react";
+import { Home, Users, Calendar, Trophy, Activity, Camera, Award, MapPin, MessageSquare, Moon, Sun, ChefHat, CreditCard, Star, ChevronDown, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useTheme } from "@/hooks/useTheme";
 
 export default function Navbar() {
   const [location] = useLocation();
   const { theme, toggleTheme } = useTheme();
 
-  const navItems = [
+  const mainNavItems = [
     { 
       path: "/", 
       label: "Dashboard", 
@@ -17,7 +23,10 @@ export default function Navbar() {
       path: "/trainers", 
       label: "Trainers", 
       icon: Users 
-    },
+    }
+  ];
+
+  const dropdownItems = [
     { 
       path: "/bookings", 
       label: "Bookings", 
@@ -60,6 +69,8 @@ export default function Navbar() {
     }
   ];
 
+  const isDropdownActive = dropdownItems.some(item => location === item.path);
+
   return (
     <nav className="bg-white dark:bg-gray-900 shadow-sm border-b border-gray-200 dark:border-gray-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -72,7 +83,8 @@ export default function Navbar() {
           </div>
 
           <div className="flex items-center space-x-8">
-            {navItems.map((item) => {
+            {/* Main navigation items */}
+            {mainNavItems.map((item) => {
               const Icon = item.icon;
               const isActive = location === item.path || 
                 (item.path === "/trainers" && location.startsWith("/trainers"));
@@ -92,6 +104,44 @@ export default function Navbar() {
                 </Link>
               );
             })}
+
+            {/* Dropdown menu for additional items */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  className={`flex items-center space-x-2 px-3 py-2 text-sm font-medium transition-colors ${
+                    isDropdownActive
+                      ? "text-primary bg-primary/10"
+                      : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800"
+                  }`}
+                >
+                  <Menu size={18} />
+                  <span>More</span>
+                  <ChevronDown size={14} />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                {dropdownItems.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = location === item.path;
+                  
+                  return (
+                    <DropdownMenuItem key={item.path} asChild>
+                      <Link 
+                        href={item.path}
+                        className={`flex items-center space-x-3 px-2 py-2 w-full cursor-pointer ${
+                          isActive ? "bg-primary/10 text-primary" : ""
+                        }`}
+                      >
+                        <Icon size={16} />
+                        <span>{item.label}</span>
+                      </Link>
+                    </DropdownMenuItem>
+                  );
+                })}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
           <div className="flex items-center">
