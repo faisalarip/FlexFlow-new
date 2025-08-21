@@ -23,7 +23,8 @@ import {
   type TrainerReviewWithUser,
   type UserStats,
   type FoodEntry,
-  type InsertFoodEntry
+  type InsertFoodEntry,
+  type LeaderboardEntry
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 
@@ -58,6 +59,9 @@ export interface IStorage {
   
   // Stats
   getUserStats(userId: string): Promise<UserStats>;
+  
+  // Leaderboard
+  getLeaderboard(): Promise<LeaderboardEntry[]>;
   
   // Trainers
   getTrainers(filters?: { specialties?: string[], location?: string, maxRate?: number }): Promise<TrainerWithServices[]>;
@@ -752,6 +756,44 @@ export class MemStorage implements IStorage {
 
   async deleteFoodEntry(id: string): Promise<boolean> {
     return this.foodEntries.delete(id);
+  }
+
+  async getLeaderboard(): Promise<LeaderboardEntry[]> {
+    // Calculate total reps for each user
+    const userReps = new Map<string, number>();
+    
+    // Iterate through all workout exercises to sum up reps per user
+    for (const workoutExercise of Array.from(this.workoutExercises.values())) {
+      const workout = this.workouts.get(workoutExercise.workoutId);
+      if (workout && workoutExercise.reps) {
+        const currentReps = userReps.get(workout.userId) || 0;
+        userReps.set(workout.userId, currentReps + workoutExercise.reps);
+      }
+    }
+
+    // Convert to leaderboard entries with user details
+    const leaderboardEntries: LeaderboardEntry[] = [];
+    
+    for (const [userId, totalReps] of Array.from(userReps.entries())) {
+      const user = this.users.get(userId);
+      if (user) {
+        leaderboardEntries.push({
+          userId: user.id,
+          username: user.username,
+          name: user.name,
+          totalReps,
+          rank: 0 // Will be set after sorting
+        });
+      }
+    }
+
+    // Sort by total reps (descending) and assign ranks
+    leaderboardEntries.sort((a, b) => b.totalReps - a.totalReps);
+    leaderboardEntries.forEach((entry, index) => {
+      entry.rank = index + 1;
+    });
+
+    return leaderboardEntries;
   }
 }
 

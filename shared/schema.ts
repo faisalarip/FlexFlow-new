@@ -236,3 +236,11 @@ export type UserStats = {
   caloriesBurned: number;
   personalRecords: number;
 };
+
+export type LeaderboardEntry = {
+  userId: string;
+  username: string;
+  name: string;
+  totalReps: number;
+  rank: number;
+};

@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Home, Users, Calendar, Trophy, Activity, Camera } from "lucide-react";
+import { Home, Users, Calendar, Trophy, Activity, Camera, Award } from "lucide-react";
 
 export default function Navbar() {
   const [location] = useLocation();
@@ -24,6 +24,11 @@ export default function Navbar() {
       path: "/food-scanner", 
       label: "Food Scanner", 
       icon: Camera 
+    },
+    { 
+      path: "/leaderboard", 
+      label: "Leaderboard", 
+      icon: Award 
     }
   ];
 
