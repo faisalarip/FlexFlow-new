@@ -1,6 +1,9 @@
 import { Dumbbell, Menu, User } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function NavigationHeader() {
+  const { user } = useAuth();
+  const userName = user ? `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email : 'User';
   return (
     <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -32,7 +35,7 @@ export default function NavigationHeader() {
               <Menu className="text-xl" />
             </button>
             <div className="hidden md:flex items-center space-x-3">
-              <span className="text-sm text-muted">John Doe</span>
+              <span className="text-sm text-muted">{userName}</span>
               <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
                 <User className="text-white text-sm" />
               </div>
