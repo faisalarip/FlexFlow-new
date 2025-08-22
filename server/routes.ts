@@ -63,9 +63,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get workouts
-  app.get("/api/workouts", async (req, res) => {
+  app.get("/api/workouts", isAuthenticated, async (req, res) => {
     try {
-      const workouts = await storage.getWorkouts(CURRENT_USER_ID);
+      const userId = getCurrentUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      const workouts = await storage.getWorkouts(userId);
       res.json(workouts);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch workouts" });
@@ -86,11 +90,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create workout
-  app.post("/api/workouts", async (req, res) => {
+  app.post("/api/workouts", isAuthenticated, async (req, res) => {
     try {
+      const userId = getCurrentUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
       const data = insertWorkoutSchema.parse({
         ...req.body,
-        userId: CURRENT_USER_ID,
+        userId: userId,
         date: new Date(req.body.date || Date.now())
       });
       
@@ -123,9 +131,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get user stats
-  app.get("/api/stats", async (req, res) => {
+  app.get("/api/stats", isAuthenticated, async (req, res) => {
     try {
-      const stats = await storage.getUserStats(CURRENT_USER_ID);
+      const userId = getCurrentUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      const stats = await storage.getUserStats(userId);
       res.json(stats);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch stats" });
@@ -133,9 +145,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get goals
-  app.get("/api/goals", async (req, res) => {
+  app.get("/api/goals", isAuthenticated, async (req, res) => {
     try {
-      const goals = await storage.getGoals(CURRENT_USER_ID);
+      const userId = getCurrentUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      const goals = await storage.getGoals(userId);
       res.json(goals);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch goals" });
@@ -143,11 +159,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create goal
-  app.post("/api/goals", async (req, res) => {
+  app.post("/api/goals", isAuthenticated, async (req, res) => {
     try {
+      const userId = getCurrentUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
       const data = insertGoalSchema.parse({
         ...req.body,
-        userId: CURRENT_USER_ID
+        userId: userId
       });
       
       const goal = await storage.createGoal(data);
@@ -174,12 +194,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get workouts by date range (for calendar)
-  app.get("/api/workouts/range/:start/:end", async (req, res) => {
+  app.get("/api/workouts/range/:start/:end", isAuthenticated, async (req, res) => {
     try {
+      const userId = getCurrentUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
       const startDate = new Date(req.params.start);
       const endDate = new Date(req.params.end);
       
-      const workouts = await storage.getWorkoutsByDateRange(CURRENT_USER_ID, startDate, endDate);
+      const workouts = await storage.getWorkoutsByDateRange(userId, startDate, endDate);
       res.json(workouts);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch workouts for date range" });
@@ -221,11 +245,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create trainer profile
-  app.post("/api/trainers", async (req, res) => {
+  app.post("/api/trainers", isAuthenticated, async (req, res) => {
     try {
+      const userId = getCurrentUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
       const data = insertTrainerSchema.parse({
         ...req.body,
-        userId: CURRENT_USER_ID
+        userId: userId
       });
       
       const trainer = await storage.createTrainer(data);
@@ -282,9 +310,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Booking Routes
 
   // Get user bookings
-  app.get("/api/bookings", async (req, res) => {
+  app.get("/api/bookings", isAuthenticated, async (req, res) => {
     try {
-      const bookings = await storage.getBookings(CURRENT_USER_ID);
+      const userId = getCurrentUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      const bookings = await storage.getBookings(userId);
       res.json(bookings);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch bookings" });
@@ -305,11 +337,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create booking
-  app.post("/api/bookings", async (req, res) => {
+  app.post("/api/bookings", isAuthenticated, async (req, res) => {
     try {
+      const userId = getCurrentUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
       const data = insertBookingSchema.parse({
         ...req.body,
-        userId: CURRENT_USER_ID,
+        userId: userId,
         scheduledAt: new Date(req.body.scheduledAt)
       });
       
@@ -337,11 +373,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create review for trainer
-  app.post("/api/reviews", async (req, res) => {
+  app.post("/api/reviews", isAuthenticated, async (req, res) => {
     try {
+      const userId = getCurrentUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
       const data = insertTrainerReviewSchema.parse({
         ...req.body,
-        userId: CURRENT_USER_ID
+        userId: userId
       });
       
       const review = await storage.createTrainerReview(data);
@@ -357,12 +397,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Food Routes
 
   // Get food entries for user
-  app.get("/api/food-entries", async (req, res) => {
+  app.get("/api/food-entries", isAuthenticated, async (req, res) => {
     try {
+      const userId = getCurrentUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
       const { date } = req.query;
       const targetDate = date ? new Date(date as string) : undefined;
       
-      const entries = await storage.getFoodEntries(CURRENT_USER_ID, targetDate);
+      const entries = await storage.getFoodEntries(userId, targetDate);
       res.json(entries);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch food entries" });
@@ -397,16 +441,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(analysis);
     } catch (error) {
       console.error("Error analyzing food:", error);
-      res.status(500).json({ message: error.message || "Failed to analyze food image" });
+      res.status(500).json({ message: (error as Error).message || "Failed to analyze food image" });
     }
   });
 
   // Create food entry
-  app.post("/api/food-entries", async (req, res) => {
+  app.post("/api/food-entries", isAuthenticated, async (req, res) => {
     try {
+      const userId = getCurrentUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
       const data = insertFoodEntrySchema.parse({
         ...req.body,
-        userId: CURRENT_USER_ID
+        userId: userId
       });
       
       const entry = await storage.createFoodEntry(data);
@@ -459,9 +507,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get current user's trainer profile
-  app.get("/api/trainers/me", async (req, res) => {
+  app.get("/api/trainers/me", isAuthenticated, async (req, res) => {
     try {
-      const trainer = await storage.getTrainerByUserId(CURRENT_USER_ID);
+      const userId = getCurrentUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      const trainer = await storage.getTrainerByUserId(userId);
       if (!trainer) {
         return res.status(404).json({ message: "User is not a trainer" });
       }
@@ -473,17 +525,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create trainer profile for current user
-  app.post("/api/trainers", async (req, res) => {
+  app.post("/api/trainers", isAuthenticated, async (req, res) => {
     try {
+      const userId = getCurrentUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
       // Check if user is already a trainer
-      const existingTrainer = await storage.getTrainerByUserId(CURRENT_USER_ID);
+      const existingTrainer = await storage.getTrainerByUserId(userId);
       if (existingTrainer) {
         return res.status(400).json({ message: "User is already a trainer" });
       }
 
       const data = insertTrainerSchema.parse({
         ...req.body,
-        userId: CURRENT_USER_ID
+        userId: userId
       });
       
       const trainer = await storage.createTrainer(data);
@@ -500,9 +556,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Mile Tracker Routes
 
   // Get all mile tracker sessions for user
-  app.get("/api/mile-tracker/sessions", async (req, res) => {
+  app.get("/api/mile-tracker/sessions", isAuthenticated, async (req, res) => {
     try {
-      const sessions = await storage.getMileTrackerSessions(CURRENT_USER_ID);
+      const userId = getCurrentUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      const sessions = await storage.getMileTrackerSessions(userId);
       res.json(sessions);
     } catch (error) {
       console.error("Error fetching mile tracker sessions:", error);
@@ -511,9 +571,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get active mile tracker session
-  app.get("/api/mile-tracker/sessions/active", async (req, res) => {
+  app.get("/api/mile-tracker/sessions/active", isAuthenticated, async (req, res) => {
     try {
-      const activeSession = await storage.getActiveMileTrackerSession(CURRENT_USER_ID);
+      const userId = getCurrentUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      const activeSession = await storage.getActiveMileTrackerSession(userId);
       if (!activeSession) {
         return res.status(404).json({ message: "No active session found" });
       }
@@ -539,17 +603,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Start new mile tracker session
-  app.post("/api/mile-tracker/sessions", async (req, res) => {
+  app.post("/api/mile-tracker/sessions", isAuthenticated, async (req, res) => {
     try {
+      const userId = getCurrentUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
       // Check if there's already an active session
-      const activeSession = await storage.getActiveMileTrackerSession(CURRENT_USER_ID);
+      const activeSession = await storage.getActiveMileTrackerSession(userId);
       if (activeSession) {
         return res.status(400).json({ message: "There's already an active session" });
       }
 
       const data = insertMileTrackerSessionSchema.parse({
         ...req.body,
-        userId: CURRENT_USER_ID,
+        userId: userId,
         status: "active"
       });
       
@@ -579,13 +647,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Add mile split to session
-  app.post("/api/mile-tracker/sessions/:sessionId/splits", async (req, res) => {
+  app.post("/api/mile-tracker/sessions/:sessionId/splits", isAuthenticated, async (req, res) => {
     try {
+      const userId = getCurrentUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
       const sessionId = req.params.sessionId;
       
       // Verify session exists and belongs to user
       const session = await storage.getMileTrackerSession(sessionId);
-      if (!session || session.userId !== CURRENT_USER_ID) {
+      if (!session || session.userId !== userId) {
         return res.status(404).json({ message: "Session not found" });
       }
 
@@ -620,11 +692,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create new community post
-  app.post("/api/community/posts", async (req, res) => {
+  app.post("/api/community/posts", isAuthenticated, async (req, res) => {
     try {
+      const userId = getCurrentUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
       const data = insertCommunityPostSchema.parse({
         ...req.body,
-        userId: CURRENT_USER_ID
+        userId: userId
       });
       
       const post = await storage.createCommunityPost(data);
@@ -696,9 +772,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get current user's meal plan
-  app.get("/api/user-meal-plan", async (req, res) => {
+  app.get("/api/user-meal-plan", isAuthenticated, async (req, res) => {
     try {
-      const userMealPlan = await storage.getUserMealPlan(CURRENT_USER_ID);
+      const userId = getCurrentUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      const userMealPlan = await storage.getUserMealPlan(userId);
       if (!userMealPlan) {
         return res.status(404).json({ message: "No active meal plan found" });
       }
@@ -710,11 +790,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Assign a meal plan to the current user
-  app.post("/api/user-meal-plan", async (req, res) => {
+  app.post("/api/user-meal-plan", isAuthenticated, async (req, res) => {
     try {
+      const userId = getCurrentUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
       const data = insertUserMealPlanSchema.parse({
         ...req.body,
-        userId: CURRENT_USER_ID
+        userId: userId
       });
       const userMealPlan = await storage.assignMealPlan(data);
       res.status(201).json(userMealPlan);
@@ -774,9 +858,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Trainer subscription management routes
 
   // Get current trainer subscription status
-  app.get("/api/trainer/subscription", async (req, res) => {
+  app.get("/api/trainer/subscription", isAuthenticated, async (req, res) => {
     try {
-      const subscriptionStatus = await storage.getTrainerSubscriptionStatus(CURRENT_USER_ID);
+      const userId = getCurrentUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      const subscriptionStatus = await storage.getTrainerSubscriptionStatus(userId);
       if (!subscriptionStatus) {
         return res.status(404).json({ message: "Trainer not found" });
       }
@@ -788,14 +876,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Activate trainer subscription (pay $25)
-  app.post("/api/trainer/subscription/activate", async (req, res) => {
+  app.post("/api/trainer/subscription/activate", isAuthenticated, async (req, res) => {
     try {
-      const updatedTrainer = await storage.activateTrainerSubscription(CURRENT_USER_ID);
+      const userId = getCurrentUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      const updatedTrainer = await storage.activateTrainerSubscription(userId);
       if (!updatedTrainer) {
         return res.status(404).json({ message: "Trainer not found" });
       }
       
-      const subscriptionStatus = await storage.getTrainerSubscriptionStatus(CURRENT_USER_ID);
+      const subscriptionStatus = await storage.getTrainerSubscriptionStatus(userId);
       res.json({
         message: "Subscription activated successfully",
         ...subscriptionStatus,
@@ -808,9 +900,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Cancel trainer subscription
-  app.post("/api/trainer/subscription/cancel", async (req, res) => {
+  app.post("/api/trainer/subscription/cancel", isAuthenticated, async (req, res) => {
     try {
-      const updatedTrainer = await storage.cancelTrainerSubscription(CURRENT_USER_ID);
+      const userId = getCurrentUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      const updatedTrainer = await storage.cancelTrainerSubscription(userId);
       if (!updatedTrainer) {
         return res.status(404).json({ message: "Trainer not found" });
       }
@@ -840,9 +936,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // User Subscription Routes
 
   // Get user subscription status
-  app.get("/api/user/subscription", async (req, res) => {
+  app.get("/api/user/subscription", isAuthenticated, async (req, res) => {
     try {
-      const user = await storage.getUser(CURRENT_USER_ID);
+      const userId = getCurrentUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      const user = await storage.getUser(userId);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
@@ -876,9 +976,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Activate paid subscription (after free trial or to reactivate)
-  app.post("/api/user/subscription/activate", async (req, res) => {
+  app.post("/api/user/subscription/activate", isAuthenticated, async (req, res) => {
     try {
-      const user = await storage.getUser(CURRENT_USER_ID);
+      const userId = getCurrentUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      const user = await storage.getUser(userId);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
@@ -886,7 +990,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const now = new Date();
       const nextExpiry = new Date(now.getTime() + (30 * 24 * 60 * 60 * 1000)); // 30 days from now
 
-      const updatedUser = await storage.updateUser(CURRENT_USER_ID, {
+      const updatedUser = await storage.updateUser(userId, {
         subscriptionStatus: "active",
         lastPaymentDate: now,
         subscriptionExpiresAt: nextExpiry
@@ -910,9 +1014,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Cancel user subscription
-  app.post("/api/user/subscription/cancel", async (req, res) => {
+  app.post("/api/user/subscription/cancel", isAuthenticated, async (req, res) => {
     try {
-      const updatedUser = await storage.updateUser(CURRENT_USER_ID, {
+      const userId = getCurrentUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      const updatedUser = await storage.updateUser(userId, {
         subscriptionStatus: "inactive"
       });
 
