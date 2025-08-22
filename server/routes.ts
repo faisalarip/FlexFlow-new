@@ -181,6 +181,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update user profile
+  app.patch("/api/user/profile", isAuthenticated, async (req, res) => {
+    try {
+      const userId = getCurrentUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      
+      const { firstName, lastName } = req.body;
+      if (!firstName?.trim() && !lastName?.trim()) {
+        return res.status(400).json({ message: "First name or last name is required" });
+      }
+      
+      const updatedUser = await storage.updateUser(userId, {
+        firstName: firstName?.trim() || null,
+        lastName: lastName?.trim() || null,
+        updatedAt: new Date()
+      });
+      
+      if (!updatedUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      res.json(updatedUser);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update profile" });
+    }
+  });
+
   // Get goals
   app.get("/api/goals", isAuthenticated, async (req, res) => {
     try {
