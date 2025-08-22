@@ -92,6 +92,11 @@ export interface IStorage {
     workoutFrequency: { date: string; count: number }[];
     streakHistory: { start: string; end: string; length: number }[];
   }>;
+  getWeightProgressData(userId: string): Promise<{
+    exerciseNames: string[];
+    maxWeights: number[];
+    progressOverTime: { exerciseName: string; dates: string[]; weights: number[] }[];
+  }>;
   
   // Leaderboard
   getLeaderboard(): Promise<LeaderboardEntry[]>;
@@ -594,6 +599,109 @@ export class MemStorage implements IStorage {
       consistencyPercentage7Days,
       workoutFrequency,
       streakHistory
+    };
+  }
+
+  async getWeightProgressData(userId: string): Promise<{
+    exerciseNames: string[];
+    maxWeights: number[];
+    progressOverTime: { exerciseName: string; dates: string[]; weights: number[] }[];
+  }> {
+    const userWorkouts = await this.getWorkouts(userId);
+    
+    if (userWorkouts.length === 0) {
+      return {
+        exerciseNames: [],
+        maxWeights: [],
+        progressOverTime: []
+      };
+    }
+
+    // Get all workout exercises for this user
+    const allWorkoutExercises: (WorkoutExercise & { exercise: Exercise; workoutDate: Date })[] = [];
+    
+    for (const workout of userWorkouts) {
+      const workoutExercises = await this.getWorkoutExercises(workout.id);
+      for (const we of workoutExercises) {
+        if (we.weight && we.weight > 0) { // Only include exercises with weight data
+          allWorkoutExercises.push({
+            ...we,
+            workoutDate: workout.date
+          });
+        }
+      }
+    }
+
+    if (allWorkoutExercises.length === 0) {
+      return {
+        exerciseNames: [],
+        maxWeights: [],
+        progressOverTime: []
+      };
+    }
+
+    // Group by exercise and find max weights
+    const exerciseWeightMap = new Map<string, { maxWeight: number; records: { date: Date; weight: number }[] }>();
+    
+    for (const we of allWorkoutExercises) {
+      const exerciseName = we.exercise.name;
+      const weight = we.weight!;
+      const date = we.workoutDate;
+      
+      if (!exerciseWeightMap.has(exerciseName)) {
+        exerciseWeightMap.set(exerciseName, {
+          maxWeight: weight,
+          records: [{ date, weight }]
+        });
+      } else {
+        const current = exerciseWeightMap.get(exerciseName)!;
+        current.maxWeight = Math.max(current.maxWeight, weight);
+        current.records.push({ date, weight });
+      }
+    }
+
+    // Sort exercises by max weight (descending) and take top 8 for chart readability
+    const sortedExercises = Array.from(exerciseWeightMap.entries())
+      .sort(([, a], [, b]) => b.maxWeight - a.maxWeight)
+      .slice(0, 8);
+
+    const exerciseNames = sortedExercises.map(([name]) => name);
+    const maxWeights = sortedExercises.map(([, data]) => data.maxWeight);
+
+    // Create progress over time data for trending
+    const progressOverTime = sortedExercises.map(([exerciseName, data]) => {
+      // Sort records by date and get progression
+      const sortedRecords = data.records.sort((a, b) => a.date.getTime() - b.date.getTime());
+      
+      // Group by week to reduce noise and show clear progression
+      const weeklyMaxes = new Map<string, number>();
+      
+      for (const record of sortedRecords) {
+        // Get the start of the week for this date
+        const weekStart = new Date(record.date);
+        weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+        const weekKey = weekStart.toISOString().split('T')[0];
+        
+        const currentMax = weeklyMaxes.get(weekKey) || 0;
+        weeklyMaxes.set(weekKey, Math.max(currentMax, record.weight));
+      }
+      
+      // Convert to arrays for chart
+      const sortedWeeks = Array.from(weeklyMaxes.entries()).sort((a, b) => a[0].localeCompare(b[0]));
+      const dates = sortedWeeks.map(([date]) => date);
+      const weights = sortedWeeks.map(([, weight]) => weight);
+      
+      return {
+        exerciseName,
+        dates,
+        weights
+      };
+    });
+
+    return {
+      exerciseNames,
+      maxWeights,
+      progressOverTime
     };
   }
 

@@ -167,6 +167,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get weight progress data for charts
+  app.get("/api/progress/weight", isAuthenticated, async (req, res) => {
+    try {
+      const userId = getCurrentUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      const weightProgress = await storage.getWeightProgressData(userId);
+      res.json(weightProgress);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch weight progress" });
+    }
+  });
+
   // Get goals
   app.get("/api/goals", isAuthenticated, async (req, res) => {
     try {

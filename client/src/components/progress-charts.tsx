@@ -2,6 +2,12 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
 import type { Workout } from "@shared/schema";
 
+interface WeightProgressData {
+  exerciseNames: string[];
+  maxWeights: number[];
+  progressOverTime: { exerciseName: string; dates: string[]; weights: number[] }[];
+}
+
 declare global {
   interface Window {
     Chart: any;
@@ -12,9 +18,15 @@ export default function ProgressCharts() {
   const { data: workouts } = useQuery<Workout[]>({
     queryKey: ["/api/workouts"],
   });
+  
+  const { data: weightProgress } = useQuery<WeightProgressData>({
+    queryKey: ["/api/progress/weight"],
+  });
 
   const frequencyChartRef = useRef<HTMLCanvasElement>(null);
   const weightChartRef = useRef<HTMLCanvasElement>(null);
+  const frequencyChartInstance = useRef<any>(null);
+  const weightChartInstance = useRef<any>(null);
 
   useEffect(() => {
     // Load Chart.js if not already loaded
@@ -28,7 +40,7 @@ export default function ProgressCharts() {
     } else {
       initializeCharts();
     }
-  }, [workouts]);
+  }, [workouts, weightProgress]);
 
   const initializeCharts = () => {
     if (!workouts || !window.Chart) return;
@@ -37,6 +49,11 @@ export default function ProgressCharts() {
     if (frequencyChartRef.current) {
       const ctx = frequencyChartRef.current.getContext('2d');
       if (ctx) {
+        // Destroy existing chart if it exists
+        if (frequencyChartInstance.current) {
+          frequencyChartInstance.current.destroy();
+        }
+        
         // Process workout data for the last 7 days
         const last7Days = Array.from({ length: 7 }, (_, i) => {
           const date = new Date();
@@ -51,7 +68,7 @@ export default function ProgressCharts() {
           }).length;
         });
 
-        new window.Chart(ctx, {
+        frequencyChartInstance.current = new window.Chart(ctx, {
           type: 'line',
           data: {
             labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
@@ -85,41 +102,74 @@ export default function ProgressCharts() {
       }
     }
 
-    // Weight Progress Chart (using sample data for demo)
-    if (weightChartRef.current) {
+    // Weight Progress Chart (using real workout data)
+    if (weightChartRef.current && weightProgress) {
       const ctx = weightChartRef.current.getContext('2d');
       if (ctx) {
-        new window.Chart(ctx, {
-          type: 'bar',
-          data: {
-            labels: ['Bench Press', 'Squats', 'Deadlift', 'Rows'],
-            datasets: [{
-              label: 'Max Weight (lbs)',
-              data: [185, 225, 275, 155],
-              backgroundColor: [
-                'rgba(30, 64, 175, 0.8)',
-                'rgba(5, 150, 105, 0.8)', 
-                'rgba(249, 115, 22, 0.8)',
-                'rgba(168, 85, 247, 0.8)'
-              ],
-              borderRadius: 6
-            }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-              legend: {
-                display: false
-              }
+        // Destroy existing chart if it exists
+        if (weightChartInstance.current) {
+          weightChartInstance.current.destroy();
+        }
+        
+        if (weightProgress.exerciseNames.length > 0) {
+          // Create color palette for exercises
+          const colors = [
+            'rgba(30, 64, 175, 0.8)',
+            'rgba(5, 150, 105, 0.8)',
+            'rgba(249, 115, 22, 0.8)',
+            'rgba(168, 85, 247, 0.8)',
+            'rgba(239, 68, 68, 0.8)',
+            'rgba(245, 158, 11, 0.8)',
+            'rgba(59, 130, 246, 0.8)',
+            'rgba(16, 185, 129, 0.8)'
+          ];
+          
+          weightChartInstance.current = new window.Chart(ctx, {
+            type: 'bar',
+            data: {
+              labels: weightProgress.exerciseNames,
+              datasets: [{
+                label: 'Max Weight (lbs)',
+                data: weightProgress.maxWeights,
+                backgroundColor: weightProgress.exerciseNames.map((_, i) => colors[i % colors.length]),
+                borderRadius: 6
+              }]
             },
-            scales: {
-              y: {
-                beginAtZero: true
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: {
+                  display: false
+                },
+                tooltip: {
+                  callbacks: {
+                    label: function(context: any) {
+                      return `Max Weight: ${context.parsed.y} lbs`;
+                    }
+                  }
+                }
+              },
+              scales: {
+                y: {
+                  beginAtZero: true,
+                  title: {
+                    display: true,
+                    text: 'Weight (lbs)'
+                  }
+                },
+                x: {
+                  ticks: {
+                    maxRotation: 45,
+                    font: {
+                      size: 10
+                    }
+                  }
+                }
               }
             }
-          }
-        });
+          });
+        }
       }
     }
   };
@@ -145,7 +195,18 @@ export default function ProgressCharts() {
         <div>
           <h4 className="font-medium text-gray-800 mb-3">Weight Progress</h4>
           <div className="h-48 bg-gray-50 rounded-xl flex items-center justify-center">
-            <canvas ref={weightChartRef} className="max-w-full max-h-full"></canvas>
+            {!weightProgress ? (
+              <div className="text-gray-500 text-sm text-center">
+                <div className="animate-pulse mb-2">Loading...</div>
+              </div>
+            ) : weightProgress.exerciseNames.length === 0 ? (
+              <div className="text-gray-500 text-sm text-center">
+                <div className="mb-2">📊 No weight data yet</div>
+                <div className="text-xs">Log workouts with weights to see your progress</div>
+              </div>
+            ) : (
+              <canvas ref={weightChartRef} className="max-w-full max-h-full" data-testid="weight-progress-chart"></canvas>
+            )}
           </div>
         </div>
       </div>
