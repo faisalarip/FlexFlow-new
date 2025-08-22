@@ -40,7 +40,7 @@ export default function Landing() {
                 Get Started Free
               </a>
             </Button>
-            <p className="text-sm text-gray-500">30-day free trial • No credit card required</p>
+            <p className="text-sm text-gray-500">30-day free trial</p>
           </div>
         </div>
 
