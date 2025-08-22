@@ -1,5 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import Stripe from "stripe";
 import { storage } from "./storage";
 import { 
   insertWorkoutSchema, 
@@ -14,12 +15,20 @@ import {
   insertMileTrackerSplitSchema,
   insertCommunityPostSchema,
   insertMealPlanSchema,
-  insertUserMealPlanSchema
+  insertUserMealPlanSchema,
+  insertPaymentSchema
 } from "@shared/schema";
 import { z } from "zod";
 import { ObjectStorageService } from "./objectStorage";
 import { analyzeFoodImage } from "./foodRecognition";
 import { setupAuth, isAuthenticated } from "./replitAuth";
+
+if (!process.env.STRIPE_SECRET_KEY) {
+  throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
+}
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+  apiVersion: "2024-06-20",
+});
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
@@ -178,6 +187,189 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       res.status(500).json({ message: "Failed to create goal" });
     }
+  });
+  
+  // Update goal
+  app.patch("/api/goals/:id", isAuthenticated, async (req, res) => {
+    try {
+      const userId = getCurrentUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      const { id } = req.params;
+      const updates = req.body;
+      
+      const goal = await storage.updateGoal(id, updates);
+      if (!goal) {
+        return res.status(404).json({ message: "Goal not found" });
+      }
+      
+      res.json(goal);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update goal" });
+    }
+  });
+
+  // Stripe payment routes
+  app.post("/api/create-payment-intent", isAuthenticated, async (req, res) => {
+    try {
+      const userId = getCurrentUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      
+      const { amount } = req.body;
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: Math.round(amount * 100), // Convert to cents
+        currency: "usd",
+        metadata: {
+          userId: userId
+        }
+      });
+      
+      // Store payment record
+      await storage.createPayment({
+        userId: userId,
+        stripePaymentIntentId: paymentIntent.id,
+        amount: Math.round(amount * 100),
+        currency: "usd",
+        status: "pending",
+        description: "FlexFlow Premium Payment"
+      });
+      
+      res.json({ clientSecret: paymentIntent.client_secret });
+    } catch (error: any) {
+      res
+        .status(500)
+        .json({ message: "Error creating payment intent: " + error.message });
+    }
+  });
+
+  // Create subscription
+  app.post('/api/get-or-create-subscription', isAuthenticated, async (req, res) => {
+    try {
+      const userId = getCurrentUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+
+      let user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // If user already has a subscription
+      if (user.stripeSubscriptionId) {
+        const subscription = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
+        const latestInvoice = await stripe.invoices.retrieve(subscription.latest_invoice as string, {
+          expand: ['payment_intent'],
+        });
+
+        res.json({
+          subscriptionId: subscription.id,
+          clientSecret: (latestInvoice.payment_intent as any)?.client_secret,
+        });
+        return;
+      }
+      
+      if (!user.email) {
+        throw new Error('No user email on file');
+      }
+
+      // Create customer if not exists
+      let customer;
+      if (user.stripeCustomerId) {
+        customer = await stripe.customers.retrieve(user.stripeCustomerId);
+      } else {
+        customer = await stripe.customers.create({
+          email: user.email,
+          name: `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email,
+        });
+        
+        await storage.updateStripeCustomerId(userId, customer.id);
+        user = await storage.getUser(userId); // Refresh user data
+      }
+
+      // Create subscription
+      const subscription = await stripe.subscriptions.create({
+        customer: customer.id,
+        items: [{
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: 'FlexFlow Premium',
+              description: 'Access to premium features including unlimited workouts, meal plans, and personal trainer booking'
+            },
+            unit_amount: 999, // $9.99
+            recurring: {
+              interval: 'month'
+            }
+          }
+        }],
+        payment_behavior: 'default_incomplete',
+        expand: ['latest_invoice.payment_intent'],
+      });
+
+      await storage.updateUserStripeInfo(userId, customer.id, subscription.id);
+  
+      res.json({
+        subscriptionId: subscription.id,
+        clientSecret: (subscription.latest_invoice as any)?.payment_intent?.client_secret,
+      });
+    } catch (error: any) {
+      console.error('Subscription error:', error);
+      return res.status(400).json({ error: { message: error.message } });
+    }
+  });
+
+  // Webhook for handling Stripe events
+  app.post('/api/stripe-webhook', async (req, res) => {
+    const sig = req.headers['stripe-signature'] as string;
+    let event;
+
+    try {
+      event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET || '');
+    } catch (err: any) {
+      console.log(`Webhook signature verification failed.`, err.message);
+      return res.status(400).send(`Webhook Error: ${err.message}`);
+    }
+
+    try {
+      switch (event.type) {
+        case 'payment_intent.succeeded':
+          const paymentIntent = event.data.object;
+          await storage.updatePayment(
+            paymentIntent.metadata.paymentId,
+            { status: 'succeeded' }
+          );
+          break;
+          
+        case 'payment_intent.payment_failed':
+          const failedPayment = event.data.object;
+          await storage.updatePayment(
+            failedPayment.metadata.paymentId,
+            { status: 'failed' }
+          );
+          break;
+          
+        case 'invoice.payment_succeeded':
+          const invoice = event.data.object;
+          const subscription = await stripe.subscriptions.retrieve(invoice.subscription as string);
+          
+          // Update user subscription status
+          const customer = await stripe.customers.retrieve(subscription.customer as string);
+          // Find user by customer ID and update subscription status
+          break;
+
+        default:
+          console.log(`Unhandled event type ${event.type}`);
+      }
+    } catch (error: any) {
+      console.error('Error processing webhook:', error);
+      return res.status(500).json({ error: error.message });
+    }
+
+    res.json({ received: true });
   });
 
   // Update goal

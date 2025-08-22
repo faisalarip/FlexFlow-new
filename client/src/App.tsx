@@ -17,6 +17,8 @@ import MileTracker from "@/pages/mile-tracker";
 import Community from "@/pages/community";
 import MealPlans from "@/pages/meal-plans";
 import Landing from "@/pages/landing";
+import Checkout from "@/pages/checkout";
+import Subscribe from "@/pages/subscribe";
 import NotFound from "@/pages/not-found";
 import Navbar from "@/components/navbar";
 
@@ -51,6 +53,8 @@ function Router() {
             <Route path="/mile-tracker" component={MileTracker} />
             <Route path="/community" component={Community} />
             <Route path="/meal-plans" component={MealPlans} />
+            <Route path="/checkout" component={Checkout} />
+            <Route path="/subscribe" component={Subscribe} />
           </>
         )}
         <Route component={NotFound} />

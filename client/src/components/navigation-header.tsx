@@ -1,5 +1,6 @@
 import { Dumbbell, Menu, User } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import PremiumBadge from "@/components/premium-badge";
 
 export default function NavigationHeader() {
   const { user } = useAuth();
@@ -48,6 +49,7 @@ export default function NavigationHeader() {
             <button className="md:hidden text-muted">
               <Menu className="text-xl" />
             </button>
+            <PremiumBadge />
             <div className="hidden md:flex items-center space-x-3">
               <span className="text-sm text-muted">{userName}</span>
               <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">

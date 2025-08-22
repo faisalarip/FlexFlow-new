@@ -43,7 +43,9 @@ import {
   type InsertMealPlanMeal,
   type UserMealPlan,
   type UserMealPlanWithDetails,
-  type InsertUserMealPlan
+  type InsertUserMealPlan,
+  type Payment,
+  type InsertPayment
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 
@@ -147,6 +149,7 @@ export class MemStorage implements IStorage {
   private workouts: Map<string, Workout> = new Map();
   private workoutExercises: Map<string, WorkoutExercise> = new Map();
   private goals: Map<string, Goal> = new Map();
+  private payments: Map<string, Payment> = new Map();
   private trainers: Map<string, Trainer> = new Map();
   private trainerServices: Map<string, TrainerService> = new Map();
   private bookings: Map<string, Booking> = new Map();
@@ -548,6 +551,61 @@ export class MemStorage implements IStorage {
       const updatedGoal = { ...goal, ...updates };
       this.goals.set(id, updatedGoal);
       return updatedGoal;
+    }
+    return undefined;
+  }
+
+  // Payment management
+  async createPayment(insertPayment: InsertPayment): Promise<Payment> {
+    const id = randomUUID();
+    const payment: Payment = {
+      ...insertPayment,
+      id,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.payments.set(id, payment);
+    return payment;
+  }
+
+  async getPayment(id: string): Promise<Payment | undefined> {
+    return this.payments.get(id);
+  }
+
+  async getPaymentByStripeId(stripePaymentIntentId: string): Promise<Payment | undefined> {
+    return Array.from(this.payments.values()).find(p => p.stripePaymentIntentId === stripePaymentIntentId);
+  }
+
+  async updatePayment(id: string, updates: Partial<Payment>): Promise<Payment | undefined> {
+    const payment = this.payments.get(id);
+    if (payment) {
+      const updatedPayment = { ...payment, ...updates, updatedAt: new Date() };
+      this.payments.set(id, updatedPayment);
+      return updatedPayment;
+    }
+    return undefined;
+  }
+
+  async getUserPayments(userId: string): Promise<Payment[]> {
+    return Array.from(this.payments.values()).filter(p => p.userId === userId);
+  }
+
+  async updateStripeCustomerId(userId: string, stripeCustomerId: string): Promise<User | undefined> {
+    const user = this.users.get(userId);
+    if (user) {
+      const updatedUser = { ...user, stripeCustomerId };
+      this.users.set(userId, updatedUser);
+      return updatedUser;
+    }
+    return undefined;
+  }
+
+  async updateUserStripeInfo(userId: string, stripeCustomerId: string, stripeSubscriptionId: string): Promise<User | undefined> {
+    const user = this.users.get(userId);
+    if (user) {
+      const updatedUser = { ...user, stripeCustomerId, stripeSubscriptionId };
+      this.users.set(userId, updatedUser);
+      return updatedUser;
     }
     return undefined;
   }

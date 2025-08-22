@@ -28,6 +28,8 @@ export const users = pgTable("users", {
   subscriptionStartDate: timestamp("subscription_start_date"),
   lastPaymentDate: timestamp("last_payment_date"),
   subscriptionExpiresAt: timestamp("subscription_expires_at"),
+  stripeCustomerId: varchar("stripe_customer_id"),
+  stripeSubscriptionId: varchar("stripe_subscription_id"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -75,6 +77,19 @@ export const goals = pgTable("goals", {
   period: text("period").notNull().default("weekly"), // weekly, monthly
   isActive: boolean("is_active").notNull().default(true),
   createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// Payment history table
+export const payments = pgTable("payments", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  stripePaymentIntentId: varchar("stripe_payment_intent_id").unique().notNull(),
+  amount: integer("amount").notNull(), // in cents
+  currency: varchar("currency").default("usd").notNull(),
+  status: varchar("status").notNull(), // pending, succeeded, failed, canceled
+  description: text("description"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
 export const trainers = pgTable("trainers", {
@@ -159,6 +174,12 @@ export const insertGoalSchema = createInsertSchema(goals).omit({
   createdAt: true,
 });
 
+export const insertPaymentSchema = createInsertSchema(payments).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 export const insertTrainerSchema = createInsertSchema(trainers).omit({
   id: true,
   rating: true,
@@ -199,6 +220,9 @@ export type WorkoutExercise = typeof workoutExercises.$inferSelect;
 
 export type InsertGoal = z.infer<typeof insertGoalSchema>;
 export type Goal = typeof goals.$inferSelect;
+
+export type InsertPayment = z.infer<typeof insertPaymentSchema>;
+export type Payment = typeof payments.$inferSelect;
 
 export type InsertTrainer = z.infer<typeof insertTrainerSchema>;
 export type Trainer = typeof trainers.$inferSelect;
