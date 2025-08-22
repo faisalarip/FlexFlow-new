@@ -412,6 +412,59 @@ export class MemStorage implements IStorage {
     return undefined;
   }
 
+  async calculateUserStreak(userId: string): Promise<number> {
+    const userWorkouts = await this.getWorkouts(userId);
+    if (userWorkouts.length === 0) return 0;
+
+    // Sort workouts by date (newest first)
+    const sortedWorkouts = userWorkouts.sort((a, b) => b.date.getTime() - a.date.getTime());
+    
+    // Get unique workout dates (only the date part, not time)
+    const uniqueDates = [...new Set(sortedWorkouts.map(w => {
+      const date = new Date(w.date);
+      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+    }))].sort().reverse(); // Sort dates in descending order
+
+    if (uniqueDates.length === 0) return 0;
+
+    let streak = 0;
+    const today = new Date();
+    const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    
+    // Check if user worked out today or yesterday (to account for different time zones)
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr = `${yesterday.getFullYear()}-${String(yesterday.getMonth() + 1).padStart(2, '0')}-${String(yesterday.getDate()).padStart(2, '0')}`;
+    
+    let startDate = todayStr;
+    if (uniqueDates[0] === todayStr) {
+      // User worked out today, start counting from today
+      startDate = todayStr;
+    } else if (uniqueDates[0] === yesterdayStr) {
+      // User's last workout was yesterday, start counting from yesterday  
+      startDate = yesterdayStr;
+    } else {
+      // User hasn't worked out today or yesterday, streak is 0
+      return 0;
+    }
+
+    // Count consecutive days starting from the most recent workout date
+    let expectedDate = new Date(startDate);
+    
+    for (const workoutDate of uniqueDates) {
+      const expectedDateStr = `${expectedDate.getFullYear()}-${String(expectedDate.getMonth() + 1).padStart(2, '0')}-${String(expectedDate.getDate()).padStart(2, '0')}`;
+      
+      if (workoutDate === expectedDateStr) {
+        streak++;
+        expectedDate.setDate(expectedDate.getDate() - 1); // Move to previous day
+      } else {
+        break; // Streak broken
+      }
+    }
+
+    return streak;
+  }
+
   async updateUser(id: string, updates: Partial<User>): Promise<User | undefined> {
     const user = this.users.get(id);
     if (user) {
@@ -485,6 +538,11 @@ export class MemStorage implements IStorage {
       createdAt: new Date()
     };
     this.workouts.set(id, workout);
+    
+    // Recalculate and update user streak after adding workout
+    const newStreak = await this.calculateUserStreak(insertWorkout.userId);
+    await this.updateUserStreak(insertWorkout.userId, newStreak);
+    
     return workout;
   }
 

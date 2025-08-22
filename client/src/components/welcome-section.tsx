@@ -1,13 +1,24 @@
 import { Plus, Flame } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useQuery } from "@tanstack/react-query";
+import type { User } from "@shared/schema";
 
 export default function WelcomeSection() {
-  const { user, isLoading } = useAuth();
+  const { isLoading } = useAuth();
   const currentHour = new Date().getHours();
   const greeting = currentHour < 12 ? "Good morning" : currentHour < 18 ? "Good afternoon" : "Good evening";
   
+  // Get full user data with streak
+  const { data: user } = useQuery<User>({
+    queryKey: ["/api/auth/user"],
+  });
+  
   // Get user's name for greeting
   const userName = user ? `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email : null;
+  
+  // Get user's current streak
+  const userStreak = user?.streak || 0;
+  const streakText = userStreak === 0 ? "Start today!" : userStreak === 1 ? "1 day" : `${userStreak} days`;
 
   return (
     <section className="mb-8">
@@ -44,7 +55,7 @@ export default function WelcomeSection() {
               <Flame className="text-accent text-xl" />
               <div>
                 <p className="text-sm opacity-80">Current Streak</p>
-                <p className="font-bold text-lg">7 days</p>
+                <p className="font-bold text-lg">{streakText}</p>
               </div>
             </div>
           </div>
