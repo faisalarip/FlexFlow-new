@@ -54,7 +54,7 @@ export default function WorkoutLogger() {
   };
 
   return (
-    <section className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+    <section id="workout-logger" className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-xl font-bold text-gray-800">Log Workout</h3>
         <button className="text-primary hover:text-primary/80 transition-colors">

@@ -25,7 +25,18 @@ export default function WelcomeSection() {
           </h2>
           <p className="text-lg opacity-90 mb-4">Ready to crush your fitness goals today?</p>
           <div className="flex flex-col sm:flex-row gap-4">
-            <button className="bg-accent hover:bg-orange-600 text-white px-6 py-3 rounded-xl font-medium transition-colors flex items-center justify-center space-x-2">
+            <button 
+              onClick={() => {
+                const workoutLogger = document.getElementById('workout-logger');
+                if (workoutLogger) {
+                  workoutLogger.scrollIntoView({ 
+                    behavior: 'smooth',
+                    block: 'start' 
+                  });
+                }
+              }}
+              className="bg-accent hover:bg-orange-600 text-white px-6 py-3 rounded-xl font-medium transition-colors flex items-center justify-center space-x-2"
+            >
               <Plus />
               <span>Start Workout</span>
             </button>
