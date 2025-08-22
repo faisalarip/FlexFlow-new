@@ -153,6 +153,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get advanced progress metrics
+  app.get("/api/progress/metrics", isAuthenticated, async (req, res) => {
+    try {
+      const userId = getCurrentUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      const metrics = await storage.getAdvancedProgressMetrics(userId);
+      res.json(metrics);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch progress metrics" });
+    }
+  });
+
   // Get goals
   app.get("/api/goals", isAuthenticated, async (req, res) => {
     try {

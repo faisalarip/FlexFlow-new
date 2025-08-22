@@ -83,6 +83,15 @@ export interface IStorage {
   
   // Stats
   getUserStats(userId: string): Promise<UserStats>;
+  getAdvancedProgressMetrics(userId: string): Promise<{
+    currentStreak: number;
+    longestStreak: number;
+    totalWorkoutDays: number;
+    consistencyPercentage30Days: number;
+    consistencyPercentage7Days: number;
+    workoutFrequency: { date: string; count: number }[];
+    streakHistory: { start: string; end: string; length: number }[];
+  }>;
   
   // Leaderboard
   getLeaderboard(): Promise<LeaderboardEntry[]>;
@@ -463,6 +472,129 @@ export class MemStorage implements IStorage {
     }
 
     return streak;
+  }
+
+  async getAdvancedProgressMetrics(userId: string): Promise<{
+    currentStreak: number;
+    longestStreak: number;
+    totalWorkoutDays: number;
+    consistencyPercentage30Days: number;
+    consistencyPercentage7Days: number;
+    workoutFrequency: { date: string; count: number }[];
+    streakHistory: { start: string; end: string; length: number }[];
+  }> {
+    const userWorkouts = await this.getWorkouts(userId);
+    const currentStreak = await this.calculateUserStreak(userId);
+    
+    if (userWorkouts.length === 0) {
+      return {
+        currentStreak: 0,
+        longestStreak: 0,
+        totalWorkoutDays: 0,
+        consistencyPercentage30Days: 0,
+        consistencyPercentage7Days: 0,
+        workoutFrequency: [],
+        streakHistory: []
+      };
+    }
+
+    // Get unique workout dates
+    const uniqueDates = [...new Set(userWorkouts.map(w => {
+      const date = new Date(w.date);
+      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+    }))].sort();
+
+    const totalWorkoutDays = uniqueDates.length;
+
+    // Calculate longest streak and all streaks
+    let longestStreak = 0;
+    let streakHistory: { start: string; end: string; length: number }[] = [];
+    
+    if (uniqueDates.length > 0) {
+      let currentStreakStart = uniqueDates[0];
+      let currentStreakLength = 1;
+      
+      for (let i = 1; i < uniqueDates.length; i++) {
+        const currentDate = new Date(uniqueDates[i]);
+        const prevDate = new Date(uniqueDates[i - 1]);
+        const dayDiff = Math.floor((currentDate.getTime() - prevDate.getTime()) / (1000 * 60 * 60 * 24));
+        
+        if (dayDiff === 1) {
+          // Consecutive day
+          currentStreakLength++;
+        } else {
+          // Streak broken, record the streak
+          if (currentStreakLength >= 1) {
+            streakHistory.push({
+              start: currentStreakStart,
+              end: uniqueDates[i - 1],
+              length: currentStreakLength
+            });
+            longestStreak = Math.max(longestStreak, currentStreakLength);
+          }
+          // Start new streak
+          currentStreakStart = uniqueDates[i];
+          currentStreakLength = 1;
+        }
+      }
+      
+      // Record the final streak
+      if (currentStreakLength >= 1) {
+        streakHistory.push({
+          start: currentStreakStart,
+          end: uniqueDates[uniqueDates.length - 1],
+          length: currentStreakLength
+        });
+        longestStreak = Math.max(longestStreak, currentStreakLength);
+      }
+    }
+
+    // Calculate consistency percentages
+    const today = new Date();
+    const thirtyDaysAgo = new Date(today);
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    
+    const sevenDaysAgo = new Date(today);
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+    const workoutDaysLast30 = uniqueDates.filter(dateStr => {
+      const date = new Date(dateStr);
+      return date >= thirtyDaysAgo && date <= today;
+    }).length;
+    
+    const workoutDaysLast7 = uniqueDates.filter(dateStr => {
+      const date = new Date(dateStr);
+      return date >= sevenDaysAgo && date <= today;
+    }).length;
+
+    const consistencyPercentage30Days = Math.round((workoutDaysLast30 / 30) * 100);
+    const consistencyPercentage7Days = Math.round((workoutDaysLast7 / 7) * 100);
+
+    // Calculate workout frequency for last 30 days
+    const workoutFrequency: { date: string; count: number }[] = [];
+    for (let i = 29; i >= 0; i--) {
+      const date = new Date(today);
+      date.setDate(date.getDate() - i);
+      const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+      
+      const workoutCount = userWorkouts.filter(w => {
+        const workoutDate = new Date(w.date);
+        const workoutDateStr = `${workoutDate.getFullYear()}-${String(workoutDate.getMonth() + 1).padStart(2, '0')}-${String(workoutDate.getDate()).padStart(2, '0')}`;
+        return workoutDateStr === dateStr;
+      }).length;
+      
+      workoutFrequency.push({ date: dateStr, count: workoutCount });
+    }
+
+    return {
+      currentStreak,
+      longestStreak,
+      totalWorkoutDays,
+      consistencyPercentage30Days,
+      consistencyPercentage7Days,
+      workoutFrequency,
+      streakHistory
+    };
   }
 
   async updateUser(id: string, updates: Partial<User>): Promise<User | undefined> {

@@ -9,6 +9,7 @@ import CalendarView from "@/components/calendar-view";
 import GoalsWidget from "@/components/goals-widget";
 import WorkoutRecommendations from "@/components/workout-recommendations";
 import FloatingActionButton from "@/components/floating-action-button";
+import ProgressOverview from "@/components/progress-overview";
 
 export default function Dashboard() {
   return (
@@ -19,6 +20,7 @@ export default function Dashboard() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-20 md:pb-6">
         <WelcomeSection />
         <QuickStats />
+        <ProgressOverview />
         
         <div className="grid lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-8">
