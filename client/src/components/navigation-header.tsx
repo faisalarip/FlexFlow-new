@@ -28,7 +28,6 @@ export default function NavigationHeader() {
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
               <Dumbbell className="text-primary text-2xl" />
-              <h1 className="text-xl font-bold text-primary">FlexFlow</h1>
             </div>
           </div>
 
