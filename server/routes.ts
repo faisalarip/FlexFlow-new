@@ -29,7 +29,7 @@ if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
 }
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2024-06-20",
+  apiVersion: "2023-10-16",
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -440,9 +440,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
             currency: 'usd',
             product_data: {
               name: 'FlexFlow Premium',
-              description: 'Access to premium features including unlimited workouts, meal plans, and personal trainer booking'
             },
-            unit_amount: 999, // $9.99
+            unit_amount: 1500, // $15.00
             recurring: {
               interval: 'month'
             }
