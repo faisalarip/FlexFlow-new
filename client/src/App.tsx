@@ -20,6 +20,9 @@ import Landing from "@/pages/landing";
 import Checkout from "@/pages/checkout";
 import Subscribe from "@/pages/subscribe";
 import Settings from "@/pages/settings";
+import Workouts from "@/pages/workouts";
+import Progress from "@/pages/progress";
+import Calendar from "@/pages/calendar";
 import NotFound from "@/pages/not-found";
 import Navbar from "@/components/navbar";
 
@@ -55,6 +58,9 @@ function Router() {
             <Route path="/community" component={Community} />
             <Route path="/meal-plans" component={MealPlans} />
             <Route path="/settings" component={Settings} />
+            <Route path="/workouts" component={Workouts} />
+            <Route path="/progress" component={Progress} />
+            <Route path="/calendar" component={Calendar} />
             <Route path="/checkout" component={Checkout} />
             <Route path="/subscribe" component={Subscribe} />
           </>

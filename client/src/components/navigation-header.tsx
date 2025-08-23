@@ -1,4 +1,5 @@
 import { Dumbbell, Menu, User, ChevronDown } from "lucide-react";
+import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
 import PremiumBadge from "@/components/premium-badge";
 import ProfileEditor from "@/components/profile-editor";
@@ -15,8 +16,11 @@ import type { User as UserType } from "@shared/schema";
 
 export default function NavigationHeader() {
   const { user } = useAuth() as { user: UserType | null };
+  const [location] = useLocation();
   const fullName = user ? `${user.firstName || ""} ${user.lastName || ""}`.trim() : "";
   const displayName = fullName || user?.email || "User";
+
+  const isActive = (path: string) => location === path;
   return (
     <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -29,30 +33,50 @@ export default function NavigationHeader() {
           </div>
 
           <nav className="hidden md:flex space-x-8">
-            <a
-              href="#dashboard"
-              className="text-primary font-medium border-b-2 border-primary pb-4"
+            <Link
+              href="/"
+              className={`transition-colors py-4 ${
+                isActive("/")
+                  ? "text-primary font-medium border-b-2 border-primary"
+                  : "text-gray-600 hover:text-primary"
+              }`}
+              data-testid="nav-dashboard"
             >
               Dashboard
-            </a>
-            <a
-              href="#workouts"
-              className="text-muted hover:text-primary transition-colors"
+            </Link>
+            <Link
+              href="/workouts"
+              className={`transition-colors py-4 ${
+                isActive("/workouts")
+                  ? "text-primary font-medium border-b-2 border-primary"
+                  : "text-gray-600 hover:text-primary"
+              }`}
+              data-testid="nav-workouts"
             >
               Workouts
-            </a>
-            <a
-              href="#progress"
-              className="text-muted hover:text-primary transition-colors"
+            </Link>
+            <Link
+              href="/progress"
+              className={`transition-colors py-4 ${
+                isActive("/progress")
+                  ? "text-primary font-medium border-b-2 border-primary"
+                  : "text-gray-600 hover:text-primary"
+              }`}
+              data-testid="nav-progress"
             >
               Progress
-            </a>
-            <a
-              href="#calendar"
-              className="text-muted hover:text-primary transition-colors"
+            </Link>
+            <Link
+              href="/calendar"
+              className={`transition-colors py-4 ${
+                isActive("/calendar")
+                  ? "text-primary font-medium border-b-2 border-primary"
+                  : "text-gray-600 hover:text-primary"
+              }`}
+              data-testid="nav-calendar"
             >
               Calendar
-            </a>
+            </Link>
           </nav>
 
           <div className="flex items-center space-x-4">
