@@ -30,10 +30,22 @@ const SubscribeForm = () => {
       return;
     }
 
+    // Ensure payment method is complete before submission
+    const { error: submitError } = await elements.submit();
+    if (submitError) {
+      toast({
+        title: "Payment Information Required",
+        description: "Please complete all required payment fields.",
+        variant: "destructive",
+      });
+      setIsProcessing(false);
+      return;
+    }
+
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        return_url: `${window.location.origin}/dashboard`,
+        return_url: `${window.location.origin}/dashboard?subscription=success`,
       },
     });
 
@@ -54,14 +66,36 @@ const SubscribeForm = () => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <PaymentElement />
+      <div className="space-y-4">
+        <div className="text-sm text-gray-700 font-medium">
+          Enter your payment information:
+        </div>
+        <PaymentElement 
+          options={{
+            fields: {
+              billingDetails: {
+                email: 'never',
+                phone: 'never',
+                address: 'never'
+              }
+            }
+          }}
+        />
+        <div className="text-xs text-gray-500">
+          ✓ Your card will be charged $15.00 monthly
+          <br />
+          ✓ Secure encryption protects your payment data
+          <br />
+          ✓ Cancel anytime from your account settings
+        </div>
+      </div>
       <Button 
         type="submit" 
         className="w-full" 
         disabled={!stripe || !elements || isProcessing}
         data-testid="subscribe-button"
       >
-        {isProcessing ? "Processing..." : "Subscribe Now"}
+        {isProcessing ? "Processing Payment..." : "Pay $15/month & Subscribe"}
       </Button>
     </form>
   );
@@ -130,15 +164,20 @@ export default function Subscribe() {
           </Link>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Subscribe to FlexFlow Premium</h1>
           <p className="text-gray-600">Get unlimited access to all premium features</p>
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mt-4">
+            <p className="text-yellow-800 text-sm font-medium">
+              🔒 Secure Payment Required: You must enter valid payment information to complete your subscription.
+            </p>
+          </div>
         </div>
 
         <div className="grid md:grid-cols-2 gap-8">
           {/* Payment Form */}
           <Card>
             <CardHeader>
-              <CardTitle>Payment Details</CardTitle>
+              <CardTitle>💳 Payment Required</CardTitle>
               <CardDescription>
-                Start your premium subscription today
+                Enter your credit or debit card information to activate your $15/month subscription
               </CardDescription>
             </CardHeader>
             <CardContent>

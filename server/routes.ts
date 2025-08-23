@@ -494,12 +494,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
           break;
           
         case 'invoice.payment_succeeded':
-          const invoice = event.data.object;
-          const subscription = await stripe.subscriptions.retrieve(invoice.subscription as string);
-          
-          // Update user subscription status
-          const customer = await stripe.customers.retrieve(subscription.customer as string);
-          // Find user by customer ID and update subscription status
+          const invoice = event.data.object as any;
+          if (invoice.subscription) {
+            const subscription = await stripe.subscriptions.retrieve(invoice.subscription as string);
+            const customer = await stripe.customers.retrieve(subscription.customer as string);
+            
+            // Find user by Stripe customer ID and activate subscription
+            const users = await storage.getUsers();
+            const user = users.find(u => u.stripeCustomerId === customer.id);
+            
+            if (user) {
+              const now = new Date();
+              const nextExpiry = new Date(now.getTime() + (30 * 24 * 60 * 60 * 1000)); // 30 days
+              
+              await storage.updateUser(user.id, {
+                subscriptionStatus: "active",
+                lastPaymentDate: now,
+                subscriptionExpiresAt: nextExpiry
+              });
+              
+              console.log(`Subscription activated for user ${user.id}`);
+            }
+          }
           break;
 
         default:
