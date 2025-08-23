@@ -28,7 +28,7 @@ export default function PremiumBadge() {
       className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white border-none shadow-md"
       data-testid="upgrade-button"
     >
-      <Link href="/subscribe">
+      <Link href="/subscription">
         <Sparkles className="w-4 h-4 mr-1" />
         Upgrade to Premium
       </Link>
