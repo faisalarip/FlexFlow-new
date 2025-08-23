@@ -432,7 +432,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         user = await storage.getUser(userId); // Refresh user data
       }
 
-      // Create subscription
+      // Create subscription with 10-day trial
       const subscription = await stripe.subscriptions.create({
         customer: customer.id,
         items: [{
@@ -447,6 +447,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             }
           }
         }],
+        trial_period_days: 10, // 10-day free trial
         payment_behavior: 'default_incomplete',
         expand: ['latest_invoice.payment_intent'],
       });
@@ -505,7 +506,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             
             if (user) {
               const now = new Date();
-              const nextExpiry = new Date(now.getTime() + (30 * 24 * 60 * 60 * 1000)); // 30 days
+              const nextExpiry = new Date(now.getTime() + (30 * 24 * 60 * 60 * 1000)); // 30 days for paid subscription
               
               await storage.updateUser(user.id, {
                 subscriptionStatus: "active",
@@ -1337,7 +1338,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const now = new Date();
-      const nextExpiry = new Date(now.getTime() + (30 * 24 * 60 * 60 * 1000)); // 30 days from now
+      const nextExpiry = new Date(now.getTime() + (30 * 24 * 60 * 60 * 1000)); // 30 days from now for paid subscription
 
       const updatedUser = await storage.updateUser(userId, {
         subscriptionStatus: "active",

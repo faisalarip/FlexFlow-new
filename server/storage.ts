@@ -376,7 +376,7 @@ export class MemStorage implements IStorage {
       return updatedUser;
     } else {
       const now = new Date();
-      const freeTrialExpiry = new Date(now.getTime() + (30 * 24 * 60 * 60 * 1000)); // 30 days from now
+      const freeTrialExpiry = new Date(now.getTime() + (10 * 24 * 60 * 60 * 1000)); // 10 days from now
       
       const user: User = {
         id: userData.id!,
@@ -409,7 +409,7 @@ export class MemStorage implements IStorage {
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = randomUUID();
     const now = new Date();
-    const freeTrialExpiry = new Date(now.getTime() + (30 * 24 * 60 * 60 * 1000)); // 30 days from now
+    const freeTrialExpiry = new Date(now.getTime() + (10 * 24 * 60 * 60 * 1000)); // 10 days from now
     
     const user: User = {
       ...insertUser,

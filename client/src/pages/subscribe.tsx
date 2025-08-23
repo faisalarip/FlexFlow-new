@@ -163,10 +163,10 @@ export default function Subscribe() {
             Back to Dashboard
           </Link>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Subscribe to FlexFlow Premium</h1>
-          <p className="text-gray-600">Get unlimited access to all premium features</p>
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mt-4">
-            <p className="text-yellow-800 text-sm font-medium">
-              🔒 Secure Payment Required: You must enter valid payment information to complete your subscription.
+          <p className="text-gray-600">Start your 10-day free trial with unlimited access to all premium features</p>
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
+            <p className="text-blue-800 text-sm font-medium">
+              🎉 10-Day Free Trial: Enter your payment info to start your 10-day trial. You'll be charged $15/month automatically after the trial ends.
             </p>
           </div>
         </div>
