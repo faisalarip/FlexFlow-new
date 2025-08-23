@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Calendar, CreditCard, CheckCircle, XCircle, AlertCircle, Gift, Star, DollarSign } from "lucide-react";
 import { format } from "date-fns";
+import { Link } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -305,12 +306,13 @@ export default function UserSubscription() {
                   </div>
                   <Button 
                     size="lg"
-                    onClick={() => activateSubscriptionMutation.mutate()}
-                    disabled={activateSubscriptionMutation.isPending}
+                    asChild
                     className="bg-green-600 hover:bg-green-700"
                   >
-                    <CreditCard size={16} className="mr-2" />
-                    {activateSubscriptionMutation.isPending ? "Processing..." : "Subscribe for $15/mo"}
+                    <Link href="/subscribe">
+                      <CreditCard size={16} className="mr-2" />
+                      Subscribe for $15/mo
+                    </Link>
                   </Button>
                 </div>
               </CardContent>
@@ -331,11 +333,12 @@ export default function UserSubscription() {
                   </div>
                   <Button 
                     size="lg"
-                    onClick={() => activateSubscriptionMutation.mutate()}
-                    disabled={activateSubscriptionMutation.isPending}
+                    asChild
                   >
-                    <DollarSign size={16} className="mr-2" />
-                    {activateSubscriptionMutation.isPending ? "Processing..." : "Reactivate Premium"}
+                    <Link href="/subscribe">
+                      <DollarSign size={16} className="mr-2" />
+                      Reactivate Premium
+                    </Link>
                   </Button>
                 </div>
               </CardContent>
