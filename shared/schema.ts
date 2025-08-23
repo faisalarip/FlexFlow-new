@@ -477,3 +477,24 @@ export type MealPlanWithDetails = MealPlan & {
 export type UserMealPlanWithDetails = UserMealPlan & {
   mealPlan: MealPlanWithDetails;
 };
+
+// Calendar Notes
+export const calendarNotes = pgTable("calendar_notes", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  date: timestamp("date").notNull(), // The date this note is for
+  note: text("note").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Calendar Notes insert schemas
+export const insertCalendarNoteSchema = createInsertSchema(calendarNotes).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+// Calendar Notes types
+export type InsertCalendarNote = z.infer<typeof insertCalendarNoteSchema>;
+export type CalendarNote = typeof calendarNotes.$inferSelect;

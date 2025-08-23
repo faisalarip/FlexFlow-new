@@ -45,7 +45,9 @@ import {
   type UserMealPlanWithDetails,
   type InsertUserMealPlan,
   type Payment,
-  type InsertPayment
+  type InsertPayment,
+  type CalendarNote,
+  type InsertCalendarNote
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 
@@ -155,6 +157,13 @@ export interface IStorage {
   // Commission tracking
   getTotalCommissions(): Promise<{ totalCommissions: number; totalBookings: number }>;
   markBookingAsPaid(bookingId: string, totalPrice: number): Promise<Booking | undefined>;
+
+  // Calendar Notes
+  getCalendarNotes(userId: string, date?: Date): Promise<CalendarNote[]>;
+  getCalendarNote(id: string): Promise<CalendarNote | undefined>;
+  createCalendarNote(note: InsertCalendarNote): Promise<CalendarNote>;
+  updateCalendarNote(id: string, updates: Partial<CalendarNote>): Promise<CalendarNote | undefined>;
+  deleteCalendarNote(id: string): Promise<boolean>;
 }
 
 export class MemStorage implements IStorage {
@@ -176,6 +185,7 @@ export class MemStorage implements IStorage {
   private mealPlanDays: Map<string, MealPlanDay> = new Map();
   private mealPlanMeals: Map<string, MealPlanMeal> = new Map();
   private userMealPlans: Map<string, UserMealPlan> = new Map();
+  private calendarNotes: Map<string, CalendarNote> = new Map();
 
   constructor() {
     this.seedExercises();
@@ -1797,6 +1807,55 @@ export class MemStorage implements IStorage {
       totalRevenue: totalRevenue * 100, // Convert to cents for consistency
       activeTrainers: activeTrainers.length
     };
+  }
+
+  // Calendar Notes
+  async getCalendarNotes(userId: string, date?: Date): Promise<CalendarNote[]> {
+    const notes = Array.from(this.calendarNotes.values()).filter(note => {
+      if (note.userId !== userId) return false;
+      if (date) {
+        const noteDate = new Date(note.date);
+        const targetDate = new Date(date);
+        return noteDate.toDateString() === targetDate.toDateString();
+      }
+      return true;
+    });
+    return notes.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  }
+
+  async getCalendarNote(id: string): Promise<CalendarNote | undefined> {
+    return this.calendarNotes.get(id);
+  }
+
+  async createCalendarNote(noteData: InsertCalendarNote): Promise<CalendarNote> {
+    const id = randomUUID();
+    const now = new Date();
+    const note: CalendarNote = {
+      ...noteData,
+      id,
+      createdAt: now,
+      updatedAt: now,
+    };
+    this.calendarNotes.set(id, note);
+    return note;
+  }
+
+  async updateCalendarNote(id: string, updates: Partial<CalendarNote>): Promise<CalendarNote | undefined> {
+    const note = this.calendarNotes.get(id);
+    if (!note) return undefined;
+
+    const updatedNote: CalendarNote = {
+      ...note,
+      ...updates,
+      id, // Ensure ID doesn't change
+      updatedAt: new Date(),
+    };
+    this.calendarNotes.set(id, updatedNote);
+    return updatedNote;
+  }
+
+  async deleteCalendarNote(id: string): Promise<boolean> {
+    return this.calendarNotes.delete(id);
   }
 }
 
