@@ -11,9 +11,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import type { User as UserType } from "@shared/schema";
 
 export default function NavigationHeader() {
-  const { user } = useAuth();
+  const { user } = useAuth() as { user: UserType | null };
   const fullName = user ? `${user.firstName || ""} ${user.lastName || ""}`.trim() : "";
   const displayName = fullName || user?.email || "User";
   return (
@@ -64,8 +65,17 @@ export default function NavigationHeader() {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="flex items-center space-x-2 hover:bg-gray-50" data-testid="user-menu-trigger">
                     <span className="text-sm text-gray-700">{displayName}</span>
-                    <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-                      <User className="text-white text-sm" />
+                    <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center overflow-hidden border-2 border-gray-200">
+                      {user?.profileImageUrl ? (
+                        <img 
+                          src={user.profileImageUrl} 
+                          alt="Profile" 
+                          className="w-full h-full object-cover"
+                          data-testid="nav-profile-image"
+                        />
+                      ) : (
+                        <User className="text-white text-sm" />
+                      )}
                     </div>
                     <ChevronDown className="w-4 h-4 text-gray-500" />
                   </Button>
@@ -86,7 +96,7 @@ export default function NavigationHeader() {
                     <ProfileEditor trigger={
                       <div className="flex items-center w-full cursor-pointer" data-testid="profile-menu-item">
                         <User className="w-4 h-4 mr-2" />
-                        Edit Name
+                        Edit Profile
                       </div>
                     } />
                   </DropdownMenuItem>

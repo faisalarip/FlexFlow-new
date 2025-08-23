@@ -1,6 +1,8 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import Stripe from "stripe";
+import multer from "multer";
+import path from "path";
 import { storage } from "./storage";
 import { 
   insertWorkoutSchema, 
@@ -181,7 +183,90 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Update user profile
+  // Set up multer for file uploads
+  const upload = multer({
+    storage: multer.memoryStorage(),
+    limits: {
+      fileSize: 5 * 1024 * 1024, // 5MB limit
+    },
+    fileFilter: (req, file, cb) => {
+      if (file.mimetype.startsWith('image/')) {
+        cb(null, true);
+      } else {
+        cb(new Error('Only image files are allowed'));
+      }
+    },
+  });
+
+  // Update user profile with image upload
+  app.post("/api/user/profile/upload", isAuthenticated, upload.single('profileImage'), async (req, res) => {
+    try {
+      const userId = getCurrentUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      
+      const { firstName, lastName } = req.body;
+      let profileImageUrl = null;
+      
+      // Handle file upload if present
+      if (req.file) {
+        const fileExtension = path.extname(req.file.originalname);
+        const fileName = `profile-${userId}-${Date.now()}${fileExtension}`;
+        
+        // Store in private directory
+        const fs = require('fs').promises;
+        const uploadPath = path.join(process.env.PRIVATE_OBJECT_DIR || '', fileName);
+        
+        try {
+          await fs.writeFile(uploadPath, req.file.buffer);
+          profileImageUrl = `/api/user/profile/image/${fileName}`;
+        } catch (error) {
+          console.error('File upload error:', error);
+          return res.status(500).json({ message: "Failed to upload image" });
+        }
+      }
+      
+      const updates: any = {
+        updatedAt: new Date()
+      };
+      
+      if (firstName?.trim()) updates.firstName = firstName.trim();
+      if (lastName?.trim()) updates.lastName = lastName.trim();
+      if (profileImageUrl) updates.profileImageUrl = profileImageUrl;
+      
+      const updatedUser = await storage.updateUser(userId, updates);
+      
+      if (!updatedUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      res.json(updatedUser);
+    } catch (error) {
+      console.error('Profile update error:', error);
+      res.status(500).json({ message: "Failed to update profile" });
+    }
+  });
+
+  // Serve profile images
+  app.get("/api/user/profile/image/:filename", isAuthenticated, async (req, res) => {
+    try {
+      const { filename } = req.params;
+      const fs = require('fs').promises;
+      const imagePath = path.join(process.env.PRIVATE_OBJECT_DIR || '', filename);
+      
+      try {
+        await fs.access(imagePath);
+        res.sendFile(path.resolve(imagePath));
+      } catch (error) {
+        res.status(404).json({ message: "Image not found" });
+      }
+    } catch (error) {
+      res.status(500).json({ message: "Failed to serve image" });
+    }
+  });
+
+  // Update user profile (name only)
   app.patch("/api/user/profile", isAuthenticated, async (req, res) => {
     try {
       const userId = getCurrentUserId(req);

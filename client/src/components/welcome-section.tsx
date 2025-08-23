@@ -1,4 +1,4 @@
-import { Plus, Flame } from "lucide-react";
+import { Plus, Flame, User as UserIcon } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import type { User } from "@shared/schema";
@@ -31,10 +31,26 @@ export default function WelcomeSection() {
           />
         </div>
         <div className="relative z-10">
-          <h2 className="text-2xl md:text-3xl font-bold mb-2">
-            {greeting}{userName ? `, ${userName}` : ''}!
-          </h2>
-          <p className="text-lg opacity-90 mb-4">Ready to crush your fitness goals today?</p>
+          <div className="flex items-center gap-4 mb-4">
+            <div className="w-16 h-16 rounded-full overflow-hidden bg-white bg-opacity-20 flex items-center justify-center flex-shrink-0">
+              {user?.profileImageUrl ? (
+                <img 
+                  src={user.profileImageUrl} 
+                  alt="Profile" 
+                  className="w-full h-full object-cover"
+                  data-testid="welcome-profile-image"
+                />
+              ) : (
+                <UserIcon className="text-white text-xl" />
+              )}
+            </div>
+            <div>
+              <h2 className="text-2xl md:text-3xl font-bold">
+                {greeting}{userName ? `, ${userName}` : ''}!
+              </h2>
+              <p className="text-lg opacity-90">Ready to crush your fitness goals today?</p>
+            </div>
+          </div>
           <div className="flex flex-col sm:flex-row gap-4">
             <button 
               onClick={() => {
