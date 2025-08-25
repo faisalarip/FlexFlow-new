@@ -444,7 +444,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
             recurring: {
               interval: 'month'
             },
-            product: 'FlexFlow Premium' // Fixed: changed from product_data to product
+            product_data: {
+              name: 'FlexFlow Premium',
+            }
           }
         }],
         trial_period_days: 7, // 7-day free trial
