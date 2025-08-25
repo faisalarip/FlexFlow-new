@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Clock, Users, Target, TrendingUp, TrendingDown, Calendar, ChefHat, Sparkles, Settings } from "lucide-react";
+import { Clock, Users, Target, TrendingUp, TrendingDown, Calendar, ChefHat, Sparkles, Settings, ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -34,6 +34,7 @@ export default function MealPlans() {
   const [selectedPlan, setSelectedPlan] = useState<MealPlanWithDetails | null>(null);
   const [selectedDay, setSelectedDay] = useState(1);
   const [showAIDialog, setShowAIDialog] = useState(false);
+  const [expandedIngredients, setExpandedIngredients] = useState<Set<string>>(new Set());
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -158,6 +159,18 @@ export default function MealPlans() {
 
   const onSubmitAIMealPlan = (data: MealPlanGenerationForm) => {
     generateMealPlanMutation.mutate(data);
+  };
+
+  const toggleIngredients = (mealId: string) => {
+    setExpandedIngredients(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(mealId)) {
+        newSet.delete(mealId);
+      } else {
+        newSet.add(mealId);
+      }
+      return newSet;
+    });
   };
 
   if (isLoading) {
@@ -538,15 +551,38 @@ export default function MealPlans() {
                                     
                                     <div className="space-y-2">
                                       <div>
-                                        <h6 className="text-xs font-semibold text-gray-700 dark:text-gray-300">
-                                          Ingredients:
-                                        </h6>
+                                        <button
+                                          onClick={() => toggleIngredients(meal.id)}
+                                          className="flex items-center justify-between w-full text-left hover:bg-gray-100 dark:hover:bg-gray-700 rounded p-1 transition-colors"
+                                          data-testid={`ingredients-toggle-${meal.id}`}
+                                        >
+                                          <h6 className="text-xs font-semibold text-gray-700 dark:text-gray-300">
+                                            Ingredients ({meal.ingredients.length})
+                                          </h6>
+                                          {expandedIngredients.has(meal.id) ? (
+                                            <ChevronUp size={14} className="text-gray-500" />
+                                          ) : (
+                                            <ChevronDown size={14} className="text-gray-500" />
+                                          )}
+                                        </button>
                                         <ul className="text-xs text-gray-600 dark:text-gray-400">
-                                          {meal.ingredients.slice(0, 3).map((ingredient: string, idx: number) => (
-                                            <li key={idx}>• {ingredient}</li>
-                                          ))}
-                                          {meal.ingredients.length > 3 && (
-                                            <li>• +{meal.ingredients.length - 3} more...</li>
+                                          {expandedIngredients.has(meal.id) ? (
+                                            // Show all ingredients when expanded
+                                            meal.ingredients.map((ingredient: string, idx: number) => (
+                                              <li key={idx} className="py-0.5">• {ingredient}</li>
+                                            ))
+                                          ) : (
+                                            // Show only first 3 when collapsed
+                                            <>
+                                              {meal.ingredients.slice(0, 3).map((ingredient: string, idx: number) => (
+                                                <li key={idx} className="py-0.5">• {ingredient}</li>
+                                              ))}
+                                              {meal.ingredients.length > 3 && (
+                                                <li className="py-0.5 italic text-blue-600 dark:text-blue-400">
+                                                  • Click to see {meal.ingredients.length - 3} more ingredients...
+                                                </li>
+                                              )}
+                                            </>
                                           )}
                                         </ul>
                                       </div>
