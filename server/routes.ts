@@ -30,8 +30,8 @@ import { setupAuth, isAuthenticated } from "./replitAuth";
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
 }
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2023-10-16",
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  apiVersion: "2024-06-20",
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -434,23 +434,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
         user = await storage.getUser(userId); // Refresh user data
       }
 
-      // Create subscription with 10-day trial
+      // Create subscription with 7-day trial
       const subscription = await stripe.subscriptions.create({
         customer: customer.id,
         items: [{
           price_data: {
             currency: 'usd',
-            product_data: {
-              name: 'FlexFlow Premium',
-            },
-            unit_amount: 1500, // $15.00
+            unit_amount: 999, // $9.99 per month
             recurring: {
               interval: 'month'
+            },
+            product_data: {
+              name: 'FlexFlow Premium',
+              description: 'Premium fitness tracking with AI meal plans and advanced features'
             }
           }
         }],
-        trial_period_days: 10, // 10-day free trial
+        trial_period_days: 7, // 7-day free trial
         payment_behavior: 'default_incomplete',
+        payment_settings: {
+          save_default_payment_method: 'on_subscription',
+        },
         expand: ['latest_invoice.payment_intent'],
       });
 
