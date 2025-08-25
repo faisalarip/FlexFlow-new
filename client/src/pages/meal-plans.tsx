@@ -1,19 +1,39 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Clock, Users, Target, TrendingUp, TrendingDown, Calendar, ChefHat } from "lucide-react";
+import { Clock, Users, Target, TrendingUp, TrendingDown, Calendar, ChefHat, Sparkles, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { apiRequest } from "@/lib/queryClient";
-import type { MealPlanWithDetails, UserMealPlanWithDetails } from "@shared/schema";
+import type { MealPlanWithDetails, UserMealPlanWithDetails, UserMealPreferences } from "@shared/schema";
+
+const mealPlanGenerationSchema = z.object({
+  goal: z.enum(["weight_loss", "weight_gain", "maintenance"]),
+  dailyCalories: z.number().min(1200).max(4000),
+  dietaryRestrictions: z.array(z.string()).optional(),
+  allergies: z.array(z.string()).optional(),
+  preferences: z.array(z.string()).optional(),
+  duration: z.number().min(3).max(14).default(7),
+});
+
+type MealPlanGenerationForm = z.infer<typeof mealPlanGenerationSchema>;
 
 export default function MealPlans() {
   const [selectedGoal, setSelectedGoal] = useState<string>("all");
   const [selectedPlan, setSelectedPlan] = useState<MealPlanWithDetails | null>(null);
   const [selectedDay, setSelectedDay] = useState(1);
+  const [showAIDialog, setShowAIDialog] = useState(false);
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -27,6 +47,25 @@ export default function MealPlans() {
   const { data: userMealPlan } = useQuery<UserMealPlanWithDetails>({
     queryKey: ["/api/user-meal-plan"],
     retry: false,
+  });
+
+  // Fetch user meal preferences
+  const { data: userPreferences } = useQuery<UserMealPreferences>({
+    queryKey: ["/api/user-meal-preferences"],
+    retry: false,
+  });
+
+  // AI Meal Plan Generation Form
+  const form = useForm<MealPlanGenerationForm>({
+    resolver: zodResolver(mealPlanGenerationSchema),
+    defaultValues: {
+      goal: userPreferences?.goal as "weight_loss" | "weight_gain" | "maintenance" || "maintenance",
+      dailyCalories: userPreferences?.dailyCalories || 2000,
+      dietaryRestrictions: userPreferences?.dietaryRestrictions || [],
+      allergies: userPreferences?.allergies || [],
+      preferences: userPreferences?.preferences || [],
+      duration: 7,
+    },
   });
 
   const assignMealPlanMutation = useMutation({
@@ -49,6 +88,31 @@ export default function MealPlans() {
       toast({ 
         title: "Error", 
         description: "Failed to assign meal plan", 
+        variant: "destructive" 
+      });
+    }
+  });
+
+  const generateMealPlanMutation = useMutation({
+    mutationFn: async (data: MealPlanGenerationForm) => {
+      const response = await apiRequest("POST", "/api/generate-meal-plan", data);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/meal-plans"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/user-meal-plan"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/user-meal-preferences"] });
+      setShowAIDialog(false);
+      form.reset();
+      toast({ 
+        title: "AI Meal Plan Generated!", 
+        description: "Your personalized meal plan has been created and assigned." 
+      });
+    },
+    onError: (error: any) => {
+      toast({ 
+        title: "Error", 
+        description: error.message || "Failed to generate meal plan", 
         variant: "destructive" 
       });
     }
@@ -92,6 +156,10 @@ export default function MealPlans() {
     assignMealPlanMutation.mutate(planId);
   };
 
+  const onSubmitAIMealPlan = (data: MealPlanGenerationForm) => {
+    generateMealPlanMutation.mutate(data);
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
@@ -108,6 +176,152 @@ export default function MealPlans() {
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Meal Plans</h1>
             <p className="text-gray-600 dark:text-gray-400">Choose a meal plan to support your fitness goals</p>
           </div>
+          <Dialog open={showAIDialog} onOpenChange={setShowAIDialog}>
+            <DialogTrigger asChild>
+              <Button className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white" data-testid="generate-ai-meal-plan">
+                <Sparkles className="w-4 h-4 mr-2" />
+                Generate AI Meal Plan
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Generate Personalized Meal Plan</DialogTitle>
+              </DialogHeader>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmitAIMealPlan)} className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="goal"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Fitness Goal</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select your goal" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="weight_loss">Weight Loss</SelectItem>
+                              <SelectItem value="weight_gain">Weight Gain</SelectItem>
+                              <SelectItem value="maintenance">Maintenance</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="dailyCalories"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Daily Calories</FormLabel>
+                          <FormControl>
+                            <Input 
+                              type="number" 
+                              placeholder="2000" 
+                              {...field}
+                              onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <FormField
+                    control={form.control}
+                    name="duration"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Plan Duration (days)</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="number" 
+                            placeholder="7" 
+                            {...field}
+                            onChange={(e) => field.onChange(parseInt(e.target.value) || 7)}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="dietaryRestrictions"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Dietary Restrictions</FormLabel>
+                        <FormControl>
+                          <Textarea 
+                            placeholder="e.g., vegetarian, gluten-free, dairy-free (separate with commas)"
+                            value={field.value?.join(", ") || ""}
+                            onChange={(e) => field.onChange(e.target.value.split(",").map(s => s.trim()).filter(Boolean))}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="allergies"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Allergies</FormLabel>
+                        <FormControl>
+                          <Textarea 
+                            placeholder="e.g., nuts, shellfish, eggs (separate with commas)"
+                            value={field.value?.join(", ") || ""}
+                            onChange={(e) => field.onChange(e.target.value.split(",").map(s => s.trim()).filter(Boolean))}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="preferences"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Food Preferences</FormLabel>
+                        <FormControl>
+                          <Textarea 
+                            placeholder="e.g., Mediterranean, low-carb, high-protein (separate with commas)"
+                            value={field.value?.join(", ") || ""}
+                            onChange={(e) => field.onChange(e.target.value.split(",").map(s => s.trim()).filter(Boolean))}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <div className="flex justify-end space-x-2">
+                    <Button type="button" variant="outline" onClick={() => setShowAIDialog(false)}>
+                      Cancel
+                    </Button>
+                    <Button type="submit" disabled={generateMealPlanMutation.isPending}>
+                      {generateMealPlanMutation.isPending ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2" />
+                          Generating...
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles className="w-4 h-4 mr-2" />
+                          Generate Meal Plan
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </form>
+              </Form>
+            </DialogContent>
+          </Dialog>
         </div>
 
         {/* Current Meal Plan */}

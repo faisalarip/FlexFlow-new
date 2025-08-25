@@ -498,3 +498,29 @@ export const insertCalendarNoteSchema = createInsertSchema(calendarNotes).omit({
 // Calendar Notes types
 export type InsertCalendarNote = z.infer<typeof insertCalendarNoteSchema>;
 export type CalendarNote = typeof calendarNotes.$inferSelect;
+
+// User Meal Preferences for AI generation
+export const userMealPreferences = pgTable("user_meal_preferences", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  goal: text("goal").notNull(), // weight_loss, weight_gain, maintenance
+  dailyCalories: integer("daily_calories").notNull(),
+  dietaryRestrictions: text("dietary_restrictions").array().default([]),
+  allergies: text("allergies").array().default([]),
+  preferences: text("preferences").array().default([]),
+  lastGeneratedAt: timestamp("last_generated_at"),
+  autoGenerate: boolean("auto_generate").default(true), // weekly auto-generation
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// User Meal Preferences insert schemas
+export const insertUserMealPreferencesSchema = createInsertSchema(userMealPreferences).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+// User Meal Preferences types
+export type InsertUserMealPreferences = z.infer<typeof insertUserMealPreferencesSchema>;
+export type UserMealPreferences = typeof userMealPreferences.$inferSelect;

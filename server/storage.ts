@@ -47,7 +47,9 @@ import {
   type Payment,
   type InsertPayment,
   type CalendarNote,
-  type InsertCalendarNote
+  type InsertCalendarNote,
+  type UserMealPreferences,
+  type InsertUserMealPreferences
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 
@@ -164,6 +166,15 @@ export interface IStorage {
   createCalendarNote(note: InsertCalendarNote): Promise<CalendarNote>;
   updateCalendarNote(id: string, updates: Partial<CalendarNote>): Promise<CalendarNote | undefined>;
   deleteCalendarNote(id: string): Promise<boolean>;
+
+  // User Meal Preferences for AI generation
+  getUserMealPreferences(userId: string): Promise<UserMealPreferences | undefined>;
+  createUserMealPreferences(preferences: InsertUserMealPreferences): Promise<UserMealPreferences>;
+  updateUserMealPreferences(userId: string, updates: Partial<UserMealPreferences>): Promise<UserMealPreferences | undefined>;
+  getUsersForWeeklyMealPlanGeneration(): Promise<{ userId: string; preferences: UserMealPreferences }[]>;
+
+  // AI Meal Plan Generation
+  createAIMealPlan(mealPlan: InsertMealPlan, days: { dayNumber: number; name: string; meals: any[] }[]): Promise<MealPlan>;
 }
 
 export class MemStorage implements IStorage {
@@ -186,6 +197,7 @@ export class MemStorage implements IStorage {
   private mealPlanMeals: Map<string, MealPlanMeal> = new Map();
   private userMealPlans: Map<string, UserMealPlan> = new Map();
   private calendarNotes: Map<string, CalendarNote> = new Map();
+  private userMealPreferences: Map<string, UserMealPreferences> = new Map();
 
   constructor() {
     this.seedExercises();
@@ -1856,6 +1868,100 @@ export class MemStorage implements IStorage {
 
   async deleteCalendarNote(id: string): Promise<boolean> {
     return this.calendarNotes.delete(id);
+  }
+
+  // User Meal Preferences for AI generation
+  async getUserMealPreferences(userId: string): Promise<UserMealPreferences | undefined> {
+    return Array.from(this.userMealPreferences.values())
+      .find(prefs => prefs.userId === userId);
+  }
+
+  async createUserMealPreferences(preferences: InsertUserMealPreferences): Promise<UserMealPreferences> {
+    const id = randomUUID();
+    const now = new Date();
+    const userPreferences: UserMealPreferences = {
+      ...preferences,
+      id,
+      createdAt: now,
+      updatedAt: now,
+    };
+    this.userMealPreferences.set(id, userPreferences);
+    return userPreferences;
+  }
+
+  async updateUserMealPreferences(userId: string, updates: Partial<UserMealPreferences>): Promise<UserMealPreferences | undefined> {
+    const existing = Array.from(this.userMealPreferences.values())
+      .find(prefs => prefs.userId === userId);
+    
+    if (!existing) return undefined;
+
+    const updatedPreferences: UserMealPreferences = {
+      ...existing,
+      ...updates,
+      id: existing.id, // Ensure ID doesn't change
+      updatedAt: new Date(),
+    };
+    this.userMealPreferences.set(existing.id, updatedPreferences);
+    return updatedPreferences;
+  }
+
+  async getUsersForWeeklyMealPlanGeneration(): Promise<{ userId: string; preferences: UserMealPreferences }[]> {
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+    return Array.from(this.userMealPreferences.values())
+      .filter(prefs => 
+        prefs.autoGenerate && 
+        (!prefs.lastGeneratedAt || new Date(prefs.lastGeneratedAt) <= oneWeekAgo)
+      )
+      .map(prefs => ({ userId: prefs.userId, preferences: prefs }));
+  }
+
+  // AI Meal Plan Generation
+  async createAIMealPlan(mealPlan: InsertMealPlan, days: { dayNumber: number; name: string; meals: any[] }[]): Promise<MealPlan> {
+    // Create the meal plan
+    const planId = randomUUID();
+    const newPlan: MealPlan = {
+      id: planId,
+      ...mealPlan,
+      createdAt: new Date(),
+    };
+    this.mealPlans.set(planId, newPlan);
+
+    // Create the days and meals
+    for (const dayData of days) {
+      const dayId = randomUUID();
+      const day: MealPlanDay = {
+        id: dayId,
+        mealPlanId: planId,
+        dayNumber: dayData.dayNumber,
+        name: dayData.name,
+      };
+      this.mealPlanDays.set(dayId, day);
+
+      // Create meals for this day
+      for (const mealData of dayData.meals) {
+        const mealId = randomUUID();
+        const meal: MealPlanMeal = {
+          id: mealId,
+          mealPlanDayId: dayId,
+          mealType: mealData.mealType,
+          name: mealData.name,
+          description: mealData.description,
+          calories: mealData.calories,
+          protein: mealData.protein,
+          carbs: mealData.carbs,
+          fat: mealData.fat,
+          ingredients: mealData.ingredients,
+          instructions: mealData.instructions || [],
+          prepTime: mealData.prepTime,
+          servings: mealData.servings,
+        };
+        this.mealPlanMeals.set(mealId, meal);
+      }
+    }
+
+    return newPlan;
   }
 }
 

@@ -18,11 +18,13 @@ import {
   insertCommunityPostSchema,
   insertMealPlanSchema,
   insertUserMealPlanSchema,
-  insertPaymentSchema
+  insertPaymentSchema,
+  insertUserMealPreferencesSchema
 } from "@shared/schema";
 import { z } from "zod";
 import { ObjectStorageService } from "./objectStorage";
 import { analyzeFoodImage } from "./foodRecognition";
+import { generatePersonalizedMealPlan, generateWeeklyMealPlan } from "./mealPlanGenerator";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 
 if (!process.env.STRIPE_SECRET_KEY) {
@@ -1158,6 +1160,179 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       console.error("Error assigning meal plan:", error);
       res.status(500).json({ message: "Failed to assign meal plan" });
+    }
+  });
+
+  // Get user meal preferences
+  app.get("/api/user-meal-preferences", isAuthenticated, async (req, res) => {
+    try {
+      const userId = getCurrentUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      const preferences = await storage.getUserMealPreferences(userId);
+      res.json(preferences || null);
+    } catch (error) {
+      console.error("Error fetching user meal preferences:", error);
+      res.status(500).json({ message: "Failed to fetch meal preferences" });
+    }
+  });
+
+  // Create or update user meal preferences
+  app.post("/api/user-meal-preferences", isAuthenticated, async (req, res) => {
+    try {
+      const userId = getCurrentUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      
+      const data = insertUserMealPreferencesSchema.parse({
+        ...req.body,
+        userId: userId
+      });
+
+      // Check if preferences already exist
+      const existing = await storage.getUserMealPreferences(userId);
+      let preferences;
+      
+      if (existing) {
+        preferences = await storage.updateUserMealPreferences(userId, data);
+      } else {
+        preferences = await storage.createUserMealPreferences(data);
+      }
+      
+      res.json(preferences);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid preferences data", errors: error.errors });
+      }
+      console.error("Error saving meal preferences:", error);
+      res.status(500).json({ message: "Failed to save meal preferences" });
+    }
+  });
+
+  // Generate personalized meal plan using AI
+  app.post("/api/generate-meal-plan", isAuthenticated, async (req, res) => {
+    try {
+      const userId = getCurrentUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+
+      const { goal, dailyCalories, dietaryRestrictions, allergies, preferences, duration = 7 } = req.body;
+      
+      if (!goal || !dailyCalories) {
+        return res.status(400).json({ message: "Goal and daily calories are required" });
+      }
+
+      // Generate the meal plan using AI
+      const generatedPlan = await generatePersonalizedMealPlan({
+        goal,
+        dailyCalories,
+        dietaryRestrictions: dietaryRestrictions || [],
+        preferences: preferences || [],
+        allergies: allergies || [],
+        duration
+      });
+
+      // Save the generated meal plan to storage
+      const mealPlan = await storage.createAIMealPlan(
+        {
+          name: generatedPlan.name,
+          description: generatedPlan.description,
+          goal: generatedPlan.goal,
+          dailyCalories: generatedPlan.dailyCalories,
+          dailyProtein: generatedPlan.dailyProtein,
+          dailyCarbs: generatedPlan.dailyCarbs,
+          dailyFat: generatedPlan.dailyFat,
+          duration: generatedPlan.duration,
+        },
+        generatedPlan.days
+      );
+
+      // Update user preferences with last generation date
+      await storage.updateUserMealPreferences(userId, {
+        lastGeneratedAt: new Date(),
+        goal,
+        dailyCalories,
+        dietaryRestrictions: dietaryRestrictions || [],
+        allergies: allergies || [],
+        preferences: preferences || []
+      });
+
+      // Automatically assign the new meal plan to the user
+      await storage.assignMealPlan({
+        userId,
+        mealPlanId: mealPlan.id,
+        startDate: new Date(),
+        isActive: true
+      });
+
+      res.json({ mealPlan, message: "Meal plan generated and assigned successfully!" });
+    } catch (error) {
+      console.error("Error generating meal plan:", error);
+      res.status(500).json({ message: "Failed to generate meal plan. Please try again." });
+    }
+  });
+
+  // Generate weekly meal plans for users (background task)
+  app.post("/api/generate-weekly-meal-plans", async (req, res) => {
+    try {
+      const usersForGeneration = await storage.getUsersForWeeklyMealPlanGeneration();
+      const results = [];
+
+      for (const { userId, preferences } of usersForGeneration) {
+        try {
+          const generatedPlan = await generateWeeklyMealPlan(userId, {
+            goal: preferences.goal as "weight_loss" | "weight_gain" | "maintenance",
+            dailyCalories: preferences.dailyCalories,
+            dietaryRestrictions: preferences.dietaryRestrictions || [],
+            preferences: preferences.preferences || [],
+            allergies: preferences.allergies || []
+          });
+
+          // Save the generated meal plan
+          const mealPlan = await storage.createAIMealPlan(
+            {
+              name: generatedPlan.name,
+              description: generatedPlan.description,
+              goal: generatedPlan.goal,
+              dailyCalories: generatedPlan.dailyCalories,
+              dailyProtein: generatedPlan.dailyProtein,
+              dailyCarbs: generatedPlan.dailyCarbs,
+              dailyFat: generatedPlan.dailyFat,
+              duration: generatedPlan.duration,
+            },
+            generatedPlan.days
+          );
+
+          // Assign to user
+          await storage.assignMealPlan({
+            userId,
+            mealPlanId: mealPlan.id,
+            startDate: new Date(),
+            isActive: true
+          });
+
+          // Update last generation date
+          await storage.updateUserMealPreferences(userId, {
+            lastGeneratedAt: new Date()
+          });
+
+          results.push({ userId, success: true, mealPlanId: mealPlan.id });
+        } catch (error) {
+          console.error(`Error generating meal plan for user ${userId}:`, error);
+          results.push({ userId, success: false, error: error.message });
+        }
+      }
+
+      res.json({ 
+        message: `Generated meal plans for ${results.filter(r => r.success).length}/${results.length} users`,
+        results 
+      });
+    } catch (error) {
+      console.error("Error in weekly meal plan generation:", error);
+      res.status(500).json({ message: "Failed to generate weekly meal plans" });
     }
   });
 
