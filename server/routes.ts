@@ -444,10 +444,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             recurring: {
               interval: 'month'
             },
-            product_data: {
-              name: 'FlexFlow Premium',
-              description: 'Premium fitness tracking with AI meal plans and advanced features'
-            }
+            product: 'FlexFlow Premium' // Fixed: changed from product_data to product
           }
         }],
         trial_period_days: 7, // 7-day free trial
