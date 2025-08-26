@@ -19,7 +19,7 @@ export default function ProgressOverview() {
 
   if (isLoading) {
     return (
-      <section className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      <section className="relative bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 rounded-2xl shadow-lg border border-slate-200 p-6 overflow-hidden">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-xl font-bold text-gray-800">Progress Overview</h3>
         </div>
@@ -43,7 +43,7 @@ export default function ProgressOverview() {
 
   if (!metrics) {
     return (
-      <section className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      <section className="relative bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 rounded-2xl shadow-lg border border-slate-200 p-6 overflow-hidden">
         <div className="text-center py-8 text-gray-500">
           <BarChart3 className="mx-auto h-12 w-12 text-gray-300 mb-4" />
           <p className="text-lg font-medium mb-2">Unable to load progress data</p>
@@ -69,16 +69,27 @@ export default function ProgressOverview() {
   const maxWorkouts = Math.max(...recentWorkouts.map(w => w.count), 1);
 
   return (
-    <section className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6" data-testid="progress-overview">
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="text-xl font-bold text-gray-800">Progress Overview</h3>
-        <TrendingUp className="text-primary w-6 h-6" />
+    <section className="relative bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 rounded-2xl shadow-lg border border-slate-200 p-6 overflow-hidden" data-testid="progress-overview">
+      {/* Decorative background pattern */}
+      <div className="absolute inset-0 opacity-5">
+        <div className="absolute top-0 left-0 w-32 h-32 bg-gradient-to-br from-blue-400 to-purple-400 rounded-full blur-3xl"></div>
+        <div className="absolute top-20 right-10 w-24 h-24 bg-gradient-to-br from-indigo-400 to-blue-400 rounded-full blur-2xl"></div>
+        <div className="absolute bottom-10 left-20 w-28 h-28 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full blur-3xl"></div>
       </div>
+      
+      {/* Content wrapper with relative positioning */}
+      <div className="relative z-10">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-xl font-bold text-slate-800">Progress Overview</h3>
+          <div className="p-2 bg-white/70 backdrop-blur-sm rounded-lg shadow-sm">
+            <TrendingUp className="text-primary w-6 h-6" />
+          </div>
+        </div>
 
       {/* Main Metrics Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         {/* Current Streak */}
-        <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-4 border border-orange-100">
+        <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-4 border border-orange-100 shadow-md backdrop-blur-sm bg-white/40">
           <div className="flex items-center justify-between mb-3">
             <h4 className="font-semibold text-gray-800">Current Streak</h4>
             <Flame className="text-orange-500 w-5 h-5" />
@@ -90,7 +101,7 @@ export default function ProgressOverview() {
         </div>
 
         {/* Longest Streak */}
-        <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 border border-green-100">
+        <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 border border-green-100 shadow-md backdrop-blur-sm bg-white/40">
           <div className="flex items-center justify-between mb-3">
             <h4 className="font-semibold text-gray-800">Personal Best</h4>
             <Award className="text-green-500 w-5 h-5" />
@@ -102,7 +113,7 @@ export default function ProgressOverview() {
         </div>
 
         {/* Total Workout Days */}
-        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-100">
+        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-100 shadow-md backdrop-blur-sm bg-white/40">
           <div className="flex items-center justify-between mb-3">
             <h4 className="font-semibold text-gray-800">Total Active Days</h4>
             <Calendar className="text-blue-500 w-5 h-5" />
@@ -117,7 +128,7 @@ export default function ProgressOverview() {
       {/* Consistency Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         {/* 7-Day Consistency */}
-        <div className={`${consistency7.bgColor} rounded-xl p-4 border`}>
+        <div className={`${consistency7.bgColor} rounded-xl p-4 border shadow-md backdrop-blur-sm bg-white/50`}>
           <div className="flex items-center justify-between mb-3">
             <h4 className="font-semibold text-gray-800">7-Day Consistency</h4>
             <Target className="text-gray-600 w-5 h-5" />
@@ -135,7 +146,7 @@ export default function ProgressOverview() {
         </div>
 
         {/* 30-Day Consistency */}
-        <div className={`${consistency30.bgColor} rounded-xl p-4 border`}>
+        <div className={`${consistency30.bgColor} rounded-xl p-4 border shadow-md backdrop-blur-sm bg-white/50`}>
           <div className="flex items-center justify-between mb-3">
             <h4 className="font-semibold text-gray-800">30-Day Consistency</h4>
             <Target className="text-gray-600 w-5 h-5" />
@@ -154,7 +165,7 @@ export default function ProgressOverview() {
       </div>
 
       {/* Workout Frequency Chart */}
-      <div className="bg-gray-50 rounded-xl p-4">
+      <div className="bg-gradient-to-br from-white/60 to-slate-100/60 rounded-xl p-4 border border-slate-200 shadow-md backdrop-blur-sm">
         <h4 className="font-semibold text-gray-800 mb-4">Recent Activity (Last 14 Days)</h4>
         <div className="flex items-end justify-between space-x-1" style={{ height: '60px' }}>
           {recentWorkouts.map((day, index) => {
@@ -182,7 +193,7 @@ export default function ProgressOverview() {
 
       {/* Progress Insights */}
       {metrics.currentStreak > 0 && metrics.longestStreak > 0 && (
-        <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-xl">
+        <div className="mt-6 p-4 bg-gradient-to-br from-blue-50/80 to-indigo-100/80 border border-blue-200/50 rounded-xl shadow-md backdrop-blur-sm">
           <div className="flex items-center space-x-3">
             <TrendingUp className="text-blue-500" />
             <div>
@@ -199,6 +210,7 @@ export default function ProgressOverview() {
           </div>
         </div>
       )}
+      </div>
     </section>
   );
 }
