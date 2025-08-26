@@ -81,8 +81,8 @@ export default function Subscribe() {
         </div>
 
         <div className="space-y-8">
-          {/* Subscription Plan */}
-          <div className="max-w-md mx-auto">
+          {/* Subscription Plans */}
+          <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
             <Card className="relative">
               <CardHeader>
                 <CardTitle>Monthly Premium</CardTitle>
@@ -91,6 +91,18 @@ export default function Subscribe() {
               <CardContent className="space-y-4">
                 <div className="flex justify-center">
                   <StripeBuyButtonPremium />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="relative">
+              <CardHeader>
+                <CardTitle>Annual Premium</CardTitle>
+                <CardDescription>Best value for committed users</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex justify-center">
+                  <StripeBuyButtonAnnual />
                 </div>
               </CardContent>
             </Card>
