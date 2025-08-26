@@ -217,18 +217,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const fileExtension = path.extname(req.file.originalname);
         const fileName = `profile-${userId}-${Date.now()}${fileExtension}`;
         
-        // Store in private directory
-        const privateDir = process.env.PRIVATE_OBJECT_DIR || '';
-        
-        if (!privateDir) {
-          return res.status(500).json({ message: "Object storage not configured" });
-        }
-        
-        const uploadPath = path.join(privateDir, fileName);
+        // Store in uploads directory
+        const uploadsDir = path.join(process.cwd(), 'uploads', 'profiles');
+        const uploadPath = path.join(uploadsDir, fileName);
         
         try {
           // Ensure directory exists
-          await fs.mkdir(privateDir, { recursive: true });
+          await fs.mkdir(uploadsDir, { recursive: true });
           // Write file
           await fs.writeFile(uploadPath, req.file.buffer);
           profileImageUrl = `/api/user/profile/image/${fileName}`;
@@ -263,7 +258,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/user/profile/image/:filename", isAuthenticated, async (req, res) => {
     try {
       const { filename } = req.params;
-      const imagePath = path.join(process.env.PRIVATE_OBJECT_DIR || '', filename);
+      const uploadsDir = path.join(process.cwd(), 'uploads', 'profiles');
+      const imagePath = path.join(uploadsDir, filename);
       
       try {
         await fs.access(imagePath);
