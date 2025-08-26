@@ -110,11 +110,11 @@ export default function GoalsWidget() {
     }
   };
   
-  // Update goals with real progress data - set to zero for fresh start
+  // Update goals with real progress data from user's actual workouts
   const displayGoals = goals && goals.length > 0 
     ? goals.map(goal => ({
         ...goal,
-        current: 0
+        current: getCurrentProgress(goal.type)
       }))
     : [];
     
