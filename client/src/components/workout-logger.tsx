@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Search, Expand, Hand, Activity, ArrowUpDown, Leaf, Weight, Bike, Dumbbell } from "lucide-react";
+import { Search, Expand, Hand, Activity, ArrowUpDown, Leaf, Weight, Bike, Dumbbell, X, Play } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { apiRequest } from "@/lib/queryClient";
@@ -11,6 +11,7 @@ export default function WorkoutLogger() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("strength");
   const [showAllExercises, setShowAllExercises] = useState(false);
+  const [selectedExercise, setSelectedExercise] = useState<any>(null);
   const [, setLocation] = useLocation();
   const queryClient = useQueryClient();
 
@@ -139,6 +140,107 @@ export default function WorkoutLogger() {
 
   const filteredExercises = getFilteredExercises();
 
+  // Exercise instructions database
+  const exerciseInstructions: Record<string, { steps: string[], tips: string[], muscles: string[] }> = {
+    "Push-ups": {
+      steps: [
+        "Start in a plank position with hands shoulder-width apart",
+        "Lower your body until chest nearly touches the floor",
+        "Push back up to starting position",
+        "Keep your core tight throughout the movement"
+      ],
+      tips: ["Keep your body in a straight line", "Don't let your hips sag", "Control the movement"],
+      muscles: ["Chest", "Triceps", "Shoulders", "Core"]
+    },
+    "Squats": {
+      steps: [
+        "Stand with feet shoulder-width apart",
+        "Lower your body by bending at hips and knees",
+        "Go down until thighs are parallel to floor",
+        "Push through heels to return to starting position"
+      ],
+      tips: ["Keep chest up", "Don't let knees cave inward", "Weight on heels"],
+      muscles: ["Quadriceps", "Glutes", "Hamstrings", "Core"]
+    },
+    "Deadlifts": {
+      steps: [
+        "Stand with feet hip-width apart, bar over mid-foot",
+        "Bend at hips and knees to grip the bar",
+        "Lift by driving through heels and extending hips",
+        "Keep bar close to body throughout movement"
+      ],
+      tips: ["Keep back straight", "Don't round shoulders", "Engage core"],
+      muscles: ["Hamstrings", "Glutes", "Lower Back", "Traps"]
+    },
+    "Plank": {
+      steps: [
+        "Start in push-up position on forearms",
+        "Keep body in straight line from head to heels",
+        "Hold position while breathing normally",
+        "Don't let hips sag or pike up"
+      ],
+      tips: ["Engage core muscles", "Keep neck neutral", "Start with shorter holds"],
+      muscles: ["Core", "Shoulders", "Glutes"]
+    },
+    "Pull-ups": {
+      steps: [
+        "Hang from bar with palms facing away",
+        "Pull body up until chin clears the bar",
+        "Lower with control to full arm extension",
+        "Repeat without swinging"
+      ],
+      tips: ["Engage lats", "Don't use momentum", "Full range of motion"],
+      muscles: ["Lats", "Biceps", "Rhomboids", "Core"]
+    },
+    "Bench Press": {
+      steps: [
+        "Lie on bench with eyes under the bar",
+        "Grip bar slightly wider than shoulder-width",
+        "Lower bar to chest with control",
+        "Press bar back up to starting position"
+      ],
+      tips: ["Keep feet on floor", "Retract shoulder blades", "Don't bounce off chest"],
+      muscles: ["Chest", "Triceps", "Front Deltoids"]
+    },
+    "Dumbbell Curls": {
+      steps: [
+        "Stand with dumbbells at your sides",
+        "Keep elbows close to your body",
+        "Curl weights up to shoulder level",
+        "Lower with control to starting position"
+      ],
+      tips: ["Don't swing the weights", "Keep wrists straight", "Focus on bicep contraction"],
+      muscles: ["Biceps", "Forearms"]
+    },
+    "Running": {
+      steps: [
+        "Start with proper warm-up and stretching",
+        "Maintain upright posture with slight forward lean",
+        "Land on midfoot, not heel or toes",
+        "Keep arms relaxed with 90-degree bend"
+      ],
+      tips: ["Start slow and build endurance", "Breathe rhythmically", "Stay hydrated"],
+      muscles: ["Legs", "Glutes", "Core", "Cardiovascular System"]
+    }
+  };
+
+  const getExerciseInstructions = (exerciseName: string) => {
+    return exerciseInstructions[exerciseName] || {
+      steps: [
+        "Position yourself in the starting stance",
+        "Perform the movement with controlled form",
+        "Focus on proper breathing throughout",
+        "Return to starting position with control"
+      ],
+      tips: ["Start with lighter weight", "Focus on form over speed", "Listen to your body"],
+      muscles: ["Target muscle groups", "Stabilizing muscles"]
+    };
+  };
+
+  const handleExerciseClick = (exercise: any) => {
+    setSelectedExercise(exercise);
+  };
+
   const handleStartWorkout = (exerciseName: string) => {
     // This would typically open a workout tracking modal
     // For now, we'll create a simple workout entry
@@ -148,6 +250,7 @@ export default function WorkoutLogger() {
       duration: 30,
       caloriesBurned: 200,
     });
+    setSelectedExercise(null);
   };
 
   return (
@@ -226,15 +329,20 @@ export default function WorkoutLogger() {
           return (
             <button
               key={exercise.name}
-              onClick={() => handleStartWorkout(exercise.name)}
+              onClick={() => handleExerciseClick(exercise)}
               disabled={createWorkoutMutation.isPending}
               className={`bg-gradient-to-br from-${exercise.color}-50 to-${exercise.color}-100 border border-${exercise.color}-200 rounded-xl p-4 text-left hover:from-${exercise.color}-100 hover:to-${exercise.color}-200 transition-all group disabled:opacity-50`}
+              data-testid={`exercise-${exercise.name.toLowerCase().replace(/\s+/g, '-')}`}
             >
               <div className="flex items-center space-x-3 mb-2">
                 <IconComponent className={`text-${exercise.color}-600 text-lg group-hover:scale-110 transition-transform`} />
                 <span className="font-medium text-gray-800">{exercise.name}</span>
               </div>
               <p className="text-xs text-muted">{exercise.description}</p>
+              <div className="flex items-center mt-2 text-xs text-gray-500">
+                <Play className="w-3 h-3 mr-1" />
+                <span>View instructions</span>
+              </div>
             </button>
           );
         }) : (
@@ -252,6 +360,96 @@ export default function WorkoutLogger() {
 
       {createWorkoutMutation.isPending && (
         <p className="text-center text-muted mt-4">Creating workout...</p>
+      )}
+
+      {/* Exercise Instructions Modal */}
+      {selectedExercise && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50" onClick={() => setSelectedExercise(null)}>
+          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="p-6">
+              {/* Header */}
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center space-x-3">
+                  <selectedExercise.icon className={`text-${selectedExercise.color}-600 text-2xl`} />
+                  <div>
+                    <h2 className="text-2xl font-bold text-gray-800">{selectedExercise.name}</h2>
+                    <p className="text-muted capitalize">{selectedExercise.category} • {selectedExercise.description}</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setSelectedExercise(null)}
+                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                  data-testid="close-exercise-modal"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              {/* Exercise Instructions */}
+              <div className="space-y-6">
+                {/* Target Muscles */}
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-800 mb-3">Target Muscles</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {getExerciseInstructions(selectedExercise.name).muscles.map((muscle, index) => (
+                      <span key={index} className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+                        {muscle}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Step-by-Step Instructions */}
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-800 mb-3">How to Perform</h3>
+                  <ol className="space-y-3">
+                    {getExerciseInstructions(selectedExercise.name).steps.map((step, index) => (
+                      <li key={index} className="flex items-start space-x-3">
+                        <span className="bg-primary text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-medium flex-shrink-0 mt-0.5">
+                          {index + 1}
+                        </span>
+                        <p className="text-gray-700">{step}</p>
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+
+                {/* Tips */}
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-800 mb-3">Pro Tips</h3>
+                  <ul className="space-y-2">
+                    {getExerciseInstructions(selectedExercise.name).tips.map((tip, index) => (
+                      <li key={index} className="flex items-start space-x-2">
+                        <span className="text-yellow-500 mt-1">💡</span>
+                        <p className="text-gray-700">{tip}</p>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex space-x-3 mt-8">
+                <Button
+                  onClick={() => handleStartWorkout(selectedExercise.name)}
+                  disabled={createWorkoutMutation.isPending}
+                  className="flex-1"
+                  data-testid="start-workout-button"
+                >
+                  {createWorkoutMutation.isPending ? 'Starting...' : 'Start Workout'}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => setSelectedExercise(null)}
+                  className="px-6"
+                  data-testid="close-modal-button"
+                >
+                  Close
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </section>
   );
