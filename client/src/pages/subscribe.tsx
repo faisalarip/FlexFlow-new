@@ -73,6 +73,10 @@ export default function Subscribe() {
                 <CardDescription>Perfect for getting started</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
+                <div className="text-center py-4">
+                  <span className="font-semibold text-3xl">$15.99</span>
+                  <span className="text-gray-500">/month</span>
+                </div>
                 <div className="flex justify-center">
                   <StripeBuyButtonPremium />
                 </div>
