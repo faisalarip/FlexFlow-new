@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Trophy, Plus, Edit2 } from "lucide-react";
+import { Trophy, Plus, Edit2, Trash2 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -59,6 +59,17 @@ export default function GoalsWidget() {
       queryClient.invalidateQueries({ queryKey: ["/api/goals"] });
       setIsEditDialogOpen(false);
       setEditingGoal(null);
+    },
+  });
+  
+  // Mutation for deleting goals
+  const deleteGoalMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const response = await apiRequest("DELETE", `/api/goals/${id}`);
+      return response;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/goals"] });
     },
   });
 
@@ -287,14 +298,27 @@ export default function GoalsWidget() {
                     <span className="text-sm text-muted">
                       {goal.current}/{goal.target}
                     </span>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="opacity-0 group-hover:opacity-100 transition-opacity p-1 h-6 w-6"
-                      onClick={() => handleEditGoal(goal)}
-                    >
-                      <Edit2 className="w-3 h-3" />
-                    </Button>
+                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="p-1 h-6 w-6"
+                        onClick={() => handleEditGoal(goal)}
+                        data-testid={`edit-goal-${goal.id}`}
+                      >
+                        <Edit2 className="w-3 h-3" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="p-1 h-6 w-6 text-red-500 hover:text-red-700 hover:bg-red-50"
+                        onClick={() => deleteGoalMutation.mutate(goal.id)}
+                        disabled={deleteGoalMutation.isPending}
+                        data-testid={`delete-goal-${goal.id}`}
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </Button>
+                    </div>
                   </div>
                 </div>
                 <Progress value={progress} className="h-2" />
