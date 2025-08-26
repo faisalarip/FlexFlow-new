@@ -221,6 +221,197 @@ export default function WorkoutLogger() {
       ],
       tips: ["Start slow and build endurance", "Breathe rhythmically", "Stay hydrated"],
       muscles: ["Legs", "Glutes", "Core", "Cardiovascular System"]
+    },
+    // Dumbbell Specific Instructions
+    "Dumbbell Press": {
+      steps: [
+        "Lie on bench holding dumbbells at chest level",
+        "Position dumbbells with palms facing forward",
+        "Press weights straight up until arms are fully extended",
+        "Lower dumbbells slowly to starting position with control"
+      ],
+      tips: ["Keep wrists straight and stable", "Don't let dumbbells drift inward", "Use full range of motion"],
+      muscles: ["Chest", "Front Deltoids", "Triceps"]
+    },
+    "Dumbbell Rows": {
+      steps: [
+        "Place one knee and hand on bench for support",
+        "Hold dumbbell in opposite hand with arm hanging straight",
+        "Pull dumbbell up to your ribcage by squeezing shoulder blade",
+        "Lower weight slowly while maintaining back position"
+      ],
+      tips: ["Keep back flat and parallel to floor", "Pull with your back, not your arm", "Don't rotate your torso"],
+      muscles: ["Lats", "Rhomboids", "Middle Traps", "Rear Deltoids"]
+    },
+    "Dumbbell Flyes": {
+      steps: [
+        "Lie on bench with dumbbells held above chest",
+        "Lower weights in wide arc with slight bend in elbows",
+        "Feel stretch in chest at bottom position",
+        "Bring dumbbells back together in same arc motion"
+      ],
+      tips: ["Keep slight bend in elbows throughout", "Focus on chest squeeze at top", "Control the weight on the way down"],
+      muscles: ["Chest", "Front Deltoids"]
+    },
+    "Dumbbell Squats": {
+      steps: [
+        "Hold dumbbells at shoulder height or at your sides",
+        "Stand with feet shoulder-width apart",
+        "Squat down by pushing hips back and bending knees",
+        "Drive through heels to return to standing position"
+      ],
+      tips: ["Keep chest up and core engaged", "Don't let knees cave inward", "Go as deep as mobility allows"],
+      muscles: ["Quadriceps", "Glutes", "Hamstrings", "Core"]
+    },
+    "Dumbbell Lunges": {
+      steps: [
+        "Hold dumbbells at your sides or shoulders",
+        "Step forward into a lunge position",
+        "Lower back knee toward ground while keeping front knee over ankle",
+        "Push off front foot to return to starting position"
+      ],
+      tips: ["Keep torso upright", "Don't let front knee go past toes", "Alternate legs or complete all reps on one side"],
+      muscles: ["Quadriceps", "Glutes", "Hamstrings", "Calves"]
+    },
+    "Dumbbell Shoulder Press": {
+      steps: [
+        "Sit or stand with dumbbells at shoulder level",
+        "Position palms facing forward with elbows at 90 degrees",
+        "Press weights straight overhead until arms are fully extended",
+        "Lower dumbbells back to shoulder level with control"
+      ],
+      tips: ["Keep core tight to avoid arching back", "Don't press weights behind your head", "Maintain neutral wrist position"],
+      muscles: ["Deltoids", "Triceps", "Upper Traps"]
+    },
+    "Dumbbell Lateral Raises": {
+      steps: [
+        "Stand with dumbbells at your sides, palms facing body",
+        "Raise weights out to sides until arms are parallel to floor",
+        "Keep slight bend in elbows throughout movement",
+        "Lower weights slowly back to starting position"
+      ],
+      tips: ["Don't raise weights above shoulder height", "Lead with your pinkies", "Use lighter weight and focus on form"],
+      muscles: ["Middle Deltoids", "Supraspinatus"]
+    },
+    "Dumbbell Front Raises": {
+      steps: [
+        "Stand with dumbbells in front of thighs, palms facing back",
+        "Raise one or both dumbbells forward to shoulder height",
+        "Keep arms straight with slight bend in elbows",
+        "Lower weights slowly back to starting position"
+      ],
+      tips: ["Don't swing or use momentum", "Keep shoulders down and back", "Alternate arms for better control"],
+      muscles: ["Front Deltoids", "Upper Chest"]
+    },
+    "Dumbbell Shrugs": {
+      steps: [
+        "Stand with dumbbells at your sides, arms hanging straight",
+        "Shrug shoulders straight up toward your ears",
+        "Hold briefly at the top position",
+        "Lower shoulders back down slowly"
+      ],
+      tips: ["Don't roll shoulders forward or backward", "Use heavy weight with slow, controlled movement", "Keep arms straight throughout"],
+      muscles: ["Upper Traps", "Levator Scapulae"]
+    },
+    "Dumbbell Deadlifts": {
+      steps: [
+        "Stand with feet hip-width apart, dumbbells in front of thighs",
+        "Hinge at hips and push glutes back while lowering weights",
+        "Keep dumbbells close to legs as you lower them",
+        "Drive hips forward to return to standing position"
+      ],
+      tips: ["Keep back straight and chest up", "Feel stretch in hamstrings at bottom", "Lead with your hips, not your knees"],
+      muscles: ["Hamstrings", "Glutes", "Lower Back", "Core"]
+    },
+    "Dumbbell Step-ups": {
+      steps: [
+        "Stand facing a bench or box with dumbbells at your sides",
+        "Step up onto platform with one foot, placing entire foot on surface",
+        "Push through heel to lift your body up onto the platform",
+        "Step down with control and repeat on same leg or alternate"
+      ],
+      tips: ["Use a platform that puts your knee at 90 degrees", "Don't push off back foot", "Keep torso upright throughout"],
+      muscles: ["Quadriceps", "Glutes", "Hamstrings", "Calves"]
+    },
+    "Dumbbell Tricep Extensions": {
+      steps: [
+        "Hold one dumbbell with both hands overhead",
+        "Lower weight behind head by bending only at elbows",
+        "Keep upper arms stationary and elbows pointing forward",
+        "Extend arms back to starting position"
+      ],
+      tips: ["Keep elbows close together", "Don't let elbows flare out", "Use lighter weight to maintain form"],
+      muscles: ["Triceps"]
+    },
+    "Dumbbell Hammer Curls": {
+      steps: [
+        "Stand with dumbbells at sides, palms facing each other",
+        "Curl weights up while keeping palms facing each other",
+        "Squeeze biceps at the top of the movement",
+        "Lower weights slowly back to starting position"
+      ],
+      tips: ["Keep elbows stationary at your sides", "Don't swing or use momentum", "Neutral grip targets different muscle fibers"],
+      muscles: ["Biceps", "Brachialis", "Forearms"]
+    },
+    "Dumbbell Thrusters": {
+      steps: [
+        "Hold dumbbells at shoulder level in squat position",
+        "Squat down by pushing hips back and bending knees",
+        "Drive up explosively through heels while pressing weights overhead",
+        "Lower weights back to shoulders and repeat"
+      ],
+      tips: ["Use momentum from legs to help press", "Keep core tight throughout", "This is a compound power movement"],
+      muscles: ["Full Body", "Shoulders", "Legs", "Core"]
+    },
+    "Dumbbell Russian Twists": {
+      steps: [
+        "Sit on floor holding one dumbbell with both hands",
+        "Lean back slightly and lift feet off ground",
+        "Rotate torso to one side, touching weight to floor",
+        "Rotate to opposite side and repeat"
+      ],
+      tips: ["Keep feet elevated throughout", "Move with control, not speed", "Look forward, not at the weight"],
+      muscles: ["Obliques", "Core", "Hip Flexors"]
+    },
+    "Dumbbell Walking Lunges": {
+      steps: [
+        "Hold dumbbells at your sides or shoulders",
+        "Step forward into lunge position",
+        "Instead of returning to start, step forward with back leg",
+        "Continue alternating legs while moving forward"
+      ],
+      tips: ["Take larger steps for better glute activation", "Keep torso upright throughout", "Ensure adequate space to walk"],
+      muscles: ["Quadriceps", "Glutes", "Hamstrings", "Core"]
+    },
+    "Dumbbell Renegade Rows": {
+      steps: [
+        "Start in plank position with hands on dumbbells",
+        "Row one dumbbell to your ribcage while balancing on other arm",
+        "Keep hips square and core tight",
+        "Lower weight and repeat on opposite side"
+      ],
+      tips: ["Use hexagonal dumbbells for stability", "Don't let hips rotate", "This combines core and back training"],
+      muscles: ["Lats", "Core", "Shoulders", "Triceps"]
+    },
+    "Dumbbell Goblet Squats": {
+      steps: [
+        "Hold one dumbbell vertically against your chest",
+        "Stand with feet slightly wider than shoulder-width",
+        "Squat down while keeping dumbbell close to body",
+        "Drive through heels to return to standing"
+      ],
+      tips: ["Elbows should point down toward floor", "This position helps maintain upright torso", "Great for learning squat form"],
+      muscles: ["Quadriceps", "Glutes", "Core"]
+    },
+    "Dumbbell Bulgarian Split Squats": {
+      steps: [
+        "Hold dumbbells at sides with rear foot elevated on bench",
+        "Lower into lunge position by bending front knee",
+        "Keep most weight on front foot",
+        "Push through front heel to return to starting position"
+      ],
+      tips: ["Don't put too much weight on back foot", "Keep torso upright", "This targets one leg at a time"],
+      muscles: ["Quadriceps", "Glutes", "Hamstrings"]
     }
   };
 
