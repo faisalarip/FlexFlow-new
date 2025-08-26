@@ -81,46 +81,16 @@ export default function Subscribe() {
         </div>
 
         <div className="space-y-8">
-          {/* Subscription Plans */}
-          <div className="grid md:grid-cols-2 gap-6">
-            {/* Monthly Plan */}
+          {/* Subscription Plan */}
+          <div className="max-w-md mx-auto">
             <Card className="relative">
               <CardHeader>
                 <CardTitle>Monthly Premium</CardTitle>
                 <CardDescription>Perfect for getting started</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="text-center py-4">
-                  <span className="font-semibold text-3xl">$10.00</span>
-                  <span className="text-gray-500">/month</span>
-                </div>
                 <div className="flex justify-center">
                   <StripeBuyButtonPremium />
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Annual Plan */}
-            <Card className="relative border-primary">
-              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                <span className="bg-primary text-primary-foreground px-3 py-1 rounded-full text-sm font-medium">
-                  Best Value
-                </span>
-              </div>
-              <CardHeader>
-                <CardTitle>Annual Premium</CardTitle>
-                <CardDescription>Save with yearly billing</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="text-center py-4">
-                  <span className="font-semibold text-3xl">$100.00</span>
-                  <span className="text-gray-500">/year</span>
-                  <div className="text-sm text-green-600 mt-1">
-                    Save $20 per year
-                  </div>
-                </div>
-                <div className="flex justify-center">
-                  <StripeBuyButtonAnnual />
                 </div>
               </CardContent>
             </Card>
