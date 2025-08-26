@@ -91,7 +91,7 @@ export default function Subscribe() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="text-center py-4">
-                  <span className="font-semibold text-3xl">$10.00</span>
+                  <span className="font-semibold text-3xl">$25.00</span>
                   <span className="text-gray-500">/month</span>
                 </div>
                 <div className="flex justify-center">
@@ -108,12 +108,12 @@ export default function Subscribe() {
                 </span>
               </div>
               <CardHeader>
-                <CardTitle>Annual Premium</CardTitle>
-                <CardDescription>Save with yearly billing</CardDescription>
+                <CardTitle>monthly Premium for users</CardTitle>
+                <CardDescription></CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="text-center py-4">
-                  <span className="font-semibold text-3xl">$100.00</span>
+                  <span className="font-semibold text-3xl"></span>
                   <span className="text-gray-500">/year</span>
                   <div className="text-sm text-green-600 mt-1">
                     Save $20 per year
