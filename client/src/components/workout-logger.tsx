@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useLocation } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Search, Expand, Hand, Activity, ArrowUpDown, Leaf, Weight, Bike, Dumbbell } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -9,6 +10,7 @@ import type { Exercise } from "@shared/schema";
 export default function WorkoutLogger() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("strength");
+  const [, setLocation] = useLocation();
   const queryClient = useQueryClient();
 
   const { data: exercises, isLoading } = useQuery<Exercise[]>({
@@ -57,7 +59,12 @@ export default function WorkoutLogger() {
     <section id="workout-logger" className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-xl font-bold text-gray-800">Log Workout</h3>
-        <button className="text-primary hover:text-primary/80 transition-colors">
+        <button 
+          className="text-primary hover:text-primary/80 transition-colors"
+          onClick={() => setLocation('/workouts')}
+          data-testid="expand-workouts-button"
+          title="View all workouts"
+        >
           <Expand />
         </button>
       </div>

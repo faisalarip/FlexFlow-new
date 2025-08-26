@@ -86,7 +86,7 @@ export default function Subscribe() {
             <Card className="relative">
               <CardHeader>
                 <CardTitle>Monthly Premium</CardTitle>
-                <CardDescription>Perfect for getting started</CardDescription>
+                <CardDescription>Best value for committed users</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex justify-center">
@@ -98,7 +98,7 @@ export default function Subscribe() {
             <Card className="relative">
               <CardHeader>
                 <CardTitle>Monthly Premium</CardTitle>
-                <CardDescription>Best value for committed users</CardDescription>
+                <CardDescription>Perfect for getting started</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex justify-center">
