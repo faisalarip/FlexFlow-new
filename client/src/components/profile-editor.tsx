@@ -100,6 +100,8 @@ export default function ProfileEditor({ trigger }: ProfileEditorProps) {
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      console.log('File selected:', file.name, file.type, file.size);
+      
       // Validate file type
       if (!file.type.startsWith('image/')) {
         toast({
@@ -126,6 +128,17 @@ export default function ProfileEditor({ trigger }: ProfileEditorProps) {
       const reader = new FileReader();
       reader.onload = () => {
         setProfileImagePreview(reader.result as string);
+        toast({
+          title: "Image Selected",
+          description: "Profile picture ready to upload!",
+        });
+      };
+      reader.onerror = () => {
+        toast({
+          title: "Error Reading File",
+          description: "Failed to process the selected image.",
+          variant: "destructive",
+        });
       };
       reader.readAsDataURL(file);
     }
@@ -207,7 +220,11 @@ export default function ProfileEditor({ trigger }: ProfileEditorProps) {
                   </div>
                   <button
                     type="button"
-                    onClick={() => fileInputRef.current?.click()}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      fileInputRef.current?.click();
+                    }}
                     className="absolute -bottom-1 -right-1 w-6 h-6 bg-primary rounded-full flex items-center justify-center text-white hover:bg-primary/90 transition-colors"
                     data-testid="upload-image-button"
                   >
@@ -217,7 +234,11 @@ export default function ProfileEditor({ trigger }: ProfileEditorProps) {
                 <div className="flex-1">
                   <button
                     type="button"
-                    onClick={() => fileInputRef.current?.click()}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      fileInputRef.current?.click();
+                    }}
                     className="flex items-center gap-2 text-sm text-primary hover:text-primary/80 transition-colors"
                     data-testid="choose-image-button"
                   >

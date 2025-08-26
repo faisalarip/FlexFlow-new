@@ -218,9 +218,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         // Store in private directory
         const fs = require('fs').promises;
-        const uploadPath = path.join(process.env.PRIVATE_OBJECT_DIR || '', fileName);
+        const privateDir = process.env.PRIVATE_OBJECT_DIR || '';
+        
+        if (!privateDir) {
+          return res.status(500).json({ message: "Object storage not configured" });
+        }
+        
+        const uploadPath = path.join(privateDir, fileName);
         
         try {
+          // Ensure directory exists
+          await fs.mkdir(privateDir, { recursive: true });
+          // Write file
           await fs.writeFile(uploadPath, req.file.buffer);
           profileImageUrl = `/api/user/profile/image/${fileName}`;
         } catch (error) {
