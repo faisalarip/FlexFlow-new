@@ -110,11 +110,11 @@ export default function GoalsWidget() {
     }
   };
   
-  // Update goals with real progress data
+  // Update goals with real progress data - set to zero for fresh start
   const displayGoals = goals && goals.length > 0 
     ? goals.map(goal => ({
         ...goal,
-        current: getCurrentProgress(goal.type)
+        current: 0
       }))
     : [];
     
