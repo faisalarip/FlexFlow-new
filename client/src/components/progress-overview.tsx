@@ -69,104 +69,121 @@ export default function ProgressOverview() {
   const maxWorkouts = Math.max(...recentWorkouts.map(w => w.count), 1);
 
   return (
-    <section className="relative bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 rounded-2xl shadow-lg border border-slate-200 p-6 overflow-hidden" data-testid="progress-overview">
-      {/* Decorative background pattern */}
-      <div className="absolute inset-0 opacity-5">
-        <div className="absolute top-0 left-0 w-32 h-32 bg-gradient-to-br from-blue-400 to-purple-400 rounded-full blur-3xl"></div>
-        <div className="absolute top-20 right-10 w-24 h-24 bg-gradient-to-br from-indigo-400 to-blue-400 rounded-full blur-2xl"></div>
-        <div className="absolute bottom-10 left-20 w-28 h-28 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full blur-3xl"></div>
+    <section className="relative bg-gradient-to-br from-indigo-900 via-purple-900 to-blue-900 rounded-3xl shadow-2xl border border-indigo-700/50 p-8 overflow-hidden" data-testid="progress-overview">
+      {/* Animated background elements */}
+      <div className="absolute inset-0">
+        {/* Floating orbs */}
+        <div className="absolute top-0 left-0 w-40 h-40 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-full blur-3xl opacity-20 animate-pulse"></div>
+        <div className="absolute top-1/4 right-0 w-32 h-32 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full blur-2xl opacity-15 animate-bounce" style={{animationDuration: '3s'}}></div>
+        <div className="absolute bottom-0 left-1/3 w-36 h-36 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-full blur-3xl opacity-20 animate-pulse" style={{animationDelay: '1s'}}></div>
+        <div className="absolute bottom-1/4 right-1/4 w-28 h-28 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full blur-2xl opacity-10 animate-ping" style={{animationDuration: '4s'}}></div>
+        
+        {/* Grid pattern overlay */}
+        <div className="absolute inset-0 opacity-5">
+          <svg className="w-full h-full" viewBox="0 0 100 100">
+            <defs>
+              <pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse">
+                <path d="M 10 0 L 0 0 0 10" fill="none" stroke="currentColor" strokeWidth="0.5"/>
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#grid)" className="text-white" />
+          </svg>
+        </div>
+        
+        {/* Radial gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-radial from-transparent via-indigo-900/20 to-indigo-900/40"></div>
       </div>
       
       {/* Content wrapper with relative positioning */}
       <div className="relative z-10">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-xl font-bold text-slate-800">Progress Overview</h3>
-          <div className="p-2 bg-white/70 backdrop-blur-sm rounded-lg shadow-sm">
-            <TrendingUp className="text-primary w-6 h-6" />
+        <div className="flex items-center justify-between mb-8">
+          <h3 className="text-3xl font-bold text-white drop-shadow-lg">Progress Overview</h3>
+          <div className="p-3 bg-white/10 backdrop-blur-md rounded-xl shadow-lg border border-white/20">
+            <TrendingUp className="text-cyan-300 w-8 h-8" />
           </div>
         </div>
 
       {/* Main Metrics Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         {/* Current Streak */}
-        <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-4 border border-orange-100 shadow-md backdrop-blur-sm bg-white/40">
+        <div className="bg-gradient-to-br from-orange-500/20 to-red-500/20 rounded-2xl p-6 border border-orange-400/30 shadow-2xl backdrop-blur-md bg-white/10 hover:bg-white/15 transition-all duration-300 hover:scale-105">
           <div className="flex items-center justify-between mb-3">
-            <h4 className="font-semibold text-gray-800">Current Streak</h4>
-            <Flame className="text-orange-500 w-5 h-5" />
+            <h4 className="font-semibold text-white drop-shadow-sm">Current Streak</h4>
+            <Flame className="text-orange-300 w-6 h-6 drop-shadow-sm" />
           </div>
-          <div className="text-3xl font-bold text-orange-600 mb-1" data-testid="current-streak">
+          <div className="text-4xl font-bold text-orange-200 mb-2 drop-shadow-lg" data-testid="current-streak">
             {metrics.currentStreak === 0 ? "Start today!" : `${metrics.currentStreak} ${metrics.currentStreak === 1 ? 'day' : 'days'}`}
           </div>
-          <p className="text-sm text-gray-600">Keep the momentum going!</p>
+          <p className="text-sm text-orange-100/80 drop-shadow-sm">Keep the momentum going!</p>
         </div>
 
         {/* Longest Streak */}
-        <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 border border-green-100 shadow-md backdrop-blur-sm bg-white/40">
+        <div className="bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded-2xl p-6 border border-green-400/30 shadow-2xl backdrop-blur-md bg-white/10 hover:bg-white/15 transition-all duration-300 hover:scale-105">
           <div className="flex items-center justify-between mb-3">
-            <h4 className="font-semibold text-gray-800">Personal Best</h4>
-            <Award className="text-green-500 w-5 h-5" />
+            <h4 className="font-semibold text-white drop-shadow-sm">Personal Best</h4>
+            <Award className="text-green-300 w-6 h-6 drop-shadow-sm" />
           </div>
-          <div className="text-3xl font-bold text-green-600 mb-1" data-testid="longest-streak">
+          <div className="text-4xl font-bold text-green-200 mb-2 drop-shadow-lg" data-testid="longest-streak">
             {metrics.longestStreak} days
           </div>
-          <p className="text-sm text-gray-600">Your longest streak</p>
+          <p className="text-sm text-green-100/80 drop-shadow-sm">Your longest streak</p>
         </div>
 
         {/* Total Workout Days */}
-        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-100 shadow-md backdrop-blur-sm bg-white/40">
+        <div className="bg-gradient-to-br from-blue-500/20 to-indigo-500/20 rounded-2xl p-6 border border-blue-400/30 shadow-2xl backdrop-blur-md bg-white/10 hover:bg-white/15 transition-all duration-300 hover:scale-105">
           <div className="flex items-center justify-between mb-3">
-            <h4 className="font-semibold text-gray-800">Total Active Days</h4>
-            <Calendar className="text-blue-500 w-5 h-5" />
+            <h4 className="font-semibold text-white drop-shadow-sm">Total Active Days</h4>
+            <Calendar className="text-blue-300 w-6 h-6 drop-shadow-sm" />
           </div>
-          <div className="text-3xl font-bold text-blue-600 mb-1" data-testid="total-workout-days">
+          <div className="text-4xl font-bold text-blue-200 mb-2 drop-shadow-lg" data-testid="total-workout-days">
             {metrics.totalWorkoutDays}
           </div>
-          <p className="text-sm text-gray-600">Days you've exercised</p>
+          <p className="text-sm text-blue-100/80 drop-shadow-sm">Days you've exercised</p>
         </div>
       </div>
 
       {/* Consistency Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         {/* 7-Day Consistency */}
-        <div className={`${consistency7.bgColor} rounded-xl p-4 border shadow-md backdrop-blur-sm bg-white/50`}>
+        <div className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-2xl p-6 border border-purple-400/30 shadow-2xl backdrop-blur-md bg-white/10 hover:bg-white/15 transition-all duration-300">
           <div className="flex items-center justify-between mb-3">
-            <h4 className="font-semibold text-gray-800">7-Day Consistency</h4>
-            <Target className="text-gray-600 w-5 h-5" />
+            <h4 className="font-semibold text-white drop-shadow-sm">7-Day Consistency</h4>
+            <Target className="text-purple-300 w-6 h-6 drop-shadow-sm" />
           </div>
           <div className="flex items-center justify-between mb-2">
-            <span className={`text-2xl font-bold ${consistency7.color}`} data-testid="consistency-7-days">
+            <span className="text-3xl font-bold text-purple-200 drop-shadow-lg" data-testid="consistency-7-days">
               {metrics.consistencyPercentage7Days}%
             </span>
-            <span className={`text-sm font-medium ${consistency7.color}`}>
+            <span className="text-sm font-medium text-purple-100/90 drop-shadow-sm">
               {consistency7.status}
             </span>
           </div>
           <Progress value={metrics.consistencyPercentage7Days} className="h-2" />
-          <p className="text-sm text-gray-600 mt-2">Last 7 days performance</p>
+          <p className="text-sm text-purple-100/70 mt-2 drop-shadow-sm">Last 7 days performance</p>
         </div>
 
         {/* 30-Day Consistency */}
-        <div className={`${consistency30.bgColor} rounded-xl p-4 border shadow-md backdrop-blur-sm bg-white/50`}>
+        <div className="bg-gradient-to-br from-cyan-500/20 to-teal-500/20 rounded-2xl p-6 border border-cyan-400/30 shadow-2xl backdrop-blur-md bg-white/10 hover:bg-white/15 transition-all duration-300">
           <div className="flex items-center justify-between mb-3">
-            <h4 className="font-semibold text-gray-800">30-Day Consistency</h4>
-            <Target className="text-gray-600 w-5 h-5" />
+            <h4 className="font-semibold text-white drop-shadow-sm">30-Day Consistency</h4>
+            <Target className="text-cyan-300 w-6 h-6 drop-shadow-sm" />
           </div>
           <div className="flex items-center justify-between mb-2">
-            <span className={`text-2xl font-bold ${consistency30.color}`} data-testid="consistency-30-days">
+            <span className="text-3xl font-bold text-cyan-200 drop-shadow-lg" data-testid="consistency-30-days">
               {metrics.consistencyPercentage30Days}%
             </span>
-            <span className={`text-sm font-medium ${consistency30.color}`}>
+            <span className="text-sm font-medium text-cyan-100/90 drop-shadow-sm">
               {consistency30.status}
             </span>
           </div>
           <Progress value={metrics.consistencyPercentage30Days} className="h-2" />
-          <p className="text-sm text-gray-600 mt-2">Last 30 days performance</p>
+          <p className="text-sm text-cyan-100/70 mt-2 drop-shadow-sm">Last 30 days performance</p>
         </div>
       </div>
 
       {/* Workout Frequency Chart */}
-      <div className="bg-gradient-to-br from-white/60 to-slate-100/60 rounded-xl p-4 border border-slate-200 shadow-md backdrop-blur-sm">
-        <h4 className="font-semibold text-gray-800 mb-4">Recent Activity (Last 14 Days)</h4>
+      <div className="bg-gradient-to-br from-slate-800/40 to-gray-800/40 rounded-2xl p-6 border border-slate-600/30 shadow-2xl backdrop-blur-md bg-black/20">
+        <h4 className="font-semibold text-white drop-shadow-sm mb-6 text-lg">Recent Activity (Last 14 Days)</h4>
         <div className="flex items-end justify-between space-x-1" style={{ height: '60px' }}>
           {recentWorkouts.map((day, index) => {
             const height = Math.max((day.count / maxWorkouts) * 100, day.count > 0 ? 20 : 8);
@@ -176,16 +193,16 @@ export default function ProgressOverview() {
             return (
               <div key={index} className="flex-1 flex flex-col items-center">
                 <div 
-                  className={`w-full rounded-sm ${day.count > 0 ? 'bg-primary' : 'bg-gray-300'}`}
+                  className={`w-full rounded-md ${day.count > 0 ? 'bg-gradient-to-t from-cyan-500 to-blue-400 shadow-lg' : 'bg-slate-600/50'}`}
                   style={{ height: `${height}%` }}
                   data-testid={`workout-bar-${index}`}
                 />
-                <span className="text-xs text-gray-500 mt-1">{dayLabel}</span>
+                <span className="text-xs text-slate-300 mt-2 font-medium">{dayLabel}</span>
               </div>
             );
           })}
         </div>
-        <div className="flex justify-between items-center mt-2 text-xs text-gray-500">
+        <div className="flex justify-between items-center mt-4 text-xs text-slate-300">
           <span>2 weeks ago</span>
           <span>Today</span>
         </div>
@@ -193,17 +210,17 @@ export default function ProgressOverview() {
 
       {/* Progress Insights */}
       {metrics.currentStreak > 0 && metrics.longestStreak > 0 && (
-        <div className="mt-6 p-4 bg-gradient-to-br from-blue-50/80 to-indigo-100/80 border border-blue-200/50 rounded-xl shadow-md backdrop-blur-sm">
+        <div className="mt-8 p-6 bg-gradient-to-br from-emerald-500/20 to-cyan-500/20 border border-emerald-400/30 rounded-2xl shadow-2xl backdrop-blur-md bg-white/10">
           <div className="flex items-center space-x-3">
-            <TrendingUp className="text-blue-500" />
+            <TrendingUp className="text-emerald-300 w-6 h-6" />
             <div>
-              <p className="font-medium text-blue-800">
+              <p className="font-medium text-white drop-shadow-sm">
                 {metrics.currentStreak === metrics.longestStreak 
                   ? "🎉 You're on your best streak ever!" 
                   : `${metrics.longestStreak - metrics.currentStreak} days away from your personal best!`
                 }
               </p>
-              <p className="text-sm text-blue-600">
+              <p className="text-sm text-emerald-100/80 drop-shadow-sm">
                 Keep up the amazing consistency to reach new milestones.
               </p>
             </div>
