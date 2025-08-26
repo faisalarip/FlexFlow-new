@@ -142,6 +142,7 @@ export default function WorkoutLogger() {
 
   // Exercise instructions database
   const exerciseInstructions: Record<string, { steps: string[], tips: string[], muscles: string[] }> = {
+    // Strength Training - Upper Body
     "Push-ups": {
       steps: [
         "Start in a plank position with hands shoulder-width apart",
@@ -151,36 +152,6 @@ export default function WorkoutLogger() {
       ],
       tips: ["Keep your body in a straight line", "Don't let your hips sag", "Control the movement"],
       muscles: ["Chest", "Triceps", "Shoulders", "Core"]
-    },
-    "Squats": {
-      steps: [
-        "Stand with feet shoulder-width apart",
-        "Lower your body by bending at hips and knees",
-        "Go down until thighs are parallel to floor",
-        "Push through heels to return to starting position"
-      ],
-      tips: ["Keep chest up", "Don't let knees cave inward", "Weight on heels"],
-      muscles: ["Quadriceps", "Glutes", "Hamstrings", "Core"]
-    },
-    "Deadlifts": {
-      steps: [
-        "Stand with feet hip-width apart, bar over mid-foot",
-        "Bend at hips and knees to grip the bar",
-        "Lift by driving through heels and extending hips",
-        "Keep bar close to body throughout movement"
-      ],
-      tips: ["Keep back straight", "Don't round shoulders", "Engage core"],
-      muscles: ["Hamstrings", "Glutes", "Lower Back", "Traps"]
-    },
-    "Plank": {
-      steps: [
-        "Start in push-up position on forearms",
-        "Keep body in straight line from head to heels",
-        "Hold position while breathing normally",
-        "Don't let hips sag or pike up"
-      ],
-      tips: ["Engage core muscles", "Keep neck neutral", "Start with shorter holds"],
-      muscles: ["Core", "Shoulders", "Glutes"]
     },
     "Pull-ups": {
       steps: [
@@ -192,6 +163,26 @@ export default function WorkoutLogger() {
       tips: ["Engage lats", "Don't use momentum", "Full range of motion"],
       muscles: ["Lats", "Biceps", "Rhomboids", "Core"]
     },
+    "Chin-ups": {
+      steps: [
+        "Grab bar with palms facing toward you, hands shoulder-width apart",
+        "Start from dead hang with arms fully extended",
+        "Pull yourself up until chin goes over the bar",
+        "Lower yourself slowly to starting position"
+      ],
+      tips: ["Palms toward you targets biceps more", "Don't kip or swing", "Squeeze shoulder blades"],
+      muscles: ["Biceps", "Lats", "Middle Traps", "Rear Deltoids"]
+    },
+    "Dips": {
+      steps: [
+        "Position hands on parallel bars or bench behind you",
+        "Start with arms extended, supporting your body weight",
+        "Lower body by bending elbows until shoulders are below elbows",
+        "Push back up to starting position"
+      ],
+      tips: ["Keep torso upright", "Don't go too low if shoulders hurt", "Control the descent"],
+      muscles: ["Triceps", "Lower Chest", "Front Deltoids"]
+    },
     "Bench Press": {
       steps: [
         "Lie on bench with eyes under the bar",
@@ -202,25 +193,475 @@ export default function WorkoutLogger() {
       tips: ["Keep feet on floor", "Retract shoulder blades", "Don't bounce off chest"],
       muscles: ["Chest", "Triceps", "Front Deltoids"]
     },
-    "Dumbbell Curls": {
+    "Overhead Press": {
       steps: [
-        "Stand with dumbbells at your sides",
-        "Keep elbows close to your body",
-        "Curl weights up to shoulder level",
-        "Lower with control to starting position"
+        "Stand with feet shoulder-width apart, bar at shoulder level",
+        "Grip bar with hands slightly wider than shoulders",
+        "Press bar straight overhead until arms are locked out",
+        "Lower bar back to shoulder level with control"
       ],
-      tips: ["Don't swing the weights", "Keep wrists straight", "Focus on bicep contraction"],
+      tips: ["Keep core tight", "Don't arch back excessively", "Press in straight line"],
+      muscles: ["Shoulders", "Triceps", "Upper Chest", "Core"]
+    },
+    "Bicep Curls": {
+      steps: [
+        "Stand holding barbell or dumbbells with underhand grip",
+        "Keep elbows close to your sides",
+        "Curl weight up by flexing biceps",
+        "Lower weight slowly to starting position"
+      ],
+      tips: ["Don't swing or use momentum", "Squeeze at the top", "Control the negative"],
       muscles: ["Biceps", "Forearms"]
     },
+    "Tricep Extensions": {
+      steps: [
+        "Lie on bench holding weight with both hands overhead",
+        "Lower weight behind head by bending only at elbows",
+        "Keep upper arms stationary throughout movement",
+        "Extend arms back to starting position"
+      ],
+      tips: ["Keep elbows pointing forward", "Don't let elbows flare", "Use controlled movement"],
+      muscles: ["Triceps"]
+    },
+    "Lat Pulldowns": {
+      steps: [
+        "Sit at lat pulldown machine with thighs under pads",
+        "Grab bar with wide overhand grip",
+        "Pull bar down to upper chest while leaning slightly back",
+        "Slowly return bar to starting position"
+      ],
+      tips: ["Pull with your back, not arms", "Squeeze shoulder blades", "Don't lean too far back"],
+      muscles: ["Lats", "Rhomboids", "Middle Traps", "Biceps"]
+    },
+    "Rows": {
+      steps: [
+        "Stand with feet hip-width apart, holding barbell",
+        "Hinge at hips and lean forward 45 degrees",
+        "Pull bar to lower chest/upper stomach",
+        "Lower bar with control to starting position"
+      ],
+      tips: ["Keep back straight", "Pull elbows back, not out", "Squeeze shoulder blades"],
+      muscles: ["Lats", "Rhomboids", "Middle Traps", "Rear Deltoids"]
+    },
+    
+    // Strength Training - Lower Body
+    "Squats": {
+      steps: [
+        "Stand with feet shoulder-width apart, toes slightly out",
+        "Lower body by pushing hips back and bending knees",
+        "Descend until thighs are parallel to floor",
+        "Drive through heels to return to standing"
+      ],
+      tips: ["Keep chest up and core tight", "Knees track over toes", "Weight on heels"],
+      muscles: ["Quadriceps", "Glutes", "Hamstrings", "Core"]
+    },
+    "Deadlifts": {
+      steps: [
+        "Stand with feet hip-width apart, bar over mid-foot",
+        "Bend at hips and knees to grip the bar",
+        "Keep chest up and back straight",
+        "Drive through heels to stand up, extending hips and knees"
+      ],
+      tips: ["Bar stays close to body", "Don't round back", "Push floor away with feet"],
+      muscles: ["Hamstrings", "Glutes", "Lower Back", "Traps"]
+    },
+    "Lunges": {
+      steps: [
+        "Stand upright with feet hip-width apart",
+        "Step forward into a lunge position",
+        "Lower back knee toward ground while keeping front shin vertical",
+        "Push off front foot to return to starting position"
+      ],
+      tips: ["Keep torso upright", "Don't let front knee drift forward", "Step out far enough"],
+      muscles: ["Quadriceps", "Glutes", "Hamstrings", "Calves"]
+    },
+    "Leg Press": {
+      steps: [
+        "Sit in leg press machine with back flat against pad",
+        "Place feet on platform shoulder-width apart",
+        "Lower weight by bending knees to 90 degrees",
+        "Press through heels to extend legs back up"
+      ],
+      tips: ["Don't let knees cave inward", "Keep core engaged", "Full range of motion"],
+      muscles: ["Quadriceps", "Glutes", "Hamstrings"]
+    },
+    "Calf Raises": {
+      steps: [
+        "Stand on balls of feet on raised platform or step",
+        "Let heels drop below the level of the platform",
+        "Rise up onto toes as high as possible",
+        "Lower heels back down slowly for a stretch"
+      ],
+      tips: ["Go for full range of motion", "Pause at the top", "Control the descent"],
+      muscles: ["Calves", "Soleus"]
+    },
+    "Romanian Deadlifts": {
+      steps: [
+        "Hold barbell with overhand grip, feet hip-width apart",
+        "Start with slight bend in knees throughout movement",
+        "Push hips back and lower bar while keeping it close to legs",
+        "Feel stretch in hamstrings, then drive hips forward to return"
+      ],
+      tips: ["This is a hip hinge, not a squat", "Feel the stretch in hamstrings", "Keep bar close"],
+      muscles: ["Hamstrings", "Glutes", "Lower Back"]
+    },
+    "Bulgarian Split Squats": {
+      steps: [
+        "Stand 2-3 feet in front of bench or step",
+        "Place top of rear foot on bench behind you",
+        "Lower into lunge position by bending front knee",
+        "Push through front heel to return to starting position"
+      ],
+      tips: ["Most weight on front foot", "Keep torso upright", "Don't push off back foot"],
+      muscles: ["Quadriceps", "Glutes", "Hamstrings"]
+    },
+    "Hip Thrusts": {
+      steps: [
+        "Sit with upper back against bench, barbell over hips",
+        "Plant feet firmly on ground, knees bent 90 degrees",
+        "Drive through heels to lift hips up",
+        "Squeeze glutes at top, then lower with control"
+      ],
+      tips: ["Focus on glute squeeze at top", "Keep ribs down", "Don't overarch back"],
+      muscles: ["Glutes", "Hamstrings", "Core"]
+    },
+    
+    // Strength Training - Core
+    "Plank": {
+      steps: [
+        "Start in push-up position on forearms",
+        "Keep body in straight line from head to heels",
+        "Hold position while breathing normally",
+        "Don't let hips sag or pike up"
+      ],
+      tips: ["Engage core muscles", "Keep neck neutral", "Start with shorter holds"],
+      muscles: ["Core", "Shoulders", "Glutes"]
+    },
+    "Crunches": {
+      steps: [
+        "Lie on back with knees bent, feet flat on floor",
+        "Place hands behind head or across chest",
+        "Lift shoulder blades off ground by contracting abs",
+        "Lower back down slowly without fully relaxing"
+      ],
+      tips: ["Don't pull on neck", "Focus on ab contraction", "Small range of motion"],
+      muscles: ["Upper Abdominals"]
+    },
+    "Russian Twists": {
+      steps: [
+        "Sit on floor with knees bent, lean back slightly",
+        "Lift feet off ground and balance on tailbone",
+        "Rotate torso side to side, touching ground beside hips",
+        "Keep chest up and core engaged throughout"
+      ],
+      tips: ["Move with control, not speed", "Keep feet elevated", "Look forward"],
+      muscles: ["Obliques", "Core", "Hip Flexors"]
+    },
+    "Mountain Climbers": {
+      steps: [
+        "Start in plank position with arms extended",
+        "Bring one knee toward chest",
+        "Quickly switch legs, bringing other knee forward",
+        "Continue alternating legs at a quick pace"
+      ],
+      tips: ["Keep hips level", "Don't let form break down", "This is cardio and core combined"],
+      muscles: ["Core", "Shoulders", "Hip Flexors"]
+    },
+    "Dead Bug": {
+      steps: [
+        "Lie on back with arms extended toward ceiling",
+        "Bring knees up to 90 degrees (tabletop position)",
+        "Lower opposite arm and leg slowly toward floor",
+        "Return to starting position and repeat other side"
+      ],
+      tips: ["Keep lower back pressed to floor", "Move slowly and controlled", "Don't let ribs flare"],
+      muscles: ["Deep Core", "Hip Flexors"]
+    },
+    "Hanging Leg Raises": {
+      steps: [
+        "Hang from pull-up bar with arms fully extended",
+        "Keep legs straight or slightly bent",
+        "Raise legs up until parallel to ground or higher",
+        "Lower legs slowly back to starting position"
+      ],
+      tips: ["Control the swing", "Don't use momentum", "Focus on ab contraction"],
+      muscles: ["Lower Abs", "Hip Flexors"]
+    },
+    
+    // Cardio Exercises
     "Running": {
       steps: [
-        "Start with proper warm-up and stretching",
-        "Maintain upright posture with slight forward lean",
-        "Land on midfoot, not heel or toes",
-        "Keep arms relaxed with 90-degree bend"
+        "Start with 5-10 minute warm-up walk",
+        "Begin running at comfortable conversational pace",
+        "Land on midfoot with slight forward lean",
+        "Keep arms relaxed, swing naturally at 90-degree angle"
       ],
-      tips: ["Start slow and build endurance", "Breathe rhythmically", "Stay hydrated"],
+      tips: ["Build distance gradually", "Breathe rhythmically", "Good shoes are essential"],
       muscles: ["Legs", "Glutes", "Core", "Cardiovascular System"]
+    },
+    "Cycling": {
+      steps: [
+        "Adjust bike seat height so leg is slightly bent at bottom",
+        "Start pedaling at moderate resistance",
+        "Keep steady cadence between 80-100 RPM",
+        "Maintain upright posture with relaxed shoulders"
+      ],
+      tips: ["Start with shorter rides", "Stay hydrated", "Use gears appropriately"],
+      muscles: ["Quadriceps", "Hamstrings", "Glutes", "Calves"]
+    },
+    "Burpees": {
+      steps: [
+        "Start standing, then squat down and place hands on floor",
+        "Jump feet back into plank position",
+        "Do a push-up (optional for beginners)",
+        "Jump feet back to squat, then jump up with arms overhead"
+      ],
+      tips: ["Modify by stepping instead of jumping", "Keep core tight in plank", "This is high intensity"],
+      muscles: ["Full Body", "Cardiovascular System"]
+    },
+    "Jumping Jacks": {
+      steps: [
+        "Stand with feet together, arms at sides",
+        "Jump feet apart while raising arms overhead",
+        "Jump feet back together while lowering arms",
+        "Continue at steady, quick pace"
+      ],
+      tips: ["Land softly on balls of feet", "Keep core engaged", "Great for warm-up"],
+      muscles: ["Calves", "Shoulders", "Core", "Cardiovascular System"]
+    },
+    "High Knees": {
+      steps: [
+        "Stand in place with feet hip-width apart",
+        "Lift one knee up toward chest",
+        "Quickly alternate legs, bringing knees as high as possible",
+        "Pump arms naturally as you run in place"
+      ],
+      tips: ["Stay on balls of feet", "Keep torso upright", "Drive knees up high"],
+      muscles: ["Hip Flexors", "Calves", "Core"]
+    },
+    "Treadmill": {
+      steps: [
+        "Start with 5-minute warm-up at walking pace",
+        "Gradually increase speed to jogging/running pace",
+        "Maintain good posture, look straight ahead",
+        "Cool down with 5-minute walk at end"
+      ],
+      tips: ["Don't hold handrails while running", "Start with flat incline", "Listen to your body"],
+      muscles: ["Legs", "Glutes", "Cardiovascular System"]
+    },
+    "Elliptical": {
+      steps: [
+        "Step onto machine and grab handles",
+        "Start moving legs in elliptical motion",
+        "Use arms to push and pull handles",
+        "Maintain steady rhythm throughout workout"
+      ],
+      tips: ["Keep feet flat on pedals", "Stand upright", "Low impact alternative to running"],
+      muscles: ["Legs", "Arms", "Core", "Cardiovascular System"]
+    },
+    "Rowing Machine": {
+      steps: [
+        "Sit on seat with feet secured in foot straps",
+        "Grab handle with both hands, arms extended",
+        "Push with legs first, then pull handle to lower ribs",
+        "Reverse the motion: extend arms, then bend legs"
+      ],
+      tips: ["Legs, core, then arms", "Keep back straight", "It's 60% legs, 40% upper body"],
+      muscles: ["Full Body", "Lats", "Legs", "Core"]
+    },
+    "Stair Climber": {
+      steps: [
+        "Step onto machine and grab handrails lightly",
+        "Start stepping at comfortable pace",
+        "Keep full foot on pedal, don't just use toes",
+        "Maintain upright posture throughout"
+      ],
+      tips: ["Don't lean heavily on rails", "Take full steps", "Great for glute activation"],
+      muscles: ["Glutes", "Quadriceps", "Calves"]
+    },
+    "Battle Ropes": {
+      steps: [
+        "Stand with feet shoulder-width apart, hold rope ends",
+        "Create waves by alternating arms up and down",
+        "Keep core tight and knees slightly bent",
+        "Work in intervals: 30 seconds on, 30 seconds rest"
+      ],
+      tips: ["Use whole body, not just arms", "Stay light on feet", "High intensity workout"],
+      muscles: ["Arms", "Shoulders", "Core", "Legs"]
+    },
+    "Box Jumps": {
+      steps: [
+        "Stand arm's length from sturdy box or platform",
+        "Swing arms back and squat down slightly",
+        "Jump explosively onto box, landing softly",
+        "Step down carefully, don't jump down"
+      ],
+      tips: ["Start with lower box", "Land softly with bent knees", "Focus on safe landing"],
+      muscles: ["Glutes", "Quadriceps", "Calves", "Core"]
+    },
+    "Sprint Intervals": {
+      steps: [
+        "Warm up with 5-10 minutes of light jogging",
+        "Sprint at near-maximum effort for 30 seconds",
+        "Recover with light jogging or walking for 1-2 minutes",
+        "Repeat sprint-recovery cycle 6-8 times"
+      ],
+      tips: ["Build up gradually", "Focus on form even when tired", "Cool down properly"],
+      muscles: ["Full Body", "Cardiovascular System"]
+    },
+    
+    // Yoga & Flexibility Exercises
+    "Yoga": {
+      steps: [
+        "Begin in Mountain Pose with feet hip-width apart",
+        "Flow through Sun Salutation sequence",
+        "Hold each pose for 5-8 breaths",
+        "End in relaxation pose (Savasana)"
+      ],
+      tips: ["Focus on breath awareness", "Don't force poses", "Use props if needed"],
+      muscles: ["Full Body", "Flexibility", "Mind-Body Connection"]
+    },
+    "Meditation": {
+      steps: [
+        "Sit comfortably with spine straight",
+        "Close eyes and focus on your breath",
+        "When mind wanders, gently return to breath",
+        "Start with 5-10 minutes, gradually increase"
+      ],
+      tips: ["Find a quiet space", "Be patient with wandering thoughts", "Consistency matters more than duration"],
+      muscles: ["Mind", "Stress Relief", "Mental Focus"]
+    },
+    "Sun Salutation": {
+      steps: [
+        "Mountain Pose → Forward Fold → Half Lift → Chaturanga",
+        "Upward Dog → Downward Dog (hold 5 breaths)",
+        "Forward Fold → Half Lift → Mountain Pose",
+        "Repeat sequence 3-5 times with breath coordination"
+      ],
+      tips: ["Coordinate movement with breath", "Modify poses as needed", "This is a complete flow sequence"],
+      muscles: ["Full Body", "Flexibility", "Core Strength"]
+    },
+    "Warrior Pose": {
+      steps: [
+        "Step left foot back 3-4 feet, turn out 45 degrees",
+        "Bend right knee directly over ankle",
+        "Raise arms overhead, square hips forward",
+        "Hold for 30 seconds to 1 minute, switch sides"
+      ],
+      tips: ["Keep front knee over ankle", "Ground through back foot", "Engage core for stability"],
+      muscles: ["Legs", "Core", "Shoulders", "Balance"]
+    },
+    "Downward Dog": {
+      steps: [
+        "Start on hands and knees, tuck toes under",
+        "Lift hips up and back, straightening legs",
+        "Create inverted V shape with body",
+        "Hold for 5-10 breaths, pedal feet to stretch"
+      ],
+      tips: ["Press hands firmly into mat", "Lengthen spine", "Bend knees if hamstrings are tight"],
+      muscles: ["Shoulders", "Arms", "Hamstrings", "Calves"]
+    },
+    "Child's Pose": {
+      steps: [
+        "Kneel on mat with big toes touching",
+        "Sit back on heels, open knees wide",
+        "Fold forward, extending arms in front",
+        "Rest forehead on mat, breathe deeply"
+      ],
+      tips: ["Use bolster under torso if needed", "This is a resting pose", "Focus on releasing tension"],
+      muscles: ["Hip Flexors", "Shoulders", "Back", "Relaxation"]
+    },
+    "Pigeon Pose": {
+      steps: [
+        "From downward dog, bring right knee to right wrist",
+        "Lower right shin parallel to front of mat",
+        "Extend left leg straight back",
+        "Fold forward over front leg, hold 1-2 minutes each side"
+      ],
+      tips: ["Use props under hip if needed", "This is an intense hip opener", "Breathe through discomfort"],
+      muscles: ["Hip Flexors", "Glutes", "IT Band"]
+    },
+    "Stretching": {
+      steps: [
+        "Target major muscle groups systematically",
+        "Hold each stretch for 20-30 seconds",
+        "Breathe deeply and relax into the stretch",
+        "Don't bounce or force the stretch"
+      ],
+      tips: ["Stretch after workouts when muscles are warm", "Focus on tight areas", "Stretch both sides equally"],
+      muscles: ["Full Body", "Flexibility", "Recovery"]
+    },
+    
+    // Swimming Exercises
+    "Swimming": {
+      steps: [
+        "Enter water and do 5-10 minutes easy warm-up",
+        "Alternate between different strokes",
+        "Focus on technique over speed",
+        "Cool down with easy swimming or walking"
+      ],
+      tips: ["Start with shorter distances", "Focus on breathing technique", "Great low-impact exercise"],
+      muscles: ["Full Body", "Cardiovascular System", "Core"]
+    },
+    "Freestyle": {
+      steps: [
+        "Float face-down, extend one arm forward while other pulls",
+        "Rotate body slightly with each stroke",
+        "Breathe by turning head to side every 2-3 strokes",
+        "Kick steadily with straight legs from hips"
+      ],
+      tips: ["High elbow catch", "Rotate from core, not shoulders", "Practice bilateral breathing"],
+      muscles: ["Shoulders", "Lats", "Core", "Legs"]
+    },
+    "Backstroke": {
+      steps: [
+        "Float on back with arms at sides",
+        "Alternate arm strokes in windmill motion",
+        "Keep hips up and head still",
+        "Flutter kick with straight legs"
+      ],
+      tips: ["Keep ears underwater", "Don't let hips sink", "Imagine lying on a pillow"],
+      muscles: ["Shoulders", "Lats", "Core", "Hip Flexors"]
+    },
+    "Breaststroke": {
+      steps: [
+        "Start face-down, arms extended forward",
+        "Pull arms out and back in heart shape",
+        "Lift head to breathe as arms finish pull",
+        "Bring knees to chest, kick legs out and together"
+      ],
+      tips: ["Coordinate arm pull with breathing", "Kick with feet flexed", "Glide between strokes"],
+      muscles: ["Chest", "Arms", "Inner Thighs", "Glutes"]
+    },
+    "Butterfly": {
+      steps: [
+        "Start face-down with arms extended forward",
+        "Pull both arms simultaneously in circular motion",
+        "Use dolphin kick with both legs together",
+        "Breathe forward when arms exit water"
+      ],
+      tips: ["This is the most challenging stroke", "Focus on rhythm", "Use core for dolphin kick"],
+      muscles: ["Shoulders", "Core", "Chest", "Legs"]
+    },
+    "Water Aerobics": {
+      steps: [
+        "Stand in chest-deep water for resistance",
+        "Perform exercises like jumping jacks, leg lifts",
+        "Use water resistance for strength movements",
+        "Move continuously for 20-45 minutes"
+      ],
+      tips: ["Water provides natural resistance", "Great for joint-friendly exercise", "Stay hydrated even in water"],
+      muscles: ["Full Body", "Low Impact", "Cardiovascular System"]
+    },
+    "Treading Water": {
+      steps: [
+        "Stay vertical in deep water",
+        "Use eggbeater kick to maintain position",
+        "Keep arms moving in sculling motion",
+        "Start with 30-second intervals"
+      ],
+      tips: ["Relax and stay calm", "Use small, efficient movements", "Great core and leg workout"],
+      muscles: ["Core", "Legs", "Arms", "Endurance"]
     },
     // Dumbbell Specific Instructions
     "Dumbbell Press": {
