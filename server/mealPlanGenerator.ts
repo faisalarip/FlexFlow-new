@@ -43,7 +43,7 @@ export interface GeneratedMealPlan {
   }[];
 }
 
-// Mock meal plan generator for testing/fallback
+// Enhanced meal plan generator with user food preferences
 function generateMockMealPlan(options: MealPlanGenerationOptions): GeneratedMealPlan {
   const {
     goal,
@@ -85,81 +85,146 @@ function generateMockMealPlan(options: MealPlanGenerationOptions): GeneratedMeal
     maintenance: "A well-balanced meal plan to maintain your current weight while supporting overall health and wellness."
   };
 
-  // Sample meals based on dietary restrictions
+  // Create diverse meal database with various options
+  const proteinFoods = ["Chicken breast", "Salmon", "Eggs", "Greek yogurt", "Tofu", "Lentils", "Chickpeas", "Turkey", "Cottage cheese", "Quinoa"];
+  const carbFoods = ["Brown rice", "Quinoa", "Oats", "Sweet potato", "Whole grain bread", "Pasta", "Barley", "Buckwheat"];
+  const vegetables = ["Broccoli", "Spinach", "Bell peppers", "Carrots", "Tomatoes", "Cucumber", "Kale", "Zucchini", "Brussels sprouts"];
+  const fruits = ["Berries", "Apple", "Banana", "Orange", "Avocado", "Grapes", "Mango", "Pineapple"];
+  const fats = ["Olive oil", "Almonds", "Walnuts", "Seeds", "Avocado oil", "Coconut oil"];
+
+  // Filter foods based on preferences
+  const likedFoods = preferences.map(p => p.toLowerCase());
+  const availableProteins = proteinFoods.filter(food => 
+    likedFoods.length === 0 || likedFoods.some(liked => food.toLowerCase().includes(liked) || liked.includes(food.toLowerCase()))
+  );
+  const availableCarbs = carbFoods.filter(food => 
+    likedFoods.length === 0 || likedFoods.some(liked => food.toLowerCase().includes(liked) || liked.includes(food.toLowerCase()))
+  );
+  const availableVeggies = vegetables.filter(food => 
+    likedFoods.length === 0 || likedFoods.some(liked => food.toLowerCase().includes(liked) || liked.includes(food.toLowerCase()))
+  );
+  const availableFruits = fruits.filter(food => 
+    likedFoods.length === 0 || likedFoods.some(liked => food.toLowerCase().includes(liked) || liked.includes(food.toLowerCase()))
+  );
+
+  // Dietary restrictions
   const isVegetarian = dietaryRestrictions.some(r => r.toLowerCase().includes('vegetarian'));
   const isVegan = dietaryRestrictions.some(r => r.toLowerCase().includes('vegan'));
-  const isGlutenFree = dietaryRestrictions.some(r => r.toLowerCase().includes('gluten'));
 
-  const sampleMeals = {
-    breakfast: [
-      {
-        name: isVegan ? "Oatmeal with Berries and Nuts" : "Greek Yogurt Parfait",
-        description: isVegan ? "Creamy oatmeal topped with fresh berries and almonds" : "Protein-rich yogurt with granola and fresh fruit",
-        calories: Math.round(dailyCalories * 0.25),
-        protein: Math.round(dailyProtein * 0.25),
-        carbs: Math.round(dailyCarbs * 0.30),
-        fat: Math.round(dailyFat * 0.20),
-        ingredients: isVegan ? ["Rolled oats", "Almond milk", "Mixed berries", "Almonds", "Maple syrup"] : ["Greek yogurt", "Granola", "Fresh berries", "Honey"],
-        instructions: ["Prepare base ingredient", "Add toppings", "Mix and enjoy"],
-        prepTime: 10,
-        servings: 1
-      }
-    ],
-    lunch: [
-      {
-        name: isVegan ? "Quinoa Buddha Bowl" : (isVegetarian ? "Caprese Salad with Quinoa" : "Grilled Chicken Salad"),
-        description: "Nutritious and filling midday meal",
-        calories: Math.round(dailyCalories * 0.30),
-        protein: Math.round(dailyProtein * 0.35),
-        carbs: Math.round(dailyCarbs * 0.35),
-        fat: Math.round(dailyFat * 0.30),
-        ingredients: isVegan ? ["Quinoa", "Chickpeas", "Mixed vegetables", "Tahini dressing"] : (isVegetarian ? ["Quinoa", "Fresh mozzarella", "Tomatoes", "Basil"] : ["Grilled chicken", "Mixed greens", "Vegetables", "Olive oil dressing"]),
-        instructions: ["Prepare main ingredient", "Add accompaniments", "Dress and serve"],
-        prepTime: 20,
-        servings: 1
-      }
-    ],
-    dinner: [
-      {
-        name: isVegan ? "Lentil Curry with Brown Rice" : (isVegetarian ? "Vegetable Stir-fry with Tofu" : "Baked Salmon with Quinoa"),
-        description: "Satisfying and nutritious dinner",
-        calories: Math.round(dailyCalories * 0.35),
-        protein: Math.round(dailyProtein * 0.30),
-        carbs: Math.round(dailyCarbs * 0.25),
-        fat: Math.round(dailyFat * 0.35),
-        ingredients: isVegan ? ["Red lentils", "Coconut milk", "Spices", "Brown rice"] : (isVegetarian ? ["Tofu", "Mixed vegetables", "Soy sauce", "Brown rice"] : ["Salmon fillet", "Quinoa", "Vegetables", "Herbs"]),
-        instructions: ["Prepare protein", "Cook grains/base", "Combine and season"],
-        prepTime: 30,
-        servings: 1
-      }
-    ],
-    snack: [
-      {
-        name: "Healthy Snack",
-        description: "Nutritious snack to keep energy stable",
-        calories: Math.round(dailyCalories * 0.10),
-        protein: Math.round(dailyProtein * 0.10),
-        carbs: Math.round(dailyCarbs * 0.10),
-        fat: Math.round(dailyFat * 0.15),
-        ingredients: isVegan ? ["Apple", "Almond butter"] : ["Greek yogurt", "Berries"],
-        instructions: ["Prepare snack", "Enjoy"],
-        prepTime: 5,
-        servings: 1
-      }
-    ]
+  // Filter proteins based on dietary restrictions
+  const finalProteins = isVegan 
+    ? availableProteins.filter(p => !["Chicken breast", "Salmon", "Eggs", "Greek yogurt", "Turkey", "Cottage cheese"].includes(p))
+    : isVegetarian 
+    ? availableProteins.filter(p => !["Chicken breast", "Salmon", "Turkey"].includes(p))
+    : availableProteins;
+
+  // Generate varied meal options for each day
+  const generateMealVariations = (mealType: string, dayIndex: number) => {
+    const baseCalories = {
+      breakfast: Math.round(dailyCalories * 0.25),
+      lunch: Math.round(dailyCalories * 0.30),
+      dinner: Math.round(dailyCalories * 0.35),
+      snack: Math.round(dailyCalories * 0.10)
+    };
+
+    const mealCalories = baseCalories[mealType as keyof typeof baseCalories];
+    const mealProtein = Math.round((mealCalories * proteinPercent) / 4);
+    const mealCarbs = Math.round((mealCalories * carbPercent) / 4);
+    const mealFat = Math.round((mealCalories * fatPercent) / 9);
+
+    // Create unique meals for each day based on available ingredients
+    const proteinIndex = dayIndex % finalProteins.length;
+    const carbIndex = dayIndex % availableCarbs.length;
+    const veggieIndex = dayIndex % availableVeggies.length;
+    const fruitIndex = dayIndex % availableFruits.length;
+
+    const protein = finalProteins[proteinIndex] || "Tofu";
+    const carb = availableCarbs[carbIndex] || "Brown rice";
+    const veggie = availableVeggies[veggieIndex] || "Mixed vegetables";
+    const fruit = availableFruits[fruitIndex] || "Berries";
+
+    const mealTemplates = {
+      breakfast: [
+        {
+          name: `${protein} and ${fruit} Bowl`,
+          description: `Nutritious breakfast with ${protein.toLowerCase()} and fresh ${fruit.toLowerCase()}`,
+          ingredients: [protein, fruit, carb === "Oats" ? "Oats" : "Whole grain toast", "Almond milk", "Honey"],
+          instructions: ["Prepare base ingredients", "Add toppings", "Serve fresh"]
+        },
+        {
+          name: `${fruit} ${carb} Parfait`,
+          description: `Layered breakfast with ${fruit.toLowerCase()} and ${carb.toLowerCase()}`,
+          ingredients: [fruit, carb, protein, "Nuts", "Greek yogurt alternative"],
+          instructions: ["Layer ingredients", "Add nuts on top", "Enjoy immediately"]
+        }
+      ],
+      lunch: [
+        {
+          name: `${protein} and ${veggie} ${carb} Bowl`,
+          description: `Power lunch bowl with ${protein.toLowerCase()}, ${veggie.toLowerCase()}, and ${carb.toLowerCase()}`,
+          ingredients: [protein, veggie, carb, "Olive oil", "Lemon", "Herbs"],
+          instructions: ["Cook protein and grain", "Prepare vegetables", "Combine with dressing"]
+        },
+        {
+          name: `Mediterranean ${protein} Salad`,
+          description: `Fresh Mediterranean salad featuring ${protein.toLowerCase()}`,
+          ingredients: [protein, veggie, "Mixed greens", "Cucumber", "Olive oil", "Lemon"],
+          instructions: ["Prepare protein", "Mix salad ingredients", "Dress and serve"]
+        }
+      ],
+      dinner: [
+        {
+          name: `Herb-Crusted ${protein} with ${carb}`,
+          description: `Flavorful dinner featuring ${protein.toLowerCase()} with ${carb.toLowerCase()}`,
+          ingredients: [protein, carb, veggie, "Herbs", "Garlic", "Olive oil"],
+          instructions: ["Season and cook protein", "Prepare grain", "Steam vegetables", "Combine and serve"]
+        },
+        {
+          name: `${veggie} and ${protein} Stir-Fry`,
+          description: `Quick and healthy stir-fry with ${veggie.toLowerCase()} and ${protein.toLowerCase()}`,
+          ingredients: [protein, veggie, carb, "Soy sauce", "Ginger", "Garlic"],
+          instructions: ["Heat pan", "Stir-fry ingredients", "Season to taste", "Serve hot"]
+        }
+      ],
+      snack: [
+        {
+          name: `${fruit} with Protein`,
+          description: `Simple and nutritious snack`,
+          ingredients: [fruit, protein === "Greek yogurt" ? "Greek yogurt" : "Nuts", "Honey"],
+          instructions: ["Combine ingredients", "Enjoy fresh"]
+        }
+      ]
+    };
+
+    const templates = mealTemplates[mealType as keyof typeof mealTemplates];
+    const template = templates[dayIndex % templates.length];
+
+    return {
+      mealType: mealType as "breakfast" | "lunch" | "dinner" | "snack",
+      name: template.name,
+      description: template.description,
+      calories: mealCalories,
+      protein: mealProtein,
+      carbs: mealCarbs,
+      fat: mealFat,
+      ingredients: template.ingredients,
+      instructions: template.instructions,
+      prepTime: mealType === "breakfast" ? 10 : mealType === "snack" ? 5 : mealType === "lunch" ? 20 : 30,
+      servings: 1
+    };
   };
 
-  // Generate days
+  // Generate days with varied meals
   const days = [];
   for (let i = 1; i <= duration; i++) {
     days.push({
       dayNumber: i,
       name: `Day ${i}`,
       meals: [
-        { mealType: "breakfast" as const, ...sampleMeals.breakfast[0] },
-        { mealType: "lunch" as const, ...sampleMeals.lunch[0] },
-        { mealType: "dinner" as const, ...sampleMeals.dinner[0] },
-        { mealType: "snack" as const, ...sampleMeals.snack[0] }
+        generateMealVariations("breakfast", i - 1),
+        generateMealVariations("lunch", i - 1),
+        generateMealVariations("dinner", i - 1),
+        generateMealVariations("snack", i - 1)
       ]
     });
   }

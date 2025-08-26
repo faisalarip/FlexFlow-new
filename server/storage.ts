@@ -1556,11 +1556,79 @@ export class MemStorage implements IStorage {
       isActive: true,
     });
 
-    // Add days and meals for Weight Loss Plan
+    // Moderate Weight Loss Plan
+    const moderateWeightLossPlan = this.createMealPlanSync({
+      name: "14-Day Moderate Weight Loss Plan",
+      description: "A gentle approach to weight loss with sustainable eating habits and 1800 calories per day.",
+      goal: "weight_loss",
+      dailyCalories: 1800,
+      dailyProtein: 135,
+      dailyCarbs: 180,
+      dailyFat: 70,
+      duration: 14,
+      isActive: true,
+    });
+
+    // Maintenance Plan
+    const maintenancePlan = this.createMealPlanSync({
+      name: "7-Day Balanced Maintenance Plan",
+      description: "Perfect for maintaining current weight while eating nutritious, satisfying meals.",
+      goal: "maintenance",
+      dailyCalories: 2200,
+      dailyProtein: 110,
+      dailyCarbs: 275,
+      dailyFat: 85,
+      duration: 7,
+      isActive: true,
+    });
+
+    // High Protein Muscle Building Plan
+    const muscleBuildingPlan = this.createMealPlanSync({
+      name: "10-Day Muscle Building Plan",
+      description: "High-protein meal plan designed for muscle growth and strength training support.",
+      goal: "weight_gain",
+      dailyCalories: 3200,
+      dailyProtein: 180,
+      dailyCarbs: 400,
+      dailyFat: 115,
+      duration: 10,
+      isActive: true,
+    });
+
+    // Quick Weight Loss Plan
+    const quickWeightLossPlan = this.createMealPlanSync({
+      name: "5-Day Quick Start Plan",
+      description: "A short-term plan to kickstart your weight loss journey with clean eating.",
+      goal: "weight_loss",
+      dailyCalories: 1400,
+      dailyProtein: 105,
+      dailyCarbs: 140,
+      dailyFat: 45,
+      duration: 5,
+      isActive: true,
+    });
+
+    // Flexible Maintenance Plan
+    const flexibleMaintenancePlan = this.createMealPlanSync({
+      name: "21-Day Flexible Living Plan",
+      description: "A longer-term maintenance plan with variety to fit your lifestyle.",
+      goal: "maintenance",
+      dailyCalories: 2400,
+      dailyProtein: 120,
+      dailyCarbs: 300,
+      dailyFat: 95,
+      duration: 21,
+      isActive: true,
+    });
+
+    // Add days and meals for all plans
     this.seedWeightLossMealPlan(weightLossPlan.id);
-    
-    // Add days and meals for Weight Gain Plan
     this.seedWeightGainMealPlan(weightGainPlan.id);
+    this.seedGeneralMealPlan(moderateWeightLossPlan.id, "weight_loss", moderateWeightLossPlan.dailyCalories, 14);
+    this.seedGeneralMealPlan(maintenancePlan.id, "maintenance", maintenancePlan.dailyCalories, 7);
+    this.seedGeneralMealPlan(muscleBuildingPlan.id, "weight_gain", muscleBuildingPlan.dailyCalories, 10);
+    this.seedGeneralMealPlan(quickWeightLossPlan.id, "weight_loss", quickWeightLossPlan.dailyCalories, 5);
+    this.seedGeneralMealPlan(flexibleMaintenancePlan.id, "maintenance", flexibleMaintenancePlan.dailyCalories, 21);
   }
 
   private createMealPlanSync(mealPlan: InsertMealPlan): MealPlan {
@@ -2123,6 +2191,160 @@ export class MemStorage implements IStorage {
       };
       this.foodItems.set(id, foodItem);
     });
+  }
+
+  private seedGeneralMealPlan(planId: string, goal: string, dailyCalories: number, duration: number) {
+    // Create days for the meal plan with variety
+    for (let day = 1; day <= duration; day++) {
+      const dayId = randomUUID();
+      const mealPlanDay: MealPlanDay = {
+        id: dayId,
+        mealPlanId: planId,
+        dayNumber: day,
+        name: `Day ${day}`,
+      };
+      this.mealPlanDays.set(dayId, mealPlanDay);
+
+      // Create varied meals for each day
+      const breakfastVariations = [
+        {
+          name: `Protein-Rich Breakfast Bowl`,
+          description: `Balanced morning meal with ${Math.round(dailyCalories * 0.25)} calories`,
+          calories: Math.round(dailyCalories * 0.25),
+          ingredients: goal === "weight_gain" ? 
+            ["Oats", "Greek yogurt", "Banana", "Nuts", "Honey", "Berries"] :
+            ["Egg whites", "Vegetables", "Avocado", "Whole grain toast"],
+        },
+        {
+          name: `Morning Energy Bowl`,
+          description: `Energizing breakfast with varied ingredients`,
+          calories: Math.round(dailyCalories * 0.25),
+          ingredients: goal === "weight_gain" ? 
+            ["Quinoa", "Almond milk", "Mixed fruits", "Chia seeds", "Maple syrup"] :
+            ["Greek yogurt", "Berries", "Almonds", "Cinnamon"],
+        }
+      ];
+
+      const lunchVariations = [
+        {
+          name: `Power Lunch Bowl`,
+          description: `Satisfying midday meal with ${Math.round(dailyCalories * 0.30)} calories`,
+          calories: Math.round(dailyCalories * 0.30),
+          ingredients: goal === "weight_gain" ? 
+            ["Brown rice", "Chicken", "Vegetables", "Avocado", "Olive oil"] :
+            ["Quinoa", "Grilled chicken", "Mixed greens", "Light dressing"],
+        },
+        {
+          name: `Mediterranean Feast`,
+          description: `Mediterranean-inspired lunch`,
+          calories: Math.round(dailyCalories * 0.30),
+          ingredients: goal === "weight_gain" ? 
+            ["Salmon", "Quinoa", "Vegetables", "Feta cheese", "Olive oil"] :
+            ["Tuna", "Mixed salad", "Chickpeas", "Lemon dressing"],
+        }
+      ];
+
+      const dinnerVariations = [
+        {
+          name: `Evening Nourishment`,
+          description: `Satisfying dinner with ${Math.round(dailyCalories * 0.35)} calories`,
+          calories: Math.round(dailyCalories * 0.35),
+          ingredients: goal === "weight_gain" ? 
+            ["Beef", "Sweet potato", "Broccoli", "Butter", "Herbs"] :
+            ["Grilled fish", "Vegetables", "Brown rice", "Herbs"],
+        },
+        {
+          name: `Comfort Dinner`,
+          description: `Hearty evening meal`,
+          calories: Math.round(dailyCalories * 0.35),
+          ingredients: goal === "weight_gain" ? 
+            ["Turkey", "Pasta", "Vegetables", "Cheese", "Olive oil"] :
+            ["Chicken", "Roasted vegetables", "Quinoa", "Light sauce"],
+        }
+      ];
+
+      // Select variations based on day to ensure variety
+      const breakfastMeal = breakfastVariations[day % 2];
+      const lunchMeal = lunchVariations[day % 2];
+      const dinnerMeal = dinnerVariations[day % 2];
+
+      const meals = [
+        {
+          mealType: "breakfast",
+          name: breakfastMeal.name,
+          description: breakfastMeal.description,
+          calories: breakfastMeal.calories,
+          protein: goal === "weight_gain" ? Math.round(breakfastMeal.calories * 0.20 / 4) : Math.round(breakfastMeal.calories * 0.25 / 4),
+          carbs: goal === "weight_gain" ? Math.round(breakfastMeal.calories * 0.50 / 4) : Math.round(breakfastMeal.calories * 0.40 / 4),
+          fat: goal === "weight_gain" ? Math.round(breakfastMeal.calories * 0.30 / 9) : Math.round(breakfastMeal.calories * 0.35 / 9),
+          ingredients: breakfastMeal.ingredients,
+          instructions: ["Prepare base ingredients", "Combine and mix", "Add toppings", "Serve fresh"],
+          prepTime: 15,
+          servings: 1,
+        },
+        {
+          mealType: "lunch",
+          name: lunchMeal.name,
+          description: lunchMeal.description,
+          calories: lunchMeal.calories,
+          protein: goal === "weight_gain" ? Math.round(lunchMeal.calories * 0.25 / 4) : Math.round(lunchMeal.calories * 0.30 / 4),
+          carbs: goal === "weight_gain" ? Math.round(lunchMeal.calories * 0.45 / 4) : Math.round(lunchMeal.calories * 0.35 / 4),
+          fat: goal === "weight_gain" ? Math.round(lunchMeal.calories * 0.30 / 9) : Math.round(lunchMeal.calories * 0.35 / 9),
+          ingredients: lunchMeal.ingredients,
+          instructions: ["Cook protein", "Prepare grain/base", "Add vegetables", "Combine with dressing"],
+          prepTime: 25,
+          servings: 1,
+        },
+        {
+          mealType: "dinner",
+          name: dinnerMeal.name,
+          description: dinnerMeal.description,
+          calories: dinnerMeal.calories,
+          protein: goal === "weight_gain" ? Math.round(dinnerMeal.calories * 0.25 / 4) : Math.round(dinnerMeal.calories * 0.30 / 4),
+          carbs: goal === "weight_gain" ? Math.round(dinnerMeal.calories * 0.45 / 4) : Math.round(dinnerMeal.calories * 0.30 / 4),
+          fat: goal === "weight_gain" ? Math.round(dinnerMeal.calories * 0.30 / 9) : Math.round(dinnerMeal.calories * 0.40 / 9),
+          ingredients: dinnerMeal.ingredients,
+          instructions: ["Season protein", "Cook thoroughly", "Prepare sides", "Plate and serve"],
+          prepTime: 35,
+          servings: 1,
+        },
+        {
+          mealType: "snack",
+          name: "Healthy Snack",
+          description: `Nutritious snack with ${Math.round(dailyCalories * 0.10)} calories`,
+          calories: Math.round(dailyCalories * 0.10),
+          protein: Math.round(dailyCalories * 0.10 * 0.20 / 4),
+          carbs: Math.round(dailyCalories * 0.10 * 0.40 / 4),
+          fat: Math.round(dailyCalories * 0.10 * 0.40 / 9),
+          ingredients: goal === "weight_gain" ? 
+            ["Mixed nuts", "Dried fruit", "Yogurt"] :
+            ["Apple", "Almond butter", "Greek yogurt"],
+          instructions: ["Prepare snack", "Enjoy between meals"],
+          prepTime: 5,
+          servings: 1,
+        }
+      ];
+
+      meals.forEach((meal, index) => {
+        const mealId = randomUUID();
+        const mealPlanMeal: MealPlanMeal = {
+          id: mealId,
+          mealPlanDayId: dayId,
+          mealType: meal.mealType as "breakfast" | "lunch" | "dinner" | "snack",
+          name: meal.name,
+          description: meal.description,
+          calories: meal.calories,
+          protein: meal.protein,
+          carbs: meal.carbs,
+          fat: meal.fat,
+          ingredients: meal.ingredients,
+          instructions: meal.instructions,
+          prepTime: meal.prepTime,
+          servings: meal.servings,
+        };
+        this.mealPlanMeals.set(mealId, mealPlanMeal);
+      });
+    }
   }
 }
 
