@@ -1,7 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft, Check } from "lucide-react";
 import { Link } from "wouter";
 
@@ -83,41 +82,30 @@ export default function Subscribe() {
 
         <div className="space-y-8">
           {/* Subscription Plans */}
-          <div className="max-w-2xl mx-auto">
-            <Tabs defaultValue="monthly" className="w-full">
-              <TabsList className="grid w-full grid-cols-2" data-testid="subscription-tabs">
-                <TabsTrigger value="monthly" data-testid="tab-monthly-25">Monthly $25</TabsTrigger>
-                <TabsTrigger value="annual" data-testid="tab-monthly-special">Monthly Special</TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="monthly" className="mt-6">
-                <Card className="relative">
-                  <CardHeader>
-                    <CardTitle>Monthly Premium - $25</CardTitle>
-                    <CardDescription>Perfect for getting started</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex justify-center">
-                      <StripeBuyButtonPremium />
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-              
-              <TabsContent value="annual" className="mt-6">
-                <Card className="relative">
-                  <CardHeader>
-                    <CardTitle>Monthly Premium - Special Offer</CardTitle>
-                    <CardDescription>Best value for committed users</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex justify-center">
-                      <StripeBuyButtonAnnual />
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-            </Tabs>
+          <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            <Card className="relative">
+              <CardHeader>
+                <CardTitle>Monthly Premium</CardTitle>
+                <CardDescription>Perfect for getting started</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex justify-center">
+                  <StripeBuyButtonPremium />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="relative">
+              <CardHeader>
+                <CardTitle>Monthly Premium</CardTitle>
+                <CardDescription>Best value for committed users</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex justify-center">
+                  <StripeBuyButtonAnnual />
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
           {/* Features */}
