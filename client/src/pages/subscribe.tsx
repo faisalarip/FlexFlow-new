@@ -97,7 +97,7 @@ export default function Subscribe() {
 
             <Card className="relative">
               <CardHeader>
-                <CardTitle>Annual Premium</CardTitle>
+                <CardTitle>Monthly Premium</CardTitle>
                 <CardDescription>Best value for committed users</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
