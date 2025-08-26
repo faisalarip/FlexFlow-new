@@ -1181,10 +1181,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "User not authenticated" });
       }
       
-      const data = insertUserMealPlanSchema.parse({
+      // Create a custom validation schema that handles date strings
+      const mealPlanAssignmentSchema = insertUserMealPlanSchema.extend({
+        startDate: z.union([z.date(), z.string().transform((str) => new Date(str))])
+      });
+      
+      const data = mealPlanAssignmentSchema.parse({
         ...req.body,
-        userId: userId,
-        startDate: req.body.startDate ? new Date(req.body.startDate) : new Date()
+        userId: userId
       });
       
       console.log("Parsed data:", data);
