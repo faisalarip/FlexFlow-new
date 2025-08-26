@@ -1172,17 +1172,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/user-meal-plan", isAuthenticated, async (req, res) => {
     try {
       const userId = getCurrentUserId(req);
+      console.log("Assigning meal plan for user:", userId);
+      console.log("Request body:", req.body);
+      
       if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
       }
+      
       const data = insertUserMealPlanSchema.parse({
         ...req.body,
         userId: userId
       });
+      
+      console.log("Parsed data:", data);
+      
       const userMealPlan = await storage.assignMealPlan(data);
+      console.log("Meal plan assigned successfully:", userMealPlan);
+      
       res.status(201).json(userMealPlan);
     } catch (error) {
       if (error instanceof z.ZodError) {
+        console.error("Validation error:", error.errors);
         return res.status(400).json({ message: "Invalid assignment data", errors: error.errors });
       }
       console.error("Error assigning meal plan:", error);

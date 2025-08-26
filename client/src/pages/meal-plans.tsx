@@ -71,24 +71,34 @@ export default function MealPlans() {
 
   const assignMealPlanMutation = useMutation({
     mutationFn: async (planId: string) => {
+      console.log("Assigning meal plan:", planId);
       const response = await apiRequest("POST", "/api/user-meal-plan", {
         mealPlanId: planId,
         startDate: new Date().toISOString(),
         isActive: true,
       });
+      
+      if (!response.ok) {
+        const error = await response.text();
+        console.error("Assignment failed:", error);
+        throw new Error(`Failed to assign meal plan: ${response.status}`);
+      }
+      
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log("Meal plan assigned successfully:", data);
       queryClient.invalidateQueries({ queryKey: ["/api/user-meal-plan"] });
       toast({ 
         title: "Meal Plan Assigned!", 
         description: "Your new meal plan is now active." 
       });
     },
-    onError: () => {
+    onError: (error: any) => {
+      console.error("Assignment error:", error);
       toast({ 
         title: "Error", 
-        description: "Failed to assign meal plan", 
+        description: error.message || "Failed to assign meal plan", 
         variant: "destructive" 
       });
     }
