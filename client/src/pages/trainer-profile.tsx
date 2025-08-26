@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRoute } from "wouter";
 import { 
@@ -13,39 +13,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { apiRequest } from "@/lib/queryClient";
 import type { TrainerWithServices, TrainerReviewWithUser, BookingWithDetails } from "@shared/schema";
-
-// Stripe Buy Button Script Loader for Trainers
-const loadStripeScript = () => {
-  if (document.getElementById('stripe-trainer-script')) {
-    return; // Script already loaded
-  }
-  
-  const script = document.createElement('script');
-  script.id = 'stripe-trainer-script';
-  script.async = true;
-  script.src = 'https://js.stripe.com/v3/buy-button.js';
-  document.head.appendChild(script);
-};
-
-// Stripe Buy Button Component for Trainer Payments
-const TrainerPaymentButton = ({ servicePrice }: { servicePrice: number }) => {
-  useEffect(() => {
-    loadStripeScript();
-  }, []);
-
-  return (
-    <div className="trainer-payment-container mt-4 p-4 bg-blue-50 dark:bg-blue-950 rounded-lg">
-      <div className="text-sm text-gray-700 dark:text-gray-300 mb-3 text-center">
-        💳 Secure payment for trainer session (${servicePrice})
-      </div>
-      <stripe-buy-button
-        buy-button-id="buy_btn_1S0D80D5Ue5ytgHWLCHlU78G"
-        publishable-key="pk_live_51RydqBD5Ue5ytgHWpjOJg39P8VJu0EJMTBHZfdtZCSfRkf7EelPmERe5jat5DVUiIhfE1yDnyGVeBs9arKDQn8nZ00sMOvjEja"
-      >
-      </stripe-buy-button>
-    </div>
-  );
-};
 
 export default function TrainerProfile() {
   const [, params] = useRoute("/trainers/:id");
@@ -354,12 +321,6 @@ export default function TrainerProfile() {
                   >
                     {bookingMutation.isPending ? "Booking..." : "Confirm Booking"}
                   </Button>
-                  
-                  {selectedService && trainer?.services && (
-                    <TrainerPaymentButton 
-                      servicePrice={trainer.services.find(s => s.id === selectedService)?.price || 0}
-                    />
-                  )}
                 </div>
               </DialogContent>
             </Dialog>
