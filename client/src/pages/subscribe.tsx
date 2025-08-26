@@ -1,159 +1,44 @@
-import { useStripe, Elements, PaymentElement, useElements } from '@stripe/react-stripe-js';
-import { loadStripe } from '@stripe/stripe-js';
-import { useEffect, useState } from 'react';
-import { apiRequest } from "@/lib/queryClient";
-import { useToast } from "@/hooks/use-toast";
+import { useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, Check } from "lucide-react";
 import { Link } from "wouter";
 
-// Make sure to call `loadStripe` outside of a component's render to avoid
-// recreating the `Stripe` object on every render.
-if (!import.meta.env.VITE_STRIPE_PUBLIC_KEY) {
-  throw new Error('Missing required Stripe key: VITE_STRIPE_PUBLIC_KEY');
-}
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+// Stripe Buy Button Script Loader
+const loadStripeScript = () => {
+  if (document.getElementById('stripe-buy-button-script')) {
+    return; // Script already loaded
+  }
+  
+  const script = document.createElement('script');
+  script.id = 'stripe-buy-button-script';
+  script.async = true;
+  script.src = 'https://js.stripe.com/v3/buy-button.js';
+  document.head.appendChild(script);
+};
 
-const SubscribeForm = () => {
-  const stripe = useStripe();
-  const elements = useElements();
-  const { toast } = useToast();
-  const [isProcessing, setIsProcessing] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsProcessing(true);
-
-    if (!stripe || !elements) {
-      setIsProcessing(false);
-      return;
-    }
-
-    // Ensure payment method is complete before submission
-    const { error: submitError } = await elements.submit();
-    if (submitError) {
-      toast({
-        title: "Payment Information Required",
-        description: "Please complete all required payment fields.",
-        variant: "destructive",
-      });
-      setIsProcessing(false);
-      return;
-    }
-
-    const { error } = await stripe.confirmPayment({
-      elements,
-      confirmParams: {
-        return_url: `${window.location.origin}/dashboard?subscription=success`,
-      },
-    });
-
-    if (error) {
-      toast({
-        title: "Payment Failed",
-        description: error.message,
-        variant: "destructive",
-      });
-    } else {
-      toast({
-        title: "Subscription Successful",
-        description: "Welcome to FlexFlow Premium! Your subscription is now active.",
-      });
-    }
-    setIsProcessing(false);
-  };
+// Stripe Buy Button Component
+const StripeBuyButton = () => {
+  useEffect(() => {
+    loadStripeScript();
+  }, []);
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="space-y-4">
-        <div className="text-sm text-gray-700 font-medium">
-          Enter your payment information:
-        </div>
-        <PaymentElement 
-          options={{
-            fields: {
-              billingDetails: {
-                email: 'never',
-                phone: 'never',
-                address: 'never'
-              }
-            }
-          }}
-        />
-        <div className="text-xs text-gray-500">
-          ✓ Your card will be charged $15.00 monthly
-          <br />
-          ✓ Secure encryption protects your payment data
-          <br />
-          ✓ Cancel anytime from your account settings
-        </div>
-      </div>
-      <Button 
-        type="submit" 
-        className="w-full" 
-        disabled={!stripe || !elements || isProcessing}
-        data-testid="subscribe-button"
+    <div className="stripe-buy-button-container">
+      <stripe-buy-button
+        buy-button-id="buy_btn_1S0D64D5Ue5ytgHWvbMKX18b"
+        publishable-key="pk_live_51RydqBD5Ue5ytgHWpjOJg39P8VJu0EJMTBHZfdtZCSfRkf7EelPmERe5jat5DVUiIhfE1yDnyGVeBs9arKDQn8nZ00sMOvjEja"
       >
-        {isProcessing ? "Processing Payment..." : "Pay $15/month & Subscribe"}
-      </Button>
-    </form>
+      </stripe-buy-button>
+    </div>
   );
 };
 
 export default function Subscribe() {
-  const [clientSecret, setClientSecret] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
-  const { toast } = useToast();
-
   useEffect(() => {
-    // Create subscription as soon as the page loads
-    apiRequest("POST", "/api/get-or-create-subscription")
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error('Failed to create subscription');
-        }
-        return res.json();
-      })
-      .then((data) => {
-        setClientSecret(data.clientSecret);
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        console.error('Subscription error:', error);
-        toast({
-          title: "Error",
-          description: "Failed to initialize subscription. Please try again.",
-          variant: "destructive",
-        });
-        setIsLoading(false);
-      });
-  }, [toast]);
+    loadStripeScript();
+  }, []);
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" aria-label="Loading"/>
-      </div>
-    );
-  }
-
-  if (!clientSecret) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <Card className="max-w-md">
-          <CardContent className="pt-6">
-            <p className="text-center text-red-600">Subscription initialization failed. Please try again.</p>
-            <Button asChild className="w-full mt-4">
-              <Link href="/dashboard">Return to Dashboard</Link>
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  // Make SURE to wrap the form in <Elements> which provides the stripe context.
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
       <div className="max-w-2xl mx-auto">
@@ -163,27 +48,20 @@ export default function Subscribe() {
             Back to Dashboard
           </Link>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Subscribe to FlexFlow Premium</h1>
-          <p className="text-gray-600">Start your 10-day free trial with unlimited access to all premium features</p>
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
-            <p className="text-blue-800 text-sm font-medium">
-              🎉 10-Day Free Trial: Enter your payment info to start your 10-day trial. You'll be charged $15/month automatically after the trial ends.
-            </p>
-          </div>
+          <p className="text-gray-600">Upgrade to premium and unlock all features</p>
         </div>
 
         <div className="grid md:grid-cols-2 gap-8">
           {/* Payment Form */}
           <Card>
             <CardHeader>
-              <CardTitle>💳 Payment Required</CardTitle>
+              <CardTitle>💳 Secure Checkout</CardTitle>
               <CardDescription>
-                Enter your credit or debit card information to activate your $15/month subscription
+                Click below to subscribe with Stripe's secure payment system
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <Elements stripe={stripePromise} options={{ clientSecret }}>
-                <SubscribeForm />
-              </Elements>
+            <CardContent className="flex justify-center py-8">
+              <StripeBuyButton />
             </CardContent>
           </Card>
 
@@ -202,7 +80,7 @@ export default function Subscribe() {
                   </p>
                 </div>
                 <div className="text-right">
-                  <span className="font-semibold text-2xl">$9.99</span>
+                  <span className="font-semibold text-2xl">$10.00</span>
                   <span className="text-gray-500">/month</span>
                 </div>
               </div>
@@ -245,7 +123,7 @@ export default function Subscribe() {
                 <p className="text-xs text-gray-500">
                   Cancel anytime. No long-term commitments.
                   <br />
-                  Billing starts immediately upon subscription.
+                  Secure payment processed by Stripe.
                 </p>
               </div>
             </CardContent>
