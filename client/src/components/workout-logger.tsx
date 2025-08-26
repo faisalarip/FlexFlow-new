@@ -10,6 +10,7 @@ import type { Exercise } from "@shared/schema";
 export default function WorkoutLogger() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("strength");
+  const [showAllExercises, setShowAllExercises] = useState(false);
   const [, setLocation] = useLocation();
   const queryClient = useQueryClient();
 
@@ -30,6 +31,7 @@ export default function WorkoutLogger() {
 
   const categories = [
     { id: "strength", name: "Strength", icon: Dumbbell },
+    { id: "dumbbells", name: "Dumbbells", icon: Weight },
     { id: "cardio", name: "Cardio", icon: Activity },
     { id: "yoga", name: "Yoga", icon: Leaf },
     { id: "swimming", name: "Swimming", icon: Activity },
@@ -98,6 +100,28 @@ export default function WorkoutLogger() {
     { name: "Butterfly", category: "swimming", icon: Activity, color: "blue", description: "Advanced stroke" },
     { name: "Water Aerobics", category: "swimming", icon: Activity, color: "blue", description: "Low impact exercise" },
     { name: "Treading Water", category: "swimming", icon: Activity, color: "blue", description: "Core & leg workout" },
+    
+    // Dumbbell Exercises
+    { name: "Dumbbell Press", category: "dumbbells", icon: Weight, color: "blue", description: "Chest development" },
+    { name: "Dumbbell Rows", category: "dumbbells", icon: Weight, color: "green", description: "Back muscle building" },
+    { name: "Dumbbell Curls", category: "dumbbells", icon: Weight, color: "blue", description: "Bicep isolation" },
+    { name: "Dumbbell Flyes", category: "dumbbells", icon: Weight, color: "blue", description: "Chest isolation" },
+    { name: "Dumbbell Squats", category: "dumbbells", icon: Weight, color: "purple", description: "Leg strength" },
+    { name: "Dumbbell Lunges", category: "dumbbells", icon: Weight, color: "purple", description: "Single leg work" },
+    { name: "Dumbbell Shoulder Press", category: "dumbbells", icon: Weight, color: "yellow", description: "Shoulder development" },
+    { name: "Dumbbell Lateral Raises", category: "dumbbells", icon: Weight, color: "yellow", description: "Side deltoid focus" },
+    { name: "Dumbbell Front Raises", category: "dumbbells", icon: Weight, color: "yellow", description: "Front deltoid work" },
+    { name: "Dumbbell Shrugs", category: "dumbbells", icon: Weight, color: "green", description: "Trap muscle building" },
+    { name: "Dumbbell Deadlifts", category: "dumbbells", icon: Weight, color: "red", description: "Posterior chain" },
+    { name: "Dumbbell Step-ups", category: "dumbbells", icon: Weight, color: "purple", description: "Functional leg work" },
+    { name: "Dumbbell Tricep Extensions", category: "dumbbells", icon: Weight, color: "blue", description: "Tricep isolation" },
+    { name: "Dumbbell Hammer Curls", category: "dumbbells", icon: Weight, color: "blue", description: "Bicep variation" },
+    { name: "Dumbbell Thrusters", category: "dumbbells", icon: Weight, color: "red", description: "Full body exercise" },
+    { name: "Dumbbell Russian Twists", category: "dumbbells", icon: Weight, color: "purple", description: "Weighted core work" },
+    { name: "Dumbbell Walking Lunges", category: "dumbbells", icon: Weight, color: "purple", description: "Dynamic leg exercise" },
+    { name: "Dumbbell Renegade Rows", category: "dumbbells", icon: Weight, color: "red", description: "Core and back combo" },
+    { name: "Dumbbell Goblet Squats", category: "dumbbells", icon: Weight, color: "purple", description: "Front-loaded squats" },
+    { name: "Dumbbell Bulgarian Split Squats", category: "dumbbells", icon: Weight, color: "purple", description: "Single leg focus" },
   ];
 
   // Filter exercises based on search query
@@ -174,16 +198,30 @@ export default function WorkoutLogger() {
       </div>
 
       {/* Exercise Results */}
-      {searchQuery ? (
-        <div className="mb-4">
-          <p className="text-sm font-medium text-muted mb-3">
-            {filteredExercises.length > 0 ? `Found ${filteredExercises.length} exercise${filteredExercises.length === 1 ? '' : 's'}` : 'No exercises found'}
+      {(searchQuery || filteredExercises.length > 6) ? (
+        <div className="mb-4 flex items-center justify-between">
+          <p className="text-sm font-medium text-muted">
+            {searchQuery ? 
+              (filteredExercises.length > 0 ? `Found ${filteredExercises.length} exercise${filteredExercises.length === 1 ? '' : 's'}` : 'No exercises found') :
+              `Showing ${Math.min(filteredExercises.length, showAllExercises ? filteredExercises.length : 6)} of ${filteredExercises.length} exercises`
+            }
           </p>
+          {!searchQuery && filteredExercises.length > 6 && (
+            <button
+              onClick={() => setShowAllExercises(!showAllExercises)}
+              className="text-primary hover:text-primary/80 text-sm font-medium transition-colors"
+              data-testid="view-all-exercises-button"
+            >
+              {showAllExercises ? 'Show Less' : 'View All'}
+            </button>
+          )}
         </div>
       ) : null}
       
       <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-        {filteredExercises.length > 0 ? filteredExercises.map((exercise) => {
+        {filteredExercises.length > 0 ? 
+          (searchQuery || showAllExercises ? filteredExercises : filteredExercises.slice(0, 6))
+          .map((exercise) => {
           const IconComponent = exercise.icon;
           return (
             <button
