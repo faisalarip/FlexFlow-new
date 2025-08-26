@@ -46,22 +46,6 @@ const StripeBuyButtonPremium = () => {
   );
 };
 
-// Stripe Buy Button Component for Premium Annual
-const StripeBuyButtonAnnual = () => {
-  useEffect(() => {
-    loadStripeScript();
-  }, []);
-
-  return (
-    <div className="stripe-buy-button-container">
-      <stripe-buy-button
-        buy-button-id="buy_btn_1S0D64D5Ue5ytgHWvbMKX18b"
-        publishable-key="pk_live_51RydqBD5Ue5ytgHWpjOJg39P8VJu0EJMTBHZfdtZCSfRkf7EelPmERe5jat5DVUiIhfE1yDnyGVeBs9arKDQn8nZ00sMOvjEja"
-      >
-      </stripe-buy-button>
-    </div>
-  );
-};
 
 export default function Subscribe() {
   useEffect(() => {
