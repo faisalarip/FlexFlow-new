@@ -42,7 +42,28 @@ export default function WorkoutLogger() {
     { name: "Yoga", category: "yoga", icon: Leaf, color: "pink", description: "Flexibility & mind" },
     { name: "Deadlifts", category: "strength", icon: Weight, color: "red", description: "Full body strength" },
     { name: "Cycling", category: "cardio", icon: Bike, color: "yellow", description: "Leg endurance" },
+    { name: "Bench Press", category: "strength", icon: Weight, color: "blue", description: "Chest strength" },
+    { name: "Pull-ups", category: "strength", icon: ArrowUpDown, color: "green", description: "Back and arms" },
+    { name: "Burpees", category: "cardio", icon: Activity, color: "red", description: "Full body cardio" },
+    { name: "Plank", category: "strength", icon: Hand, color: "purple", description: "Core strength" },
+    { name: "Swimming", category: "swimming", icon: Activity, color: "blue", description: "Full body cardio" },
+    { name: "Meditation", category: "yoga", icon: Leaf, color: "pink", description: "Mental wellness" },
   ];
+
+  // Filter exercises based on search query
+  const getFilteredExercises = () => {
+    if (!searchQuery.trim()) {
+      return quickExercises.filter(exercise => exercise.category === selectedCategory);
+    }
+    
+    return quickExercises.filter(exercise => 
+      exercise.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      exercise.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      exercise.category.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  };
+
+  const filteredExercises = getFilteredExercises();
 
   const handleStartWorkout = (exerciseName: string) => {
     // This would typically open a workout tracking modal
@@ -102,9 +123,17 @@ export default function WorkoutLogger() {
         </div>
       </div>
 
-      {/* Quick Exercise Buttons */}
+      {/* Exercise Results */}
+      {searchQuery ? (
+        <div className="mb-4">
+          <p className="text-sm font-medium text-muted mb-3">
+            {filteredExercises.length > 0 ? `Found ${filteredExercises.length} exercise${filteredExercises.length === 1 ? '' : 's'}` : 'No exercises found'}
+          </p>
+        </div>
+      ) : null}
+      
       <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-        {quickExercises.map((exercise) => {
+        {filteredExercises.length > 0 ? filteredExercises.map((exercise) => {
           const IconComponent = exercise.icon;
           return (
             <button
@@ -120,7 +149,17 @@ export default function WorkoutLogger() {
               <p className="text-xs text-muted">{exercise.description}</p>
             </button>
           );
-        })}
+        }) : (
+          <div className="col-span-full text-center py-8">
+            <Search className="mx-auto h-12 w-12 text-gray-300 mb-4" />
+            <p className="text-lg font-medium text-gray-500 mb-2">
+              {searchQuery ? 'No exercises found' : 'Try searching for an exercise'}
+            </p>
+            <p className="text-sm text-gray-400">
+              {searchQuery ? `No exercises match "${searchQuery}"` : 'Search for exercises like "push-ups", "running", or "yoga"'}
+            </p>
+          </div>
+        )}
       </div>
 
       {createWorkoutMutation.isPending && (
