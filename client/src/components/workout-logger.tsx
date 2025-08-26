@@ -36,18 +36,68 @@ export default function WorkoutLogger() {
   ];
 
   const quickExercises = [
+    // Strength Training - Upper Body
     { name: "Push-ups", category: "strength", icon: Hand, color: "blue", description: "Upper body strength" },
-    { name: "Running", category: "cardio", icon: Activity, color: "green", description: "Cardio endurance" },
-    { name: "Squats", category: "strength", icon: ArrowUpDown, color: "purple", description: "Lower body power" },
-    { name: "Yoga", category: "yoga", icon: Leaf, color: "pink", description: "Flexibility & mind" },
-    { name: "Deadlifts", category: "strength", icon: Weight, color: "red", description: "Full body strength" },
-    { name: "Cycling", category: "cardio", icon: Bike, color: "yellow", description: "Leg endurance" },
     { name: "Bench Press", category: "strength", icon: Weight, color: "blue", description: "Chest strength" },
     { name: "Pull-ups", category: "strength", icon: ArrowUpDown, color: "green", description: "Back and arms" },
-    { name: "Burpees", category: "cardio", icon: Activity, color: "red", description: "Full body cardio" },
+    { name: "Chin-ups", category: "strength", icon: ArrowUpDown, color: "green", description: "Biceps and back" },
+    { name: "Dips", category: "strength", icon: Hand, color: "blue", description: "Triceps and chest" },
+    { name: "Overhead Press", category: "strength", icon: Weight, color: "purple", description: "Shoulder strength" },
+    { name: "Bicep Curls", category: "strength", icon: Weight, color: "blue", description: "Arm muscle building" },
+    { name: "Tricep Extensions", category: "strength", icon: Weight, color: "purple", description: "Tricep isolation" },
+    { name: "Lat Pulldowns", category: "strength", icon: ArrowUpDown, color: "green", description: "Back width" },
+    { name: "Rows", category: "strength", icon: Weight, color: "green", description: "Back thickness" },
+    
+    // Strength Training - Lower Body
+    { name: "Squats", category: "strength", icon: ArrowUpDown, color: "purple", description: "Lower body power" },
+    { name: "Deadlifts", category: "strength", icon: Weight, color: "red", description: "Full body strength" },
+    { name: "Lunges", category: "strength", icon: ArrowUpDown, color: "purple", description: "Leg stability" },
+    { name: "Leg Press", category: "strength", icon: Weight, color: "purple", description: "Quad development" },
+    { name: "Calf Raises", category: "strength", icon: ArrowUpDown, color: "blue", description: "Calf muscle" },
+    { name: "Romanian Deadlifts", category: "strength", icon: Weight, color: "red", description: "Hamstring focus" },
+    { name: "Bulgarian Split Squats", category: "strength", icon: ArrowUpDown, color: "purple", description: "Single leg strength" },
+    { name: "Hip Thrusts", category: "strength", icon: Weight, color: "pink", description: "Glute activation" },
+    
+    // Strength Training - Core
     { name: "Plank", category: "strength", icon: Hand, color: "purple", description: "Core strength" },
-    { name: "Swimming", category: "swimming", icon: Activity, color: "blue", description: "Full body cardio" },
+    { name: "Crunches", category: "strength", icon: Hand, color: "purple", description: "Abdominal focus" },
+    { name: "Russian Twists", category: "strength", icon: Hand, color: "purple", description: "Oblique strength" },
+    { name: "Mountain Climbers", category: "strength", icon: Activity, color: "red", description: "Core cardio" },
+    { name: "Dead Bug", category: "strength", icon: Hand, color: "purple", description: "Core stability" },
+    { name: "Hanging Leg Raises", category: "strength", icon: ArrowUpDown, color: "green", description: "Lower abs" },
+    
+    // Cardio Exercises
+    { name: "Running", category: "cardio", icon: Activity, color: "green", description: "Cardio endurance" },
+    { name: "Cycling", category: "cardio", icon: Bike, color: "yellow", description: "Leg endurance" },
+    { name: "Burpees", category: "cardio", icon: Activity, color: "red", description: "Full body cardio" },
+    { name: "Jumping Jacks", category: "cardio", icon: Activity, color: "green", description: "Quick cardio burst" },
+    { name: "High Knees", category: "cardio", icon: Activity, color: "yellow", description: "Leg cardio" },
+    { name: "Treadmill", category: "cardio", icon: Activity, color: "green", description: "Indoor running" },
+    { name: "Elliptical", category: "cardio", icon: Activity, color: "blue", description: "Low impact cardio" },
+    { name: "Rowing Machine", category: "cardio", icon: Activity, color: "red", description: "Full body cardio" },
+    { name: "Stair Climber", category: "cardio", icon: Activity, color: "purple", description: "Leg cardio" },
+    { name: "Battle Ropes", category: "cardio", icon: Activity, color: "red", description: "Upper body cardio" },
+    { name: "Box Jumps", category: "cardio", icon: ArrowUpDown, color: "yellow", description: "Explosive power" },
+    { name: "Sprint Intervals", category: "cardio", icon: Activity, color: "red", description: "High intensity" },
+    
+    // Yoga & Flexibility
+    { name: "Yoga", category: "yoga", icon: Leaf, color: "pink", description: "Flexibility & mind" },
     { name: "Meditation", category: "yoga", icon: Leaf, color: "pink", description: "Mental wellness" },
+    { name: "Sun Salutation", category: "yoga", icon: Leaf, color: "pink", description: "Flow sequence" },
+    { name: "Warrior Pose", category: "yoga", icon: Leaf, color: "pink", description: "Strength & balance" },
+    { name: "Downward Dog", category: "yoga", icon: Leaf, color: "pink", description: "Full body stretch" },
+    { name: "Child's Pose", category: "yoga", icon: Leaf, color: "pink", description: "Relaxation pose" },
+    { name: "Pigeon Pose", category: "yoga", icon: Leaf, color: "pink", description: "Hip flexibility" },
+    { name: "Stretching", category: "yoga", icon: Leaf, color: "pink", description: "Muscle recovery" },
+    
+    // Swimming
+    { name: "Swimming", category: "swimming", icon: Activity, color: "blue", description: "Full body cardio" },
+    { name: "Freestyle", category: "swimming", icon: Activity, color: "blue", description: "Front crawl stroke" },
+    { name: "Backstroke", category: "swimming", icon: Activity, color: "blue", description: "Back swimming" },
+    { name: "Breaststroke", category: "swimming", icon: Activity, color: "blue", description: "Chest stroke" },
+    { name: "Butterfly", category: "swimming", icon: Activity, color: "blue", description: "Advanced stroke" },
+    { name: "Water Aerobics", category: "swimming", icon: Activity, color: "blue", description: "Low impact exercise" },
+    { name: "Treading Water", category: "swimming", icon: Activity, color: "blue", description: "Core & leg workout" },
   ];
 
   // Filter exercises based on search query
