@@ -217,7 +217,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const fileName = `profile-${userId}-${Date.now()}${fileExtension}`;
         
         // Store in private directory
-        const fs = require('fs').promises;
         const privateDir = process.env.PRIVATE_OBJECT_DIR || '';
         
         if (!privateDir) {
@@ -263,7 +262,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/user/profile/image/:filename", isAuthenticated, async (req, res) => {
     try {
       const { filename } = req.params;
-      const fs = require('fs').promises;
       const imagePath = path.join(process.env.PRIVATE_OBJECT_DIR || '', filename);
       
       try {
