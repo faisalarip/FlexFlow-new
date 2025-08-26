@@ -354,6 +354,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Delete goal
+  app.delete("/api/goals/:id", isAuthenticated, async (req, res) => {
+    try {
+      const userId = getCurrentUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      const { id } = req.params;
+      
+      const deleted = await storage.deleteGoal(id);
+      if (!deleted) {
+        return res.status(404).json({ message: "Goal not found" });
+      }
+      
+      res.status(200).json({ message: "Goal deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete goal" });
+    }
+  });
+
   // Stripe payment routes
   app.post("/api/create-payment-intent", isAuthenticated, async (req, res) => {
     try {

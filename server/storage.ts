@@ -84,6 +84,7 @@ export interface IStorage {
   getGoals(userId: string): Promise<Goal[]>;
   createGoal(goal: InsertGoal): Promise<Goal>;
   updateGoal(id: string, updates: Partial<Goal>): Promise<Goal | undefined>;
+  deleteGoal(id: string): Promise<boolean>;
   
   // Stats
   getUserStats(userId: string): Promise<UserStats>;
@@ -873,6 +874,10 @@ export class MemStorage implements IStorage {
       return updatedGoal;
     }
     return undefined;
+  }
+
+  async deleteGoal(id: string): Promise<boolean> {
+    return this.goals.delete(id);
   }
 
   // Payment management
