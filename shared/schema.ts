@@ -435,6 +435,31 @@ export const userMealPlans = pgTable("user_meal_plans", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+// Food Items Database
+export const foodItems = pgTable("food_items", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  category: text("category").notNull(), // fruits, vegetables, proteins, grains, dairy, etc.
+  caloriesPer100g: integer("calories_per_100g").notNull(),
+  proteinPer100g: integer("protein_per_100g").default(0), // grams
+  carbsPer100g: integer("carbs_per_100g").default(0), // grams
+  fatPer100g: integer("fat_per_100g").default(0), // grams
+  fiberPer100g: integer("fiber_per_100g").default(0), // grams
+  commonServingSize: text("common_serving_size"), // e.g., "1 medium apple (182g)"
+  isCommon: boolean("is_common").default(true), // popular foods shown first
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// User Food Preferences
+export const userFoodPreferences = pgTable("user_food_preferences", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  foodItemId: varchar("food_item_id").references(() => foodItems.id).notNull(),
+  preference: text("preference").notNull(), // "like", "love", "dislike", "never"
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Meal Plan insert schemas
 export const insertMealPlanSchema = createInsertSchema(mealPlans).omit({
   id: true,
@@ -454,6 +479,17 @@ export const insertUserMealPlanSchema = createInsertSchema(userMealPlans).omit({
   createdAt: true,
 });
 
+export const insertFoodItemSchema = createInsertSchema(foodItems).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertUserFoodPreferenceSchema = createInsertSchema(userFoodPreferences).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 // Meal Plan types
 export type InsertMealPlan = z.infer<typeof insertMealPlanSchema>;
 export type MealPlan = typeof mealPlans.$inferSelect;
@@ -467,6 +503,12 @@ export type MealPlanMeal = typeof mealPlanMeals.$inferSelect;
 export type InsertUserMealPlan = z.infer<typeof insertUserMealPlanSchema>;
 export type UserMealPlan = typeof userMealPlans.$inferSelect;
 
+export type InsertFoodItem = z.infer<typeof insertFoodItemSchema>;
+export type FoodItem = typeof foodItems.$inferSelect;
+
+export type InsertUserFoodPreference = z.infer<typeof insertUserFoodPreferenceSchema>;
+export type UserFoodPreference = typeof userFoodPreferences.$inferSelect;
+
 // Extended types for API responses
 export type MealPlanWithDetails = MealPlan & {
   days: (MealPlanDay & {
@@ -476,6 +518,10 @@ export type MealPlanWithDetails = MealPlan & {
 
 export type UserMealPlanWithDetails = UserMealPlan & {
   mealPlan: MealPlanWithDetails;
+};
+
+export type FoodItemWithPreference = FoodItem & {
+  userPreference?: UserFoodPreference;
 };
 
 // Calendar Notes

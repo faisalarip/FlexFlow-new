@@ -177,7 +177,23 @@ function generateMockMealPlan(options: MealPlanGenerationOptions): GeneratedMeal
   };
 }
 
-export async function generatePersonalizedMealPlan(options: MealPlanGenerationOptions): Promise<GeneratedMealPlan> {
+// New interface for personalized meal plans with food preferences
+interface PersonalizedMealPlanParams {
+  goal: string; 
+  dailyCalories: number;
+  duration: number;
+  likedFoods: string[];
+  dislikedFoods: string[];
+  userId: string;
+}
+
+export async function generatePersonalizedMealPlan(params: PersonalizedMealPlanParams | MealPlanGenerationOptions): Promise<GeneratedMealPlan> {
+  // Handle both old and new interface
+  if ('likedFoods' in params) {
+    return generatePersonalizedMealPlanWithFoodPreferences(params as PersonalizedMealPlanParams);
+  }
+  
+  const options = params as MealPlanGenerationOptions;
   if (!process.env.OPENAI_API_KEY) {
     console.log("OPENAI_API_KEY not configured, using mock meal plan");
     return generateMockMealPlan(options);
@@ -312,4 +328,153 @@ export async function generateWeeklyMealPlan(
   };
 
   return generatePersonalizedMealPlan(options);
+}
+
+async function generatePersonalizedMealPlanWithFoodPreferences(params: PersonalizedMealPlanParams): Promise<GeneratedMealPlan> {
+  const { goal, dailyCalories, duration, likedFoods, dislikedFoods, userId } = params;
+
+  console.log(`Generating personalized meal plan for user ${userId}:`, {
+    goal,
+    dailyCalories,
+    duration,
+    likedFoodsCount: likedFoods.length,
+    dislikedFoodsCount: dislikedFoods.length
+  });
+
+  if (!process.env.OPENAI_API_KEY) {
+    console.log("OPENAI_API_KEY not configured, using mock meal plan");
+    return generateMockMealPlan({
+      goal: goal as any,
+      dailyCalories,
+      duration,
+      preferences: likedFoods,
+      dietaryRestrictions: dislikedFoods.map(food => `Avoid ${food}`)
+    });
+  }
+
+  // Calculate macronutrient targets based on goal
+  const proteinPercentage = goal === "weight_gain" ? 0.25 : goal === "weight_loss" ? 0.30 : 0.25;
+  const fatPercentage = goal === "weight_gain" ? 0.30 : 0.25;
+  const carbPercentage = 1 - proteinPercentage - fatPercentage;
+
+  const dailyProtein = Math.round((dailyCalories * proteinPercentage) / 4); // 4 cal per gram
+  const dailyFat = Math.round((dailyCalories * fatPercentage) / 9); // 9 cal per gram  
+  const dailyCarbs = Math.round((dailyCalories * carbPercentage) / 4); // 4 cal per gram
+
+  const goalDescription = goal === "weight_loss" ? 
+    "weight loss with moderate calorie deficit" : 
+    goal === "weight_gain" ? 
+    "healthy weight gain with calorie surplus" : 
+    "weight maintenance and overall health";
+
+  const prompt = `Create a ${duration}-day personalized meal plan for ${goalDescription}.
+
+REQUIREMENTS:
+- Daily calories: ${dailyCalories}
+- Daily protein: ${dailyProtein}g
+- Daily carbs: ${dailyCarbs}g  
+- Daily fat: ${dailyFat}g
+- 4 meals per day: breakfast, lunch, dinner, snack
+
+FOOD PREFERENCES:
+Preferred foods (use these heavily): ${likedFoods.length > 0 ? likedFoods.join(", ") : "No specific preferences"}
+Foods to avoid: ${dislikedFoods.length > 0 ? dislikedFoods.join(", ") : "None"}
+
+CONSTRAINTS:
+- Focus on whole, minimally processed foods
+- Include variety across all food groups
+- Ensure adequate micronutrient coverage
+- Make meals practical and realistic
+- Each meal should have clear portions and instructions
+
+Respond with JSON in this exact format:
+{
+  "name": "string",
+  "description": "string", 
+  "goal": "${goal}",
+  "dailyCalories": ${dailyCalories},
+  "dailyProtein": ${dailyProtein},
+  "dailyCarbs": ${dailyCarbs},
+  "dailyFat": ${dailyFat},
+  "duration": ${duration},
+  "days": [
+    {
+      "dayNumber": 1,
+      "name": "Day 1",
+      "meals": [
+        {
+          "mealType": "breakfast",
+          "name": "string",
+          "description": "string",
+          "calories": number,
+          "protein": number,
+          "carbs": number, 
+          "fat": number,
+          "ingredients": ["string"],
+          "instructions": ["string"],
+          "prepTime": number,
+          "servings": 1
+        }
+      ]
+    }
+  ]
+}`;
+
+  try {
+    const response = await openai.chat.completions.create({
+      model: "gpt-5", // the newest OpenAI model is "gpt-5" which was released August 7, 2025. do not change this unless explicitly requested by the user
+      messages: [
+        {
+          role: "system",
+          content: "You are a professional nutritionist and meal planning expert. Create detailed, nutritionally balanced meal plans based on user preferences and goals. Always respond with valid JSON only."
+        },
+        {
+          role: "user",
+          content: prompt
+        }
+      ],
+      response_format: { type: "json_object" },
+      temperature: 0.7,
+      max_tokens: 4000
+    });
+
+    const generatedPlan = JSON.parse(response.choices[0].message.content);
+    
+    // Validate the response structure
+    if (!generatedPlan.name || !generatedPlan.days || !Array.isArray(generatedPlan.days)) {
+      throw new Error("Invalid meal plan structure received from AI");
+    }
+
+    // Ensure each day has the required meal types
+    generatedPlan.days.forEach((day: any, dayIndex: number) => {
+      if (!day.meals || !Array.isArray(day.meals)) {
+        throw new Error(`Day ${dayIndex + 1} is missing meals array`);
+      }
+      
+      const mealTypes = day.meals.map((meal: any) => meal.mealType);
+      const requiredTypes = ["breakfast", "lunch", "dinner", "snack"];
+      
+      requiredTypes.forEach(type => {
+        if (!mealTypes.includes(type)) {
+          console.warn(`Day ${dayIndex + 1} is missing ${type} meal`);
+        }
+      });
+    });
+
+    console.log(`Successfully generated ${duration}-day meal plan: "${generatedPlan.name}"`);
+    return generatedPlan as GeneratedMealPlan;
+
+  } catch (error: any) {
+    console.error("Error generating personalized meal plan:", error);
+    
+    if (error.message?.includes("API key")) {
+      throw new Error("OpenAI API key is not configured. Please set OPENAI_API_KEY environment variable.");
+    }
+    
+    if (error.message?.includes("JSON")) {
+      throw new Error("Failed to parse AI response. Please try again.");
+    }
+    
+    throw new Error(`Failed to generate meal plan: ${error.message}`);
+  }
 }

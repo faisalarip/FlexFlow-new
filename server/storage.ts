@@ -176,6 +176,15 @@ export interface IStorage {
 
   // AI Meal Plan Generation
   createAIMealPlan(mealPlan: InsertMealPlan, days: { dayNumber: number; name: string; meals: any[] }[]): Promise<MealPlan>;
+
+  // Food Items and Preferences
+  getFoodItems(category?: string): Promise<FoodItem[]>;
+  createFoodItem(foodItem: InsertFoodItem): Promise<FoodItem>;
+  getFoodItemsWithUserPreferences(userId: string, category?: string): Promise<FoodItemWithPreference[]>;
+  getUserFoodPreferences(userId: string): Promise<UserFoodPreference[]>;
+  setUserFoodPreference(preference: InsertUserFoodPreference): Promise<UserFoodPreference>;
+  updateUserFoodPreference(userId: string, foodItemId: string, preference: string): Promise<UserFoodPreference | undefined>;
+  deleteUserFoodPreference(userId: string, foodItemId: string): Promise<boolean>;
 }
 
 export class MemStorage implements IStorage {
@@ -199,11 +208,14 @@ export class MemStorage implements IStorage {
   private userMealPlans: Map<string, UserMealPlan> = new Map();
   private calendarNotes: Map<string, CalendarNote> = new Map();
   private userMealPreferences: Map<string, UserMealPreferences> = new Map();
+  private foodItems: Map<string, FoodItem> = new Map();
+  private userFoodPreferences: Map<string, UserFoodPreference> = new Map();
 
   constructor() {
     this.seedExercises();
     this.seedTrainers();
     this.seedMealPlans();
+    this.seedFoodItems();
   }
 
   private seedExercises() {
@@ -1967,6 +1979,150 @@ export class MemStorage implements IStorage {
     }
 
     return newPlan;
+  }
+
+  // Food Items and Preferences Implementation
+  async getFoodItems(category?: string): Promise<FoodItem[]> {
+    const items = Array.from(this.foodItems.values());
+    if (category) {
+      return items.filter(item => item.category === category);
+    }
+    return items.sort((a, b) => (b.isCommon ? 1 : 0) - (a.isCommon ? 1 : 0));
+  }
+
+  async createFoodItem(foodItem: InsertFoodItem): Promise<FoodItem> {
+    const newItem: FoodItem = {
+      id: randomUUID(),
+      ...foodItem,
+      createdAt: new Date(),
+    };
+    this.foodItems.set(newItem.id, newItem);
+    return newItem;
+  }
+
+  async getFoodItemsWithUserPreferences(userId: string, category?: string): Promise<FoodItemWithPreference[]> {
+    const items = await this.getFoodItems(category);
+    const userPrefs = await this.getUserFoodPreferences(userId);
+    
+    return items.map(item => {
+      const userPreference = userPrefs.find(pref => pref.foodItemId === item.id);
+      return { ...item, userPreference };
+    });
+  }
+
+  async getUserFoodPreferences(userId: string): Promise<UserFoodPreference[]> {
+    return Array.from(this.userFoodPreferences.values())
+      .filter(pref => pref.userId === userId);
+  }
+
+  async setUserFoodPreference(preference: InsertUserFoodPreference): Promise<UserFoodPreference> {
+    // Check if preference already exists
+    const existing = Array.from(this.userFoodPreferences.values())
+      .find(pref => pref.userId === preference.userId && pref.foodItemId === preference.foodItemId);
+
+    if (existing) {
+      // Update existing preference
+      const updated: UserFoodPreference = {
+        ...existing,
+        preference: preference.preference,
+        updatedAt: new Date(),
+      };
+      this.userFoodPreferences.set(existing.id, updated);
+      return updated;
+    }
+
+    // Create new preference
+    const newPreference: UserFoodPreference = {
+      id: randomUUID(),
+      ...preference,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    this.userFoodPreferences.set(newPreference.id, newPreference);
+    return newPreference;
+  }
+
+  async updateUserFoodPreference(userId: string, foodItemId: string, preference: string): Promise<UserFoodPreference | undefined> {
+    const existing = Array.from(this.userFoodPreferences.values())
+      .find(pref => pref.userId === userId && pref.foodItemId === foodItemId);
+
+    if (!existing) return undefined;
+
+    const updated: UserFoodPreference = {
+      ...existing,
+      preference,
+      updatedAt: new Date(),
+    };
+    this.userFoodPreferences.set(existing.id, updated);
+    return updated;
+  }
+
+  async deleteUserFoodPreference(userId: string, foodItemId: string): Promise<boolean> {
+    const existing = Array.from(this.userFoodPreferences.values())
+      .find(pref => pref.userId === userId && pref.foodItemId === foodItemId);
+
+    if (!existing) return false;
+
+    this.userFoodPreferences.delete(existing.id);
+    return true;
+  }
+
+  private seedFoodItems() {
+    const foodItems: InsertFoodItem[] = [
+      // Proteins
+      { name: "Chicken Breast", category: "proteins", caloriesPer100g: 165, proteinPer100g: 31, carbsPer100g: 0, fatPer100g: 4, fiberPer100g: 0, commonServingSize: "1 piece (100g)", isCommon: true },
+      { name: "Salmon", category: "proteins", caloriesPer100g: 208, proteinPer100g: 20, carbsPer100g: 0, fatPer100g: 13, fiberPer100g: 0, commonServingSize: "1 fillet (150g)", isCommon: true },
+      { name: "Ground Turkey", category: "proteins", caloriesPer100g: 149, proteinPer100g: 20, carbsPer100g: 0, fatPer100g: 7, fiberPer100g: 0, commonServingSize: "100g", isCommon: true },
+      { name: "Eggs", category: "proteins", caloriesPer100g: 155, proteinPer100g: 13, carbsPer100g: 1, fatPer100g: 11, fiberPer100g: 0, commonServingSize: "2 large eggs (100g)", isCommon: true },
+      { name: "Greek Yogurt", category: "dairy", caloriesPer100g: 59, proteinPer100g: 10, carbsPer100g: 4, fatPer100g: 0, fiberPer100g: 0, commonServingSize: "1 cup (245g)", isCommon: true },
+      { name: "Tofu", category: "proteins", caloriesPer100g: 76, proteinPer100g: 8, carbsPer100g: 2, fatPer100g: 5, fiberPer100g: 1, commonServingSize: "100g", isCommon: true },
+
+      // Carbohydrates
+      { name: "Brown Rice", category: "grains", caloriesPer100g: 111, proteinPer100g: 3, carbsPer100g: 23, fatPer100g: 1, fiberPer100g: 2, commonServingSize: "1 cup cooked (195g)", isCommon: true },
+      { name: "Quinoa", category: "grains", caloriesPer100g: 120, proteinPer100g: 4, carbsPer100g: 22, fatPer100g: 2, fiberPer100g: 3, commonServingSize: "1 cup cooked (185g)", isCommon: true },
+      { name: "Sweet Potato", category: "vegetables", caloriesPer100g: 86, proteinPer100g: 2, carbsPer100g: 20, fatPer100g: 0, fiberPer100g: 3, commonServingSize: "1 medium (128g)", isCommon: true },
+      { name: "Oats", category: "grains", caloriesPer100g: 389, proteinPer100g: 17, carbsPer100g: 66, fatPer100g: 7, fiberPer100g: 11, commonServingSize: "1/2 cup dry (40g)", isCommon: true },
+      { name: "Whole Wheat Bread", category: "grains", caloriesPer100g: 247, proteinPer100g: 13, carbsPer100g: 41, fatPer100g: 4, fiberPer100g: 7, commonServingSize: "2 slices (56g)", isCommon: true },
+
+      // Vegetables
+      { name: "Broccoli", category: "vegetables", caloriesPer100g: 34, proteinPer100g: 3, carbsPer100g: 7, fatPer100g: 0, fiberPer100g: 3, commonServingSize: "1 cup chopped (91g)", isCommon: true },
+      { name: "Spinach", category: "vegetables", caloriesPer100g: 23, proteinPer100g: 3, carbsPer100g: 4, fatPer100g: 0, fiberPer100g: 2, commonServingSize: "1 cup raw (30g)", isCommon: true },
+      { name: "Bell Peppers", category: "vegetables", caloriesPer100g: 31, proteinPer100g: 1, carbsPer100g: 7, fatPer100g: 0, fiberPer100g: 3, commonServingSize: "1 medium (119g)", isCommon: true },
+      { name: "Carrots", category: "vegetables", caloriesPer100g: 41, proteinPer100g: 1, carbsPer100g: 10, fatPer100g: 0, fiberPer100g: 3, commonServingSize: "1 medium (61g)", isCommon: true },
+      { name: "Tomatoes", category: "vegetables", caloriesPer100g: 18, proteinPer100g: 1, carbsPer100g: 4, fatPer100g: 0, fiberPer100g: 1, commonServingSize: "1 medium (123g)", isCommon: true },
+
+      // Fruits
+      { name: "Banana", category: "fruits", caloriesPer100g: 89, proteinPer100g: 1, carbsPer100g: 23, fatPer100g: 0, fiberPer100g: 3, commonServingSize: "1 medium (118g)", isCommon: true },
+      { name: "Apple", category: "fruits", caloriesPer100g: 52, proteinPer100g: 0, carbsPer100g: 14, fatPer100g: 0, fiberPer100g: 2, commonServingSize: "1 medium (182g)", isCommon: true },
+      { name: "Berries (Mixed)", category: "fruits", caloriesPer100g: 57, proteinPer100g: 1, carbsPer100g: 14, fatPer100g: 0, fiberPer100g: 6, commonServingSize: "1 cup (148g)", isCommon: true },
+      { name: "Orange", category: "fruits", caloriesPer100g: 47, proteinPer100g: 1, carbsPer100g: 12, fatPer100g: 0, fiberPer100g: 2, commonServingSize: "1 medium (154g)", isCommon: true },
+
+      // Healthy Fats
+      { name: "Avocado", category: "fats", caloriesPer100g: 160, proteinPer100g: 2, carbsPer100g: 9, fatPer100g: 15, fiberPer100g: 7, commonServingSize: "1 medium (150g)", isCommon: true },
+      { name: "Almonds", category: "nuts", caloriesPer100g: 579, proteinPer100g: 21, carbsPer100g: 22, fatPer100g: 50, fiberPer100g: 12, commonServingSize: "1 oz (28g)", isCommon: true },
+      { name: "Olive Oil", category: "fats", caloriesPer100g: 884, proteinPer100g: 0, carbsPer100g: 0, fatPer100g: 100, fiberPer100g: 0, commonServingSize: "1 tbsp (14g)", isCommon: true },
+      { name: "Walnuts", category: "nuts", caloriesPer100g: 654, proteinPer100g: 15, carbsPer100g: 14, fatPer100g: 65, fiberPer100g: 7, commonServingSize: "1 oz (28g)", isCommon: true },
+
+      // Dairy
+      { name: "Milk (2%)", category: "dairy", caloriesPer100g: 50, proteinPer100g: 3, carbsPer100g: 5, fatPer100g: 2, fiberPer100g: 0, commonServingSize: "1 cup (244g)", isCommon: true },
+      { name: "Cheese (Cheddar)", category: "dairy", caloriesPer100g: 403, proteinPer100g: 25, carbsPer100g: 1, fatPer100g: 33, fiberPer100g: 0, commonServingSize: "1 oz (28g)", isCommon: true },
+
+      // Additional options
+      { name: "Black Beans", category: "legumes", caloriesPer100g: 132, proteinPer100g: 9, carbsPer100g: 23, fatPer100g: 1, fiberPer100g: 9, commonServingSize: "1/2 cup (86g)", isCommon: true },
+      { name: "Lentils", category: "legumes", caloriesPer100g: 116, proteinPer100g: 9, carbsPer100g: 20, fatPer100g: 0, fiberPer100g: 8, commonServingSize: "1/2 cup (99g)", isCommon: true },
+      { name: "Tuna", category: "proteins", caloriesPer100g: 144, proteinPer100g: 30, carbsPer100g: 0, fatPer100g: 1, fiberPer100g: 0, commonServingSize: "1 can (142g)", isCommon: true },
+      { name: "Cottage Cheese", category: "dairy", caloriesPer100g: 98, proteinPer100g: 11, carbsPer100g: 4, fatPer100g: 4, fiberPer100g: 0, commonServingSize: "1/2 cup (113g)", isCommon: true },
+    ];
+
+    foodItems.forEach((item, index) => {
+      const id = `food-${index + 1}`;
+      const foodItem: FoodItem = {
+        id,
+        ...item,
+        createdAt: new Date(),
+      };
+      this.foodItems.set(id, foodItem);
+    });
   }
 }
 

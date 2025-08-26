@@ -20,7 +20,9 @@ import {
   insertMealPlanSchema,
   insertUserMealPlanSchema,
   insertPaymentSchema,
-  insertUserMealPreferencesSchema
+  insertUserMealPreferencesSchema,
+  insertFoodItemSchema,
+  insertUserFoodPreferenceSchema
 } from "@shared/schema";
 import { z } from "zod";
 import { ObjectStorageService } from "./objectStorage";
@@ -1618,6 +1620,153 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching user subscription revenue:", error);
       res.status(500).json({ message: "Failed to fetch user subscription revenue" });
+    }
+  });
+
+  // Food Items and Preferences API Routes
+  
+  // Get all food items with optional category filter
+  app.get("/api/food-items", isAuthenticated, async (req, res) => {
+    try {
+      const category = req.query.category as string | undefined;
+      const foodItems = await storage.getFoodItems(category);
+      res.json(foodItems);
+    } catch (error) {
+      console.error("Error fetching food items:", error);
+      res.status(500).json({ message: "Failed to fetch food items" });
+    }
+  });
+
+  // Get food items with user preferences
+  app.get("/api/food-items-with-preferences", isAuthenticated, async (req, res) => {
+    try {
+      const userId = getCurrentUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      
+      const category = req.query.category as string | undefined;
+      const foodItems = await storage.getFoodItemsWithUserPreferences(userId, category);
+      res.json(foodItems);
+    } catch (error) {
+      console.error("Error fetching food items with preferences:", error);
+      res.status(500).json({ message: "Failed to fetch food items" });
+    }
+  });
+
+  // Get user food preferences
+  app.get("/api/user-food-preferences", isAuthenticated, async (req, res) => {
+    try {
+      const userId = getCurrentUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      
+      const preferences = await storage.getUserFoodPreferences(userId);
+      res.json(preferences);
+    } catch (error) {
+      console.error("Error fetching user food preferences:", error);
+      res.status(500).json({ message: "Failed to fetch food preferences" });
+    }
+  });
+
+  // Set user food preference
+  app.post("/api/user-food-preference", isAuthenticated, async (req, res) => {
+    try {
+      const userId = getCurrentUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      
+      const data = insertUserFoodPreferenceSchema.parse({
+        ...req.body,
+        userId: userId
+      });
+      
+      const preference = await storage.setUserFoodPreference(data);
+      res.status(201).json(preference);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid preference data", errors: error.errors });
+      }
+      console.error("Error setting food preference:", error);
+      res.status(500).json({ message: "Failed to set food preference" });
+    }
+  });
+
+  // Generate AI meal plan based on food preferences
+  app.post("/api/generate-personalized-meal-plan", isAuthenticated, async (req, res) => {
+    try {
+      const userId = getCurrentUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+
+      const { goal, dailyCalories, duration = 7 } = req.body;
+      
+      if (!goal || !dailyCalories) {
+        return res.status(400).json({ message: "Goal and daily calories are required" });
+      }
+
+      // Get user food preferences
+      const userPreferences = await storage.getUserFoodPreferences(userId);
+      const likedFoods = userPreferences
+        .filter(pref => pref.preference === "like" || pref.preference === "love")
+        .map(pref => pref.foodItemId);
+      
+      const dislikedFoods = userPreferences
+        .filter(pref => pref.preference === "dislike" || pref.preference === "never")
+        .map(pref => pref.foodItemId);
+
+      // Get the actual food items
+      const allFoodItems = await storage.getFoodItems();
+      const likedFoodItems = allFoodItems.filter(item => likedFoods.includes(item.id));
+      const dislikedFoodItems = allFoodItems.filter(item => dislikedFoods.includes(item.id));
+
+      // Generate personalized meal plan using OpenAI
+      const generatedPlan = await generatePersonalizedMealPlan({
+        goal,
+        dailyCalories: parseInt(dailyCalories),
+        duration,
+        likedFoods: likedFoodItems.map(item => item.name),
+        dislikedFoods: dislikedFoodItems.map(item => item.name),
+        userId
+      });
+
+      // Create the meal plan in storage
+      const mealPlan = await storage.createAIMealPlan(
+        {
+          name: generatedPlan.name,
+          description: generatedPlan.description,
+          goal: generatedPlan.goal,
+          dailyCalories: generatedPlan.dailyCalories,
+          dailyProtein: generatedPlan.dailyProtein,
+          dailyCarbs: generatedPlan.dailyCarbs,
+          dailyFat: generatedPlan.dailyFat,
+          duration: generatedPlan.duration,
+          isActive: true,
+        },
+        generatedPlan.days
+      );
+
+      // Assign to user
+      await storage.assignMealPlan({
+        userId,
+        mealPlanId: mealPlan.id,
+        startDate: new Date(),
+        isActive: true,
+      });
+
+      res.status(201).json({ 
+        message: "Personalized meal plan generated successfully!", 
+        mealPlan 
+      });
+    } catch (error: any) {
+      console.error("Error generating personalized meal plan:", error);
+      res.status(500).json({ 
+        message: "Failed to generate personalized meal plan",
+        details: error.message 
+      });
     }
   });
 
