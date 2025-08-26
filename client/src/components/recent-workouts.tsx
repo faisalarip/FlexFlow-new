@@ -1,11 +1,11 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Dumbbell, Activity, Leaf } from "lucide-react";
+import { Dumbbell, Activity, Leaf, ChevronUp, ChevronDown } from "lucide-react";
 import { format, isToday, isYesterday, formatDistanceToNow } from "date-fns";
-import { useLocation } from "wouter";
 import type { Workout } from "@shared/schema";
 
 export default function RecentWorkouts() {
-  const [, setLocation] = useLocation();
+  const [showAll, setShowAll] = useState(false);
   const { data: workouts, isLoading } = useQuery<Workout[]>({
     queryKey: ["/api/workouts"],
   });
@@ -88,16 +88,17 @@ export default function RecentWorkouts() {
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-xl font-bold text-gray-800">Recent Workouts</h3>
         <button 
-          onClick={() => setLocation('/workouts')}
-          className="text-primary hover:text-primary/80 text-sm font-medium transition-colors"
+          onClick={() => setShowAll(!showAll)}
+          className="text-primary hover:text-primary/80 text-sm font-medium transition-colors flex items-center gap-1"
           data-testid="view-all-workouts-button"
         >
-          View All
+          {showAll ? 'Show Less' : 'View All'}
+          {showAll ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
         </button>
       </div>
 
       <div className="space-y-4">
-        {workouts.slice(0, 3).map((workout) => {
+        {(showAll ? workouts : workouts.slice(0, 3)).map((workout) => {
           const IconComponent = getWorkoutIcon(workout.category);
           const colorClass = getWorkoutColor(workout.category);
 
@@ -127,6 +128,14 @@ export default function RecentWorkouts() {
           );
         })}
       </div>
+      
+      {workouts.length > 3 && (
+        <div className="mt-4 text-center">
+          <p className="text-sm text-gray-500">
+            {showAll ? `Showing all ${workouts.length} workouts` : `Showing 3 of ${workouts.length} workouts`}
+          </p>
+        </div>
+      )}
     </section>
   );
 }
