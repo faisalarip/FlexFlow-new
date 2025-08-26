@@ -1183,7 +1183,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const data = insertUserMealPlanSchema.parse({
         ...req.body,
-        userId: userId
+        userId: userId,
+        startDate: req.body.startDate ? new Date(req.body.startDate) : new Date()
       });
       
       console.log("Parsed data:", data);
@@ -1361,7 +1362,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           results.push({ userId, success: true, mealPlanId: mealPlan.id });
         } catch (error) {
           console.error(`Error generating meal plan for user ${userId}:`, error);
-          results.push({ userId, success: false, error: error.message });
+          results.push({ userId, success: false, error: (error as Error).message });
         }
       }
 
