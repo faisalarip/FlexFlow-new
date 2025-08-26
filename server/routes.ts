@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import Stripe from "stripe";
 import multer from "multer";
 import path from "path";
+import { promises as fs } from "fs";
 import { storage } from "./storage";
 import { 
   insertWorkoutSchema, 
