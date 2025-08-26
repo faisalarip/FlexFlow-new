@@ -1,9 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { Dumbbell, Activity, Leaf } from "lucide-react";
 import { format, isToday, isYesterday, formatDistanceToNow } from "date-fns";
+import { useLocation } from "wouter";
 import type { Workout } from "@shared/schema";
 
 export default function RecentWorkouts() {
+  const [, setLocation] = useLocation();
   const { data: workouts, isLoading } = useQuery<Workout[]>({
     queryKey: ["/api/workouts"],
   });
@@ -85,7 +87,11 @@ export default function RecentWorkouts() {
     <section className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-xl font-bold text-gray-800">Recent Workouts</h3>
-        <button className="text-primary hover:text-primary/80 text-sm font-medium transition-colors">
+        <button 
+          onClick={() => setLocation('/workouts')}
+          className="text-primary hover:text-primary/80 text-sm font-medium transition-colors"
+          data-testid="view-all-workouts-button"
+        >
           View All
         </button>
       </div>
