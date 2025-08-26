@@ -68,13 +68,21 @@ export default function WorkoutRecommendations() {
   }, []);
 
   return (
-    <section className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+    <section className="relative bg-gradient-to-br from-indigo-900 via-purple-900 to-blue-900 rounded-3xl shadow-2xl border border-indigo-700/50 p-8 overflow-hidden">
+      {/* Animated background elements */}
+      <div className="absolute inset-0">
+        <div className="absolute top-0 left-0 w-40 h-40 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-full blur-3xl opacity-20 animate-pulse"></div>
+        <div className="absolute bottom-0 right-0 w-32 h-32 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full blur-2xl opacity-15 animate-bounce" style={{animationDuration: '3s'}}></div>
+        <div className="absolute top-1/2 left-1/3 w-28 h-28 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-full blur-3xl opacity-10 animate-ping" style={{animationDuration: '4s'}}></div>
+      </div>
+      {/* Content wrapper */}
+      <div className="relative z-10">
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-xl font-bold text-gray-800">Recommended Workouts</h3>
+        <h3 className="text-2xl font-bold text-white drop-shadow-lg">Recommended Workouts</h3>
         <button 
           onClick={handleRefresh}
           disabled={isRefreshing}
-          className="flex items-center space-x-1 text-primary hover:text-primary/80 text-sm font-medium transition-colors disabled:opacity-50"
+          className="flex items-center space-x-1 text-gray-300 hover:text-cyan-300 text-sm font-medium transition-colors disabled:opacity-50"
           data-testid="refresh-workouts-button"
         >
           <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
@@ -88,20 +96,21 @@ export default function WorkoutRecommendations() {
           return (
             <div
               key={`${recommendation.name}-${index}`}
-              className={`flex items-center space-x-4 p-3 bg-gradient-to-r from-${recommendation.bgColor}-50 to-${recommendation.bgColor}-100 rounded-xl hover:from-${recommendation.bgColor}-100 hover:to-${recommendation.bgColor}-200 transition-all cursor-pointer`}
+              className="flex items-center space-x-4 p-3 bg-white/10 backdrop-blur-sm rounded-xl hover:bg-white/15 transition-all cursor-pointer border border-white/20"
               data-testid={`workout-recommendation-${index}`}
             >
-              <div className={`bg-${recommendation.color} bg-opacity-20 rounded-lg p-2`}>
-                <IconComponent className={`text-${recommendation.color}`} />
+              <div className="bg-white/20 rounded-lg p-2">
+                <IconComponent className="text-cyan-300" />
               </div>
               <div className="flex-1">
-                <h4 className="font-medium text-gray-800">{recommendation.name}</h4>
-                <p className="text-sm text-muted">{recommendation.details}</p>
+                <h4 className="font-medium text-white">{recommendation.name}</h4>
+                <p className="text-sm text-gray-300">{recommendation.details}</p>
               </div>
-              <ChevronRight className="text-muted" />
+              <ChevronRight className="text-gray-300" />
             </div>
           );
         })}
+      </div>
       </div>
     </section>
   );

@@ -75,9 +75,17 @@ export default function GoalsWidget() {
 
   if (isLoading) {
     return (
-      <section className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      <section className="relative bg-gradient-to-br from-indigo-900 via-purple-900 to-blue-900 rounded-3xl shadow-2xl border border-indigo-700/50 p-8 overflow-hidden">
+        {/* Animated background elements */}
+        <div className="absolute inset-0">
+          <div className="absolute top-0 left-0 w-40 h-40 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-full blur-3xl opacity-20 animate-pulse"></div>
+          <div className="absolute bottom-0 right-0 w-32 h-32 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full blur-2xl opacity-15 animate-bounce" style={{animationDuration: '3s'}}></div>
+          <div className="absolute top-1/2 left-1/3 w-28 h-28 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-full blur-3xl opacity-10 animate-ping" style={{animationDuration: '4s'}}></div>
+        </div>
+        {/* Content wrapper */}
+        <div className="relative z-10">
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-xl font-bold text-gray-800">Weekly Goals</h3>
+          <h3 className="text-2xl font-bold text-white drop-shadow-lg">Weekly Goals</h3>
         </div>
         <div className="space-y-4">
           {[...Array(3)].map((_, i) => (
@@ -89,6 +97,7 @@ export default function GoalsWidget() {
               <div className="w-full bg-gray-200 rounded-full h-2"></div>
             </div>
           ))}
+        </div>
         </div>
       </section>
     );
@@ -196,9 +205,17 @@ export default function GoalsWidget() {
   };
 
   return (
-    <section className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+    <section className="relative bg-gradient-to-br from-indigo-900 via-purple-900 to-blue-900 rounded-3xl shadow-2xl border border-indigo-700/50 p-8 overflow-hidden">
+      {/* Animated background elements */}
+      <div className="absolute inset-0">
+        <div className="absolute top-0 left-0 w-40 h-40 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-full blur-3xl opacity-20 animate-pulse"></div>
+        <div className="absolute bottom-0 right-0 w-32 h-32 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full blur-2xl opacity-15 animate-bounce" style={{animationDuration: '3s'}}></div>
+        <div className="absolute top-1/2 left-1/3 w-28 h-28 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-full blur-3xl opacity-10 animate-ping" style={{animationDuration: '4s'}}></div>
+      </div>
+      {/* Content wrapper */}
+      <div className="relative z-10">
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-xl font-bold text-gray-800">Weekly Goals</h3>
+        <h3 className="text-2xl font-bold text-white drop-shadow-lg">Weekly Goals</h3>
         <div className="flex gap-2">
           {displayGoals.length === 0 && (
             <Button 
@@ -345,6 +362,7 @@ export default function GoalsWidget() {
           </div>
         </div>
       )}
+      </div>
     </section>
   );
 }
