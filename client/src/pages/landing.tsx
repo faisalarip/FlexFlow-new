@@ -18,8 +18,17 @@ export default function Landing() {
       </header>
 
       {/* Hero Section */}
-      <main className="container mx-auto px-4 py-16">
-        <div className="text-center space-y-8 max-w-4xl mx-auto">
+      <main className="relative container mx-auto px-4 py-16">
+        {/* Animated background elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-20 left-10 w-72 h-72 bg-gradient-to-br from-purple-400 to-blue-500 rounded-full blur-3xl opacity-20 animate-pulse"></div>
+          <div className="absolute top-40 right-16 w-56 h-56 bg-gradient-to-br from-cyan-400 to-emerald-500 rounded-full blur-2xl opacity-25 animate-bounce" style={{animationDuration: '4s'}}></div>
+          <div className="absolute bottom-20 left-1/4 w-64 h-64 bg-gradient-to-br from-pink-400 to-purple-500 rounded-full blur-3xl opacity-15 animate-ping" style={{animationDuration: '6s'}}></div>
+          <div className="absolute top-60 left-1/2 w-48 h-48 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full blur-2xl opacity-20 animate-pulse" style={{animationDuration: '3s'}}></div>
+          <div className="absolute bottom-40 right-1/3 w-40 h-40 bg-gradient-to-br from-indigo-400 to-blue-500 rounded-full blur-3xl opacity-30 animate-bounce" style={{animationDuration: '5s'}}></div>
+        </div>
+        
+        <div className="relative z-10 text-center space-y-8 max-w-4xl mx-auto">
           <h1 className="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white">
             Your Complete
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary block">
