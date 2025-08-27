@@ -3,9 +3,21 @@ import { Button } from "@/components/ui/button";
 
 export default function Landing() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-white to-secondary/5 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+    <div className="relative min-h-screen bg-gradient-to-br from-primary/5 via-white to-secondary/5 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 overflow-hidden">
+      {/* Full page animated background elements */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <div className="absolute top-20 left-10 w-72 h-72 bg-gradient-to-br from-purple-400 to-blue-500 rounded-full blur-3xl opacity-20 animate-pulse"></div>
+        <div className="absolute top-40 right-16 w-56 h-56 bg-gradient-to-br from-cyan-400 to-emerald-500 rounded-full blur-2xl opacity-25 animate-bounce" style={{animationDuration: '4s'}}></div>
+        <div className="absolute top-96 left-1/4 w-64 h-64 bg-gradient-to-br from-pink-400 to-purple-500 rounded-full blur-3xl opacity-15 animate-ping" style={{animationDuration: '6s'}}></div>
+        <div className="absolute top-60 left-1/2 w-48 h-48 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full blur-2xl opacity-20 animate-pulse" style={{animationDuration: '3s'}}></div>
+        <div className="absolute bottom-80 right-1/3 w-40 h-40 bg-gradient-to-br from-indigo-400 to-blue-500 rounded-full blur-3xl opacity-30 animate-bounce" style={{animationDuration: '5s'}}></div>
+        <div className="absolute bottom-40 left-20 w-60 h-60 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-full blur-3xl opacity-25 animate-pulse" style={{animationDuration: '7s'}}></div>
+        <div className="absolute bottom-20 right-10 w-44 h-44 bg-gradient-to-br from-rose-400 to-pink-500 rounded-full blur-2xl opacity-20 animate-bounce" style={{animationDuration: '4.5s'}}></div>
+        <div className="absolute top-1/3 right-1/4 w-52 h-52 bg-gradient-to-br from-violet-400 to-purple-500 rounded-full blur-3xl opacity-15 animate-ping" style={{animationDuration: '8s'}}></div>
+        <div className="absolute bottom-1/3 left-1/3 w-36 h-36 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full blur-2xl opacity-25 animate-pulse" style={{animationDuration: '3.5s'}}></div>
+      </div>
       {/* Header */}
-      <header className="px-4 lg:px-6 h-14 flex items-center border-b bg-white/80 dark:bg-gray-800/80 backdrop-blur">
+      <header className="relative z-10 px-4 lg:px-6 h-14 flex items-center border-b bg-white/80 dark:bg-gray-800/80 backdrop-blur">
         <div className="flex items-center space-x-2">
           <Activity className="text-primary" size={32} />
           <h1 className="text-xl font-bold text-gray-900 dark:text-white">FlexFlow</h1>
@@ -18,17 +30,8 @@ export default function Landing() {
       </header>
 
       {/* Hero Section */}
-      <main className="relative container mx-auto px-4 py-16">
-        {/* Animated background elements */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-20 left-10 w-72 h-72 bg-gradient-to-br from-purple-400 to-blue-500 rounded-full blur-3xl opacity-20 animate-pulse"></div>
-          <div className="absolute top-40 right-16 w-56 h-56 bg-gradient-to-br from-cyan-400 to-emerald-500 rounded-full blur-2xl opacity-25 animate-bounce" style={{animationDuration: '4s'}}></div>
-          <div className="absolute bottom-20 left-1/4 w-64 h-64 bg-gradient-to-br from-pink-400 to-purple-500 rounded-full blur-3xl opacity-15 animate-ping" style={{animationDuration: '6s'}}></div>
-          <div className="absolute top-60 left-1/2 w-48 h-48 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full blur-2xl opacity-20 animate-pulse" style={{animationDuration: '3s'}}></div>
-          <div className="absolute bottom-40 right-1/3 w-40 h-40 bg-gradient-to-br from-indigo-400 to-blue-500 rounded-full blur-3xl opacity-30 animate-bounce" style={{animationDuration: '5s'}}></div>
-        </div>
-        
-        <div className="relative z-10 text-center space-y-8 max-w-4xl mx-auto">
+      <main className="relative z-10 container mx-auto px-4 py-16">
+        <div className="text-center space-y-8 max-w-4xl mx-auto">
           <h1 className="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white">
             Your Complete
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary block">
@@ -54,7 +57,7 @@ export default function Landing() {
         </div>
 
         {/* Features Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mt-20">
+        <div className="relative z-10 grid md:grid-cols-2 lg:grid-cols-3 gap-8 mt-20">
           <div className="text-center p-6 rounded-2xl bg-white dark:bg-gray-800 shadow-sm border">
             <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
               <Activity className="text-primary" size={24} />
@@ -117,7 +120,7 @@ export default function Landing() {
         </div>
 
         {/* CTA Section */}
-        <div className="text-center mt-20 p-8 rounded-2xl bg-gradient-to-r from-primary to-secondary text-white">
+        <div className="relative z-10 text-center mt-20 p-8 rounded-2xl bg-gradient-to-r from-primary to-secondary text-white">
           <h2 className="text-3xl font-bold mb-4">Ready to Transform Your Fitness?</h2>
           <p className="text-xl mb-6 opacity-90">
             Join thousands of users already achieving their goals with FlexFlow
@@ -132,7 +135,7 @@ export default function Landing() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t bg-white/80 dark:bg-gray-800/80 backdrop-blur py-6">
+      <footer className="relative z-10 border-t bg-white/80 dark:bg-gray-800/80 backdrop-blur py-6">
         <div className="container mx-auto px-4 text-center">
           <p className="text-gray-600 dark:text-gray-400">
             CEO Steven Bates Jr
