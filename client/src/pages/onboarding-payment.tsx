@@ -51,7 +51,7 @@ const CheckoutForm = () => {
         title: "Welcome to FlexFlow!",
         description: "Your free trial has started successfully!",
       });
-      setLocation('/dashboard');
+      setLocation('/trial-success');
     }
   };
 
@@ -100,6 +100,7 @@ export default function OnboardingPayment() {
     apiRequest("POST", "/api/create-trial-subscription")
       .then((res) => res.json())
       .then((data) => {
+        console.log('Trial subscription response:', data);
         // For trials, we might not have a client secret
         setClientSecret(data.clientSecret || "trial_mode");
         setLoading(false);
@@ -218,7 +219,7 @@ export default function OnboardingPayment() {
               <Button 
                 size="lg" 
                 className="w-full text-lg py-4 mb-4" 
-                onClick={() => setLocation('/dashboard')}
+                onClick={() => setLocation('/trial-success')}
                 data-testid="start-trial-button"
               >
                 <CheckCircle className="mr-2" size={20} />

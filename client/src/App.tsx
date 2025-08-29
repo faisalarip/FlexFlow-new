@@ -28,6 +28,7 @@ import Navbar from "@/components/navbar";
 import Onboarding from "@/pages/onboarding";
 import OnboardingPlan from "@/pages/onboarding-plan";
 import OnboardingPayment from "@/pages/onboarding-payment";
+import TrialSuccess from "@/pages/trial-success";
 
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -51,6 +52,7 @@ function Router() {
             <Route path="/onboarding" component={Onboarding} />
             <Route path="/onboarding/plan" component={OnboardingPlan} />
             <Route path="/onboarding/payment" component={OnboardingPayment} />
+            <Route path="/trial-success" component={TrialSuccess} />
           </>
         ) : (
           <>
