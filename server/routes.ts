@@ -34,7 +34,7 @@ if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
 }
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2024-06-20",
+  apiVersion: "2023-10-16",
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -437,7 +437,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         res.json({
           subscriptionId: subscription.id,
-          clientSecret: (latestInvoice.payment_intent as any)?.client_secret,
+          clientSecret: latestInvoice.payment_intent && typeof latestInvoice.payment_intent === 'object' ? latestInvoice.payment_intent.client_secret : null,
         });
         return;
       }
@@ -530,17 +530,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
           price: price.id
         }],
         trial_period_days: 10,
-        payment_behavior: 'default_incomplete',
-        payment_settings: {
-          save_default_payment_method: 'on_subscription',
-        },
-        expand: ['latest_invoice.payment_intent'],
+        // For trials, we don't need payment upfront
+        collection_method: 'charge_automatically',
+        expand: ['latest_invoice'],
       });
 
       res.json({
         subscriptionId: subscription.id,
         customerId: customer.id,
-        clientSecret: subscription.latest_invoice?.payment_intent?.client_secret,
+        trial: true,
+        trialEnd: subscription.trial_end,
+        // No client secret needed for trial subscriptions
+        clientSecret: null,
       });
     } catch (error: any) {
       console.error('Trial subscription error:', error);
