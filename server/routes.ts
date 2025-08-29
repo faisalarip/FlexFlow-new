@@ -507,21 +507,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       });
 
+      // First create a product
+      const product = await stripe.products.create({
+        name: 'FlexFlow Premium',
+        description: 'Complete fitness tracking and personal training platform'
+      });
+
+      // Then create a price for the product
+      const price = await stripe.prices.create({
+        unit_amount: 1999, // $19.99 per month
+        currency: 'usd',
+        recurring: {
+          interval: 'month'
+        },
+        product: product.id
+      });
+
       // Create a subscription with 10-day trial period
       const subscription = await stripe.subscriptions.create({
         customer: customer.id,
         items: [{
-          price_data: {
-            currency: 'usd',
-            product_data: {
-              name: 'FlexFlow Premium',
-              description: 'Complete fitness tracking and personal training platform'
-            },
-            unit_amount: 1999, // $19.99 per month
-            recurring: {
-              interval: 'month'
-            }
-          }
+          price: price.id
         }],
         trial_period_days: 10,
         payment_behavior: 'default_incomplete',
