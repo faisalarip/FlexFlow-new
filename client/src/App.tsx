@@ -25,6 +25,9 @@ import Progress from "@/pages/progress";
 import Calendar from "@/pages/calendar";
 import NotFound from "@/pages/not-found";
 import Navbar from "@/components/navbar";
+import Onboarding from "@/pages/onboarding";
+import OnboardingPlan from "@/pages/onboarding-plan";
+import OnboardingPayment from "@/pages/onboarding-payment";
 
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -43,7 +46,12 @@ function Router() {
       
       <Switch>
         {!isAuthenticated ? (
-          <Route path="/" component={Landing} />
+          <>
+            <Route path="/" component={Landing} />
+            <Route path="/onboarding" component={Onboarding} />
+            <Route path="/onboarding/plan" component={OnboardingPlan} />
+            <Route path="/onboarding/payment" component={OnboardingPayment} />
+          </>
         ) : (
           <>
             <Route path="/" component={Dashboard} />

@@ -495,6 +495,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Create trial subscription for new users (no authentication required)
+  app.post("/api/create-trial-subscription", async (req, res) => {
+    try {
+      // Create a customer for trial user
+      const customer = await stripe.customers.create({
+        email: `trial-${Date.now()}@flexflow.app`,
+        metadata: {
+          trial_user: 'true',
+          signup_date: new Date().toISOString()
+        }
+      });
+
+      // Create a subscription with 10-day trial period
+      const subscription = await stripe.subscriptions.create({
+        customer: customer.id,
+        items: [{
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: 'FlexFlow Premium',
+              description: 'Complete fitness tracking and personal training platform'
+            },
+            unit_amount: 1999, // $19.99 per month
+            recurring: {
+              interval: 'month'
+            }
+          }
+        }],
+        trial_period_days: 10,
+        payment_behavior: 'default_incomplete',
+        payment_settings: {
+          save_default_payment_method: 'on_subscription',
+        },
+        expand: ['latest_invoice.payment_intent'],
+      });
+
+      res.json({
+        subscriptionId: subscription.id,
+        customerId: customer.id,
+        clientSecret: subscription.latest_invoice?.payment_intent?.client_secret,
+      });
+    } catch (error: any) {
+      console.error('Trial subscription error:', error);
+      res
+        .status(500)
+        .json({ message: "Error creating trial subscription: " + error.message });
+    }
+  });
+
   // Webhook for handling Stripe events
   app.post('/api/stripe-webhook', async (req, res) => {
     const sig = req.headers['stripe-signature'] as string;

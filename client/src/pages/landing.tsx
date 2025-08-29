@@ -47,7 +47,7 @@ export default function Landing() {
 
           <div className="space-y-4">
             <Button size="lg" className="text-lg px-8 py-4" asChild>
-              <a href="/api/login">
+              <a href="/onboarding">
                 <Play className="mr-2" size={20} />
                 Get Started Free
               </a>
