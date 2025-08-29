@@ -117,7 +117,7 @@ export default function Navbar() {
                   }`}
                 >
                   <Users size={18} />
-                  <span>Trainers</span>
+                  <span>More</span>
                   <ChevronDown size={14} />
                 </Button>
               </DropdownMenuTrigger>
