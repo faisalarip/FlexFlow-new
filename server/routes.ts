@@ -466,7 +466,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         items: [{
           price_data: {
             currency: 'usd',
-            unit_amount: 999, // $9.99 per month
+            unit_amount: 1599, // $15.99 per month
             recurring: {
               interval: 'month'
             },
@@ -515,7 +515,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Then create a price for the product
       const price = await stripe.prices.create({
-        unit_amount: 1999, // $19.99 per month
+        unit_amount: 1599, // $15.99 per month
         currency: 'usd',
         recurring: {
           interval: 'month'

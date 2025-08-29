@@ -211,7 +211,7 @@ export default function OnboardingPayment() {
                   $0.00 <span className="text-lg font-normal text-gray-500">for 10 days</span>
                 </div>
                 <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                  Then $19.99/month • Cancel anytime
+                  Then $15.99/month • Cancel anytime
                 </div>
               </div>
 
