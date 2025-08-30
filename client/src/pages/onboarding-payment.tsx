@@ -219,7 +219,7 @@ export default function OnboardingPayment() {
               <Button 
                 size="lg" 
                 className="w-full text-lg py-4 mb-4" 
-                onClick={() => setLocation('/trial-success')}
+                onClick={() => window.location.href = '/api/login'}
                 data-testid="start-trial-button"
               >
                 <CheckCircle className="mr-2" size={20} />
