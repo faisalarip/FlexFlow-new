@@ -3,15 +3,32 @@ import { Activity, CheckCircle, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
+// Declare the stripe-buy-button element for TypeScript
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      'stripe-buy-button': {
+        'buy-button-id': string;
+        'publishable-key': string;
+      };
+    }
+  }
+}
+
 export default function TrialSuccess() {
   useEffect(() => {
-    // Confetti effect or any success animations could go here
+    // Load Stripe buy button script
+    const script = document.createElement('script');
+    script.src = 'https://js.stripe.com/v3/buy-button.js';
+    script.async = true;
+    document.head.appendChild(script);
+
+    return () => {
+      // Cleanup script on unmount
+      document.head.removeChild(script);
+    };
   }, []);
 
-  const handleGetStarted = () => {
-    // Redirect to Stripe billing portal
-    window.location.href = 'https://billing.stripe.com/p/login/eVq5kC5jOfam2ow6ZGgMw00';
-  };
 
   return (
     <div className="relative min-h-screen bg-gradient-to-br from-primary/5 via-white to-secondary/5 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 overflow-hidden">
@@ -107,15 +124,13 @@ export default function TrialSuccess() {
               </div>
             </div>
 
-            <Button 
-              size="lg" 
-              className="w-full text-lg py-4" 
-              onClick={handleGetStarted}
-              data-testid="get-started-button"
-            >
-              Get Started
-              <ArrowRight className="ml-2" size={20} />
-            </Button>
+            <div className="w-full" data-testid="stripe-buy-button-container">
+              <stripe-buy-button
+                buy-button-id="buy_btn_1S0D64D5Ue5ytgHWvbMKX18b"
+                publishable-key="pk_live_51RydqBD5Ue5ytgHWpjOJg39P8VJu0EJMTBHZfdtZCSfRkf7EelPmERe5jat5DVUiIhfE1yDnyGVeBs9arKDQn8nZ00sMOvjEja"
+              >
+              </stripe-buy-button>
+            </div>
           </CardContent>
         </Card>
 
