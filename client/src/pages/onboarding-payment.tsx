@@ -228,7 +228,7 @@ export default function OnboardingPayment() {
               
               <div className="flex items-center justify-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
                 <Shield className="w-4 h-4" />
-                <span>No credit card required • Cancel anytime</span>
+                <span>Cancel anytime</span>
               </div>
             </CardContent>
           </Card>
