@@ -9,8 +9,8 @@ export default function TrialSuccess() {
   }, []);
 
   const handleGetStarted = () => {
-    // Redirect to payment page to set up subscription
-    window.location.href = '/subscribe';
+    // Redirect to Stripe billing portal
+    window.location.href = 'https://billing.stripe.com/p/login/eVq5kC5jOfam2ow6ZGgMw00';
   };
 
   return (
