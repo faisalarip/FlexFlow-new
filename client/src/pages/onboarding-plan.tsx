@@ -16,66 +16,135 @@ interface PersonalizedPlan {
 }
 
 const generatePlan = (answers: any): PersonalizedPlan => {
-  // This is a simplified plan generation logic
-  // In a real app, this would be more sophisticated
-  
-  let planType: 'beginner' | 'intermediate' | 'advanced' = 'beginner';
-  let workoutsPerWeek = 3;
-  let sessionDuration = "30-45 minutes";
-  
+  // Get the actual user answers
+  const fitnessGoal = answers.fitnessGoal || '';
+  const experience = answers.experience || '';
+  const consistency = answers.consistency || '';
+  const location = answers.location || '';
+
   // Determine plan complexity based on experience and consistency
-  if (answers?.experience?.includes('Advanced') || answers?.consistency?.includes('Daily')) {
+  let planType: 'beginner' | 'intermediate' | 'advanced' = 'beginner';
+  let workoutsPerWeek = 2;
+  let sessionDuration = "20-30 minutes";
+
+  // Experience-based adjustments
+  if (experience.includes('Advanced') || experience.includes('5+ years')) {
     planType = 'advanced';
     workoutsPerWeek = 6;
-    sessionDuration = "45-60 minutes";
-  } else if (answers?.experience?.includes('Experienced') || answers?.consistency?.includes('5-6 times')) {
+    sessionDuration = "60-75 minutes";
+  } else if (experience.includes('Experienced') || experience.includes('2+ years')) {
     planType = 'intermediate';
     workoutsPerWeek = 5;
-    sessionDuration = "40-50 minutes";
-  } else if (answers?.consistency?.includes('3-4 times')) {
+    sessionDuration = "45-60 minutes";
+  } else if (experience.includes('Moderate') || experience.includes('6 months to 2 years')) {
+    planType = 'intermediate';
     workoutsPerWeek = 4;
-    sessionDuration = "35-45 minutes";
+    sessionDuration = "40-50 minutes";
+  } else if (experience.includes('Some experience')) {
+    planType = 'beginner';
+    workoutsPerWeek = 3;
+    sessionDuration = "25-35 minutes";
   }
 
-  // Equipment recommendations based on location
+  // Consistency-based adjustments
+  if (consistency.includes('Daily workouts')) {
+    workoutsPerWeek = Math.max(workoutsPerWeek, 6);
+    sessionDuration = "45-60 minutes";
+  } else if (consistency.includes('5-6 times')) {
+    workoutsPerWeek = Math.max(workoutsPerWeek, 5);
+  } else if (consistency.includes('3-4 times')) {
+    workoutsPerWeek = Math.max(workoutsPerWeek, 4);
+  } else if (consistency.includes('1-2 times')) {
+    workoutsPerWeek = Math.min(workoutsPerWeek, 3);
+    sessionDuration = "30-40 minutes";
+  } else if (consistency.includes('Just getting started')) {
+    workoutsPerWeek = 2;
+    sessionDuration = "20-30 minutes";
+  }
+
+  // Equipment recommendations based on workout location
   let equipment: string[] = [];
-  if (answers?.location?.includes('no equipment')) {
-    equipment = ['Bodyweight exercises', 'Resistance bands', 'Yoga mat'];
-  } else if (answers?.location?.includes('basic equipment')) {
-    equipment = ['Dumbbells', 'Resistance bands', 'Yoga mat', 'Pull-up bar'];
-  } else if (answers?.location?.includes('gym')) {
-    equipment = ['Full gym access', 'Barbells & dumbbells', 'Cardio machines', 'Cable machines'];
-  } else if (answers?.location?.includes('Outdoor')) {
-    equipment = ['Bodyweight exercises', 'Running/walking', 'Park equipment', 'Portable gear'];
-  } else {
-    equipment = ['Flexible equipment options', 'Adaptive routines', 'Multiple workout styles'];
+  if (location.includes('no equipment')) {
+    equipment = ['Bodyweight exercises', 'Resistance bands', 'Yoga mat', 'Water bottles as weights'];
+  } else if (location.includes('basic equipment')) {
+    equipment = ['Adjustable dumbbells', 'Resistance bands', 'Yoga mat', 'Pull-up bar', 'Kettlebell'];
+  } else if (location.includes('gym') || location.includes('fitness center')) {
+    equipment = ['Full gym access', 'Barbells & dumbbells', 'Cable machines', 'Cardio equipment', 'Free weights'];
+  } else if (location.includes('Outdoor')) {
+    equipment = ['Bodyweight exercises', 'Running/walking paths', 'Park benches & equipment', 'Resistance bands'];
+  } else if (location.includes('Multiple locations')) {
+    equipment = ['Adaptive equipment', 'Portable gear', 'Bodyweight routines', 'Gym & home options'];
   }
 
-  // Goal-specific features
-  let features: string[] = [
-    'Personalized workout routines',
-    'Progress tracking & analytics',
-    'Video exercise demonstrations',
-    'Meal planning recommendations'
-  ];
+  // Goal-specific features and plan customization
+  let features: string[] = [];
+  let planTitle = '';
+  let planDescription = '';
 
-  if (answers?.fitnessGoal?.includes('weight')) {
-    features.push('Fat-burning cardio routines', 'Calorie tracking integration', 'HIIT workout plans');
-  } else if (answers?.fitnessGoal?.includes('muscle')) {
-    features.push('Strength training focus', 'Progressive overload tracking', 'Muscle-building nutrition');
-  } else if (answers?.fitnessGoal?.includes('endurance')) {
-    features.push('Cardio training plans', 'Endurance challenges', 'Heart rate monitoring');
-  } else if (answers?.fitnessGoal?.includes('Athletic')) {
-    features.push('Sport-specific training', 'Performance analytics', 'Competition preparation');
+  if (fitnessGoal.includes('weight') || fitnessGoal.includes('fat')) {
+    planTitle = 'Fat Loss & Weight Management Plan';
+    planDescription = 'Designed to help you burn fat, lose weight, and improve your body composition through targeted cardio and strength training.';
+    features = [
+      'HIIT cardio workouts for maximum calorie burn',
+      'Strength training to preserve muscle mass',
+      'Nutrition guidance for calorie deficit',
+      'Progress tracking with body measurements',
+      'Metabolic conditioning circuits',
+      'Recovery and rest day planning'
+    ];
+  } else if (fitnessGoal.includes('muscle') || fitnessGoal.includes('strength')) {
+    planTitle = 'Muscle Building & Strength Plan';
+    planDescription = 'Focus on building lean muscle mass and increasing strength through progressive resistance training and optimal nutrition.';
+    features = [
+      'Progressive overload strength training',
+      'Compound movement focus (squats, deadlifts, bench)',
+      'Muscle-building nutrition protocols',
+      'Detailed workout logs and PR tracking',
+      'Hypertrophy-focused rep ranges',
+      'Strategic rest and recovery periods'
+    ];
+  } else if (fitnessGoal.includes('endurance') || fitnessGoal.includes('cardio')) {
+    planTitle = 'Endurance & Cardiovascular Plan';
+    planDescription = 'Build cardiovascular fitness, improve endurance, and enhance your aerobic capacity through structured cardio training.';
+    features = [
+      'Progressive cardio training zones',
+      'Long-distance and interval training',
+      'Heart rate monitoring guidance',
+      'Endurance nutrition strategies',
+      'Running, cycling, and swimming workouts',
+      'VO2 max improvement protocols'
+    ];
+  } else if (fitnessGoal.includes('Athletic') || fitnessGoal.includes('performance')) {
+    planTitle = 'Athletic Performance Enhancement Plan';
+    planDescription = 'Elite-level training designed to improve athletic performance, power, speed, and sport-specific skills.';
+    features = [
+      'Sport-specific movement patterns',
+      'Power and explosiveness training',
+      'Agility and speed development',
+      'Performance analytics and testing',
+      'Competition preparation protocols',
+      'Advanced recovery techniques'
+    ];
+  } else if (fitnessGoal.includes('health') || fitnessGoal.includes('wellness')) {
+    planTitle = 'General Health & Wellness Plan';
+    planDescription = 'A balanced approach to fitness focusing on overall health, mobility, and sustainable lifestyle habits.';
+    features = [
+      'Balanced strength and cardio training',
+      'Mobility and flexibility routines',
+      'Stress management through exercise',
+      'Sustainable healthy habits',
+      'Functional movement patterns',
+      'Holistic wellness approach'
+    ];
   }
 
   return {
-    title: `${planType.charAt(0).toUpperCase() + planType.slice(1)} Fitness Plan`,
-    description: `A personalized ${planType} plan designed specifically for your fitness goals and lifestyle.`,
+    title: planTitle,
+    description: planDescription,
     workoutsPerWeek,
     sessionDuration,
     equipment,
-    features: features.slice(0, 6), // Limit to 6 features for display
+    features,
     planType
   };
 };
@@ -86,17 +155,18 @@ export default function OnboardingPlan() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // In a real app, you'd get the answers from the previous step
-    // For now, we'll simulate with sample data
-    const sampleAnswers = {
-      fitnessGoal: 'Build muscle and gain strength',
-      experience: 'Moderate experience - 6 months to 2 years',
-      consistency: '3-4 times per week regularly',
-      location: 'Local gym or fitness center'
+    // Get answers from URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const answers = {
+      fitnessGoal: urlParams.get('fitnessGoal') || '',
+      experience: urlParams.get('experience') || '',
+      consistency: urlParams.get('consistency') || '',
+      location: urlParams.get('location') || ''
     };
 
+    // Generate plan based on actual user answers
     setTimeout(() => {
-      const generatedPlan = generatePlan(sampleAnswers);
+      const generatedPlan = generatePlan(answers);
       setPlan(generatedPlan);
       setLoading(false);
     }, 1500); // Simulate plan generation time

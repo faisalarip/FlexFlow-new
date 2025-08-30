@@ -83,8 +83,12 @@ export default function Onboarding() {
     if (currentStep < questions.length - 1) {
       setCurrentStep(prev => prev + 1);
     } else {
-      // Generate plan and go to payment
-      setLocation('/onboarding/plan');
+      // Pass answers to plan generation page
+      const queryParams = new URLSearchParams();
+      Object.entries(answers).forEach(([key, value]) => {
+        queryParams.append(key, value);
+      });
+      setLocation(`/onboarding/plan?${queryParams.toString()}`);
     }
   };
 
