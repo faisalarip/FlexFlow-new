@@ -9,8 +9,8 @@ export default function TrialSuccess() {
   }, []);
 
   const handleGetStarted = () => {
-    // Redirect to login page to access the full dashboard
-    window.location.href = '/api/login';
+    // Redirect to payment page to set up subscription
+    window.location.href = '/subscribe';
   };
 
   return (
