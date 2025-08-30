@@ -17,11 +17,27 @@ declare global {
 
 export default function TrialSuccess() {
   useEffect(() => {
-    // Load Stripe buy button script
-    const script = document.createElement('script');
-    script.src = 'https://js.stripe.com/v3/buy-button.js';
-    script.async = true;
-    document.head.appendChild(script);
+    // Check if script is already loaded
+    const existingScript = document.querySelector('script[src="https://js.stripe.com/v3/buy-button.js"]');
+    
+    if (!existingScript) {
+      // Load Stripe buy button script
+      const script = document.createElement('script');
+      script.src = 'https://js.stripe.com/v3/buy-button.js';
+      script.async = true;
+      script.crossOrigin = 'anonymous';
+      
+      // Add error handling
+      script.onerror = (error) => {
+        console.error('Failed to load Stripe script:', error);
+      };
+      
+      script.onload = () => {
+        console.log('Stripe script loaded successfully');
+      };
+      
+      document.head.appendChild(script);
+    }
 
     // Check if user came from successful subscription
     const urlParams = new URLSearchParams(window.location.search);
@@ -31,13 +47,6 @@ export default function TrialSuccess() {
         window.location.href = '/dashboard';
       }, 2000);
     }
-
-    return () => {
-      // Cleanup script on unmount
-      if (document.head.contains(script)) {
-        document.head.removeChild(script);
-      }
-    };
   }, []);
 
 
