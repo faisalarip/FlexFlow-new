@@ -113,7 +113,7 @@ export default function TrialSuccess() {
               onClick={handleGetStarted}
               data-testid="get-started-button"
             >
-              Access My Dashboard
+              Get Started
               <ArrowRight className="ml-2" size={20} />
             </Button>
           </CardContent>
