@@ -2144,6 +2144,16 @@ export class MemStorage implements IStorage {
       { name: "Eggs", category: "proteins", caloriesPer100g: 155, proteinPer100g: 13, carbsPer100g: 1, fatPer100g: 11, fiberPer100g: 0, commonServingSize: "2 large eggs (100g)", isCommon: true },
       { name: "Greek Yogurt", category: "dairy", caloriesPer100g: 59, proteinPer100g: 10, carbsPer100g: 4, fatPer100g: 0, fiberPer100g: 0, commonServingSize: "1 cup (245g)", isCommon: true },
       { name: "Tofu", category: "proteins", caloriesPer100g: 76, proteinPer100g: 8, carbsPer100g: 2, fatPer100g: 5, fiberPer100g: 1, commonServingSize: "100g", isCommon: true },
+      { name: "Lean Beef", category: "proteins", caloriesPer100g: 250, proteinPer100g: 26, carbsPer100g: 0, fatPer100g: 15, fiberPer100g: 0, commonServingSize: "3 oz (85g)", isCommon: true },
+      { name: "Cod Fish", category: "proteins", caloriesPer100g: 82, proteinPer100g: 18, carbsPer100g: 0, fatPer100g: 1, fiberPer100g: 0, commonServingSize: "1 fillet (150g)", isCommon: true },
+      { name: "Shrimp", category: "proteins", caloriesPer100g: 99, proteinPer100g: 18, carbsPer100g: 0, fatPer100g: 1, fiberPer100g: 0, commonServingSize: "3 oz (85g)", isCommon: true },
+      { name: "Protein Powder", category: "proteins", caloriesPer100g: 411, proteinPer100g: 82, carbsPer100g: 6, fatPer100g: 8, fiberPer100g: 0, commonServingSize: "1 scoop (30g)", isCommon: true },
+      { name: "Chicken Thighs", category: "proteins", caloriesPer100g: 209, proteinPer100g: 26, carbsPer100g: 0, fatPer100g: 11, fiberPer100g: 0, commonServingSize: "1 thigh (85g)", isCommon: true },
+      { name: "Turkey Breast", category: "proteins", caloriesPer100g: 135, proteinPer100g: 30, carbsPer100g: 0, fatPer100g: 1, fiberPer100g: 0, commonServingSize: "3 oz (85g)", isCommon: true },
+      { name: "Pork Tenderloin", category: "proteins", caloriesPer100g: 143, proteinPer100g: 26, carbsPer100g: 0, fatPer100g: 4, fiberPer100g: 0, commonServingSize: "3 oz (85g)", isCommon: true },
+      { name: "Egg Whites", category: "proteins", caloriesPer100g: 52, proteinPer100g: 11, carbsPer100g: 1, fatPer100g: 0, fiberPer100g: 0, commonServingSize: "3 egg whites (100g)", isCommon: true },
+      { name: "Seitan", category: "proteins", caloriesPer100g: 370, proteinPer100g: 75, carbsPer100g: 14, fatPer100g: 2, fiberPer100g: 6, commonServingSize: "3 oz (85g)", isCommon: true },
+      { name: "Tempeh", category: "proteins", caloriesPer100g: 190, proteinPer100g: 19, carbsPer100g: 9, fatPer100g: 11, fiberPer100g: 9, commonServingSize: "3 oz (85g)", isCommon: true },
 
       // Carbohydrates
       { name: "Brown Rice", category: "grains", caloriesPer100g: 111, proteinPer100g: 3, carbsPer100g: 23, fatPer100g: 1, fiberPer100g: 2, commonServingSize: "1 cup cooked (195g)", isCommon: true },
