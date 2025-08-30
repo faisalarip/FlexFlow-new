@@ -23,9 +23,20 @@ export default function TrialSuccess() {
     script.async = true;
     document.head.appendChild(script);
 
+    // Check if user came from successful subscription
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('success') === 'true') {
+      // Redirect to dashboard after successful subscription
+      setTimeout(() => {
+        window.location.href = '/dashboard';
+      }, 2000);
+    }
+
     return () => {
       // Cleanup script on unmount
-      document.head.removeChild(script);
+      if (document.head.contains(script)) {
+        document.head.removeChild(script);
+      }
     };
   }, []);
 
