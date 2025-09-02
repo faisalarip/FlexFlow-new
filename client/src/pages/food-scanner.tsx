@@ -69,20 +69,57 @@ export default function FoodScanner() {
 
   const startCamera = async () => {
     try {
-      const mediaStream = await navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: 'environment' } 
-      });
+      // Check if media devices are supported
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error("Camera not supported on this device");
+      }
+
+      // Try environment camera first (rear camera), fallback to any camera
+      let mediaStream;
+      try {
+        mediaStream = await navigator.mediaDevices.getUserMedia({ 
+          video: { 
+            facingMode: 'environment',
+            width: { ideal: 1280 },
+            height: { ideal: 720 }
+          } 
+        });
+      } catch (envError) {
+        // Fallback to any available camera
+        mediaStream = await navigator.mediaDevices.getUserMedia({ 
+          video: {
+            width: { ideal: 1280 },
+            height: { ideal: 720 }
+          }
+        });
+      }
+
       setStream(mediaStream);
       setIsUsingCamera(true);
       
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
-        videoRef.current.play();
+        videoRef.current.play().catch((playError) => {
+          console.error("Error playing video:", playError);
+        });
       }
     } catch (error) {
+      console.error("Camera error:", error);
+      let errorMessage = "Failed to access camera. Please try uploading an image instead.";
+      
+      if (error instanceof Error) {
+        if (error.name === 'NotAllowedError') {
+          errorMessage = "Camera access denied. Please allow camera permission and try again.";
+        } else if (error.name === 'NotFoundError') {
+          errorMessage = "No camera found on this device. Please upload an image instead.";
+        } else if (error.name === 'NotSupportedError') {
+          errorMessage = "Camera not supported on this device. Please upload an image instead.";
+        }
+      }
+      
       toast({
         title: "Camera Error",
-        description: "Failed to access camera. Please try uploading an image instead.",
+        description: errorMessage,
         variant: "destructive"
       });
     }
@@ -102,15 +139,39 @@ export default function FoodScanner() {
       const canvas = canvasRef.current;
       const context = canvas.getContext('2d');
       
+      // Ensure video is ready and has dimensions
+      if (video.videoWidth === 0 || video.videoHeight === 0) {
+        toast({
+          title: "Camera Error",
+          description: "Camera not ready. Please wait a moment and try again.",
+          variant: "destructive"
+        });
+        return;
+      }
+      
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
       
       if (context) {
-        context.drawImage(video, 0, 0);
+        // Clear the canvas first
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        // Draw the video frame
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
         const imageData = canvas.toDataURL('image/jpeg', 0.8);
         setSelectedImage(imageData);
         stopCamera();
+        
+        toast({
+          title: "Photo Captured",
+          description: "Photo captured successfully! Click 'Analyze Food' to continue.",
+        });
       }
+    } else {
+      toast({
+        title: "Camera Error",
+        description: "Camera not available. Please try again.",
+        variant: "destructive"
+      });
     }
   };
 
