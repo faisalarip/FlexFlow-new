@@ -21,6 +21,7 @@ export default function FoodScanner() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isUsingCamera, setIsUsingCamera] = useState(false);
   const [stream, setStream] = useState<MediaStream | null>(null);
+  const [isStartingCamera, setIsStartingCamera] = useState(false);
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -68,15 +69,27 @@ export default function FoodScanner() {
   };
 
   const startCamera = async () => {
+    console.log("startCamera function called");
+    setIsStartingCamera(true);
+    
     try {
       // Check if media devices are supported
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        console.error("Media devices not supported");
         throw new Error("Camera not supported on this device");
+      }
+      
+      console.log("Media devices supported, requesting camera access...");
+
+      // Check if we're on HTTPS (required for camera access in most browsers)
+      if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
+        throw new Error("Camera requires HTTPS connection");
       }
 
       // Try environment camera first (rear camera), fallback to any camera
       let mediaStream;
       try {
+        console.log("Trying environment camera...");
         mediaStream = await navigator.mediaDevices.getUserMedia({ 
           video: { 
             facingMode: 'environment',
@@ -84,7 +97,9 @@ export default function FoodScanner() {
             height: { ideal: 720 }
           } 
         });
+        console.log("Environment camera success");
       } catch (envError) {
+        console.log("Environment camera failed, trying any camera...", envError);
         // Fallback to any available camera
         mediaStream = await navigator.mediaDevices.getUserMedia({ 
           video: {
@@ -92,6 +107,7 @@ export default function FoodScanner() {
             height: { ideal: 720 }
           }
         });
+        console.log("Any camera success");
       }
 
       setStream(mediaStream);
@@ -114,6 +130,8 @@ export default function FoodScanner() {
           errorMessage = "No camera found on this device. Please upload an image instead.";
         } else if (error.name === 'NotSupportedError') {
           errorMessage = "Camera not supported on this device. Please upload an image instead.";
+        } else if (error.message.includes("HTTPS")) {
+          errorMessage = "Camera requires a secure connection. Please use the image upload instead.";
         }
       }
       
@@ -122,6 +140,8 @@ export default function FoodScanner() {
         description: errorMessage,
         variant: "destructive"
       });
+    } finally {
+      setIsStartingCamera(false);
     }
   };
 
@@ -262,9 +282,18 @@ export default function FoodScanner() {
             {!selectedImage && !isUsingCamera && (
               <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Button onClick={startCamera} className="h-24">
-                    <Camera className="mr-2" size={24} />
-                    Use Camera
+                  <Button 
+                    onClick={startCamera} 
+                    className="h-24"
+                    data-testid="button-use-camera"
+                    disabled={isStartingCamera}
+                  >
+                    {isStartingCamera ? (
+                      <Loader2 className="mr-2 animate-spin" size={24} />
+                    ) : (
+                      <Camera className="mr-2" size={24} />
+                    )}
+                    {isStartingCamera ? "Starting Camera..." : "Use Camera"}
                   </Button>
                   <Button 
                     variant="outline" 
