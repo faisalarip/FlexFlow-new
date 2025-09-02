@@ -237,14 +237,20 @@ export default function FoodScanner() {
   const handleManualSave = (formData: FormData) => {
     const data = {
       name: formData.get('name') as string,
-      description: formData.get('description') as string,
+      description: formData.get('description') as string || "",
       calories: parseInt(formData.get('calories') as string) || 0,
       protein: parseInt(formData.get('protein') as string) || 0,
       carbs: parseInt(formData.get('carbs') as string) || 0,
       fat: parseInt(formData.get('fat') as string) || 0,
-      servingSize: formData.get('servingSize') as string,
+      fiber: parseInt(formData.get('fiber') as string) || 0,
+      sugar: parseInt(formData.get('sugar') as string) || 0,
+      sodium: parseInt(formData.get('sodium') as string) || 0,
+      servingSize: formData.get('servingSize') as string || "",
+      imageUrl: null,
+      confidence: null,
       loggedAt: new Date().toISOString()
     };
+    console.log("Manual entry data:", data);
     createFoodEntryMutation.mutate(data);
   };
 
@@ -514,6 +520,17 @@ export default function FoodScanner() {
                   <div>
                     <Label htmlFor="fiber">Fiber (g)</Label>
                     <Input id="fiber" name="fiber" type="number" min="0" step="0.1" />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="sugar">Sugar (g)</Label>
+                    <Input id="sugar" name="sugar" type="number" min="0" step="0.1" />
+                  </div>
+                  <div>
+                    <Label htmlFor="sodium">Sodium (mg)</Label>
+                    <Input id="sodium" name="sodium" type="number" min="0" step="1" />
                   </div>
                 </div>
 
