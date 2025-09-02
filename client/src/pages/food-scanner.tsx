@@ -26,7 +26,8 @@ export default function FoodScanner() {
   const queryClient = useQueryClient();
 
   const { data: todayEntries } = useQuery<FoodEntry[]>({
-    queryKey: ["/api/food-entries", { date: new Date().toISOString().split('T')[0] }],
+    queryKey: ["/api/food-entries", new Date().toISOString().split('T')[0]],
+    queryFn: () => apiRequest("GET", `/api/food-entries/${new Date().toISOString().split('T')[0]}`).then(res => res.json()),
   });
 
   const createFoodEntryMutation = useMutation({
