@@ -24,6 +24,7 @@ import Onboarding from "@/pages/onboarding";
 import OnboardingPlan from "@/pages/onboarding-plan";
 import OnboardingPayment from "@/pages/onboarding-payment";
 import TrialSuccess from "@/pages/trial-success";
+import ProfileCompletionGuard from "@/components/profile-completion-guard";
 
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -50,7 +51,7 @@ function Router() {
             <Route path="/trial-success" component={TrialSuccess} />
           </>
         ) : (
-          <>
+          <ProfileCompletionGuard>
             <Route path="/" component={Dashboard} />
             <Route path="/subscription" component={UserSubscription} />
             <Route path="/leaderboard" component={Leaderboard} />
@@ -63,7 +64,7 @@ function Router() {
             <Route path="/calendar" component={Calendar} />
             <Route path="/checkout" component={Checkout} />
             <Route path="/subscribe" component={Subscribe} />
-          </>
+          </ProfileCompletionGuard>
         )}
         <Route component={NotFound} />
       </Switch>
