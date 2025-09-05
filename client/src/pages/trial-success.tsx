@@ -42,9 +42,9 @@ export default function TrialSuccess() {
     // Check if user came from successful subscription
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('success') === 'true') {
-      // Redirect to dashboard after successful subscription
+      // Redirect to create account after successful trial activation
       setTimeout(() => {
-        window.location.href = '/dashboard';
+        window.location.href = '/auth';
       }, 2000);
     }
   }, []);
@@ -140,7 +140,7 @@ export default function TrialSuccess() {
                 What's Next?
               </div>
               <div className="text-sm text-gray-600 dark:text-gray-400">
-                Sign in to access your personalized dashboard and start your fitness journey
+                Create your account to access your personalized dashboard and start your fitness journey
               </div>
             </div>
 
