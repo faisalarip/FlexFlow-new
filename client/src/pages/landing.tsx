@@ -67,25 +67,7 @@ export default function Landing() {
             </p>
           </div>
 
-          <div className="text-center p-6 rounded-2xl bg-white dark:bg-gray-800 shadow-sm border">
-            <div className="w-16 h-16 bg-secondary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Users className="text-secondary" size={24} />
-            </div>
-            <h3 className="font-semibold text-lg mb-2">Personal Trainers</h3>
-            <p className="text-gray-600 dark:text-gray-400">
-              Connect with certified trainers for personalized coaching and guidance.
-            </p>
-          </div>
 
-          <div className="text-center p-6 rounded-2xl bg-white dark:bg-gray-800 shadow-sm border">
-            <div className="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Star className="text-accent" size={24} />
-            </div>
-            <h3 className="font-semibold text-lg mb-2">AI Food Scanner</h3>
-            <p className="text-gray-600 dark:text-gray-400">
-              Scan food with your camera for instant nutrition tracking and calorie counting.
-            </p>
-          </div>
 
           <div className="text-center p-6 rounded-2xl bg-white dark:bg-gray-800 shadow-sm border">
             <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
