@@ -105,17 +105,6 @@ export default function Navbar() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuItem asChild>
-                  <Link 
-                    href="/trainers"
-                    className={`flex items-center space-x-3 px-2 py-2 w-full cursor-pointer ${
-                      location === "/trainers" ? "bg-primary/10 text-primary" : ""
-                    }`}
-                  >
-                    <Users size={16} />
-                    <span>Find Trainers</span>
-                  </Link>
-                </DropdownMenuItem>
                 {dropdownItems.map((item) => {
                   const Icon = item.icon;
                   const isActive = location === item.path;
