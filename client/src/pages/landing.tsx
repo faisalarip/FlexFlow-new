@@ -3,24 +3,45 @@ import { Button } from "@/components/ui/button";
 
 export default function Landing() {
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-primary/5 via-white to-secondary/5 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 overflow-hidden">
-      {/* Full page animated background elements */}
+    <div className="relative min-h-screen bg-black hexagon-bg hexagon-pattern overflow-hidden">
+      {/* Hexagonal background elements */}
       <div className="fixed inset-0 pointer-events-none z-0">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-gradient-to-br from-purple-400 to-blue-500 rounded-full blur-3xl opacity-20 animate-pulse"></div>
-        <div className="absolute top-40 right-16 w-56 h-56 bg-gradient-to-br from-cyan-400 to-emerald-500 rounded-full blur-2xl opacity-25 animate-bounce" style={{animationDuration: '4s'}}></div>
-        <div className="absolute top-96 left-1/4 w-64 h-64 bg-gradient-to-br from-pink-400 to-purple-500 rounded-full blur-3xl opacity-15 animate-ping" style={{animationDuration: '6s'}}></div>
-        <div className="absolute top-60 left-1/2 w-48 h-48 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full blur-2xl opacity-20 animate-pulse" style={{animationDuration: '3s'}}></div>
-        <div className="absolute bottom-80 right-1/3 w-40 h-40 bg-gradient-to-br from-indigo-400 to-blue-500 rounded-full blur-3xl opacity-30 animate-bounce" style={{animationDuration: '5s'}}></div>
-        <div className="absolute bottom-40 left-20 w-60 h-60 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-full blur-3xl opacity-25 animate-pulse" style={{animationDuration: '7s'}}></div>
-        <div className="absolute bottom-20 right-10 w-44 h-44 bg-gradient-to-br from-rose-400 to-pink-500 rounded-full blur-2xl opacity-20 animate-bounce" style={{animationDuration: '4.5s'}}></div>
-        <div className="absolute top-1/3 right-1/4 w-52 h-52 bg-gradient-to-br from-violet-400 to-purple-500 rounded-full blur-3xl opacity-15 animate-ping" style={{animationDuration: '8s'}}></div>
-        <div className="absolute bottom-1/3 left-1/3 w-36 h-36 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full blur-2xl opacity-25 animate-pulse" style={{animationDuration: '3.5s'}}></div>
+        <div className="absolute top-20 left-10 w-32 h-28 opacity-20 animate-pulse" style={{animationDuration: '6s'}}>
+          <svg viewBox="0 0 120 104" className="w-full h-full">
+            <polygon points="30,2 90,2 120,52 90,102 30,102 0,52" fill="#dc2626" stroke="#dc2626" strokeWidth="2" opacity="0.3"/>
+          </svg>
+        </div>
+        <div className="absolute top-40 right-16 w-24 h-21 opacity-15 animate-bounce" style={{animationDuration: '8s'}}>
+          <svg viewBox="0 0 120 104" className="w-full h-full">
+            <polygon points="30,2 90,2 120,52 90,102 30,102 0,52" fill="none" stroke="#dc2626" strokeWidth="1" opacity="0.4"/>
+          </svg>
+        </div>
+        <div className="absolute top-96 left-1/4 w-28 h-24 opacity-25 animate-ping" style={{animationDuration: '10s'}}>
+          <svg viewBox="0 0 120 104" className="w-full h-full">
+            <polygon points="30,2 90,2 120,52 90,102 30,102 0,52" fill="#000000" stroke="#dc2626" strokeWidth="2" opacity="0.6"/>
+          </svg>
+        </div>
+        <div className="absolute bottom-80 right-1/3 w-20 h-17 opacity-30 animate-bounce" style={{animationDuration: '7s'}}>
+          <svg viewBox="0 0 120 104" className="w-full h-full">
+            <polygon points="30,2 90,2 120,52 90,102 30,102 0,52" fill="#dc2626" stroke="#000000" strokeWidth="1" opacity="0.5"/>
+          </svg>
+        </div>
+        <div className="absolute bottom-40 left-20 w-36 h-31 opacity-20 animate-pulse" style={{animationDuration: '9s'}}>
+          <svg viewBox="0 0 120 104" className="w-full h-full">
+            <polygon points="30,2 90,2 120,52 90,102 30,102 0,52" fill="none" stroke="#dc2626" strokeWidth="2" opacity="0.3"/>
+          </svg>
+        </div>
+        <div className="absolute top-1/3 right-1/4 w-26 h-22 opacity-15 animate-ping" style={{animationDuration: '12s'}}>
+          <svg viewBox="0 0 120 104" className="w-full h-full">
+            <polygon points="30,2 90,2 120,52 90,102 30,102 0,52" fill="#000000" stroke="#dc2626" strokeWidth="1" opacity="0.4"/>
+          </svg>
+        </div>
       </div>
       {/* Header */}
-      <header className="relative z-10 px-4 lg:px-6 h-14 flex items-center border-b bg-white/80 dark:bg-gray-800/80 backdrop-blur">
+      <header className="relative z-10 px-4 lg:px-6 h-14 flex items-center border-b bg-black/90 border-red-600/30 backdrop-blur">
         <div className="flex items-center space-x-2">
-          <Activity className="text-primary" size={32} />
-          <h1 className="text-xl font-bold text-gray-900 dark:text-white">FlexFlow</h1>
+          <Activity className="text-red-600" size={32} />
+          <h1 className="text-xl font-bold text-white">FlexFlow</h1>
         </div>
         <div className="ml-auto">
           <Button asChild>
@@ -32,15 +53,15 @@ export default function Landing() {
       {/* Hero Section */}
       <main className="relative z-10 container mx-auto px-4 py-16">
         <div className="text-center space-y-8 max-w-4xl mx-auto">
-          <h1 className="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-4xl md:text-6xl font-bold text-white">
             Your Complete
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary block">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-red-400 block">
               Fitness Journey
             </span>
             Starts Here
           </h1>
           
-          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
             Track workouts, compete with friends, and achieve your fitness goals with FlexFlow.
           </p>
 
@@ -51,51 +72,51 @@ export default function Landing() {
                 Get Started Free
               </a>
             </Button>
-            <p className="text-sm text-gray-500">10-day free trial</p>
+            <p className="text-sm text-gray-400">10-day free trial</p>
           </div>
         </div>
 
         {/* Features Grid */}
         <div className="relative z-10 grid md:grid-cols-2 lg:grid-cols-3 gap-8 mt-20">
-          <div className="text-center p-6 rounded-2xl bg-white dark:bg-gray-800 shadow-sm border">
-            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Activity className="text-primary" size={24} />
+          <div className="text-center p-6 rounded-2xl bg-black border border-red-600/30 shadow-lg shadow-red-600/20">
+            <div className="w-16 h-16 bg-red-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Activity className="text-red-600" size={24} />
             </div>
-            <h3 className="font-semibold text-lg mb-2">Workout Tracking</h3>
-            <p className="text-gray-600 dark:text-gray-400">
+            <h3 className="font-semibold text-lg mb-2 text-white">Workout Tracking</h3>
+            <p className="text-gray-300">
               Log exercises, track progress, and hit your fitness goals with detailed analytics.
             </p>
           </div>
 
 
 
-          <div className="text-center p-6 rounded-2xl bg-white dark:bg-gray-800 shadow-sm border">
-            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Clock className="text-primary" size={24} />
+          <div className="text-center p-6 rounded-2xl bg-black border border-red-600/30 shadow-lg shadow-red-600/20">
+            <div className="w-16 h-16 bg-red-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Clock className="text-red-600" size={24} />
             </div>
-            <h3 className="font-semibold text-lg mb-2">Mile Tracker</h3>
-            <p className="text-gray-600 dark:text-gray-400">
+            <h3 className="font-semibold text-lg mb-2 text-white">Mile Tracker</h3>
+            <p className="text-gray-300">
               Track running and walking with timer functionality and detailed pace analytics.
             </p>
           </div>
 
-          <div className="text-center p-6 rounded-2xl bg-white dark:bg-gray-800 shadow-sm border">
-            <div className="w-16 h-16 bg-secondary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Users className="text-secondary" size={24} />
+          <div className="text-center p-6 rounded-2xl bg-black border border-red-600/30 shadow-lg shadow-red-600/20">
+            <div className="w-16 h-16 bg-red-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Users className="text-red-600" size={24} />
             </div>
-            <h3 className="font-semibold text-lg mb-2">Community</h3>
-            <p className="text-gray-600 dark:text-gray-400">
+            <h3 className="font-semibold text-lg mb-2 text-white">Community</h3>
+            <p className="text-gray-300">
               Share progress, compete on leaderboards, and stay motivated with friends.
             </p>
           </div>
 
-          <div className="text-center p-6 rounded-2xl bg-white dark:bg-gray-800 shadow-sm border">
-            <div className="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Shield className="text-accent" size={24} />
+          <div className="text-center p-6 rounded-2xl bg-black border border-red-600/30 shadow-lg shadow-red-600/20">
+            <div className="w-16 h-16 bg-red-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Shield className="text-red-600" size={24} />
             </div>
-            <h3 className="font-semibold text-lg mb-2">Premium Features</h3>
-            <p className="text-gray-600 dark:text-gray-400">
-              Unlock meal plans, advanced analytics, and priority trainer bookings.
+            <h3 className="font-semibold text-lg mb-2 text-white">Premium Features</h3>
+            <p className="text-gray-300">
+              Unlock meal plans, advanced analytics, and priority features.
             </p>
           </div>
         </div>
