@@ -55,13 +55,13 @@ export default function Navbar() {
   const isDropdownActive = dropdownItems.some(item => location === item.path);
 
   return (
-    <nav className="bg-card border-b border-border backdrop-blur-lg bg-opacity-80 shadow-lg">
+    <nav className="bg-white dark:bg-gray-900 shadow-sm border-b border-gray-200 dark:border-gray-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
-            <div className="flex items-center space-x-2 slide-in-left">
-              <Activity className="text-primary gold-pulse" size={32} />
-              <h1 className="text-xl font-bold text-primary shimmer">FlexFlow</h1>
+            <div className="flex items-center space-x-2">
+              <Activity className="text-primary" size={32} />
+              <h1 className="text-xl font-bold text-gray-900 dark:text-white">FlexFlow</h1>
             </div>
           </div>
 
@@ -76,13 +76,13 @@ export default function Navbar() {
                 <Link 
                   key={item.path}
                   href={item.path}
-                  className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-all duration-300 fade-in-up ${
+                  className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                     isActive
-                      ? "text-primary bg-primary/20 gold-glow shadow-lg"
-                      : "text-foreground hover:text-primary hover:bg-primary/10 hover:gold-glow"
+                      ? "text-primary bg-primary/10"
+                      : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800"
                   }`}
                 >
-                  <Icon size={18} className={isActive ? "bounce-in" : ""} />
+                  <Icon size={18} />
                   <span>{item.label}</span>
                 </Link>
               );
@@ -93,10 +93,10 @@ export default function Navbar() {
               <DropdownMenuTrigger asChild>
                 <Button 
                   variant="ghost" 
-                  className={`flex items-center space-x-2 px-3 py-2 text-sm font-medium transition-all duration-300 ${
+                  className={`flex items-center space-x-2 px-3 py-2 text-sm font-medium transition-colors ${
                     location === "/trainers" || location.startsWith("/trainers") || isDropdownActive
-                      ? "text-primary bg-primary/20 gold-glow shadow-lg"
-                      : "text-foreground hover:text-primary hover:bg-primary/10 hover:gold-glow"
+                      ? "text-primary bg-primary/10"
+                      : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800"
                   }`}
                 >
                   <Users size={18} />
