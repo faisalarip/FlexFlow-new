@@ -228,7 +228,7 @@ export default function CalendarView() {
               }`}
               data-testid={`calendar-day-${format(day, 'yyyy-MM-dd')}`}
             >
-              <span className={`${isToday ? 'text-primary font-bold' : dayWorkouts.length > 0 ? 'text-gray-800 font-medium' : 'text-muted'}`}>
+              <span className={`${isToday ? 'text-red-400 font-bold' : dayWorkouts.length > 0 ? 'text-white font-medium' : 'text-white'}`}>
                 {format(day, 'd')}
               </span>
               
