@@ -953,7 +953,7 @@ export default function WorkoutLogger() {
 
       {/* Workout Categories */}
       <div className="mb-6">
-        <p className="text-sm font-medium text-muted mb-3">Popular Categories</p>
+        <p className="text-sm font-medium text-white mb-3">Popular Categories</p>
         <div className="flex flex-wrap gap-3">
           {categories.map((category) => (
             <Button
@@ -973,7 +973,7 @@ export default function WorkoutLogger() {
       {/* Exercise Results */}
       {(searchQuery || filteredExercises.length > 6) ? (
         <div className="mb-4 flex items-center justify-between">
-          <p className="text-sm font-medium text-muted">
+          <p className="text-sm font-medium text-white">
             {searchQuery ? 
               (filteredExercises.length > 0 ? `Found ${filteredExercises.length} exercise${filteredExercises.length === 1 ? '' : 's'}` : 'No exercises found') :
               `Showing ${Math.min(filteredExercises.length, showAllExercises ? filteredExercises.length : 6)} of ${filteredExercises.length} exercises`
