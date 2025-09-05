@@ -2,6 +2,9 @@ import {
   type User, 
   type InsertUser,
   type UpsertUser,
+  type SignUpData,
+  type SignInData,
+  type GoogleAuthData,
   type Exercise,
   type InsertExercise,
   type Workout,
@@ -59,6 +62,7 @@ import {
   type InsertAiDifficultyAdjustment
 } from "@shared/schema";
 import { randomUUID } from "crypto";
+import * as bcrypt from "bcrypt";
 
 export interface IStorage {
   // Users (IMPORTANT) these user operations are mandatory for Replit Auth.
@@ -69,6 +73,14 @@ export interface IStorage {
   createUser(user: InsertUser): Promise<User>;
   updateUserStreak(id: string, streak: number): Promise<User | undefined>;
   updateUser(id: string, updates: Partial<User>): Promise<User | undefined>;
+
+  // Authentication methods
+  createUserWithPassword(userData: SignUpData): Promise<User>;
+  getUserByEmail(email: string): Promise<User | undefined>;
+  getUserByUsernameOrEmail(identifier: string): Promise<User | undefined>;
+  upsertUserFromGoogle(googleData: GoogleAuthData): Promise<User>;
+  verifyUserEmail(userId: string): Promise<User | undefined>;
+  
   
   // Exercises
   getExercises(): Promise<Exercise[]>;
@@ -759,6 +771,125 @@ export class MemStorage implements IStorage {
     if (user) {
       const updatedUser = { ...user, ...updates };
       this.users.set(id, updatedUser);
+      return updatedUser;
+    }
+    return undefined;
+  }
+
+  // Authentication methods
+  async createUserWithPassword(userData: SignUpData): Promise<User> {
+    // Check if username or email already exists
+    const existingUser = await this.getUserByUsernameOrEmail(userData.username) || 
+                        await this.getUserByUsernameOrEmail(userData.email);
+    
+    if (existingUser) {
+      throw new Error("Username or email already exists");
+    }
+
+    const id = randomUUID();
+    const now = new Date();
+    const freeTrialExpiry = new Date(now.getTime() + (10 * 24 * 60 * 60 * 1000)); // 10 days from now
+    
+    // Hash the password
+    const saltRounds = 12;
+    const passwordHash = await bcrypt.hash(userData.password, saltRounds);
+
+    const user: User = {
+      id,
+      email: userData.email,
+      username: userData.username,
+      passwordHash,
+      firstName: userData.firstName,
+      lastName: userData.lastName,
+      profileImageUrl: null,
+      authProvider: "local",
+      googleId: null,
+      isEmailVerified: false,
+      streak: 0,
+      subscriptionStatus: "free_trial",
+      subscriptionStartDate: now,
+      lastPaymentDate: null,
+      subscriptionExpiresAt: freeTrialExpiry,
+      stripeCustomerId: null,
+      stripeSubscriptionId: null,
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    this.users.set(id, user);
+    return user;
+  }
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    return Array.from(this.users.values()).find(user => user.email === email);
+  }
+
+  async getUserByUsernameOrEmail(identifier: string): Promise<User | undefined> {
+    return Array.from(this.users.values()).find(user => 
+      user.username === identifier || user.email === identifier
+    );
+  }
+
+  async upsertUserFromGoogle(googleData: GoogleAuthData): Promise<User> {
+    // Check if user already exists by Google ID or email
+    const existingUser = Array.from(this.users.values()).find(user => 
+      user.googleId === googleData.googleId || user.email === googleData.email
+    );
+
+    const now = new Date();
+
+    if (existingUser) {
+      // Update existing user with Google data
+      const updatedUser: User = {
+        ...existingUser,
+        googleId: googleData.googleId,
+        authProvider: "google",
+        firstName: googleData.firstName || existingUser.firstName,
+        lastName: googleData.lastName || existingUser.lastName,
+        profileImageUrl: googleData.profileImageUrl || existingUser.profileImageUrl,
+        isEmailVerified: true, // Google accounts are considered verified
+        updatedAt: now,
+      };
+      
+      this.users.set(existingUser.id, updatedUser);
+      return updatedUser;
+    } else {
+      // Create new user from Google data
+      const id = randomUUID();
+      const freeTrialExpiry = new Date(now.getTime() + (10 * 24 * 60 * 60 * 1000)); // 10 days from now
+      
+      const user: User = {
+        id,
+        email: googleData.email,
+        username: null,
+        passwordHash: null,
+        firstName: googleData.firstName || null,
+        lastName: googleData.lastName || null,
+        profileImageUrl: googleData.profileImageUrl || null,
+        authProvider: "google",
+        googleId: googleData.googleId,
+        isEmailVerified: true, // Google accounts are considered verified
+        streak: 0,
+        subscriptionStatus: "free_trial",
+        subscriptionStartDate: now,
+        lastPaymentDate: null,
+        subscriptionExpiresAt: freeTrialExpiry,
+        stripeCustomerId: null,
+        stripeSubscriptionId: null,
+        createdAt: now,
+        updatedAt: now,
+      };
+
+      this.users.set(id, user);
+      return user;
+    }
+  }
+
+  async verifyUserEmail(userId: string): Promise<User | undefined> {
+    const user = this.users.get(userId);
+    if (user) {
+      const updatedUser = { ...user, isEmailVerified: true, updatedAt: new Date() };
+      this.users.set(userId, updatedUser);
       return updatedUser;
     }
     return undefined;

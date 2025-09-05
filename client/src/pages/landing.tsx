@@ -45,7 +45,7 @@ export default function Landing() {
         </div>
         <div className="ml-auto">
           <Button asChild>
-            <a href="/api/login">Sign In</a>
+            <a href="/auth">Sign In</a>
           </Button>
         </div>
       </header>

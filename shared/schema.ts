@@ -20,9 +20,14 @@ export const sessions = pgTable(
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   email: varchar("email").unique(),
+  username: varchar("username").unique(),
+  passwordHash: varchar("password_hash"), // For username/password auth
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),
+  authProvider: varchar("auth_provider").default("local"), // 'local', 'google', 'replit'
+  googleId: varchar("google_id").unique(), // Google OAuth ID
+  isEmailVerified: boolean("is_email_verified").default(false),
   streak: integer("streak").notNull().default(0),
   subscriptionStatus: varchar("subscription_status").default("free_trial"), // free_trial, active, inactive, expired
   subscriptionStartDate: timestamp("subscription_start_date"),
@@ -164,6 +169,28 @@ export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
+});
+
+// Authentication schemas
+export const signUpSchema = z.object({
+  username: z.string().min(3).max(30).regex(/^[a-zA-Z0-9_]+$/, "Username can only contain letters, numbers, and underscores"),
+  email: z.string().email(),
+  password: z.string().min(8).regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, "Password must contain at least one uppercase letter, one lowercase letter, and one number"),
+  firstName: z.string().min(1).max(50),
+  lastName: z.string().min(1).max(50),
+});
+
+export const signInSchema = z.object({
+  identifier: z.string().min(1), // can be username or email
+  password: z.string().min(1),
+});
+
+export const googleAuthSchema = z.object({
+  email: z.string().email(),
+  firstName: z.string().optional(),
+  lastName: z.string().optional(),
+  profileImageUrl: z.string().url().optional(),
+  googleId: z.string(),
 });
 
 export const insertExerciseSchema = createInsertSchema(exercises).omit({
@@ -608,3 +635,8 @@ export const insertAiDifficultyAdjustmentSchema = createInsertSchema(aiDifficult
 // AI Difficulty Adjustments types
 export type InsertAiDifficultyAdjustment = z.infer<typeof insertAiDifficultyAdjustmentSchema>;
 export type AiDifficultyAdjustment = typeof aiDifficultyAdjustments.$inferSelect;
+
+// Authentication types
+export type SignUpData = z.infer<typeof signUpSchema>;
+export type SignInData = z.infer<typeof signInSchema>;
+export type GoogleAuthData = z.infer<typeof googleAuthSchema>;

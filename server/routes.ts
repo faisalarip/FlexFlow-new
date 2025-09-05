@@ -30,6 +30,11 @@ import { analyzeFoodImage } from "./foodRecognition";
 import { generatePersonalizedMealPlan, generateWeeklyMealPlan } from "./mealPlanGenerator";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import { autoDifficultyAdjuster } from "./auto-difficulty-adjuster";
+import { authService } from "./auth-service";
+import { authenticateToken, optionalAuth, getCurrentUserId as getAuthUserId } from "./auth-middleware";
+import { signUpSchema, signInSchema } from "@shared/schema";
+import passport from "passport";
+import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
@@ -39,6 +44,41 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Configure Google OAuth Strategy
+  if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+    passport.use(new GoogleStrategy({
+      clientID: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      callbackURL: "/api/auth/google/callback"
+    },
+    async (accessToken, refreshToken, profile, done) => {
+      try {
+        const googleData = {
+          googleId: profile.id,
+          email: profile.emails?.[0]?.value || "",
+          firstName: profile.name?.givenName || "",
+          lastName: profile.name?.familyName || "",
+          profileImageUrl: profile.photos?.[0]?.value || "",
+        };
+
+        const result = await authService.signInWithGoogle(googleData);
+        return done(null, result);
+      } catch (error) {
+        return done(error, null);
+      }
+    }));
+
+    passport.serializeUser((user, done) => {
+      done(null, user);
+    });
+
+    passport.deserializeUser((user, done) => {
+      done(null, user as any);
+    });
+
+    app.use(passport.initialize());
+  }
+
   // Auth middleware
   await setupAuth(app);
 
@@ -54,8 +94,161 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Helper function to get current user ID from request
+  // New Authentication Routes (Username/Password & Google)
+  
+  // Sign up with username/password
+  app.post('/api/auth/signup', async (req, res) => {
+    try {
+      const userData = signUpSchema.parse(req.body);
+      const result = await authService.signUp(userData);
+      
+      res.status(201).json({
+        message: "Account created successfully",
+        user: result.user,
+        token: result.token
+      });
+    } catch (error: any) {
+      console.error("Sign up error:", error);
+      
+      if (error.name === 'ZodError') {
+        return res.status(400).json({
+          message: "Invalid input data",
+          errors: error.errors
+        });
+      }
+      
+      res.status(400).json({
+        message: error.message || "Failed to create account"
+      });
+    }
+  });
+
+  // Sign in with username/password
+  app.post('/api/auth/signin', async (req, res) => {
+    try {
+      const credentials = signInSchema.parse(req.body);
+      const result = await authService.signIn(credentials);
+      
+      res.json({
+        message: "Signed in successfully",
+        user: result.user,
+        token: result.token
+      });
+    } catch (error: any) {
+      console.error("Sign in error:", error);
+      
+      if (error.name === 'ZodError') {
+        return res.status(400).json({
+          message: "Invalid input data",
+          errors: error.errors
+        });
+      }
+      
+      res.status(401).json({
+        message: error.message || "Invalid credentials"
+      });
+    }
+  });
+
+  // Get current user (for JWT auth)
+  app.get('/api/auth/me', authenticateToken, async (req, res) => {
+    try {
+      res.json(req.user);
+    } catch (error) {
+      console.error("Get user error:", error);
+      res.status(500).json({ message: "Failed to fetch user data" });
+    }
+  });
+
+  // Refresh token
+  app.post('/api/auth/refresh', async (req, res) => {
+    try {
+      const { token } = req.body;
+      
+      if (!token) {
+        return res.status(400).json({ message: "Token required" });
+      }
+      
+      const newToken = await authService.refreshToken(token);
+      
+      res.json({
+        message: "Token refreshed successfully",
+        token: newToken
+      });
+    } catch (error: any) {
+      console.error("Token refresh error:", error);
+      res.status(401).json({
+        message: error.message || "Invalid token"
+      });
+    }
+  });
+
+  // Change password
+  app.post('/api/auth/change-password', authenticateToken, async (req, res) => {
+    try {
+      const { currentPassword, newPassword } = req.body;
+      
+      if (!currentPassword || !newPassword) {
+        return res.status(400).json({ 
+          message: "Current password and new password are required" 
+        });
+      }
+
+      if (newPassword.length < 8) {
+        return res.status(400).json({ 
+          message: "New password must be at least 8 characters long" 
+        });
+      }
+      
+      await authService.changePassword(req.user!.id, currentPassword, newPassword);
+      
+      res.json({
+        message: "Password changed successfully"
+      });
+    } catch (error: any) {
+      console.error("Change password error:", error);
+      res.status(400).json({
+        message: error.message || "Failed to change password"
+      });
+    }
+  });
+
+  // Google OAuth Routes
+  if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+    // Initiate Google OAuth
+    app.get('/api/auth/google',
+      passport.authenticate('google', { scope: ['profile', 'email'] })
+    );
+
+    // Google OAuth callback
+    app.get('/api/auth/google/callback',
+      passport.authenticate('google', { session: false }),
+      (req: any, res) => {
+        try {
+          const authResult = req.user;
+          
+          // Send token back to frontend
+          const frontendURL = process.env.NODE_ENV === 'production' 
+            ? 'https://your-production-domain.com' 
+            : 'http://localhost:5000';
+          
+          // Redirect to frontend with token as URL parameter
+          res.redirect(`${frontendURL}?token=${authResult.token}&user=${encodeURIComponent(JSON.stringify(authResult.user))}`);
+        } catch (error) {
+          console.error("Google OAuth callback error:", error);
+          res.redirect('/login?error=google_auth_failed');
+        }
+      }
+    );
+  }
+
+  // Helper function to get current user ID from request (supports both auth methods)
   const getCurrentUserId = (req: any): string | null => {
+    // Check JWT auth first
+    if (req.user?.id) {
+      return req.user.id;
+    }
+    // Fallback to Replit auth
     return req.user?.claims?.sub || null;
   };
 

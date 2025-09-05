@@ -25,9 +25,16 @@ import OnboardingPlan from "@/pages/onboarding-plan";
 import OnboardingPayment from "@/pages/onboarding-payment";
 import TrialSuccess from "@/pages/trial-success";
 import ProfileCompletionGuard from "@/components/profile-completion-guard";
+import AuthSelection from "@/pages/auth-selection";
+import { useNewAuth } from "@/hooks/useNewAuth";
 
 function Router() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const replitAuth = useAuth();
+  const newAuth = useNewAuth();
+  
+  // Check if either authentication system is active
+  const isAuthenticated = replitAuth.isAuthenticated || newAuth.isAuthenticated;
+  const isLoading = replitAuth.isLoading || newAuth.isLoading;
 
   if (isLoading) {
     return (
@@ -45,6 +52,7 @@ function Router() {
         {!isAuthenticated ? (
           <>
             <Route path="/" component={Landing} />
+            <Route path="/auth" component={AuthSelection} />
             <Route path="/onboarding" component={Onboarding} />
             <Route path="/onboarding/plan" component={OnboardingPlan} />
             <Route path="/onboarding/payment" component={OnboardingPayment} />
