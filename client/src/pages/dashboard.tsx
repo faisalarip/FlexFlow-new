@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import NavigationHeader from "@/components/navigation-header";
 import MobileNavigation from "@/components/mobile-navigation";
 import WelcomeSection from "@/components/welcome-section";
@@ -10,8 +11,28 @@ import GoalsWidget from "@/components/goals-widget";
 import WorkoutRecommendations from "@/components/workout-recommendations";
 import FloatingActionButton from "@/components/floating-action-button";
 import ProgressOverview from "@/components/progress-overview";
+import ProfileEditor from "@/components/profile-editor";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function Dashboard() {
+  const [showProfileEditor, setShowProfileEditor] = useState(false);
+  const { user } = useAuth();
+
+  // Auto-open profile editor when user first logs in
+  useEffect(() => {
+    const hasShownProfileEditor = localStorage.getItem('hasShownProfileEditor');
+    
+    if (user && !hasShownProfileEditor) {
+      // Small delay to ensure the page has fully loaded
+      const timer = setTimeout(() => {
+        setShowProfileEditor(true);
+        localStorage.setItem('hasShownProfileEditor', 'true');
+      }, 1000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [user]);
+
   return (
     <div className="font-inter bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 min-h-screen">
       <NavigationHeader />
@@ -38,6 +59,12 @@ export default function Dashboard() {
       </main>
 
       <FloatingActionButton />
+      
+      {/* Auto-open Profile Editor for new users */}
+      <ProfileEditor 
+        isOpen={showProfileEditor} 
+        setIsOpen={setShowProfileEditor}
+      />
     </div>
   );
 }

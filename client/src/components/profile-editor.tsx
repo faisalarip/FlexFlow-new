@@ -19,10 +19,16 @@ import type { User } from "@shared/schema";
 
 interface ProfileEditorProps {
   trigger?: React.ReactNode;
+  isOpen?: boolean;
+  setIsOpen?: (open: boolean) => void;
 }
 
-export default function ProfileEditor({ trigger }: ProfileEditorProps) {
-  const [isOpen, setIsOpen] = useState(false);
+export default function ProfileEditor({ trigger, isOpen: externalIsOpen, setIsOpen: externalSetIsOpen }: ProfileEditorProps) {
+  const [internalIsOpen, setInternalIsOpen] = useState(false);
+  
+  // Use external control if provided, otherwise use internal state
+  const isOpen = externalIsOpen !== undefined ? externalIsOpen : internalIsOpen;
+  const setIsOpen = externalSetIsOpen || setInternalIsOpen;
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [profileImage, setProfileImage] = useState<File | null>(null);
