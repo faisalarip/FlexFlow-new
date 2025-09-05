@@ -871,13 +871,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         product: product.id
       });
 
-      // Create a subscription with 10-day trial period
+      // Create a subscription with 7-day trial period
       const subscription = await stripe.subscriptions.create({
         customer: customer.id,
         items: [{
           price: price.id
         }],
-        trial_period_days: 10,
+        trial_period_days: 7,
         // For trials, we don't need payment upfront
         collection_method: 'charge_automatically',
         expand: ['latest_invoice'],

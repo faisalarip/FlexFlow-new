@@ -82,7 +82,7 @@ export default function TrialSuccess() {
             🎉 Welcome to FlexFlow!
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-300">
-            Your 10-day free trial has started successfully!
+            Your 7-day free trial has started successfully!
           </p>
         </div>
 
@@ -114,7 +114,7 @@ export default function TrialSuccess() {
                 <CheckCircle className="w-6 h-6 text-blue-500 flex-shrink-0" />
                 <div>
                   <div className="font-semibold text-blue-800 dark:text-blue-300">
-                    10 Days Free
+                    7 Days Free
                   </div>
                   <div className="text-sm text-blue-600 dark:text-blue-400">
                     No charges until your trial expires

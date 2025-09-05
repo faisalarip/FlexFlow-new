@@ -427,7 +427,7 @@ export class MemStorage implements IStorage {
       return updatedUser;
     } else {
       const now = new Date();
-      const freeTrialExpiry = new Date(now.getTime() + (10 * 24 * 60 * 60 * 1000)); // 10 days from now
+      const freeTrialExpiry = new Date(now.getTime() + (7 * 24 * 60 * 60 * 1000)); // 7 days from now
       
       const user: User = {
         id: userData.id!,
@@ -460,7 +460,7 @@ export class MemStorage implements IStorage {
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = randomUUID();
     const now = new Date();
-    const freeTrialExpiry = new Date(now.getTime() + (10 * 24 * 60 * 60 * 1000)); // 10 days from now
+    const freeTrialExpiry = new Date(now.getTime() + (7 * 24 * 60 * 60 * 1000)); // 7 days from now
     
     const user: User = {
       ...insertUser,
@@ -788,7 +788,7 @@ export class MemStorage implements IStorage {
 
     const id = randomUUID();
     const now = new Date();
-    const freeTrialExpiry = new Date(now.getTime() + (10 * 24 * 60 * 60 * 1000)); // 10 days from now
+    const freeTrialExpiry = new Date(now.getTime() + (7 * 24 * 60 * 60 * 1000)); // 7 days from now
     
     // Hash the password
     const saltRounds = 12;
@@ -856,7 +856,7 @@ export class MemStorage implements IStorage {
     } else {
       // Create new user from Google data
       const id = randomUUID();
-      const freeTrialExpiry = new Date(now.getTime() + (10 * 24 * 60 * 60 * 1000)); // 10 days from now
+      const freeTrialExpiry = new Date(now.getTime() + (7 * 24 * 60 * 60 * 1000)); // 7 days from now
       
       const user: User = {
         id,
