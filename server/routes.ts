@@ -29,6 +29,7 @@ import { ObjectStorageService } from "./objectStorage";
 import { analyzeFoodImage } from "./foodRecognition";
 import { generatePersonalizedMealPlan, generateWeeklyMealPlan } from "./mealPlanGenerator";
 import { setupAuth, isAuthenticated } from "./replitAuth";
+import { autoDifficultyAdjuster } from "./auto-difficulty-adjuster";
 
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
@@ -185,6 +186,160 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(weightProgress);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch weight progress" });
+    }
+  });
+
+  // Get AI performance analytics data
+  app.get("/api/performance-analytics/:timeframe", isAuthenticated, async (req, res) => {
+    try {
+      const userId = getCurrentUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+
+      const { timeframe } = req.params;
+      
+      // Calculate date range based on timeframe
+      const now = new Date();
+      const startDate = new Date();
+      switch (timeframe) {
+        case "7d":
+          startDate.setDate(now.getDate() - 7);
+          break;
+        case "30d":
+          startDate.setDate(now.getDate() - 30);
+          break;
+        case "90d":
+          startDate.setDate(now.getDate() - 90);
+          break;
+        default:
+          startDate.setDate(now.getDate() - 7);
+      }
+
+      // Get workouts in the specified timeframe
+      const workouts = await storage.getWorkoutsByDateRange(userId, startDate, now);
+      
+      // Calculate performance trends and analytics
+      const workoutsWithPerformance = workouts.map(workout => ({
+        id: workout.id,
+        name: workout.name,
+        date: workout.date.toISOString(),
+        difficultyLevel: workout.difficultyLevel || 3,
+        perceivedExertion: workout.perceivedExertion || 5,
+        completionRate: workout.completionRate || 100,
+        performanceScore: workout.performanceScore || null,
+        category: workout.category
+      }));
+
+      // Calculate trends
+      const totalWorkouts = workoutsWithPerformance.length;
+      const averageDifficulty = totalWorkouts > 0 
+        ? workoutsWithPerformance.reduce((sum, w) => sum + w.difficultyLevel, 0) / totalWorkouts 
+        : 0;
+      const averageExertion = totalWorkouts > 0 
+        ? workoutsWithPerformance.reduce((sum, w) => sum + w.perceivedExertion, 0) / totalWorkouts 
+        : 0;
+      const averageCompletion = totalWorkouts > 0 
+        ? workoutsWithPerformance.reduce((sum, w) => sum + w.completionRate, 0) / totalWorkouts 
+        : 0;
+
+      // Determine difficulty trend
+      let difficultyTrend: "improving" | "declining" | "stable" = "stable";
+      if (totalWorkouts >= 3) {
+        const firstHalf = workoutsWithPerformance.slice(0, Math.floor(totalWorkouts / 2));
+        const secondHalf = workoutsWithPerformance.slice(Math.floor(totalWorkouts / 2));
+        
+        const firstHalfAvg = firstHalf.reduce((sum, w) => sum + w.difficultyLevel, 0) / firstHalf.length;
+        const secondHalfAvg = secondHalf.reduce((sum, w) => sum + w.difficultyLevel, 0) / secondHalf.length;
+        
+        if (secondHalfAvg > firstHalfAvg + 0.3) {
+          difficultyTrend = "improving";
+        } else if (secondHalfAvg < firstHalfAvg - 0.3) {
+          difficultyTrend = "declining";
+        }
+      }
+
+      // Calculate consistency score (based on workout frequency)
+      const expectedWorkoutsPerWeek = 3; // Assume user should workout 3x per week
+      const weeksInTimeframe = timeframe === "7d" ? 1 : timeframe === "30d" ? 4 : 12;
+      const expectedWorkouts = expectedWorkoutsPerWeek * weeksInTimeframe;
+      const consistencyScore = Math.min(100, Math.round((totalWorkouts / expectedWorkouts) * 100));
+
+      const analyticsData = {
+        workouts: workoutsWithPerformance.slice(0, 10), // Limit to recent 10 workouts
+        trends: {
+          difficultyTrend,
+          consistencyScore,
+          averageDifficulty: Math.round(averageDifficulty * 10) / 10,
+          averageExertion: Math.round(averageExertion * 10) / 10,
+          completionRate: Math.round(averageCompletion)
+        }
+      };
+
+      res.json(analyticsData);
+    } catch (error) {
+      console.error("Failed to fetch performance analytics:", error);
+      res.status(500).json({ message: "Failed to fetch performance analytics" });
+    }
+  });
+
+  // Get AI difficulty recommendations for user
+  app.get("/api/ai-recommendations", isAuthenticated, async (req, res) => {
+    try {
+      const userId = getCurrentUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+
+      const recommendations = await autoDifficultyAdjuster.getIntelligentRecommendations(userId);
+      res.json(recommendations);
+    } catch (error) {
+      console.error("Failed to fetch AI recommendations:", error);
+      res.status(500).json({ message: "Failed to fetch AI recommendations" });
+    }
+  });
+
+  // Apply AI difficulty adjustments
+  app.post("/api/ai-adjustments/apply", isAuthenticated, async (req, res) => {
+    try {
+      const userId = getCurrentUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+
+      const { exerciseIds } = req.body;
+      if (!Array.isArray(exerciseIds)) {
+        return res.status(400).json({ message: "exerciseIds must be an array" });
+      }
+
+      const results = await autoDifficultyAdjuster.applyAutomaticAdjustments(userId, exerciseIds);
+      const appliedCount = results.filter(r => r).length;
+
+      res.json({ 
+        message: `Applied ${appliedCount} difficulty adjustments`,
+        appliedCount,
+        totalRequested: exerciseIds.length,
+        results
+      });
+    } catch (error) {
+      console.error("Failed to apply AI adjustments:", error);
+      res.status(500).json({ message: "Failed to apply AI adjustments" });
+    }
+  });
+
+  // Get pending AI difficulty adjustments for user
+  app.get("/api/ai-adjustments/pending", isAuthenticated, async (req, res) => {
+    try {
+      const userId = getCurrentUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+
+      const pendingAdjustments = await storage.getPendingAiAdjustments(userId);
+      res.json(pendingAdjustments);
+    } catch (error) {
+      console.error("Failed to fetch pending adjustments:", error);
+      res.status(500).json({ message: "Failed to fetch pending adjustments" });
     }
   });
 

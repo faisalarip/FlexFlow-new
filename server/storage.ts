@@ -54,7 +54,9 @@ import {
   type CalendarNote,
   type InsertCalendarNote,
   type UserMealPreferences,
-  type InsertUserMealPreferences
+  type InsertUserMealPreferences,
+  type AiDifficultyAdjustment,
+  type InsertAiDifficultyAdjustment
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 
@@ -190,6 +192,12 @@ export interface IStorage {
   setUserFoodPreference(preference: InsertUserFoodPreference): Promise<UserFoodPreference>;
   updateUserFoodPreference(userId: string, foodItemId: string, preference: string): Promise<UserFoodPreference | undefined>;
   deleteUserFoodPreference(userId: string, foodItemId: string): Promise<boolean>;
+
+  // AI Difficulty Adjustments
+  getRecentWorkoutsForExercise(userId: string, exerciseId: string, limit: number): Promise<(Workout & { exercises: WorkoutExercise[] })[]>;
+  createAiDifficultyAdjustment(adjustment: InsertAiDifficultyAdjustment): Promise<AiDifficultyAdjustment>;
+  getPendingAiAdjustments(userId: string): Promise<AiDifficultyAdjustment[]>;
+  applyAiDifficultyAdjustment(adjustmentId: string): Promise<boolean>;
 }
 
 export class MemStorage implements IStorage {
@@ -215,6 +223,7 @@ export class MemStorage implements IStorage {
   private userMealPreferences: Map<string, UserMealPreferences> = new Map();
   private foodItems: Map<string, FoodItem> = new Map();
   private userFoodPreferences: Map<string, UserFoodPreference> = new Map();
+  private aiDifficultyAdjustments: Map<string, AiDifficultyAdjustment> = new Map();
 
   constructor() {
     this.seedExercises();
@@ -2360,6 +2369,69 @@ export class MemStorage implements IStorage {
         this.mealPlanMeals.set(mealId, mealPlanMeal);
       });
     }
+  }
+
+  // AI Difficulty Adjustments implementation
+  async getRecentWorkoutsForExercise(userId: string, exerciseId: string, limit: number): Promise<(Workout & { exercises: WorkoutExercise[] })[]> {
+    const allWorkouts = Array.from(this.workouts.values())
+      .filter(workout => workout.userId === userId)
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+    const workoutsWithExercises: (Workout & { exercises: WorkoutExercise[] })[] = [];
+    
+    for (const workout of allWorkouts) {
+      const workoutExercises = Array.from(this.workoutExercises.values())
+        .filter(we => we.workoutId === workout.id && we.exerciseId === exerciseId);
+      
+      if (workoutExercises.length > 0) {
+        workoutsWithExercises.push({
+          ...workout,
+          exercises: workoutExercises
+        });
+        
+        if (workoutsWithExercises.length >= limit) {
+          break;
+        }
+      }
+    }
+    
+    return workoutsWithExercises;
+  }
+
+  async createAiDifficultyAdjustment(adjustment: InsertAiDifficultyAdjustment): Promise<AiDifficultyAdjustment> {
+    const id = randomUUID();
+    const now = new Date();
+    const newAdjustment: AiDifficultyAdjustment = {
+      id,
+      ...adjustment,
+      createdAt: now,
+      updatedAt: now,
+    };
+    this.aiDifficultyAdjustments.set(id, newAdjustment);
+    return newAdjustment;
+  }
+
+  async getPendingAiAdjustments(userId: string): Promise<AiDifficultyAdjustment[]> {
+    return Array.from(this.aiDifficultyAdjustments.values())
+      .filter(adjustment => adjustment.userId === userId && !adjustment.applied)
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }
+
+  async applyAiDifficultyAdjustment(adjustmentId: string): Promise<boolean> {
+    const adjustment = this.aiDifficultyAdjustments.get(adjustmentId);
+    if (!adjustment) {
+      return false;
+    }
+
+    const updatedAdjustment = {
+      ...adjustment,
+      applied: true,
+      appliedAt: new Date(),
+      updatedAt: new Date(),
+    };
+    
+    this.aiDifficultyAdjustments.set(adjustmentId, updatedAdjustment);
+    return true;
   }
 }
 

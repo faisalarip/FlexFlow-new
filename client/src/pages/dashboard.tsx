@@ -11,6 +11,7 @@ import GoalsWidget from "@/components/goals-widget";
 import WorkoutRecommendations from "@/components/workout-recommendations";
 import FloatingActionButton from "@/components/floating-action-button";
 import ProgressOverview from "@/components/progress-overview";
+import PerformanceAnalytics from "@/components/performance-analytics";
 import ProfileEditor from "@/components/profile-editor";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -42,8 +43,9 @@ export default function Dashboard() {
         <WelcomeSection />
         <QuickStats />
         <ProgressOverview />
+        <PerformanceAnalytics />
         
-        <div className="grid lg:grid-cols-3 gap-8">
+        <div className="grid lg:grid-cols-3 gap-8 mt-8">
           <div className="lg:col-span-2 space-y-8">
             <WorkoutLogger />
             <RecentWorkouts />

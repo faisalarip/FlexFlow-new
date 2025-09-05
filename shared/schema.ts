@@ -53,6 +53,11 @@ export const workouts = pgTable("workouts", {
   caloriesBurned: integer("calories_burned").notNull(),
   notes: text("notes"),
   date: timestamp("date").notNull(),
+  difficultyLevel: integer("difficulty_level").default(3), // 1-5 scale (1=very easy, 5=very hard)
+  perceivedExertion: integer("perceived_exertion"), // 1-10 RPE scale
+  completionRate: integer("completion_rate").default(100), // percentage of workout completed
+  aiDifficultyRecommendation: integer("ai_difficulty_recommendation"), // AI suggested difficulty for next workout
+  performanceScore: integer("performance_score"), // AI calculated performance score
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -66,6 +71,12 @@ export const workoutExercises = pgTable("workout_exercises", {
   distance: integer("distance"), // in meters
   duration: integer("duration"), // in seconds
   notes: text("notes"),
+  targetSets: integer("target_sets"), // AI recommended sets
+  targetReps: integer("target_reps"), // AI recommended reps  
+  targetWeight: integer("target_weight"), // AI recommended weight
+  targetDuration: integer("target_duration"), // AI recommended duration
+  completed: boolean("completed").default(true), // whether exercise was completed
+  difficultyAdjustment: integer("difficulty_adjustment").default(0), // -2 to +2 adjustment from base difficulty
 });
 
 export const goals = pgTable("goals", {
@@ -570,3 +581,30 @@ export const insertUserMealPreferencesSchema = createInsertSchema(userMealPrefer
 // User Meal Preferences types
 export type InsertUserMealPreferences = z.infer<typeof insertUserMealPreferencesSchema>;
 export type UserMealPreferences = typeof userMealPreferences.$inferSelect;
+
+// AI Difficulty Adjustments for tracking performance and suggestions
+export const aiDifficultyAdjustments = pgTable("ai_difficulty_adjustments", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  exerciseId: varchar("exercise_id").references(() => exercises.id).notNull(),
+  currentDifficulty: integer("current_difficulty").notNull().default(3), // 1-5 scale
+  suggestedDifficulty: integer("suggested_difficulty").notNull(), // AI suggested difficulty
+  confidenceScore: integer("confidence_score").notNull(), // 1-100 AI confidence in suggestion
+  reasoningFactors: jsonb("reasoning_factors"), // JSON with factors: performance_trend, completion_rate, etc.
+  performanceTrend: text("performance_trend"), // improving, declining, stable
+  applied: boolean("applied").default(false), // whether user accepted the suggestion
+  appliedAt: timestamp("applied_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// AI Difficulty Adjustments insert schemas
+export const insertAiDifficultyAdjustmentSchema = createInsertSchema(aiDifficultyAdjustments).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+// AI Difficulty Adjustments types
+export type InsertAiDifficultyAdjustment = z.infer<typeof insertAiDifficultyAdjustmentSchema>;
+export type AiDifficultyAdjustment = typeof aiDifficultyAdjustments.$inferSelect;

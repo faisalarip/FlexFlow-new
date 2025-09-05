@@ -1,10 +1,13 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Search, Expand, Hand, Activity, ArrowUpDown, Leaf, Weight, Bike, Dumbbell, X, Play } from "lucide-react";
+import { Search, Expand, Hand, Activity, ArrowUpDown, Leaf, Weight, Bike, Dumbbell, X, Play, Star, TrendingUp } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Slider } from "@/components/ui/slider";
+import { Label } from "@/components/ui/label";
 import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import type { Exercise } from "@shared/schema";
 
 export default function WorkoutLogger() {
@@ -12,21 +15,38 @@ export default function WorkoutLogger() {
   const [selectedCategory, setSelectedCategory] = useState("strength");
   const [showAllExercises, setShowAllExercises] = useState(false);
   const [selectedExercise, setSelectedExercise] = useState<any>(null);
+  const [difficultyLevel, setDifficultyLevel] = useState([3]);
+  const [perceivedExertion, setPerceivedExertion] = useState([5]);
+  const [workoutDuration, setWorkoutDuration] = useState([30]);
+  const [showWorkoutForm, setShowWorkoutForm] = useState(false);
   const [, setLocation] = useLocation();
   const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   const { data: exercises, isLoading } = useQuery<Exercise[]>({
     queryKey: ["/api/exercises", { category: selectedCategory, search: searchQuery }],
   });
 
   const createWorkoutMutation = useMutation({
-    mutationFn: async (workout: { name: string; category: string; duration: number; caloriesBurned: number }) => {
+    mutationFn: async (workout: { 
+      name: string; 
+      category: string; 
+      duration: number; 
+      caloriesBurned: number;
+      difficultyLevel?: number;
+      perceivedExertion?: number;
+      completionRate?: number;
+    }) => {
       const response = await apiRequest("POST", "/api/workouts", workout);
       return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/workouts"] });
       queryClient.invalidateQueries({ queryKey: ["/api/stats"] });
+      toast({
+        title: "Workout Logged! 🔥",
+        description: "Your workout has been successfully recorded with AI difficulty tracking.",
+      });
     },
   });
 
@@ -874,15 +894,41 @@ export default function WorkoutLogger() {
   };
 
   const handleStartWorkout = (exerciseName: string) => {
-    // This would typically open a workout tracking modal
-    // For now, we'll create a simple workout entry
+    setShowWorkoutForm(true);
+  };
+
+  const handleSubmitWorkout = () => {
+    const estimatedCalories = Math.round(workoutDuration[0] * (2 + difficultyLevel[0] * 0.8));
+    
     createWorkoutMutation.mutate({
-      name: exerciseName,
-      category: "strength",
-      duration: 30,
-      caloriesBurned: 200,
+      name: selectedExercise.name,
+      category: selectedCategory,
+      duration: workoutDuration[0],
+      caloriesBurned: estimatedCalories,
+      difficultyLevel: difficultyLevel[0],
+      perceivedExertion: perceivedExertion[0],
+      completionRate: 100, // Default to 100% for completed workouts
     });
+    
     setSelectedExercise(null);
+    setShowWorkoutForm(false);
+    // Reset form values
+    setDifficultyLevel([3]);
+    setPerceivedExertion([5]);
+    setWorkoutDuration([30]);
+  };
+
+  const getDifficultyLabel = (level: number) => {
+    const labels = ["", "Very Easy", "Easy", "Moderate", "Hard", "Very Hard"];
+    return labels[level] || "Moderate";
+  };
+
+  const getExertionLabel = (level: number) => {
+    if (level <= 2) return "Very Light";
+    if (level <= 4) return "Light";
+    if (level <= 6) return "Moderate";
+    if (level <= 8) return "Hard";
+    return "Maximum Effort";
   };
 
   return (
@@ -1115,6 +1161,163 @@ export default function WorkoutLogger() {
                   data-testid="close-modal-button"
                 >
                   Close
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* AI-Powered Workout Form with Difficulty Tracking */}
+      {showWorkoutForm && selectedExercise && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-8">
+              {/* Header */}
+              <div className="flex justify-between items-center mb-6">
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-800">Log Your Workout</h2>
+                  <p className="text-gray-600 mt-1">AI-powered difficulty tracking for {selectedExercise.name}</p>
+                </div>
+                <button
+                  onClick={() => {
+                    setShowWorkoutForm(false);
+                    setSelectedExercise(null);
+                  }}
+                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                  data-testid="close-workout-form"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              {/* Workout Form */}
+              <div className="space-y-6">
+                {/* Duration Slider */}
+                <div>
+                  <Label className="text-base font-semibold text-gray-800 flex items-center gap-2">
+                    <Activity className="w-4 h-4" />
+                    Duration: {workoutDuration[0]} minutes
+                  </Label>
+                  <div className="mt-3">
+                    <Slider
+                      value={workoutDuration}
+                      onValueChange={setWorkoutDuration}
+                      min={5}
+                      max={120}
+                      step={5}
+                      className="w-full"
+                      data-testid="duration-slider"
+                    />
+                    <div className="flex justify-between text-xs text-gray-500 mt-1">
+                      <span>5 min</span>
+                      <span>60 min</span>
+                      <span>120 min</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Difficulty Level Slider with AI Icon */}
+                <div>
+                  <Label className="text-base font-semibold text-gray-800 flex items-center gap-2">
+                    <TrendingUp className="w-4 h-4" />
+                    Difficulty Level: {getDifficultyLabel(difficultyLevel[0])} ({difficultyLevel[0]}/5)
+                  </Label>
+                  <div className="mt-3">
+                    <Slider
+                      value={difficultyLevel}
+                      onValueChange={setDifficultyLevel}
+                      min={1}
+                      max={5}
+                      step={1}
+                      className="w-full"
+                      data-testid="difficulty-slider"
+                    />
+                    <div className="flex justify-between text-xs text-gray-500 mt-1">
+                      <span>Very Easy</span>
+                      <span>Moderate</span>
+                      <span>Very Hard</span>
+                    </div>
+                  </div>
+                  <div className="mt-2 p-3 bg-blue-50 rounded-lg">
+                    <p className="text-sm text-blue-700">
+                      🤖 AI will analyze your performance and suggest difficulty adjustments for future workouts
+                    </p>
+                  </div>
+                </div>
+
+                {/* Perceived Exertion (RPE) Scale */}
+                <div>
+                  <Label className="text-base font-semibold text-gray-800 flex items-center gap-2">
+                    <Star className="w-4 h-4" />
+                    Perceived Exertion: {getExertionLabel(perceivedExertion[0])} ({perceivedExertion[0]}/10)
+                  </Label>
+                  <div className="mt-3">
+                    <Slider
+                      value={perceivedExertion}
+                      onValueChange={setPerceivedExertion}
+                      min={1}
+                      max={10}
+                      step={1}
+                      className="w-full"
+                      data-testid="exertion-slider"
+                    />
+                    <div className="flex justify-between text-xs text-gray-500 mt-1">
+                      <span>Very Light</span>
+                      <span>Moderate</span>
+                      <span>Maximum</span>
+                    </div>
+                  </div>
+                  <div className="mt-2 text-xs text-gray-600">
+                    Rate of Perceived Exertion (RPE) - How hard did this workout feel?
+                  </div>
+                </div>
+
+                {/* Estimated Calories Display */}
+                <div className="p-4 bg-gradient-to-r from-red-50 to-orange-50 rounded-lg border border-red-200">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="font-semibold text-gray-800">Estimated Calories Burned</h3>
+                      <p className="text-sm text-gray-600">Based on duration and difficulty</p>
+                    </div>
+                    <div className="text-2xl font-bold text-red-600">
+                      {Math.round(workoutDuration[0] * (2 + difficultyLevel[0] * 0.8))} kcal
+                    </div>
+                  </div>
+                </div>
+
+                {/* AI Features Preview */}
+                <div className="p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border border-purple-200">
+                  <h3 className="font-semibold text-purple-800 mb-2">🧠 AI Performance Analysis</h3>
+                  <ul className="text-sm text-purple-700 space-y-1">
+                    <li>• Track your performance trends over time</li>
+                    <li>• Get personalized difficulty recommendations</li>
+                    <li>• Receive adaptive training suggestions</li>
+                    <li>• Monitor progression and consistency</li>
+                  </ul>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex space-x-3 mt-8">
+                <Button
+                  onClick={handleSubmitWorkout}
+                  disabled={createWorkoutMutation.isPending}
+                  className="flex-1 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700"
+                  data-testid="submit-workout-button"
+                >
+                  {createWorkoutMutation.isPending ? 'Logging Workout...' : 'Log Workout & Analyze'}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setShowWorkoutForm(false);
+                    setSelectedExercise(null);
+                  }}
+                  className="px-6"
+                  data-testid="cancel-workout-button"
+                >
+                  Cancel
                 </Button>
               </div>
             </div>
