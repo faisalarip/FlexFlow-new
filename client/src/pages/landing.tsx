@@ -20,7 +20,7 @@ export default function Landing() {
       <header className="relative z-10 px-4 lg:px-6 h-14 flex items-center border-b bg-white/80 dark:bg-gray-800/80 backdrop-blur">
         <div className="flex items-center space-x-2">
           <Activity className="text-primary" size={32} />
-          <h1 className="text-xl font-bold text-gray-900 dark:text-white">FlexFlow</h1>
+          <h1 className="text-xl font-bold gold-shimmer">FlexFlow</h1>
         </div>
         <div className="ml-auto">
           <Button asChild>
@@ -34,7 +34,7 @@ export default function Landing() {
         <div className="text-center space-y-8 max-w-4xl mx-auto">
           <h1 className="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white">
             Your Complete
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary block">
+            <span className="gold-shimmer block text-5xl md:text-7xl">
               Fitness Journey
             </span>
             Starts Here
