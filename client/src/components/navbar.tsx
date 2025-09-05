@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Home, Users, Calendar, Trophy, Activity, Camera, Award, MapPin, MessageSquare, Moon, Sun, ChefHat, CreditCard, Star, ChevronDown, Menu, LogOut, Settings } from "lucide-react";
+import { Home, Users, Calendar, Trophy, Activity, Camera, Award, MapPin, MessageSquare, ChefHat, CreditCard, Star, ChevronDown, Menu, LogOut, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -7,11 +7,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useTheme } from "@/hooks/useTheme";
 
 export default function Navbar() {
   const [location] = useLocation();
-  const { theme, toggleTheme } = useTheme();
 
   const mainNavItems = [
     { 
@@ -151,18 +149,6 @@ export default function Navbar() {
           </div>
 
           <div className="flex items-center space-x-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={toggleTheme}
-              className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
-            >
-              {theme === 'light' ? (
-                <Moon size={20} />
-              ) : (
-                <Sun size={20} />
-              )}
-            </Button>
             
             <Button
               variant="ghost"
