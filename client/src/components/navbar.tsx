@@ -23,16 +23,6 @@ export default function Navbar() {
 
   const dropdownItems = [
     { 
-      path: "/bookings", 
-      label: "Bookings", 
-      icon: Calendar 
-    },
-    { 
-      path: "/trainer-subscription", 
-      label: "Trainer Plan", 
-      icon: CreditCard 
-    },
-    { 
       path: "/subscription", 
       label: "Premium", 
       icon: Star 

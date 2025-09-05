@@ -6,10 +6,6 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/hooks/useTheme";
 import { useAuth } from "@/hooks/useAuth";
 import Dashboard from "@/pages/dashboard";
-import Trainers from "@/pages/trainers";
-import TrainerProfile from "@/pages/trainer-profile";
-import Bookings from "@/pages/bookings";
-import TrainerSubscription from "@/pages/trainer-subscription";
 import UserSubscription from "@/pages/user-subscription";
 import Leaderboard from "@/pages/leaderboard";
 import MileTracker from "@/pages/mile-tracker";
@@ -56,10 +52,6 @@ function Router() {
         ) : (
           <>
             <Route path="/" component={Dashboard} />
-            <Route path="/trainers" component={Trainers} />
-            <Route path="/trainers/:id" component={TrainerProfile} />
-            <Route path="/bookings" component={Bookings} />
-            <Route path="/trainer-subscription" component={TrainerSubscription} />
             <Route path="/subscription" component={UserSubscription} />
             <Route path="/leaderboard" component={Leaderboard} />
             <Route path="/mile-tracker" component={MileTracker} />
