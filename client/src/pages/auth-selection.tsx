@@ -6,7 +6,14 @@ import { useNewAuth } from "@/hooks/useNewAuth";
 import { useLocation } from "wouter";
 
 export default function AuthSelection() {
-  const [authMode, setAuthMode] = useState<"selection" | "signin" | "signup">("selection");
+  const [authMode, setAuthMode] = useState<"selection" | "signin" | "signup">(() => {
+    // Check if user came from onboarding flow, default to signup
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('from') === 'onboarding') {
+      return "signup";
+    }
+    return "selection";
+  });
   const { signIn } = useNewAuth();
   const [, setLocation] = useLocation();
 

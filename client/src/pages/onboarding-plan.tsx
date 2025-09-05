@@ -307,7 +307,7 @@ export default function OnboardingPlan() {
                 onClick={handleStartTrial}
                 data-testid="start-trial-button"
               >
-                Start Your 10-Day Free Trial
+                Start Your 7-Day Free Trial
                 <ArrowRight className="ml-2" size={20} />
               </Button>
               <p className="text-sm text-gray-500 dark:text-gray-400">

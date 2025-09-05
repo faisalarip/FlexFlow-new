@@ -209,7 +209,7 @@ export default function OnboardingPayment() {
 
               <div className="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg mb-6">
                 <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                  $0.00 <span className="text-lg font-normal text-gray-500">for 10 days</span>
+                  $0.00 <span className="text-lg font-normal text-gray-500">for 7 days</span>
                 </div>
                 <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                   Then $15.99/month • Cancel anytime
@@ -219,7 +219,7 @@ export default function OnboardingPayment() {
               <Button 
                 size="lg" 
                 className="w-full text-lg py-4 mb-4" 
-                onClick={() => window.location.href = '/api/login'}
+                onClick={() => window.location.href = '/auth?from=onboarding'}
                 data-testid="start-trial-button"
               >
                 <CheckCircle className="mr-2" size={20} />
