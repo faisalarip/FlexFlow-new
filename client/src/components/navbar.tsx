@@ -38,11 +38,6 @@ export default function Navbar() {
       icon: Star 
     },
     { 
-      path: "/food-scanner", 
-      label: "Food Scanner", 
-      icon: Camera 
-    },
-    { 
       path: "/leaderboard", 
       label: "Leaderboard", 
       icon: Award 
