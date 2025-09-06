@@ -47,7 +47,7 @@ function Router() {
         {!isAuthenticated ? (
           <>
             <Route path="/" component={Landing} />
-            <Route path="/auth" component={Auth} />
+            <Route path="/auth" component={() => <Auth />} />
             <Route path="/auth-selection" component={AuthSelection} />
             <Route path="/onboarding" component={Onboarding} />
             <Route path="/onboarding/plan" component={OnboardingPlan} />
