@@ -169,14 +169,14 @@ export default function OnboardingPayment() {
               Your Trial is Ready!
             </h1>
             <p className="text-lg text-gray-600 dark:text-gray-300">
-              Start your 10-day free trial now - no payment required upfront
+              Start your 7-day free trial now - no payment required upfront
             </p>
           </div>
 
           <Card className="mb-8 bg-white/80 dark:bg-gray-800/80 backdrop-blur border-0 shadow-xl">
             <CardHeader className="text-center">
               <Badge className="mx-auto mb-2 bg-green-100 text-green-800 border-green-200">
-                10-Day Free Trial
+                7-Day Free Trial
               </Badge>
               <CardTitle className="text-2xl">FlexFlow Premium</CardTitle>
               <CardDescription>
@@ -295,7 +295,7 @@ export default function OnboardingPayment() {
             Start Your Free Trial
           </h1>
           <p className="text-lg text-gray-600 dark:text-gray-300">
-            No commitment • Cancel anytime during your 10-day free trial
+            No commitment • Cancel anytime during your 7-day free trial
           </p>
         </div>
 
@@ -303,7 +303,7 @@ export default function OnboardingPayment() {
         <Card className="mb-8 bg-white/80 dark:bg-gray-800/80 backdrop-blur border-0 shadow-xl">
           <CardHeader className="text-center">
             <Badge className="mx-auto mb-2 bg-green-100 text-green-800 border-green-200">
-              10-Day Free Trial
+              7-Day Free Trial
             </Badge>
             <CardTitle className="text-2xl">FlexFlow Premium</CardTitle>
             <CardDescription>

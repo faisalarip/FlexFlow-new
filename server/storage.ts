@@ -1736,14 +1736,14 @@ export class MemStorage implements IStorage {
 
     // High Protein Muscle Building Plan
     const muscleBuildingPlan = this.createMealPlanSync({
-      name: "10-Day Muscle Building Plan",
+      name: "7-Day Muscle Building Plan",
       description: "High-protein meal plan designed for muscle growth and strength training support.",
       goal: "weight_gain",
       dailyCalories: 3200,
       dailyProtein: 180,
       dailyCarbs: 400,
       dailyFat: 115,
-      duration: 10,
+      duration: 7,
       isActive: true,
     });
 
