@@ -1,5 +1,5 @@
 import * as bcrypt from "bcrypt";
-import * as jwt from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import { storage } from "./storage";
 import { signUpSchema, signInSchema, type SignUpData, type SignInData, type GoogleAuthData } from "@shared/schema";
 
@@ -30,8 +30,10 @@ export class AuthService {
     const validatedData = signUpSchema.parse(userData);
     
     try {
+      
       // Create user in storage
       const user = await storage.createUserWithPassword(validatedData);
+      
       
       // Generate JWT token
       const token = jwt.sign(
@@ -44,6 +46,7 @@ export class AuthService {
         JWT_SECRET,
         { expiresIn: JWT_EXPIRES_IN }
       );
+
 
       return {
         user: {
@@ -59,6 +62,7 @@ export class AuthService {
         token
       };
     } catch (error: any) {
+      
       if (error.message === "Username or email already exists") {
         throw new Error("An account with this username or email already exists");
       }

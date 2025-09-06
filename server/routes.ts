@@ -99,7 +99,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Sign up with username/password
   app.post('/api/auth/signup', async (req, res) => {
     try {
+      
       const userData = signUpSchema.parse(req.body);
+      
       const result = await authService.signUp(userData);
       
       res.status(201).json({
@@ -108,7 +110,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         token: result.token
       });
     } catch (error: any) {
-      console.error("Sign up error:", error);
       
       if (error.name === 'ZodError') {
         return res.status(400).json({

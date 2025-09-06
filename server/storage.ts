@@ -778,46 +778,53 @@ export class MemStorage implements IStorage {
 
   // Authentication methods
   async createUserWithPassword(userData: SignUpData): Promise<User> {
-    // Check if username or email already exists
-    const existingUser = await this.getUserByUsernameOrEmail(userData.username) || 
-                        await this.getUserByUsernameOrEmail(userData.email);
-    
-    if (existingUser) {
-      throw new Error("Username or email already exists");
+    try {
+      
+      // Check if username or email already exists
+      const existingUser = await this.getUserByUsernameOrEmail(userData.username) || 
+                          await this.getUserByUsernameOrEmail(userData.email);
+      
+      if (existingUser) {
+        console.log("User already exists:", existingUser.username || existingUser.email);
+        throw new Error("Username or email already exists");
+      }
+
+      const id = randomUUID();
+      const now = new Date();
+      const freeTrialExpiry = new Date(now.getTime() + (7 * 24 * 60 * 60 * 1000)); // 7 days from now
+      
+      
+      // Hash the password
+      const saltRounds = 12;
+      const passwordHash = await bcrypt.hash(userData.password, saltRounds);
+
+      const user: User = {
+        id,
+        email: userData.email,
+        username: userData.username,
+        passwordHash,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        profileImageUrl: null,
+        authProvider: "local",
+        googleId: null,
+        isEmailVerified: false,
+        streak: 0,
+        subscriptionStatus: "free_trial",
+        subscriptionStartDate: now,
+        lastPaymentDate: null,
+        subscriptionExpiresAt: freeTrialExpiry,
+        stripeCustomerId: null,
+        stripeSubscriptionId: null,
+        createdAt: now,
+        updatedAt: now,
+      };
+
+      this.users.set(id, user);
+      return user;
+    } catch (error) {
+      throw error;
     }
-
-    const id = randomUUID();
-    const now = new Date();
-    const freeTrialExpiry = new Date(now.getTime() + (7 * 24 * 60 * 60 * 1000)); // 7 days from now
-    
-    // Hash the password
-    const saltRounds = 12;
-    const passwordHash = await bcrypt.hash(userData.password, saltRounds);
-
-    const user: User = {
-      id,
-      email: userData.email,
-      username: userData.username,
-      passwordHash,
-      firstName: userData.firstName,
-      lastName: userData.lastName,
-      profileImageUrl: null,
-      authProvider: "local",
-      googleId: null,
-      isEmailVerified: false,
-      streak: 0,
-      subscriptionStatus: "free_trial",
-      subscriptionStartDate: now,
-      lastPaymentDate: null,
-      subscriptionExpiresAt: freeTrialExpiry,
-      stripeCustomerId: null,
-      stripeSubscriptionId: null,
-      createdAt: now,
-      updatedAt: now,
-    };
-
-    this.users.set(id, user);
-    return user;
   }
 
   async getUserByEmail(email: string): Promise<User | undefined> {
