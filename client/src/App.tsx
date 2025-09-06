@@ -4,7 +4,6 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/hooks/useTheme";
-import { useAuth } from "@/hooks/useAuth";
 import Dashboard from "@/pages/dashboard";
 import UserSubscription from "@/pages/user-subscription";
 import Leaderboard from "@/pages/leaderboard";
@@ -26,15 +25,11 @@ import OnboardingPayment from "@/pages/onboarding-payment";
 import TrialSuccess from "@/pages/trial-success";
 import ProfileCompletionGuard from "@/components/profile-completion-guard";
 import AuthSelection from "@/pages/auth-selection";
+import Auth from "@/pages/auth";
 import { useNewAuth } from "@/hooks/useNewAuth";
 
 function Router() {
-  const replitAuth = useAuth();
-  const newAuth = useNewAuth();
-  
-  // Check if either authentication system is active
-  const isAuthenticated = replitAuth.isAuthenticated || newAuth.isAuthenticated;
-  const isLoading = replitAuth.isLoading || newAuth.isLoading;
+  const { isAuthenticated, isLoading } = useNewAuth();
 
   if (isLoading) {
     return (
@@ -52,7 +47,8 @@ function Router() {
         {!isAuthenticated ? (
           <>
             <Route path="/" component={Landing} />
-            <Route path="/auth" component={AuthSelection} />
+            <Route path="/auth" component={Auth} />
+            <Route path="/auth-selection" component={AuthSelection} />
             <Route path="/onboarding" component={Onboarding} />
             <Route path="/onboarding/plan" component={OnboardingPlan} />
             <Route path="/onboarding/payment" component={OnboardingPayment} />

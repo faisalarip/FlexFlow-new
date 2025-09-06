@@ -9,18 +9,21 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { signUpSchema, signInSchema, type SignUpData, type SignInData } from "@shared/schema";
+import { useNewAuth } from "@/hooks/useNewAuth";
+import { useLocation } from "wouter";
 import { z } from "zod";
 
 interface AuthPageProps {
-  mode: "signin" | "signup";
-  onAuthSuccess: (user: any, token: string) => void;
+  mode?: "signin" | "signup";
 }
 
-export default function AuthPage({ mode, onAuthSuccess }: AuthPageProps) {
+export default function AuthPage({ mode = "signup" }: AuthPageProps) {
   const [isSignIn, setIsSignIn] = useState(mode === "signin");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const { signIn } = useNewAuth();
+  const [, setLocation] = useLocation();
 
   // Sign up form
   const signUpForm = useForm<SignUpData>({
@@ -54,7 +57,8 @@ export default function AuthPage({ mode, onAuthSuccess }: AuthPageProps) {
         title: "🎉 Welcome to FlexFlow!",
         description: "Your account has been created successfully.",
       });
-      onAuthSuccess(data.user, data.token);
+      signIn(data.user, data.token);
+      setLocation('/');
     },
     onError: (error: any) => {
       const errorMessage = error.message || "Failed to create account";
@@ -77,7 +81,8 @@ export default function AuthPage({ mode, onAuthSuccess }: AuthPageProps) {
         title: "Welcome back!",
         description: "You've been signed in successfully.",
       });
-      onAuthSuccess(data.user, data.token);
+      signIn(data.user, data.token);
+      setLocation('/');
     },
     onError: (error: any) => {
       const errorMessage = error.message || "Invalid credentials";
