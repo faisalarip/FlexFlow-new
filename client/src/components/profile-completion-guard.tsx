@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useAuth } from "@/hooks/useAuth";
+import { useNewAuth } from "@/hooks/useNewAuth";
 import ProfileEditor from "@/components/profile-editor";
 import type { User } from "@shared/schema";
 
@@ -8,7 +8,7 @@ interface ProfileCompletionGuardProps {
 }
 
 export default function ProfileCompletionGuard({ children }: ProfileCompletionGuardProps) {
-  const { user, isLoading } = useAuth();
+  const { user, isLoading } = useNewAuth();
   const [showProfileSetup, setShowProfileSetup] = useState(false);
 
   useEffect(() => {
