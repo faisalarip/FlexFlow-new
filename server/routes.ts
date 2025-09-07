@@ -31,7 +31,7 @@ import { generatePersonalizedMealPlan, generateWeeklyMealPlan } from "./mealPlan
 import { setupAuth } from "./replitAuth";
 import { autoDifficultyAdjuster } from "./auto-difficulty-adjuster";
 import { authService } from "./auth-service";
-import { authenticateToken, optionalAuth, getAuthUserId as getAuthUserId } from "./auth-middleware";
+import { authenticateToken, optionalAuth, getCurrentUserId as getAuthUserId } from "./auth-middleware";
 import { signUpSchema, signInSchema } from "@shared/schema";
 import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
