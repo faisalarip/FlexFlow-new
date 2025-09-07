@@ -1,7 +1,7 @@
 import { Dumbbell, Menu, User, ChevronDown, X } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { useAuth } from "@/hooks/useAuth";
+import { useNewAuth } from "@/hooks/useNewAuth";
 import PremiumBadge from "@/components/premium-badge";
 import ProfileEditor from "@/components/profile-editor";
 import DifficultyNotifications from "@/components/difficulty-notifications";
@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import type { User as UserType } from "@shared/schema";
 
 export default function NavigationHeader() {
-  const { user } = useAuth() as { user: UserType | null };
+  const { user } = useNewAuth() as { user: UserType | null };
   const [location] = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const fullName = user ? `${user.firstName || ""} ${user.lastName || ""}`.trim() : "";

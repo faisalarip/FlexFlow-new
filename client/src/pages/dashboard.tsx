@@ -13,11 +13,11 @@ import FloatingActionButton from "@/components/floating-action-button";
 import ProgressOverview from "@/components/progress-overview";
 import PerformanceAnalytics from "@/components/performance-analytics";
 import ProfileEditor from "@/components/profile-editor";
-import { useAuth } from "@/hooks/useAuth";
+import { useNewAuth } from "@/hooks/useNewAuth";
 
 export default function Dashboard() {
   const [showProfileEditor, setShowProfileEditor] = useState(false);
-  const { user } = useAuth();
+  const { user } = useNewAuth();
 
   // Auto-open profile editor when user first logs in
   useEffect(() => {

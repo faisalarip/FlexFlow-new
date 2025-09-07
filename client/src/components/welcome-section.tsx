@@ -1,10 +1,10 @@
 import { Plus, Flame, User as UserIcon } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
+import { useNewAuth } from "@/hooks/useNewAuth";
 import { useQuery } from "@tanstack/react-query";
 import type { User } from "@shared/schema";
 
 export default function WelcomeSection() {
-  const { isLoading } = useAuth();
+  const { isLoading } = useNewAuth();
   const currentHour = new Date().getHours();
   const greeting = currentHour < 12 ? "Good morning" : currentHour < 18 ? "Good afternoon" : "Good evening";
   

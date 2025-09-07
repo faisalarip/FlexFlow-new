@@ -4,12 +4,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { useAuth } from "@/hooks/useAuth";
+import { useNewAuth } from "@/hooks/useNewAuth";
 import ProfileEditor from "@/components/profile-editor";
 import type { User } from "@shared/schema";
 
 export default function SettingsPage() {
-  const { user } = useAuth() as { user: User | null };
+  const { user } = useNewAuth() as { user: User | null };
 
   const formatDate = (date: string | Date | null | undefined) => {
     if (!date) return "N/A";
