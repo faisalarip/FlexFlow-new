@@ -58,7 +58,8 @@ export default function AuthPage({ mode = "signup" }: AuthPageProps) {
         description: "Your account has been created successfully.",
       });
       signIn(data.user, data.token);
-      setLocation('/');
+      // Small delay to ensure state updates before navigation
+      setTimeout(() => setLocation('/'), 100);
     },
     onError: (error: any) => {
       const errorMessage = error.message || "Failed to create account";
@@ -82,7 +83,8 @@ export default function AuthPage({ mode = "signup" }: AuthPageProps) {
         description: "You've been signed in successfully.",
       });
       signIn(data.user, data.token);
-      setLocation('/');
+      // Small delay to ensure state updates before navigation
+      setTimeout(() => setLocation('/'), 100);
     },
     onError: (error: any) => {
       const errorMessage = error.message || "Invalid credentials";
