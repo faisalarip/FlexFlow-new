@@ -25,16 +25,22 @@ declare global {
 export const authenticateToken = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const authHeader = req.headers.authorization;
+    console.log("Auth header:", authHeader);
     const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
 
     if (!token) {
+      console.log("No token found");
       return res.status(401).json({ message: "Access token required" });
     }
 
+    console.log("Token:", token.substring(0, 50) + "...");
+
     // Verify token and get user data
     const user = await authService.getUserByToken(token);
+    console.log("User from token:", user);
     
     if (!user) {
+      console.log("No user found for token");
       return res.status(401).json({ message: "Invalid or expired token" });
     }
 
@@ -43,7 +49,7 @@ export const authenticateToken = async (req: Request, res: Response, next: NextF
     next();
   } catch (error) {
     console.error("Token verification error:", error);
-    return res.status(401).json({ message: "Invalid or expired token" });
+    return res.status(401).json({ message: "Unauthorized" });
   }
 };
 

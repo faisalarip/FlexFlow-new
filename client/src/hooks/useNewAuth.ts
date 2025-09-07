@@ -21,11 +21,11 @@ export function useNewAuth() {
 
   // Fetch user data with JWT token
   const { data: user, isLoading, error } = useQuery({
-    queryKey: ["/api/auth/me"],
+    queryKey: ["/api/auth/user"],
     queryFn: async () => {
       if (!token) return null;
       
-      const response = await fetch('/api/auth/me', {
+      const response = await fetch('/api/auth/user', {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -68,7 +68,7 @@ export function useNewAuth() {
           window.history.replaceState({}, document.title, window.location.pathname);
           
           // Invalidate queries to refetch with new token
-          queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+          queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
         } catch (error) {
           console.error('Failed to parse OAuth callback data:', error);
         }
@@ -81,7 +81,7 @@ export function useNewAuth() {
   const signIn = (user: AuthUser, authToken: string) => {
     localStorage.setItem('auth-token', authToken);
     setToken(authToken);
-    queryClient.setQueryData(["/api/auth/me"], user);
+    queryClient.setQueryData(["/api/auth/user"], user);
   };
 
   const signOut = async () => {
