@@ -7,9 +7,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useNewAuth } from "@/hooks/useNewAuth";
 
 export default function Navbar() {
   const [location] = useLocation();
+  const { signOut } = useNewAuth();
 
   const mainNavItems = [
     { 
@@ -124,14 +126,14 @@ export default function Navbar() {
                   );
                 })}
                 <hr className="my-2" />
-                <DropdownMenuItem asChild>
-                  <a 
-                    href="/api/logout"
-                    className="flex items-center space-x-3 px-2 py-2 w-full cursor-pointer text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+                <DropdownMenuItem>
+                  <button 
+                    onClick={signOut}
+                    className="flex items-center space-x-3 px-2 py-2 w-full cursor-pointer text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 bg-transparent border-none"
                   >
                     <LogOut size={16} />
                     <span>Sign Out</span>
-                  </a>
+                  </button>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -142,12 +144,10 @@ export default function Navbar() {
             <Button
               variant="ghost"
               size="sm"
-              asChild
+              onClick={signOut}
               className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
             >
-              <a href="/api/logout">
-                <LogOut size={20} />
-              </a>
+              <LogOut size={20} />
             </Button>
           </div>
         </div>
