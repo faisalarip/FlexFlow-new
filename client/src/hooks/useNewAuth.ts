@@ -112,8 +112,8 @@ export function useNewAuth() {
 
   return {
     user: user || null,
-    isLoading: isLoading && !!token,
-    isAuthenticated: !!user && !!token,
+    isLoading: !!token && isLoading,
+    isAuthenticated: !!token && (!!user || !isLoading),
     token,
     signIn,
     signOut,
