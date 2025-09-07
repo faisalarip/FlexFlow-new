@@ -31,7 +31,7 @@ import { generatePersonalizedMealPlan, generateWeeklyMealPlan } from "./mealPlan
 import { setupAuth } from "./replitAuth";
 import { autoDifficultyAdjuster } from "./auto-difficulty-adjuster";
 import { authService } from "./auth-service";
-import { authenticateToken, optionalAuth, getCurrentUserId as getAuthUserId } from "./auth-middleware";
+import { authenticateToken, optionalAuth, getAuthUserId as getAuthUserId } from "./auth-middleware";
 import { signUpSchema, signInSchema } from "@shared/schema";
 import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
@@ -243,15 +243,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     );
   }
 
-  // Helper function to get current user ID from request (supports both auth methods)
-  const getCurrentUserId = (req: any): string | null => {
-    // Check JWT auth first
-    if (req.user?.id) {
-      return req.user.id;
-    }
-    // Fallback to Replit auth
-    return req.user?.claims?.sub || null;
-  };
 
   // Get exercises
   app.get("/api/exercises", async (req, res) => {
@@ -276,7 +267,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get workouts
   app.get("/api/workouts", authenticateToken, async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = getAuthUserId(req);
       if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
       }
@@ -303,7 +294,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create workout
   app.post("/api/workouts", authenticateToken, async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = getAuthUserId(req);
       if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
       }
@@ -344,7 +335,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get user stats
   app.get("/api/stats", authenticateToken, async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = getAuthUserId(req);
       if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
       }
@@ -358,7 +349,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get advanced progress metrics
   app.get("/api/progress/metrics", authenticateToken, async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = getAuthUserId(req);
       if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
       }
@@ -372,7 +363,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get weight progress data for charts
   app.get("/api/progress/weight", authenticateToken, async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = getAuthUserId(req);
       if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
       }
@@ -386,7 +377,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get AI performance analytics data
   app.get("/api/performance-analytics/:timeframe", authenticateToken, async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = getAuthUserId(req);
       if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
       }
@@ -480,7 +471,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get AI difficulty recommendations for user
   app.get("/api/ai-recommendations", authenticateToken, async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = getAuthUserId(req);
       if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
       }
@@ -496,7 +487,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Apply AI difficulty adjustments
   app.post("/api/ai-adjustments/apply", authenticateToken, async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = getAuthUserId(req);
       if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
       }
@@ -524,7 +515,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get pending AI difficulty adjustments for user
   app.get("/api/ai-adjustments/pending", authenticateToken, async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = getAuthUserId(req);
       if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
       }
@@ -555,7 +546,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Update user profile with image upload
   app.post("/api/user/profile/upload", authenticateToken, upload.single('profileImage'), async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = getAuthUserId(req);
       if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
       }
@@ -626,7 +617,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Update user profile (name only)
   app.patch("/api/user/profile", authenticateToken, async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = getAuthUserId(req);
       if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
       }
@@ -655,7 +646,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get goals
   app.get("/api/goals", authenticateToken, async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = getAuthUserId(req);
       if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
       }
@@ -669,7 +660,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create goal
   app.post("/api/goals", authenticateToken, async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = getAuthUserId(req);
       if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
       }
@@ -691,7 +682,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Update goal
   app.patch("/api/goals/:id", authenticateToken, async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = getAuthUserId(req);
       if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
       }
@@ -712,7 +703,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Delete goal
   app.delete("/api/goals/:id", authenticateToken, async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = getAuthUserId(req);
       if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
       }
@@ -732,7 +723,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Stripe payment routes
   app.post("/api/create-payment-intent", authenticateToken, async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = getAuthUserId(req);
       if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
       }
@@ -767,7 +758,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create subscription
   app.post('/api/get-or-create-subscription', authenticateToken, async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = getAuthUserId(req);
       if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
       }
@@ -982,7 +973,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get workouts by date range (for calendar)
   app.get("/api/workouts/range/:start/:end", authenticateToken, async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = getAuthUserId(req);
       if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
       }
@@ -1033,7 +1024,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create trainer profile
   app.post("/api/trainers", authenticateToken, async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = getAuthUserId(req);
       if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
       }
@@ -1098,7 +1089,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get user bookings
   app.get("/api/bookings", authenticateToken, async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = getAuthUserId(req);
       if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
       }
@@ -1125,7 +1116,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create booking
   app.post("/api/bookings", authenticateToken, async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = getAuthUserId(req);
       if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
       }
@@ -1161,7 +1152,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create review for trainer
   app.post("/api/reviews", authenticateToken, async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = getAuthUserId(req);
       if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
       }
@@ -1185,7 +1176,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get food entries for user
   app.get("/api/food-entries", authenticateToken, async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = getAuthUserId(req);
       if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
       }
@@ -1234,7 +1225,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create food entry
   app.post("/api/food-entries", authenticateToken, async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = getAuthUserId(req);
       if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
       }
@@ -1295,7 +1286,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get current user's trainer profile
   app.get("/api/trainers/me", authenticateToken, async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = getAuthUserId(req);
       if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
       }
@@ -1313,7 +1304,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create trainer profile for current user
   app.post("/api/trainers", authenticateToken, async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = getAuthUserId(req);
       if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
       }
@@ -1344,7 +1335,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all mile tracker sessions for user
   app.get("/api/mile-tracker/sessions", authenticateToken, async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = getAuthUserId(req);
       if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
       }
@@ -1359,7 +1350,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get active mile tracker session
   app.get("/api/mile-tracker/sessions/active", authenticateToken, async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = getAuthUserId(req);
       if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
       }
@@ -1391,7 +1382,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Start new mile tracker session
   app.post("/api/mile-tracker/sessions", authenticateToken, async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = getAuthUserId(req);
       if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
       }
@@ -1435,7 +1426,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Add mile split to session
   app.post("/api/mile-tracker/sessions/:sessionId/splits", authenticateToken, async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = getAuthUserId(req);
       if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
       }
@@ -1480,7 +1471,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create new community post
   app.post("/api/community/posts", authenticateToken, async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = getAuthUserId(req);
       if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
       }
@@ -1560,7 +1551,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get current user's meal plan
   app.get("/api/user-meal-plan", authenticateToken, async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = getAuthUserId(req);
       if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
       }
@@ -1578,7 +1569,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Assign a meal plan to the current user
   app.post("/api/user-meal-plan", authenticateToken, async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = getAuthUserId(req);
       console.log("Assigning meal plan for user:", userId);
       console.log("Request body:", req.body);
       
@@ -1615,7 +1606,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get user meal preferences
   app.get("/api/user-meal-preferences", authenticateToken, async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = getAuthUserId(req);
       if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
       }
@@ -1630,7 +1621,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create or update user meal preferences
   app.post("/api/user-meal-preferences", authenticateToken, async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = getAuthUserId(req);
       if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
       }
@@ -1663,7 +1654,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Generate personalized meal plan using AI
   app.post("/api/generate-meal-plan", authenticateToken, async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = getAuthUserId(req);
       if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
       }
@@ -1834,7 +1825,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get current trainer subscription status
   app.get("/api/trainer/subscription", authenticateToken, async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = getAuthUserId(req);
       if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
       }
@@ -1852,7 +1843,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Activate trainer subscription (pay $25)
   app.post("/api/trainer/subscription/activate", authenticateToken, async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = getAuthUserId(req);
       if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
       }
@@ -1876,7 +1867,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Cancel trainer subscription
   app.post("/api/trainer/subscription/cancel", authenticateToken, async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = getAuthUserId(req);
       if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
       }
@@ -1912,7 +1903,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get user subscription status
   app.get("/api/user/subscription", authenticateToken, async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = getAuthUserId(req);
       if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
       }
@@ -1952,7 +1943,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Activate paid subscription (after free trial or to reactivate)
   app.post("/api/user/subscription/activate", authenticateToken, async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = getAuthUserId(req);
       if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
       }
@@ -1990,7 +1981,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Cancel user subscription
   app.post("/api/user/subscription/cancel", authenticateToken, async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = getAuthUserId(req);
       if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
       }
@@ -2050,7 +2041,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get food items with user preferences
   app.get("/api/food-items-with-preferences", authenticateToken, async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = getAuthUserId(req);
       if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
       }
@@ -2067,7 +2058,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get user food preferences
   app.get("/api/user-food-preferences", authenticateToken, async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = getAuthUserId(req);
       if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
       }
@@ -2083,7 +2074,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Set user food preference
   app.post("/api/user-food-preference", authenticateToken, async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = getAuthUserId(req);
       if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
       }
@@ -2107,7 +2098,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Generate AI meal plan based on food preferences
   app.post("/api/generate-personalized-meal-plan", authenticateToken, async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = getAuthUserId(req);
       if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
       }
