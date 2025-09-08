@@ -63,6 +63,9 @@ import {
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 import * as bcrypt from "bcrypt";
+import { db } from "./db";
+import { users } from "@shared/schema";
+import { eq, or } from "drizzle-orm";
 
 export interface IStorage {
   // Users (IMPORTANT) these user operations are mandatory for Replit Auth.
@@ -2573,4 +2576,239 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+// Database Storage Implementation
+export class DatabaseStorage implements IStorage {
+  // Authentication methods
+  async createUserWithPassword(userData: SignUpData): Promise<User> {
+    try {
+      // Check if username or email already exists
+      const existingUser = await this.getUserByUsernameOrEmail(userData.username) || 
+                          await this.getUserByUsernameOrEmail(userData.email);
+      
+      if (existingUser) {
+        throw new Error("Username or email already exists");
+      }
+      
+      // Hash the password
+      const saltRounds = 12;
+      const passwordHash = await bcrypt.hash(userData.password, saltRounds);
+      
+      // Create user in database
+      const [user] = await db
+        .insert(users)
+        .values({
+          email: userData.email,
+          username: userData.username,
+          passwordHash,
+          firstName: userData.firstName,
+          lastName: userData.lastName,
+          authProvider: "local",
+          isEmailVerified: false,
+          subscriptionStatus: "free_trial",
+          subscriptionExpiresAt: new Date(Date.now() + (7 * 24 * 60 * 60 * 1000)), // 7 days from now
+        })
+        .returning();
+      
+      return user;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getUserByUsernameOrEmail(identifier: string): Promise<User | undefined> {
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(or(eq(users.username, identifier), eq(users.email, identifier)));
+    return user;
+  }
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(eq(users.email, email));
+    return user;
+  }
+
+  async getUser(id: string): Promise<User | undefined> {
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(eq(users.id, id));
+    return user;
+  }
+
+  async upsertUser(userData: UpsertUser): Promise<User> {
+    const [user] = await db
+      .insert(users)
+      .values(userData)
+      .onConflictDoUpdate({
+        target: users.id,
+        set: {
+          ...userData,
+          updatedAt: new Date(),
+        },
+      })
+      .returning();
+    return user;
+  }
+
+  async upsertUserFromGoogle(googleData: GoogleAuthData): Promise<User> {
+    // Try to find existing user by googleId or email
+    const existingUser = await db
+      .select()
+      .from(users)
+      .where(or(eq(users.googleId, googleData.googleId), eq(users.email, googleData.email)))
+      .limit(1);
+
+    if (existingUser.length > 0) {
+      // Update existing user
+      const [updatedUser] = await db
+        .update(users)
+        .set({
+          googleId: googleData.googleId,
+          email: googleData.email,
+          firstName: googleData.firstName,
+          lastName: googleData.lastName,
+          profileImageUrl: googleData.profileImageUrl,
+          isEmailVerified: true,
+          updatedAt: new Date(),
+        })
+        .where(eq(users.id, existingUser[0].id))
+        .returning();
+      
+      return updatedUser;
+    } else {
+      // Create new user
+      const [newUser] = await db
+        .insert(users)
+        .values({
+          googleId: googleData.googleId,
+          email: googleData.email,
+          firstName: googleData.firstName,
+          lastName: googleData.lastName,
+          profileImageUrl: googleData.profileImageUrl,
+          authProvider: "google",
+          isEmailVerified: true,
+          subscriptionStatus: "free_trial",
+          subscriptionExpiresAt: new Date(Date.now() + (7 * 24 * 60 * 60 * 1000)), // 7 days from now
+        })
+        .returning();
+      
+      return newUser;
+    }
+  }
+
+  async verifyUserEmail(userId: string): Promise<User | undefined> {
+    const [user] = await db
+      .update(users)
+      .set({ isEmailVerified: true, updatedAt: new Date() })
+      .where(eq(users.id, userId))
+      .returning();
+    return user;
+  }
+
+  // Fallback to MemStorage for other methods not yet implemented
+  private memStorage = new MemStorage();
+
+  // Delegate all other methods to MemStorage for now
+  async getUsers(): Promise<User[]> { return this.memStorage.getUsers(); }
+  async getUserByUsername(username: string): Promise<User | undefined> { return this.memStorage.getUserByUsername(username); }
+  async createUser(user: InsertUser): Promise<User> { return this.memStorage.createUser(user); }
+  async updateUserStreak(id: string, streak: number): Promise<User | undefined> { return this.memStorage.updateUserStreak(id, streak); }
+  async updateUser(id: string, updates: Partial<User>): Promise<User | undefined> { return this.memStorage.updateUser(id, updates); }
+  
+  // Exercise methods
+  async getExercises(): Promise<Exercise[]> { return this.memStorage.getExercises(); }
+  async getExercisesByCategory(category: string): Promise<Exercise[]> { return this.memStorage.getExercisesByCategory(category); }
+  async searchExercises(query: string): Promise<Exercise[]> { return this.memStorage.searchExercises(query); }
+  async getExercise(id: string): Promise<Exercise | undefined> { return this.memStorage.getExercise(id); }
+  async createExercise(exercise: InsertExercise): Promise<Exercise> { return this.memStorage.createExercise(exercise); }
+  
+  // Workout methods
+  async getWorkouts(userId: string): Promise<Workout[]> { return this.memStorage.getWorkouts(userId); }
+  async getWorkout(id: string): Promise<WorkoutWithExercises | undefined> { return this.memStorage.getWorkout(id); }
+  async createWorkout(workout: InsertWorkout): Promise<Workout> { return this.memStorage.createWorkout(workout); }
+  async getWorkoutsByDateRange(userId: string, startDate: Date, endDate: Date): Promise<Workout[]> { return this.memStorage.getWorkoutsByDateRange(userId, startDate, endDate); }
+  
+  // Workout Exercise methods
+  async createWorkoutExercise(workoutExercise: InsertWorkoutExercise): Promise<WorkoutExercise> { return this.memStorage.createWorkoutExercise(workoutExercise); }
+  async getWorkoutExercises(workoutId: string): Promise<(WorkoutExercise & { exercise: Exercise })[]> { return this.memStorage.getWorkoutExercises(workoutId); }
+  
+  // Goal methods
+  async getGoals(userId: string): Promise<Goal[]> { return this.memStorage.getGoals(userId); }
+  async createGoal(goal: InsertGoal): Promise<Goal> { return this.memStorage.createGoal(goal); }
+  async updateGoal(id: string, updates: Partial<Goal>): Promise<Goal | undefined> { return this.memStorage.updateGoal(id, updates); }
+  async deleteGoal(id: string): Promise<boolean> { return this.memStorage.deleteGoal(id); }
+  
+  // Stats methods
+  async getUserStats(userId: string): Promise<UserStats> { return this.memStorage.getUserStats(userId); }
+  async getAdvancedProgressMetrics(userId: string): Promise<any> { return this.memStorage.getAdvancedProgressMetrics(userId); }
+  async getWeightProgressData(userId: string): Promise<any> { return this.memStorage.getWeightProgressData(userId); }
+  
+  // Leaderboard methods
+  async getLeaderboard(): Promise<LeaderboardEntry[]> { return this.memStorage.getLeaderboard(); }
+  
+  // All other methods delegate to MemStorage for now
+  async getTrainers(filters?: any): Promise<TrainerWithServices[]> { return this.memStorage.getTrainers(filters); }
+  async getTrainer(id: string): Promise<TrainerWithServices | undefined> { return this.memStorage.getTrainer(id); }
+  async getTrainerByUserId(userId: string): Promise<Trainer | undefined> { return this.memStorage.getTrainerByUserId(userId); }
+  async createTrainer(trainer: InsertTrainer): Promise<Trainer> { return this.memStorage.createTrainer(trainer); }
+  async updateTrainer(id: string, updates: Partial<Trainer>): Promise<Trainer | undefined> { return this.memStorage.updateTrainer(id, updates); }
+  async getTrainerServices(trainerId: string): Promise<TrainerService[]> { return this.memStorage.getTrainerServices(trainerId); }
+  async createTrainerService(service: InsertTrainerService): Promise<TrainerService> { return this.memStorage.createTrainerService(service); }
+  async updateTrainerService(id: string, updates: Partial<TrainerService>): Promise<TrainerService | undefined> { return this.memStorage.updateTrainerService(id, updates); }
+  async getBookings(userId: string): Promise<BookingWithDetails[]> { return this.memStorage.getBookings(userId); }
+  async getTrainerBookings(trainerId: string): Promise<BookingWithDetails[]> { return this.memStorage.getTrainerBookings(trainerId); }
+  async getBooking(id: string): Promise<BookingWithDetails | undefined> { return this.memStorage.getBooking(id); }
+  async createBooking(booking: InsertBooking): Promise<Booking> { return this.memStorage.createBooking(booking); }
+  async updateBooking(id: string, updates: Partial<Booking>): Promise<Booking | undefined> { return this.memStorage.updateBooking(id, updates); }
+  async getTrainerReviews(trainerId: string): Promise<TrainerReviewWithUser[]> { return this.memStorage.getTrainerReviews(trainerId); }
+  async createTrainerReview(review: InsertTrainerReview): Promise<TrainerReview> { return this.memStorage.createTrainerReview(review); }
+  async updateTrainerRating(trainerId: string): Promise<void> { return this.memStorage.updateTrainerRating(trainerId); }
+  async getFoodEntries(userId: string, date?: Date): Promise<FoodEntry[]> { return this.memStorage.getFoodEntries(userId, date); }
+  async createFoodEntry(foodEntry: InsertFoodEntry): Promise<FoodEntry> { return this.memStorage.createFoodEntry(foodEntry); }
+  async updateFoodEntry(id: string, updates: Partial<FoodEntry>): Promise<FoodEntry | undefined> { return this.memStorage.updateFoodEntry(id, updates); }
+  async deleteFoodEntry(id: string): Promise<boolean> { return this.memStorage.deleteFoodEntry(id); }
+  async getMileTrackerSessions(userId: string): Promise<MileTrackerSessionWithSplits[]> { return this.memStorage.getMileTrackerSessions(userId); }
+  async getMileTrackerSession(id: string): Promise<MileTrackerSessionWithSplits | undefined> { return this.memStorage.getMileTrackerSession(id); }
+  async getActiveMileTrackerSession(userId: string): Promise<MileTrackerSessionWithSplits | undefined> { return this.memStorage.getActiveMileTrackerSession(userId); }
+  async createMileTrackerSession(session: InsertMileTrackerSession): Promise<MileTrackerSession> { return this.memStorage.createMileTrackerSession(session); }
+  async updateMileTrackerSession(id: string, updates: Partial<MileTrackerSession>): Promise<MileTrackerSession | undefined> { return this.memStorage.updateMileTrackerSession(id, updates); }
+  async createMileTrackerSplit(split: InsertMileTrackerSplit): Promise<MileTrackerSplit> { return this.memStorage.createMileTrackerSplit(split); }
+  async getMileTrackerSplits(sessionId: string): Promise<MileTrackerSplit[]> { return this.memStorage.getMileTrackerSplits(sessionId); }
+  async getCommunityPosts(limit?: number): Promise<CommunityPostWithUser[]> { return this.memStorage.getCommunityPosts(limit); }
+  async createCommunityPost(post: InsertCommunityPost): Promise<CommunityPost> { return this.memStorage.createCommunityPost(post); }
+  async likeCommunityPost(postId: string): Promise<CommunityPost | undefined> { return this.memStorage.likeCommunityPost(postId); }
+  async getMealPlans(goal?: string): Promise<MealPlanWithDetails[]> { return this.memStorage.getMealPlans(goal); }
+  async getMealPlan(id: string): Promise<MealPlanWithDetails | undefined> { return this.memStorage.getMealPlan(id); }
+  async createMealPlan(mealPlan: InsertMealPlan): Promise<MealPlan> { return this.memStorage.createMealPlan(mealPlan); }
+  async getUserMealPlan(userId: string): Promise<UserMealPlanWithDetails | undefined> { return this.memStorage.getUserMealPlan(userId); }
+  async assignMealPlan(userMealPlan: InsertUserMealPlan): Promise<UserMealPlan> { return this.memStorage.assignMealPlan(userMealPlan); }
+  async getTotalCommissions(): Promise<{ totalCommissions: number; totalBookings: number }> { return this.memStorage.getTotalCommissions(); }
+  async markBookingAsPaid(bookingId: string, totalPrice: number): Promise<Booking | undefined> { return this.memStorage.markBookingAsPaid(bookingId, totalPrice); }
+  async getCalendarNotes(userId: string, date?: Date): Promise<CalendarNote[]> { return this.memStorage.getCalendarNotes(userId, date); }
+  async getCalendarNote(id: string): Promise<CalendarNote | undefined> { return this.memStorage.getCalendarNote(id); }
+  async createCalendarNote(note: InsertCalendarNote): Promise<CalendarNote> { return this.memStorage.createCalendarNote(note); }
+  async updateCalendarNote(id: string, updates: Partial<CalendarNote>): Promise<CalendarNote | undefined> { return this.memStorage.updateCalendarNote(id, updates); }
+  async deleteCalendarNote(id: string): Promise<boolean> { return this.memStorage.deleteCalendarNote(id); }
+  async getUserMealPreferences(userId: string): Promise<UserMealPreferences | undefined> { return this.memStorage.getUserMealPreferences(userId); }
+  async createUserMealPreferences(preferences: InsertUserMealPreferences): Promise<UserMealPreferences> { return this.memStorage.createUserMealPreferences(preferences); }
+  async updateUserMealPreferences(userId: string, updates: Partial<UserMealPreferences>): Promise<UserMealPreferences | undefined> { return this.memStorage.updateUserMealPreferences(userId, updates); }
+  async getUsersForWeeklyMealPlanGeneration(): Promise<{ userId: string; preferences: UserMealPreferences }[]> { return this.memStorage.getUsersForWeeklyMealPlanGeneration(); }
+  async createAIMealPlan(mealPlan: InsertMealPlan, days: { dayNumber: number; name: string; meals: any[] }[]): Promise<MealPlan> { return this.memStorage.createAIMealPlan(mealPlan, days); }
+  async getFoodItems(category?: string): Promise<FoodItem[]> { return this.memStorage.getFoodItems(category); }
+  async createFoodItem(foodItem: InsertFoodItem): Promise<FoodItem> { return this.memStorage.createFoodItem(foodItem); }
+  async getFoodItemsWithUserPreferences(userId: string, category?: string): Promise<FoodItemWithPreference[]> { return this.memStorage.getFoodItemsWithUserPreferences(userId, category); }
+  async getUserFoodPreferences(userId: string): Promise<UserFoodPreference[]> { return this.memStorage.getUserFoodPreferences(userId); }
+  async setUserFoodPreference(preference: InsertUserFoodPreference): Promise<UserFoodPreference> { return this.memStorage.setUserFoodPreference(preference); }
+  async updateUserFoodPreference(userId: string, foodItemId: string, preference: string): Promise<UserFoodPreference | undefined> { return this.memStorage.updateUserFoodPreference(userId, foodItemId, preference); }
+  async deleteUserFoodPreference(userId: string, foodItemId: string): Promise<boolean> { return this.memStorage.deleteUserFoodPreference(userId, foodItemId); }
+  async getRecentWorkoutsForExercise(userId: string, exerciseId: string, limit: number): Promise<(Workout & { exercises: WorkoutExercise[] })[]> { return this.memStorage.getRecentWorkoutsForExercise(userId, exerciseId, limit); }
+  async createAiDifficultyAdjustment(adjustment: InsertAiDifficultyAdjustment): Promise<AiDifficultyAdjustment> { return this.memStorage.createAiDifficultyAdjustment(adjustment); }
+  async getPendingAiAdjustments(userId: string): Promise<AiDifficultyAdjustment[]> { return this.memStorage.getPendingAiAdjustments(userId); }
+  async applyAiDifficultyAdjustment(adjustmentId: string): Promise<boolean> { return this.memStorage.applyAiDifficultyAdjustment(adjustmentId); }
+}
+
+export const storage = new DatabaseStorage();
