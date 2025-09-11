@@ -35,7 +35,6 @@ import { signUpSchema, signInSchema } from "@shared/schema";
 import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { randomBytes } from "crypto";
-import { setupAuth, isAuthenticated } from "./replitAuth";
 
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
@@ -90,9 +89,6 @@ setInterval(() => {
 }, 5 * 60 * 1000); // Clean up every 5 minutes
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Auth middleware - setup Replit Auth
-  await setupAuth(app);
-
   // Configure Google OAuth Strategy
   if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
     // Get the proper domain for callback URL
@@ -123,7 +119,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     }));
 
-    // passport.initialize() is already called in setupAuth() - no need to duplicate
+    app.use(passport.initialize());
   }
 
   // Note: Removed Replit Auth integration as requested
