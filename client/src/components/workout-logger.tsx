@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import type { Exercise } from "@shared/schema";
+import dumbbellExercisesImage from "@assets/generated_images/Man_performing_dumbbell_exercises_1979e4be.png";
 
 export default function WorkoutLogger() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -1015,6 +1016,24 @@ export default function WorkoutLogger() {
           ))}
         </div>
       </div>
+
+      {/* Dumbbell Section Header Image */}
+      {selectedCategory === "dumbbells" && !searchQuery && (
+        <div className="mb-6">
+          <div className="relative rounded-xl overflow-hidden bg-gradient-to-r from-gray-800 to-gray-900 p-6">
+            <img 
+              src={dumbbellExercisesImage} 
+              alt="Dumbbell exercises demonstration" 
+              className="w-full h-48 object-cover rounded-lg shadow-lg"
+              data-testid="dumbbell-demo-image"
+            />
+            <div className="absolute bottom-4 left-4 bg-black/70 rounded-lg px-4 py-2">
+              <h4 className="text-white font-semibold">Professional Form Demonstration</h4>
+              <p className="text-gray-300 text-sm">Master your dumbbell technique</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Exercise Results */}
       {(searchQuery || filteredExercises.length > 6) ? (
