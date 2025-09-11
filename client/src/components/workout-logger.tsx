@@ -10,6 +10,11 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import type { Exercise } from "@shared/schema";
 
+// Import muscle group images
+import strengthMuscles from "@assets/generated_images/Strength_training_muscle_groups_diagram_b1df0e4e.png";
+import dumbbellMuscles from "@assets/generated_images/Dumbbell_workout_muscle_groups_diagram_a4a341dc.png";
+import cardioMuscles from "@assets/generated_images/Cardio_workout_muscle_groups_diagram_7ac7efbc.png";
+
 export default function WorkoutLogger() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("strength");
@@ -159,6 +164,20 @@ export default function WorkoutLogger() {
   };
 
   const filteredExercises = getFilteredExercises();
+
+  // Get muscle group image based on selected category
+  const getMuscleGroupImage = () => {
+    switch (selectedCategory) {
+      case "strength":
+        return strengthMuscles;
+      case "dumbbells":
+        return dumbbellMuscles;
+      case "cardio":
+        return cardioMuscles;
+      default:
+        return null;
+    }
+  };
 
   // Exercise instructions database
   const exerciseInstructions: Record<string, { steps: string[], tips: string[], muscles: string[] }> = {
@@ -1015,6 +1034,25 @@ export default function WorkoutLogger() {
           ))}
         </div>
       </div>
+
+      {/* Muscle Group Diagram */}
+      {getMuscleGroupImage() && (
+        <div className="mb-6">
+          <p className="text-sm font-medium text-white mb-3">Muscles Targeted</p>
+          <div className="bg-background/60 backdrop-blur-sm rounded-lg p-4 border border-border">
+            <img 
+              src={getMuscleGroupImage()} 
+              alt={`${selectedCategory} muscle groups targeted`}
+              className="w-full max-w-md mx-auto rounded-lg"
+              style={{ maxHeight: '300px', objectFit: 'contain' }}
+              data-testid={`muscle-diagram-${selectedCategory}`}
+            />
+            <p className="text-xs text-muted-foreground text-center mt-2">
+              Muscle groups targeted by {selectedCategory} exercises
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Exercise Results */}
       {(searchQuery || filteredExercises.length > 6) ? (
