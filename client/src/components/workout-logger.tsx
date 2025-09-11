@@ -14,6 +14,7 @@ import type { Exercise } from "@shared/schema";
 import strengthMuscles from "@assets/generated_images/Strength_training_muscle_groups_diagram_b1df0e4e.png";
 import dumbbellMuscles from "@assets/generated_images/Dumbbell_workout_muscle_groups_diagram_a4a341dc.png";
 import cardioMuscles from "@assets/generated_images/Cardio_workout_muscle_groups_diagram_7ac7efbc.png";
+import MuscleHeatmap from "@/components/muscle-heatmap";
 
 export default function WorkoutLogger() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -1041,7 +1042,7 @@ export default function WorkoutLogger() {
           <p className="text-sm font-medium text-white mb-3">Muscles Targeted</p>
           <div className="bg-background/60 backdrop-blur-sm rounded-lg p-4 border border-border">
             <img 
-              src={getMuscleGroupImage()} 
+              src={getMuscleGroupImage() || ''} 
               alt={`${selectedCategory} muscle groups targeted`}
               className="w-full max-w-md mx-auto rounded-lg"
               style={{ maxHeight: '300px', objectFit: 'contain' }}
@@ -1144,13 +1145,19 @@ export default function WorkoutLogger() {
                 {/* Target Muscles */}
                 <div>
                   <h3 className="text-lg font-semibold text-gray-800 mb-3">Target Muscles</h3>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-2 mb-4">
                     {getExerciseInstructions(selectedExercise.name).muscles.map((muscle, index) => (
                       <span key={index} className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
                         {muscle}
                       </span>
                     ))}
                   </div>
+                  
+                  {/* Interactive Muscle Heatmap */}
+                  <MuscleHeatmap 
+                    exerciseName={selectedExercise.name}
+                    targetedMuscles={getExerciseInstructions(selectedExercise.name).muscles}
+                  />
                 </div>
 
                 {/* Step-by-Step Instructions */}
