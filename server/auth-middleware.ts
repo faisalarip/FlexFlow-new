@@ -20,12 +20,16 @@ declare global {
 }
 
 /**
- * Middleware to authenticate JWT tokens
+ * Middleware to authenticate JWT tokens (supports both Bearer header and httpOnly cookies)
  */
 export const authenticateToken = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    // Try to get token from Authorization header first, then from cookies
     const authHeader = req.headers.authorization;
-    const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+    const headerToken = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+    const cookieToken = req.cookies && req.cookies['auth-token'];
+    
+    const token = headerToken || cookieToken;
 
     if (!token) {
       return res.status(401).json({ message: "Access token required" });
@@ -52,8 +56,12 @@ export const authenticateToken = async (req: Request, res: Response, next: NextF
  */
 export const optionalAuth = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    // Try to get token from Authorization header first, then from cookies
     const authHeader = req.headers.authorization;
-    const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+    const headerToken = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+    const cookieToken = req.cookies && req.cookies['auth-token'];
+    
+    const token = headerToken || cookieToken;
 
     if (token) {
       // Try to verify token and get user data

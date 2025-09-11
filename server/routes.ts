@@ -28,13 +28,13 @@ import { z } from "zod";
 import { ObjectStorageService } from "./objectStorage";
 import { analyzeFoodImage } from "./foodRecognition";
 import { generatePersonalizedMealPlan, generateWeeklyMealPlan } from "./mealPlanGenerator";
-import { setupAuth } from "./replitAuth";
 import { autoDifficultyAdjuster } from "./auto-difficulty-adjuster";
 import { authService } from "./auth-service";
 import { authenticateToken, optionalAuth, getCurrentUserId as getAuthUserId } from "./auth-middleware";
 import { signUpSchema, signInSchema } from "@shared/schema";
 import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
+import { randomBytes } from "crypto";
 
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
@@ -43,18 +43,64 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2023-10-16",
 });
 
+// Custom state management for OAuth (without sessions)
+interface StateEntry {
+  timestamp: number;
+  ttl: number;
+}
+
+const oauthStates = new Map<string, StateEntry>();
+const STATE_TTL = 10 * 60 * 1000; // 10 minutes
+
+function generateState(): string {
+  const state = randomBytes(32).toString('hex');
+  oauthStates.set(state, {
+    timestamp: Date.now(),
+    ttl: STATE_TTL
+  });
+  return state;
+}
+
+function validateAndRemoveState(state: string): boolean {
+  const entry = oauthStates.get(state);
+  if (!entry) {
+    return false;
+  }
+  
+  // Check if expired
+  if (Date.now() - entry.timestamp > entry.ttl) {
+    oauthStates.delete(state);
+    return false;
+  }
+  
+  // Valid state, remove it (one-time use)
+  oauthStates.delete(state);
+  return true;
+}
+
+// Clean up expired states periodically
+setInterval(() => {
+  const now = Date.now();
+  for (const [state, entry] of oauthStates.entries()) {
+    if (now - entry.timestamp > entry.ttl) {
+      oauthStates.delete(state);
+    }
+  }
+}, 5 * 60 * 1000); // Clean up every 5 minutes
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // Configure Google OAuth Strategy
   if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
     // Get the proper domain for callback URL
     const domain = process.env.REPLIT_DOMAINS || 'localhost:5000';
     const protocol = process.env.REPLIT_DOMAINS ? 'https' : 'http';
-    const callbackURL = `${protocol}://${domain}/api/auth/google/callback`;
+    const callbackURL = `${protocol}://${domain}/auth/google/callback`;
     
     passport.use(new GoogleStrategy({
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       callbackURL: callbackURL
+      // Using custom state management instead of built-in state support
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
@@ -73,19 +119,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     }));
 
-    passport.serializeUser((user, done) => {
-      done(null, user);
-    });
-
-    passport.deserializeUser((user, done) => {
-      done(null, user as any);
-    });
-
     app.use(passport.initialize());
   }
 
-  // Auth middleware
-  await setupAuth(app);
+  // Note: Removed Replit Auth integration as requested
 
   // Auth routes
   app.get('/api/auth/user', authenticateToken, async (req: any, res) => {
@@ -156,13 +193,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get current user (for JWT auth)
+  // Get current user (for JWT auth - supports both Bearer and cookie auth)
   app.get('/api/auth/me', authenticateToken, async (req, res) => {
     try {
       res.json(req.user);
     } catch (error) {
       console.error("Get user error:", error);
       res.status(500).json({ message: "Failed to fetch user data" });
+    }
+  });
+
+  // Check authentication status (for cookie-based auth)
+  app.get('/api/auth/status', optionalAuth, async (req, res) => {
+    try {
+      if (req.user) {
+        res.json({ authenticated: true, user: req.user });
+      } else {
+        res.json({ authenticated: false, user: null });
+      }
+    } catch (error) {
+      console.error("Auth status check error:", error);
+      res.json({ authenticated: false, user: null });
+    }
+  });
+
+  // Logout route (clears auth cookie)
+  app.post('/api/auth/logout', (req, res) => {
+    try {
+      // Clear the auth cookie
+      res.clearCookie('auth-token', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        path: '/'
+      });
+      
+      res.json({ message: "Logged out successfully" });
+    } catch (error) {
+      console.error("Logout error:", error);
+      res.status(500).json({ message: "Failed to logout" });
     }
   });
 
@@ -221,28 +290,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Google OAuth Routes
   if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
-    // Initiate Google OAuth
-    app.get('/api/auth/google',
-      passport.authenticate('google', { scope: ['profile', 'email'] })
-    );
+    // Initiate Google OAuth with custom state management
+    app.get('/auth/google', (req, res, next) => {
+      const state = generateState();
+      passport.authenticate('google', {
+        scope: ['profile', 'email'],
+        state: state
+      })(req, res, next);
+    });
 
-    // Google OAuth callback
-    app.get('/api/auth/google/callback',
-      passport.authenticate('google', { session: false }),
-      (req: any, res) => {
+    // Google OAuth callback with state validation
+    app.get('/auth/google/callback', (req: any, res, next) => {
+      // Validate state parameter
+      const state = req.query.state as string;
+      if (!state || !validateAndRemoveState(state)) {
+        console.error('Invalid or missing state parameter in OAuth callback');
+        return res.redirect('/?error=oauth_state_invalid');
+      }
+      
+      passport.authenticate('google', { session: false })(req, res, next);
+    }, (req: any, res) => {
         try {
           const authResult = req.user;
           
-          // Send token back to frontend
+          // Set secure httpOnly cookie with JWT token
+          const cookieOptions = {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax' as const,
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+            path: '/'
+          };
+          
+          res.cookie('auth-token', authResult.token, cookieOptions);
+          
+          // Redirect to frontend without exposing token in URL
           const domain = process.env.REPLIT_DOMAINS || 'localhost:5000';
           const protocol = process.env.REPLIT_DOMAINS ? 'https' : 'http';
           const frontendURL = `${protocol}://${domain}`;
           
-          // Redirect to frontend with token as URL parameter
-          res.redirect(`${frontendURL}?token=${authResult.token}&user=${encodeURIComponent(JSON.stringify(authResult.user))}`);
+          res.redirect(`${frontendURL}?auth=success`);
         } catch (error) {
           console.error("Google OAuth callback error:", error);
-          res.redirect('/login?error=google_auth_failed');
+          res.redirect('/?error=google_auth_failed');
         }
       }
     );

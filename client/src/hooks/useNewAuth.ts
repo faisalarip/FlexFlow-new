@@ -19,59 +19,66 @@ export function useNewAuth() {
   });
   const queryClient = useQueryClient();
 
-  // Fetch user data with JWT token
+  // Fetch user data with JWT token (supports both Bearer and cookie auth)
   const { data: user, isLoading, error } = useQuery({
     queryKey: ["/api/auth/user"],
     queryFn: async () => {
-      if (!token) return null;
-      
-      const response = await fetch('/api/auth/user', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
+      // Try cookie-based auth first, then fall back to token in localStorage
+      let response = await fetch('/api/auth/status', {
+        credentials: 'include' // Include cookies
       });
       
-      if (!response.ok) {
-        if (response.status === 401) {
+      if (response.ok) {
+        const data = await response.json();
+        if (data.authenticated) {
+          return data.user;
+        }
+      }
+      
+      // Fall back to Bearer token if cookie auth failed and we have a stored token
+      if (token) {
+        response = await fetch('/api/auth/user', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+        
+        if (response.ok) {
+          return response.json();
+        } else if (response.status === 401) {
           // Token is invalid, clear it
           localStorage.removeItem('auth-token');
           setToken(null);
         }
-        throw new Error('Failed to fetch user');
       }
       
-      return response.json();
+      return null;
     },
-    enabled: !!token,
     retry: false,
   });
 
-  // Handle OAuth callback
+  // Handle OAuth callback (now cookie-based, no tokens in URL)
   useEffect(() => {
     const handleOAuthCallback = () => {
       const urlParams = new URLSearchParams(window.location.search);
-      const oauthToken = urlParams.get('token');
-      const userDataStr = urlParams.get('user');
+      const authSuccess = urlParams.get('auth');
+      const authError = urlParams.get('error');
       
-      if (oauthToken && userDataStr && localStorage.getItem('oauth-in-progress')) {
-        try {
-          const userData = JSON.parse(decodeURIComponent(userDataStr));
-          
-          // Store token and user data
-          localStorage.setItem('auth-token', oauthToken);
-          setToken(oauthToken);
-          
-          // Clear OAuth flags
-          localStorage.removeItem('oauth-in-progress');
-          
-          // Clear URL parameters
-          window.history.replaceState({}, document.title, window.location.pathname);
-          
-          // Invalidate queries to refetch with new token
-          queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
-        } catch (error) {
-          console.error('Failed to parse OAuth callback data:', error);
-        }
+      if (authSuccess === 'success' && localStorage.getItem('oauth-in-progress')) {
+        // OAuth success - cookie is already set by server
+        localStorage.removeItem('oauth-in-progress');
+        
+        // Clear URL parameters
+        window.history.replaceState({}, document.title, window.location.pathname);
+        
+        // Invalidate queries to refetch with new cookie
+        queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+      } else if (authError) {
+        console.error('OAuth error:', authError);
+        localStorage.removeItem('oauth-in-progress');
+        
+        // Clear URL parameters
+        window.history.replaceState({}, document.title, window.location.pathname);
       }
     };
 
@@ -85,6 +92,16 @@ export function useNewAuth() {
   };
 
   const signOut = async () => {
+    try {
+      // Call logout endpoint to clear cookie
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include'
+      });
+    } catch (error) {
+      console.error('Failed to logout:', error);
+    }
+    
     localStorage.removeItem('auth-token');
     setToken(null);
     queryClient.clear();

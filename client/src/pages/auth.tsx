@@ -108,7 +108,7 @@ export default function AuthPage({ mode = "signup" }: AuthPageProps) {
     setIsLoading(true);
     // Store a flag to handle the OAuth callback
     localStorage.setItem('oauth-in-progress', 'true');
-    window.location.href = '/api/auth/google';
+    window.location.href = '/auth/google';
   };
 
   const toggleMode = () => {

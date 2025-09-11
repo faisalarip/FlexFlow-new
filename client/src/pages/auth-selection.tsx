@@ -103,7 +103,7 @@ export default function AuthSelection() {
           <Button
             onClick={() => {
               localStorage.setItem('oauth-in-progress', 'true');
-              window.location.href = '/api/auth/google';
+              window.location.href = '/auth/google';
             }}
             variant="outline"
             className="w-full h-16 border-2 border-blue-500 text-blue-600 hover:bg-blue-50 text-lg font-medium"
@@ -123,23 +123,6 @@ export default function AuthSelection() {
             </div>
           </Button>
 
-          {/* Continue with Replit (existing auth) */}
-          <Button
-            onClick={() => window.location.href = "/api/login"}
-            variant="outline"
-            className="w-full h-16 border-2 border-gray-300 text-gray-700 hover:bg-gray-50 text-lg font-medium"
-            data-testid="replit-auth-button"
-          >
-            <div className="flex items-center justify-center space-x-3">
-              <div className="w-6 h-6 bg-orange-500 rounded flex items-center justify-center text-white text-xs font-bold">
-                R
-              </div>
-              <div className="text-left">
-                <div>Continue with Replit</div>
-                <div className="text-sm text-gray-600 font-normal">Use your existing Replit account</div>
-              </div>
-            </div>
-          </Button>
         </div>
 
         {/* Footer */}
