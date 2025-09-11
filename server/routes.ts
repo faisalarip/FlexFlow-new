@@ -46,10 +46,15 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 export async function registerRoutes(app: Express): Promise<Server> {
   // Configure Google OAuth Strategy
   if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+    // Get the proper domain for callback URL
+    const domain = process.env.REPLIT_DOMAINS || 'localhost:5000';
+    const protocol = process.env.REPLIT_DOMAINS ? 'https' : 'http';
+    const callbackURL = `${protocol}://${domain}/api/auth/google/callback`;
+    
     passport.use(new GoogleStrategy({
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: "/api/auth/google/callback"
+      callbackURL: callbackURL
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
@@ -229,9 +234,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const authResult = req.user;
           
           // Send token back to frontend
-          const frontendURL = process.env.NODE_ENV === 'production' 
-            ? 'https://your-production-domain.com' 
-            : 'http://localhost:5000';
+          const domain = process.env.REPLIT_DOMAINS || 'localhost:5000';
+          const protocol = process.env.REPLIT_DOMAINS ? 'https' : 'http';
+          const frontendURL = `${protocol}://${domain}`;
           
           // Redirect to frontend with token as URL parameter
           res.redirect(`${frontendURL}?token=${authResult.token}&user=${encodeURIComponent(JSON.stringify(authResult.user))}`);
