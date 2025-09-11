@@ -48,6 +48,7 @@ export default function WelcomeSection() {
               <h2 className="text-2xl md:text-3xl font-bold">
                 {greeting}{userName ? `, ${userName}` : ''}!
               </h2>
+              <p className="text-lg font-semibold text-red-400 mb-2">Eat Clean, Think Smart, Train HARD!</p>
               <p className="text-lg opacity-90">Ready to crush your fitness goals today?</p>
             </div>
           </div>

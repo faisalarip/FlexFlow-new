@@ -61,6 +61,10 @@ export default function Landing() {
             Starts Here
           </h1>
           
+          <p className="text-2xl font-bold text-red-400 mb-4">
+            Eat Clean, Think Smart, Train HARD!
+          </p>
+          
           <p className="text-xl text-gray-300 max-w-2xl mx-auto">
             Track workouts, compete with friends, and achieve your fitness goals with FlexFlow.
           </p>

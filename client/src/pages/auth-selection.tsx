@@ -55,6 +55,7 @@ export default function AuthSelection() {
             </div>
           </div>
           <h1 className="text-3xl font-bold text-white mb-2">Welcome to FlexFlow</h1>
+          <p className="text-red-100 font-semibold text-lg mb-2">Eat Clean, Think Smart, Train HARD!</p>
           <p className="text-red-100">Choose how you'd like to access your account</p>
         </div>
 
