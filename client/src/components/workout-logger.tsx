@@ -1111,11 +1111,9 @@ export default function WorkoutLogger() {
           .map((exercise) => {
           const IconComponent = exercise.icon;
           return (
-            <button
+            <div
               key={exercise.name}
-              onClick={() => handleExerciseClick(exercise)}
-              disabled={createWorkoutMutation.isPending}
-              className={`bg-gradient-to-br from-${exercise.color}-50 to-${exercise.color}-100 border border-${exercise.color}-200 rounded-xl p-4 text-left hover:from-${exercise.color}-100 hover:to-${exercise.color}-200 transition-all group disabled:opacity-50`}
+              className={`bg-gradient-to-br from-${exercise.color}-50 to-${exercise.color}-100 border border-${exercise.color}-200 rounded-xl p-4 hover:from-${exercise.color}-100 hover:to-${exercise.color}-200 transition-all group ${createWorkoutMutation.isPending ? 'opacity-50 pointer-events-none' : 'cursor-pointer'}`}
               data-testid={`exercise-${exercise.name.toLowerCase().replace(/\s+/g, '-')}`}
             >
               <div className="flex items-center space-x-3 mb-2">
@@ -1124,16 +1122,22 @@ export default function WorkoutLogger() {
               </div>
               <p className="text-xs text-muted">{exercise.description}</p>
               <div className="flex items-center justify-between mt-2 text-xs text-gray-500">
-                <div className="flex items-center">
+                <button
+                  onClick={() => handleExerciseClick(exercise)}
+                  disabled={createWorkoutMutation.isPending}
+                  className="flex items-center hover:text-gray-700 transition-colors"
+                  data-testid={`instructions-${exercise.name.toLowerCase().replace(/\s+/g, '-')}`}
+                >
                   <Play className="w-3 h-3 mr-1" />
                   <span>View instructions</span>
-                </div>
+                </button>
                 {exercise.category === "dumbbells" && (
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       handleShowAnimation(exercise);
                     }}
+                    disabled={createWorkoutMutation.isPending}
                     className="flex items-center text-blue-600 hover:text-blue-800 transition-colors"
                     data-testid={`animation-${exercise.name.toLowerCase().replace(/\s+/g, '-')}`}
                   >
@@ -1142,7 +1146,7 @@ export default function WorkoutLogger() {
                   </button>
                 )}
               </div>
-            </button>
+            </div>
           );
         }) : (
           <div className="col-span-full text-center py-8">
