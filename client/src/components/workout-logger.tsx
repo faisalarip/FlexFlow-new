@@ -942,6 +942,7 @@ export default function WorkoutLogger() {
   // Exercise animation definitions
   const getExerciseAnimation = (exerciseName: string) => {
     const animations: Record<string, { movement: string, description: string, keypoints: string[] }> = {
+      // Dumbbell Exercises
       "Dumbbell Press": {
         movement: "press-animation",
         description: "Chest press with controlled movement",
@@ -971,13 +972,106 @@ export default function WorkoutLogger() {
         movement: "lunge-animation",
         description: "Alternating lunge movement",
         keypoints: ["Step forward into lunge", "Lower back knee down", "Push back to start", "Alternate legs"]
+      },
+      
+      // Strength Exercises
+      "Push-ups": {
+        movement: "pushup-animation",
+        description: "Upper body bodyweight exercise",
+        keypoints: ["Keep body straight", "Lower chest to ground", "Push up with control", "Engage core throughout"]
+      },
+      "Squats": {
+        movement: "squat-animation",
+        description: "Lower body compound movement",
+        keypoints: ["Feet shoulder-width apart", "Lower hips back and down", "Keep chest up", "Drive through heels"]
+      },
+      "Pull-ups": {
+        movement: "pullup-animation",
+        description: "Upper body pulling exercise",
+        keypoints: ["Hang with straight arms", "Pull chin over bar", "Lower with control", "Engage lats and biceps"]
+      },
+      "Plank": {
+        movement: "plank-animation",
+        description: "Core stability exercise",
+        keypoints: ["Keep body straight", "Engage core muscles", "Hold steady position", "Breathe normally"]
+      },
+      "Deadlifts": {
+        movement: "deadlift-animation",
+        description: "Full body compound lift",
+        keypoints: ["Keep back straight", "Lift with legs", "Stand tall at top", "Lower with control"]
+      },
+      
+      // Cardio Exercises
+      "Running": {
+        movement: "running-animation",
+        description: "Cardiovascular endurance exercise",
+        keypoints: ["Land on midfoot", "Keep arms relaxed", "Maintain steady rhythm", "Breathe rhythmically"]
+      },
+      "Burpees": {
+        movement: "burpee-animation",
+        description: "Full body cardio movement",
+        keypoints: ["Drop to pushup position", "Jump feet back in", "Stand and jump up", "Move with control"]
+      },
+      "Jumping Jacks": {
+        movement: "jumping-jacks-animation",
+        description: "Quick cardio burst",
+        keypoints: ["Jump feet apart", "Raise arms overhead", "Jump feet together", "Keep light on feet"]
+      },
+      "Mountain Climbers": {
+        movement: "mountain-climbers-animation",
+        description: "Core cardio exercise",
+        keypoints: ["Start in plank position", "Alternate knee drives", "Keep hips level", "Maintain fast pace"]
+      },
+      
+      // Yoga Exercises
+      "Yoga": {
+        movement: "yoga-flow-animation",
+        description: "Flexibility and mindfulness practice",
+        keypoints: ["Move with breath", "Hold poses steadily", "Focus on alignment", "Stay present and calm"]
+      },
+      "Sun Salutation": {
+        movement: "sun-salutation-animation",
+        description: "Classic yoga flow sequence",
+        keypoints: ["Coordinate with breath", "Flow between poses", "Keep movements smooth", "Stay centered"]
+      },
+      "Warrior Pose": {
+        movement: "warrior-pose-animation",
+        description: "Strength and balance pose",
+        keypoints: ["Ground through feet", "Extend through arms", "Keep front thigh parallel", "Breathe deeply"]
+      },
+      "Downward Dog": {
+        movement: "downward-dog-animation",
+        description: "Full body stretch pose",
+        keypoints: ["Press hands down", "Lift hips up", "Straighten legs", "Create inverted V shape"]
+      },
+      
+      // Swimming Exercises
+      "Swimming": {
+        movement: "swimming-animation",
+        description: "Full body cardio exercise",
+        keypoints: ["Streamline body position", "Coordinate breathing", "Maintain steady rhythm", "Use whole body"]
+      },
+      "Freestyle": {
+        movement: "freestyle-animation",
+        description: "Front crawl swimming stroke",
+        keypoints: ["Rotate body side to side", "High elbow catch", "Breathe to one side", "Kick from hips"]
+      },
+      "Backstroke": {
+        movement: "backstroke-animation",
+        description: "Back swimming stroke",
+        keypoints: ["Keep body flat", "Rotate shoulders", "Breathe freely", "Keep head still"]
+      },
+      "Breaststroke": {
+        movement: "breaststroke-animation",
+        description: "Chest stroke technique",
+        keypoints: ["Pull, breathe, kick, glide", "Keep head in line", "Symmetric movements", "Time the rhythm"]
       }
     };
     
     return animations[exerciseName] || {
       movement: "generic-animation",
       description: "Controlled movement pattern",
-      keypoints: ["Maintain proper form", "Control the weight", "Breathe steadily", "Focus on target muscles"]
+      keypoints: ["Maintain proper form", "Control the movement", "Breathe steadily", "Focus on target muscles"]
     };
   };
 
@@ -1131,7 +1225,7 @@ export default function WorkoutLogger() {
                   <Play className="w-3 h-3 mr-1" />
                   <span>View instructions</span>
                 </button>
-                {exercise.category === "dumbbells" && (
+                {["strength", "cardio", "yoga", "swimming", "dumbbells"].includes(exercise.category) && (
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
@@ -1445,6 +1539,8 @@ export default function WorkoutLogger() {
                       data-testid="exercise-animation-figure"
                     >
                       {/* Exercise-specific animated elements */}
+                      
+                      {/* Dumbbell Exercises */}
                       {animatingExercise.name === "Dumbbell Press" && (
                         <div className="dumbbell-press-figure">
                           <div className="figure-body"></div>
@@ -1497,12 +1593,133 @@ export default function WorkoutLogger() {
                           <div className="dumbbell right-dumbbell"></div>
                         </div>
                       )}
+                      
+                      {/* Strength Exercises */}
+                      {animatingExercise.name === "Push-ups" && (
+                        <div className="pushup-figure">
+                          <div className="figure-body"></div>
+                          <div className="arm left-arm"></div>
+                          <div className="arm right-arm"></div>
+                        </div>
+                      )}
+                      {(animatingExercise.name === "Squats" || animatingExercise.name === "Lunges") && (
+                        <div className="squat-figure">
+                          <div className="figure-body"></div>
+                          <div className="leg left-leg"></div>
+                          <div className="leg right-leg"></div>
+                        </div>
+                      )}
+                      {animatingExercise.name === "Pull-ups" && (
+                        <div className="pullup-figure">
+                          <div className="figure-body"></div>
+                          <div className="arm left-arm"></div>
+                          <div className="arm right-arm"></div>
+                          <div className="bar pullup-bar"></div>
+                        </div>
+                      )}
+                      {animatingExercise.name === "Plank" && (
+                        <div className="plank-figure">
+                          <div className="figure-body"></div>
+                          <div className="arm left-arm"></div>
+                          <div className="arm right-arm"></div>
+                        </div>
+                      )}
+                      {animatingExercise.name === "Deadlifts" && (
+                        <div className="deadlift-figure">
+                          <div className="figure-body"></div>
+                          <div className="barbell"></div>
+                        </div>
+                      )}
+                      
+                      {/* Cardio Exercises */}
+                      {animatingExercise.name === "Running" && (
+                        <div className="running-figure">
+                          <div className="figure-body"></div>
+                          <div className="leg left-leg"></div>
+                          <div className="leg right-leg"></div>
+                          <div className="arm left-arm"></div>
+                          <div className="arm right-arm"></div>
+                        </div>
+                      )}
+                      {animatingExercise.name === "Burpees" && (
+                        <div className="burpee-figure">
+                          <div className="figure-body"></div>
+                          <div className="leg left-leg"></div>
+                          <div className="leg right-leg"></div>
+                          <div className="arm left-arm"></div>
+                          <div className="arm right-arm"></div>
+                        </div>
+                      )}
+                      {animatingExercise.name === "Jumping Jacks" && (
+                        <div className="jumping-jacks-figure">
+                          <div className="figure-body"></div>
+                          <div className="leg left-leg"></div>
+                          <div className="leg right-leg"></div>
+                          <div className="arm left-arm"></div>
+                          <div className="arm right-arm"></div>
+                        </div>
+                      )}
+                      {animatingExercise.name === "Mountain Climbers" && (
+                        <div className="mountain-climbers-figure">
+                          <div className="figure-body"></div>
+                          <div className="leg left-leg"></div>
+                          <div className="leg right-leg"></div>
+                          <div className="arm left-arm"></div>
+                          <div className="arm right-arm"></div>
+                        </div>
+                      )}
+                      
+                      {/* Yoga Exercises */}
+                      {(animatingExercise.name === "Yoga" || animatingExercise.name === "Sun Salutation") && (
+                        <div className="yoga-flow-figure">
+                          <div className="figure-body"></div>
+                          <div className="arm left-arm"></div>
+                          <div className="arm right-arm"></div>
+                          <div className="leg left-leg"></div>
+                          <div className="leg right-leg"></div>
+                        </div>
+                      )}
+                      {animatingExercise.name === "Warrior Pose" && (
+                        <div className="warrior-pose-figure">
+                          <div className="figure-body"></div>
+                          <div className="arm left-arm"></div>
+                          <div className="arm right-arm"></div>
+                          <div className="leg left-leg"></div>
+                          <div className="leg right-leg"></div>
+                        </div>
+                      )}
+                      {animatingExercise.name === "Downward Dog" && (
+                        <div className="downward-dog-figure">
+                          <div className="figure-body"></div>
+                          <div className="arm left-arm"></div>
+                          <div className="arm right-arm"></div>
+                          <div className="leg left-leg"></div>
+                          <div className="leg right-leg"></div>
+                        </div>
+                      )}
+                      
+                      {/* Swimming Exercises */}
+                      {(animatingExercise.name === "Swimming" || animatingExercise.name === "Freestyle" || animatingExercise.name === "Backstroke" || animatingExercise.name === "Breaststroke") && (
+                        <div className="swimming-figure">
+                          <div className="figure-body"></div>
+                          <div className="arm left-arm"></div>
+                          <div className="arm right-arm"></div>
+                          <div className="leg left-leg"></div>
+                          <div className="leg right-leg"></div>
+                          <div className="water-waves"></div>
+                        </div>
+                      )}
+                      
                       {/* Generic animation for other exercises */}
-                      {!["Dumbbell Press", "Dumbbell Curls", "Dumbbell Shoulder Press", "Dumbbell Rows", "Dumbbell Squats", "Dumbbell Lunges"].includes(animatingExercise.name) && (
+                      {!["Dumbbell Press", "Dumbbell Curls", "Dumbbell Shoulder Press", "Dumbbell Rows", "Dumbbell Squats", "Dumbbell Lunges", 
+                          "Push-ups", "Squats", "Pull-ups", "Plank", "Deadlifts", "Lunges",
+                          "Running", "Burpees", "Jumping Jacks", "Mountain Climbers",
+                          "Yoga", "Sun Salutation", "Warrior Pose", "Downward Dog",
+                          "Swimming", "Freestyle", "Backstroke", "Breaststroke"].includes(animatingExercise.name) && (
                         <div className="generic-exercise-figure">
                           <div className="figure-body"></div>
-                          <div className="dumbbell left-dumbbell"></div>
-                          <div className="dumbbell right-dumbbell"></div>
+                          <div className="arm left-arm"></div>
+                          <div className="arm right-arm"></div>
                         </div>
                       )}
                     </div>
