@@ -1030,7 +1030,7 @@ export default function WorkoutLogger() {
         keypoints: ["Move with breath", "Hold poses steadily", "Focus on alignment", "Stay present and calm"]
       },
       "Sun Salutation": {
-        movement: "sun-salutation-animation",
+        movement: "yoga-flow-animation",
         description: "Classic yoga flow sequence",
         keypoints: ["Coordinate with breath", "Flow between poses", "Keep movements smooth", "Stay centered"]
       },
@@ -1052,17 +1052,17 @@ export default function WorkoutLogger() {
         keypoints: ["Streamline body position", "Coordinate breathing", "Maintain steady rhythm", "Use whole body"]
       },
       "Freestyle": {
-        movement: "freestyle-animation",
+        movement: "swimming-animation",
         description: "Front crawl swimming stroke",
         keypoints: ["Rotate body side to side", "High elbow catch", "Breathe to one side", "Kick from hips"]
       },
       "Backstroke": {
-        movement: "backstroke-animation",
+        movement: "swimming-animation",
         description: "Back swimming stroke",
         keypoints: ["Keep body flat", "Rotate shoulders", "Breathe freely", "Keep head still"]
       },
       "Breaststroke": {
-        movement: "breaststroke-animation",
+        movement: "swimming-animation",
         description: "Chest stroke technique",
         keypoints: ["Pull, breathe, kick, glide", "Keep head in line", "Symmetric movements", "Time the rhythm"]
       }
