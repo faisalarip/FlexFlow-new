@@ -409,21 +409,772 @@
     50% { transform: translateY(15px) translateX(10px); }
   }
 
+  /* Additional element styles */
+  .bar {
+    width: 80px;
+    height: 6px;
+    background: #4b5563;
+    border-radius: 3px;
+    position: absolute;
+    z-index: 1;
+  }
+
+  .pullup-bar {
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .barbell {
+    width: 60px;
+    height: 8px;
+    background: #374151;
+    border-radius: 4px;
+    position: absolute;
+    top: 90px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1;
+  }
+
+  .barbell::before,
+  .barbell::after {
+    content: '';
+    position: absolute;
+    width: 12px;
+    height: 16px;
+    background: #1f2937;
+    border-radius: 2px;
+  }
+
+  .barbell::before {
+    left: -4px;
+    top: -4px;
+  }
+
+  .barbell::after {
+    right: -4px;
+    top: -4px;
+  }
+
+  .water-waves {
+    position: absolute;
+    bottom: 10px;
+    left: 0;
+    right: 0;
+    height: 20px;
+    background: linear-gradient(90deg, #3b82f6, #1d4ed8, #3b82f6);
+    border-radius: 10px;
+    opacity: 0.6;
+    animation: wave-flow 2s ease-in-out infinite;
+  }
+
+  @keyframes wave-flow {
+    0%, 100% { transform: scaleX(1) scaleY(1); }
+    50% { transform: scaleX(1.1) scaleY(0.8); }
+  }
+
+  /* Strength Exercise Animations */
+  
+  /* Push-ups Animation */
+  .pushup-animation .pushup-figure {
+    animation: pushup-body 2.5s ease-in-out infinite;
+  }
+
+  .pushup-animation .left-arm {
+    left: 15px;
+    top: 45px;
+    transform-origin: top;
+    animation: pushup-left-arm 2.5s ease-in-out infinite;
+  }
+
+  .pushup-animation .right-arm {
+    right: 15px;
+    top: 45px;
+    transform-origin: top;
+    animation: pushup-right-arm 2.5s ease-in-out infinite;
+  }
+
+  @keyframes pushup-body {
+    0%, 100% { transform: translateY(0px) rotateX(0deg); }
+    50% { transform: translateY(15px) rotateX(-5deg); }
+  }
+
+  @keyframes pushup-left-arm {
+    0%, 100% { transform: rotate(-30deg); }
+    50% { transform: rotate(-60deg); }
+  }
+
+  @keyframes pushup-right-arm {
+    0%, 100% { transform: rotate(30deg); }
+    50% { transform: rotate(60deg); }
+  }
+
+  /* Pull-ups Animation */
+  .pullup-animation .pullup-figure {
+    animation: pullup-body 3s ease-in-out infinite;
+  }
+
+  .pullup-animation .left-arm {
+    left: 25px;
+    top: 30px;
+    animation: pullup-left-arm 3s ease-in-out infinite;
+  }
+
+  .pullup-animation .right-arm {
+    right: 25px;
+    top: 30px;
+    animation: pullup-right-arm 3s ease-in-out infinite;
+  }
+
+  @keyframes pullup-body {
+    0%, 100% { transform: translateY(20px); }
+    50% { transform: translateY(-10px); }
+  }
+
+  @keyframes pullup-left-arm {
+    0%, 100% { transform: rotate(-20deg) translateY(10px); }
+    50% { transform: rotate(-45deg) translateY(-10px); }
+  }
+
+  @keyframes pullup-right-arm {
+    0%, 100% { transform: rotate(20deg) translateY(10px); }
+    50% { transform: rotate(45deg) translateY(-10px); }
+  }
+
+  /* Plank Animation */
+  .plank-animation .plank-figure {
+    animation: plank-body 4s ease-in-out infinite;
+  }
+
+  .plank-animation .left-arm {
+    left: 15px;
+    top: 50px;
+    animation: plank-left-arm 4s ease-in-out infinite;
+  }
+
+  .plank-animation .right-arm {
+    right: 15px;
+    top: 50px;
+    animation: plank-right-arm 4s ease-in-out infinite;
+  }
+
+  @keyframes plank-body {
+    0%, 100% { transform: translateY(0px) rotateX(0deg); }
+    25% { transform: translateY(-2px) rotateX(1deg); }
+    75% { transform: translateY(2px) rotateX(-1deg); }
+  }
+
+  @keyframes plank-left-arm {
+    0%, 100% { transform: rotate(-15deg); }
+    50% { transform: rotate(-10deg); }
+  }
+
+  @keyframes plank-right-arm {
+    0%, 100% { transform: rotate(15deg); }
+    50% { transform: rotate(10deg); }
+  }
+
+  /* Deadlift Animation */
+  .deadlift-animation .deadlift-figure {
+    animation: deadlift-body 3.5s ease-in-out infinite;
+  }
+
+  .deadlift-animation .barbell {
+    animation: deadlift-barbell 3.5s ease-in-out infinite;
+  }
+
+  @keyframes deadlift-body {
+    0%, 100% { transform: translateY(20px) rotateX(15deg); }
+    50% { transform: translateY(0px) rotateX(0deg); }
+  }
+
+  @keyframes deadlift-barbell {
+    0%, 100% { transform: translateX(-50%) translateY(20px); }
+    50% { transform: translateX(-50%) translateY(-10px); }
+  }
+
+  /* Cardio Exercise Animations */
+  
+  /* Running Animation */
+  .running-animation .running-figure {
+    animation: running-body 1.5s ease-in-out infinite;
+  }
+
+  .running-animation .left-leg {
+    left: 22px;
+    animation: running-left-leg 1.5s ease-in-out infinite;
+  }
+
+  .running-animation .right-leg {
+    right: 22px;
+    animation: running-right-leg 1.5s ease-in-out infinite;
+  }
+
+  .running-animation .left-arm {
+    left: 15px;
+    top: 45px;
+    animation: running-left-arm 1.5s ease-in-out infinite;
+  }
+
+  .running-animation .right-arm {
+    right: 15px;
+    top: 45px;
+    animation: running-right-arm 1.5s ease-in-out infinite;
+  }
+
+  @keyframes running-body {
+    0%, 100% { transform: translateY(0px) translateX(0px); }
+    25% { transform: translateY(-5px) translateX(2px); }
+    75% { transform: translateY(-5px) translateX(-2px); }
+  }
+
+  @keyframes running-left-leg {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(30deg); }
+  }
+
+  @keyframes running-right-leg {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(-30deg); }
+  }
+
+  @keyframes running-left-arm {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(-45deg); }
+  }
+
+  @keyframes running-right-arm {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(45deg); }
+  }
+
+  /* Burpee Animation */
+  .burpee-animation .burpee-figure {
+    animation: burpee-body 4s ease-in-out infinite;
+  }
+
+  .burpee-animation .left-leg {
+    left: 22px;
+    animation: burpee-left-leg 4s ease-in-out infinite;
+  }
+
+  .burpee-animation .right-leg {
+    right: 22px;
+    animation: burpee-right-leg 4s ease-in-out infinite;
+  }
+
+  .burpee-animation .left-arm {
+    left: 15px;
+    top: 45px;
+    animation: burpee-left-arm 4s ease-in-out infinite;
+  }
+
+  .burpee-animation .right-arm {
+    right: 15px;
+    top: 45px;
+    animation: burpee-right-arm 4s ease-in-out infinite;
+  }
+
+  @keyframes burpee-body {
+    0%, 100% { transform: translateY(0px) rotateX(0deg); }
+    25% { transform: translateY(15px) rotateX(-10deg); }
+    50% { transform: translateY(0px) rotateX(0deg); }
+    75% { transform: translateY(-15px) rotateX(0deg); }
+  }
+
+  @keyframes burpee-left-leg {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-45deg); }
+    75% { transform: rotate(0deg); }
+  }
+
+  @keyframes burpee-right-leg {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(45deg); }
+    75% { transform: rotate(0deg); }
+  }
+
+  @keyframes burpee-left-arm {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-30deg); }
+    75% { transform: rotate(-90deg); }
+  }
+
+  @keyframes burpee-right-arm {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(30deg); }
+    75% { transform: rotate(90deg); }
+  }
+
+  /* Jumping Jacks Animation */
+  .jumping-jacks-animation .jumping-jacks-figure {
+    animation: jumping-jacks-body 2s ease-in-out infinite;
+  }
+
+  .jumping-jacks-animation .left-leg {
+    left: 22px;
+    animation: jumping-jacks-left-leg 2s ease-in-out infinite;
+  }
+
+  .jumping-jacks-animation .right-leg {
+    right: 22px;
+    animation: jumping-jacks-right-leg 2s ease-in-out infinite;
+  }
+
+  .jumping-jacks-animation .left-arm {
+    left: 15px;
+    top: 45px;
+    animation: jumping-jacks-left-arm 2s ease-in-out infinite;
+  }
+
+  .jumping-jacks-animation .right-arm {
+    right: 15px;
+    top: 45px;
+    animation: jumping-jacks-right-arm 2s ease-in-out infinite;
+  }
+
+  @keyframes jumping-jacks-body {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+
+  @keyframes jumping-jacks-left-leg {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(-30deg); }
+  }
+
+  @keyframes jumping-jacks-right-leg {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(30deg); }
+  }
+
+  @keyframes jumping-jacks-left-arm {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(-90deg); }
+  }
+
+  @keyframes jumping-jacks-right-arm {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(90deg); }
+  }
+
+  /* Mountain Climbers Animation */
+  .mountain-climbers-animation .mountain-climbers-figure {
+    animation: mountain-climbers-body 1.5s ease-in-out infinite;
+  }
+
+  .mountain-climbers-animation .left-leg {
+    left: 22px;
+    animation: mountain-climbers-left-leg 1.5s ease-in-out infinite;
+  }
+
+  .mountain-climbers-animation .right-leg {
+    right: 22px;
+    animation: mountain-climbers-right-leg 1.5s ease-in-out infinite;
+  }
+
+  .mountain-climbers-animation .left-arm {
+    left: 15px;
+    top: 45px;
+    animation: mountain-climbers-left-arm 1.5s ease-in-out infinite;
+  }
+
+  .mountain-climbers-animation .right-arm {
+    right: 15px;
+    top: 45px;
+    animation: mountain-climbers-right-arm 1.5s ease-in-out infinite;
+  }
+
+  @keyframes mountain-climbers-body {
+    0%, 100% { transform: translateY(0px) rotateX(0deg); }
+    50% { transform: translateY(5px) rotateX(-5deg); }
+  }
+
+  @keyframes mountain-climbers-left-leg {
+    0%, 100% { transform: rotate(-45deg) translateY(20px); }
+    50% { transform: rotate(-90deg) translateY(-10px); }
+  }
+
+  @keyframes mountain-climbers-right-leg {
+    0%, 100% { transform: rotate(45deg) translateY(20px); }
+    50% { transform: rotate(90deg) translateY(-10px); }
+  }
+
+  @keyframes mountain-climbers-left-arm {
+    0%, 100% { transform: rotate(-15deg); }
+    50% { transform: rotate(-20deg); }
+  }
+
+  @keyframes mountain-climbers-right-arm {
+    0%, 100% { transform: rotate(15deg); }
+    50% { transform: rotate(20deg); }
+  }
+
+  /* Yoga Exercise Animations */
+  
+  /* Yoga Flow Animation */
+  .yoga-flow-animation .yoga-flow-figure {
+    animation: yoga-flow-body 6s ease-in-out infinite;
+  }
+
+  .yoga-flow-animation .left-arm {
+    left: 15px;
+    top: 45px;
+    animation: yoga-flow-left-arm 6s ease-in-out infinite;
+  }
+
+  .yoga-flow-animation .right-arm {
+    right: 15px;
+    top: 45px;
+    animation: yoga-flow-right-arm 6s ease-in-out infinite;
+  }
+
+  .yoga-flow-animation .left-leg {
+    left: 22px;
+    animation: yoga-flow-left-leg 6s ease-in-out infinite;
+  }
+
+  .yoga-flow-animation .right-leg {
+    right: 22px;
+    animation: yoga-flow-right-leg 6s ease-in-out infinite;
+  }
+
+  @keyframes yoga-flow-body {
+    0%, 100% { transform: translateY(0px) rotateX(0deg); }
+    33% { transform: translateY(-10px) rotateX(10deg); }
+    66% { transform: translateY(10px) rotateX(-10deg); }
+  }
+
+  @keyframes yoga-flow-left-arm {
+    0%, 100% { transform: rotate(0deg); }
+    33% { transform: rotate(-90deg); }
+    66% { transform: rotate(45deg); }
+  }
+
+  @keyframes yoga-flow-right-arm {
+    0%, 100% { transform: rotate(0deg); }
+    33% { transform: rotate(90deg); }
+    66% { transform: rotate(-45deg); }
+  }
+
+  @keyframes yoga-flow-left-leg {
+    0%, 100% { transform: rotate(0deg); }
+    33% { transform: rotate(-15deg); }
+    66% { transform: rotate(30deg); }
+  }
+
+  @keyframes yoga-flow-right-leg {
+    0%, 100% { transform: rotate(0deg); }
+    33% { transform: rotate(15deg); }
+    66% { transform: rotate(-30deg); }
+  }
+
+  /* Warrior Pose Animation */
+  .warrior-pose-animation .warrior-pose-figure {
+    animation: warrior-pose-body 5s ease-in-out infinite;
+  }
+
+  .warrior-pose-animation .left-arm {
+    left: 5px;
+    top: 35px;
+    animation: warrior-pose-left-arm 5s ease-in-out infinite;
+  }
+
+  .warrior-pose-animation .right-arm {
+    right: 5px;
+    top: 35px;
+    animation: warrior-pose-right-arm 5s ease-in-out infinite;
+  }
+
+  .warrior-pose-animation .left-leg {
+    left: 15px;
+    animation: warrior-pose-left-leg 5s ease-in-out infinite;
+  }
+
+  .warrior-pose-animation .right-leg {
+    right: 15px;
+    animation: warrior-pose-right-leg 5s ease-in-out infinite;
+  }
+
+  @keyframes warrior-pose-body {
+    0%, 100% { transform: translateY(0px) rotateY(0deg); }
+    50% { transform: translateY(-5px) rotateY(5deg); }
+  }
+
+  @keyframes warrior-pose-left-arm {
+    0%, 100% { transform: rotate(-90deg) translateY(-10px); }
+    50% { transform: rotate(-85deg) translateY(-15px); }
+  }
+
+  @keyframes warrior-pose-right-arm {
+    0%, 100% { transform: rotate(90deg) translateY(-10px); }
+    50% { transform: rotate(85deg) translateY(-15px); }
+  }
+
+  @keyframes warrior-pose-left-leg {
+    0%, 100% { transform: rotate(-30deg); }
+    50% { transform: rotate(-35deg); }
+  }
+
+  @keyframes warrior-pose-right-leg {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(5deg); }
+  }
+
+  /* Downward Dog Animation */
+  .downward-dog-animation .downward-dog-figure {
+    animation: downward-dog-body 4s ease-in-out infinite;
+  }
+
+  .downward-dog-animation .left-arm {
+    left: 10px;
+    top: 60px;
+    animation: downward-dog-left-arm 4s ease-in-out infinite;
+  }
+
+  .downward-dog-animation .right-arm {
+    right: 10px;
+    top: 60px;
+    animation: downward-dog-right-arm 4s ease-in-out infinite;
+  }
+
+  .downward-dog-animation .left-leg {
+    left: 18px;
+    animation: downward-dog-left-leg 4s ease-in-out infinite;
+  }
+
+  .downward-dog-animation .right-leg {
+    right: 18px;
+    animation: downward-dog-right-leg 4s ease-in-out infinite;
+  }
+
+  @keyframes downward-dog-body {
+    0%, 100% { transform: translateY(-15px) rotateX(45deg); }
+    50% { transform: translateY(-20px) rotateX(50deg); }
+  }
+
+  @keyframes downward-dog-left-arm {
+    0%, 100% { transform: rotate(-60deg) translateY(-10px); }
+    50% { transform: rotate(-65deg) translateY(-15px); }
+  }
+
+  @keyframes downward-dog-right-arm {
+    0%, 100% { transform: rotate(60deg) translateY(-10px); }
+    50% { transform: rotate(65deg) translateY(-15px); }
+  }
+
+  @keyframes downward-dog-left-leg {
+    0%, 100% { transform: rotate(-30deg); }
+    50% { transform: rotate(-35deg); }
+  }
+
+  @keyframes downward-dog-right-leg {
+    0%, 100% { transform: rotate(30deg); }
+    50% { transform: rotate(35deg); }
+  }
+
+  /* Swimming Exercise Animations */
+  
+  /* Swimming Animation */
+  .swimming-animation .swimming-figure {
+    animation: swimming-body 3s ease-in-out infinite;
+  }
+
+  .swimming-animation .left-arm {
+    left: 15px;
+    top: 45px;
+    animation: swimming-left-arm 3s ease-in-out infinite;
+  }
+
+  .swimming-animation .right-arm {
+    right: 15px;
+    top: 45px;
+    animation: swimming-right-arm 3s ease-in-out infinite;
+  }
+
+  .swimming-animation .left-leg {
+    left: 22px;
+    animation: swimming-left-leg 3s ease-in-out infinite;
+  }
+
+  .swimming-animation .right-leg {
+    right: 22px;
+    animation: swimming-right-leg 3s ease-in-out infinite;
+  }
+
+  @keyframes swimming-body {
+    0%, 100% { transform: translateY(0px) rotateZ(0deg); }
+    25% { transform: translateY(-5px) rotateZ(2deg); }
+    75% { transform: translateY(5px) rotateZ(-2deg); }
+  }
+
+  @keyframes swimming-left-arm {
+    0%, 100% { transform: rotate(-30deg) translateY(10px); }
+    50% { transform: rotate(-120deg) translateY(-20px); }
+  }
+
+  @keyframes swimming-right-arm {
+    0%, 100% { transform: rotate(30deg) translateY(10px); }
+    50% { transform: rotate(120deg) translateY(-20px); }
+  }
+
+  @keyframes swimming-left-leg {
+    0%, 100% { transform: rotate(0deg) translateY(0px); }
+    50% { transform: rotate(-15deg) translateY(10px); }
+  }
+
+  @keyframes swimming-right-leg {
+    0%, 100% { transform: rotate(0deg) translateY(0px); }
+    50% { transform: rotate(15deg) translateY(10px); }
+  }
+
+  /* Freestyle Animation (same as swimming but faster) */
+  .freestyle-animation .swimming-figure {
+    animation: swimming-body 2s ease-in-out infinite;
+  }
+
+  .freestyle-animation .left-arm {
+    left: 15px;
+    top: 45px;
+    animation: swimming-left-arm 2s ease-in-out infinite;
+  }
+
+  .freestyle-animation .right-arm {
+    right: 15px;
+    top: 45px;
+    animation: swimming-right-arm 2s ease-in-out infinite;
+  }
+
+  .freestyle-animation .left-leg {
+    left: 22px;
+    animation: swimming-left-leg 2s ease-in-out infinite;
+  }
+
+  .freestyle-animation .right-leg {
+    right: 22px;
+    animation: swimming-right-leg 2s ease-in-out infinite;
+  }
+
+  /* Backstroke Animation */
+  .backstroke-animation .swimming-figure {
+    animation: backstroke-body 3.5s ease-in-out infinite;
+  }
+
+  .backstroke-animation .left-arm {
+    left: 15px;
+    top: 45px;
+    animation: backstroke-left-arm 3.5s ease-in-out infinite;
+  }
+
+  .backstroke-animation .right-arm {
+    right: 15px;
+    top: 45px;
+    animation: backstroke-right-arm 3.5s ease-in-out infinite;
+  }
+
+  .backstroke-animation .left-leg {
+    left: 22px;
+    animation: swimming-left-leg 3.5s ease-in-out infinite;
+  }
+
+  .backstroke-animation .right-leg {
+    right: 22px;
+    animation: swimming-right-leg 3.5s ease-in-out infinite;
+  }
+
+  @keyframes backstroke-body {
+    0%, 100% { transform: translateY(0px) rotateZ(0deg); }
+    50% { transform: translateY(-8px) rotateZ(3deg); }
+  }
+
+  @keyframes backstroke-left-arm {
+    0%, 100% { transform: rotate(15deg) translateY(-20px); }
+    50% { transform: rotate(150deg) translateY(20px); }
+  }
+
+  @keyframes backstroke-right-arm {
+    0%, 100% { transform: rotate(-15deg) translateY(-20px); }
+    50% { transform: rotate(-150deg) translateY(20px); }
+  }
+
+  /* Breaststroke Animation */
+  .breaststroke-animation .swimming-figure {
+    animation: breaststroke-body 4s ease-in-out infinite;
+  }
+
+  .breaststroke-animation .left-arm {
+    left: 15px;
+    top: 45px;
+    animation: breaststroke-left-arm 4s ease-in-out infinite;
+  }
+
+  .breaststroke-animation .right-arm {
+    right: 15px;
+    top: 45px;
+    animation: breaststroke-right-arm 4s ease-in-out infinite;
+  }
+
+  .breaststroke-animation .left-leg {
+    left: 22px;
+    animation: breaststroke-left-leg 4s ease-in-out infinite;
+  }
+
+  .breaststroke-animation .right-leg {
+    right: 22px;
+    animation: breaststroke-right-leg 4s ease-in-out infinite;
+  }
+
+  @keyframes breaststroke-body {
+    0%, 100% { transform: translateY(0px) rotateX(0deg); }
+    25% { transform: translateY(-10px) rotateX(-5deg); }
+    50% { transform: translateY(0px) rotateX(0deg); }
+    75% { transform: translateY(5px) rotateX(5deg); }
+  }
+
+  @keyframes breaststroke-left-arm {
+    0%, 100% { transform: rotate(0deg) translateY(0px); }
+    25% { transform: rotate(-60deg) translateY(-15px); }
+    50% { transform: rotate(-90deg) translateY(0px); }
+    75% { transform: rotate(-30deg) translateY(10px); }
+  }
+
+  @keyframes breaststroke-right-arm {
+    0%, 100% { transform: rotate(0deg) translateY(0px); }
+    25% { transform: rotate(60deg) translateY(-15px); }
+    50% { transform: rotate(90deg) translateY(0px); }
+    75% { transform: rotate(30deg) translateY(10px); }
+  }
+
+  @keyframes breaststroke-left-leg {
+    0%, 100% { transform: rotate(0deg) translateY(0px); }
+    25% { transform: rotate(-30deg) translateY(10px); }
+    50% { transform: rotate(-60deg) translateY(20px); }
+    75% { transform: rotate(-15deg) translateY(5px); }
+  }
+
+  @keyframes breaststroke-right-leg {
+    0%, 100% { transform: rotate(0deg) translateY(0px); }
+    25% { transform: rotate(30deg) translateY(10px); }
+    50% { transform: rotate(60deg) translateY(20px); }
+    75% { transform: rotate(15deg) translateY(5px); }
+  }
+
   /* Generic Animation */
   .generic-animation .generic-exercise-figure {
     animation: generic-movement 2.5s ease-in-out infinite;
   }
 
-  .generic-animation .left-dumbbell {
-    left: 40px;
-    top: 70px;
-    animation: generic-left-dumbbell 2.5s ease-in-out infinite;
+  .generic-animation .left-arm {
+    left: 15px;
+    top: 45px;
+    animation: generic-left-arm 2.5s ease-in-out infinite;
   }
 
-  .generic-animation .right-dumbbell {
-    right: 40px;
-    top: 70px;
-    animation: generic-right-dumbbell 2.5s ease-in-out infinite;
+  .generic-animation .right-arm {
+    right: 15px;
+    top: 45px;
+    animation: generic-right-arm 2.5s ease-in-out infinite;
   }
 
   @keyframes generic-movement {
@@ -431,14 +1182,14 @@
     50% { transform: translateY(-10px) scale(1.05); }
   }
 
-  @keyframes generic-left-dumbbell {
-    0%, 100% { transform: translateY(0px) rotate(0deg); }
-    50% { transform: translateY(-15px) rotate(-10deg); }
+  @keyframes generic-left-arm {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(-15deg); }
   }
 
-  @keyframes generic-right-dumbbell {
-    0%, 100% { transform: translateY(0px) rotate(0deg); }
-    50% { transform: translateY(-15px) rotate(10deg); }
+  @keyframes generic-right-arm {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(15deg); }
   }
 }
 
