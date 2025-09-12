@@ -20,6 +20,8 @@ export default function WorkoutLogger() {
   const [perceivedExertion, setPerceivedExertion] = useState([5]);
   const [workoutDuration, setWorkoutDuration] = useState([30]);
   const [showWorkoutForm, setShowWorkoutForm] = useState(false);
+  const [showAnimationOverlay, setShowAnimationOverlay] = useState(false);
+  const [animatingExercise, setAnimatingExercise] = useState<any>(null);
   const [, setLocation] = useLocation();
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -894,6 +896,11 @@ export default function WorkoutLogger() {
     setSelectedExercise(exercise);
   };
 
+  const handleShowAnimation = (exercise: any) => {
+    setAnimatingExercise(exercise);
+    setShowAnimationOverlay(true);
+  };
+
   const handleStartWorkout = (exerciseName: string) => {
     setShowWorkoutForm(true);
   };
@@ -930,6 +937,48 @@ export default function WorkoutLogger() {
     if (level <= 6) return "Moderate";
     if (level <= 8) return "Hard";
     return "Maximum Effort";
+  };
+
+  // Exercise animation definitions
+  const getExerciseAnimation = (exerciseName: string) => {
+    const animations: Record<string, { movement: string, description: string, keypoints: string[] }> = {
+      "Dumbbell Press": {
+        movement: "press-animation",
+        description: "Chest press with controlled movement",
+        keypoints: ["Keep feet flat on ground", "Lower weights to chest level", "Press up with control", "Maintain neutral wrist position"]
+      },
+      "Dumbbell Curls": {
+        movement: "curl-animation", 
+        description: "Bicep curl with steady tempo",
+        keypoints: ["Keep elbows at sides", "Curl weights up smoothly", "Squeeze at the top", "Lower with control"]
+      },
+      "Dumbbell Shoulder Press": {
+        movement: "shoulder-press-animation",
+        description: "Overhead press movement",
+        keypoints: ["Start at shoulder level", "Press straight up", "Don't arch back", "Lower with control"]
+      },
+      "Dumbbell Rows": {
+        movement: "row-animation",
+        description: "Rowing motion for back muscles",
+        keypoints: ["Hinge at hips", "Pull weights to ribs", "Squeeze shoulder blades", "Lower with control"]
+      },
+      "Dumbbell Squats": {
+        movement: "squat-animation",
+        description: "Squat holding dumbbells",
+        keypoints: ["Feet shoulder-width apart", "Lower hips back and down", "Keep chest up", "Drive through heels"]
+      },
+      "Dumbbell Lunges": {
+        movement: "lunge-animation",
+        description: "Alternating lunge movement",
+        keypoints: ["Step forward into lunge", "Lower back knee down", "Push back to start", "Alternate legs"]
+      }
+    };
+    
+    return animations[exerciseName] || {
+      movement: "generic-animation",
+      description: "Controlled movement pattern",
+      keypoints: ["Maintain proper form", "Control the weight", "Breathe steadily", "Focus on target muscles"]
+    };
   };
 
   return (
@@ -1074,9 +1123,24 @@ export default function WorkoutLogger() {
                 <span className="font-medium text-gray-800">{exercise.name}</span>
               </div>
               <p className="text-xs text-muted">{exercise.description}</p>
-              <div className="flex items-center mt-2 text-xs text-gray-500">
-                <Play className="w-3 h-3 mr-1" />
-                <span>View instructions</span>
+              <div className="flex items-center justify-between mt-2 text-xs text-gray-500">
+                <div className="flex items-center">
+                  <Play className="w-3 h-3 mr-1" />
+                  <span>View instructions</span>
+                </div>
+                {exercise.category === "dumbbells" && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleShowAnimation(exercise);
+                    }}
+                    className="flex items-center text-blue-600 hover:text-blue-800 transition-colors"
+                    data-testid={`animation-${exercise.name.toLowerCase().replace(/\s+/g, '-')}`}
+                  >
+                    <Activity className="w-3 h-3 mr-1" />
+                    <span>Demo</span>
+                  </button>
+                )}
               </div>
             </button>
           );
@@ -1337,6 +1401,188 @@ export default function WorkoutLogger() {
                   data-testid="cancel-workout-button"
                 >
                   Cancel
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Animated Exercise Demonstration Overlay */}
+      {showAnimationOverlay && animatingExercise && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50" onClick={() => setShowAnimationOverlay(false)}>
+          <div className="bg-white rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="p-8">
+              {/* Header */}
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center space-x-3">
+                  <animatingExercise.icon className={`text-${animatingExercise.color}-600 text-3xl`} />
+                  <div>
+                    <h2 className="text-3xl font-bold text-gray-800">{animatingExercise.name}</h2>
+                    <p className="text-gray-600 mt-1">Animated Exercise Demonstration</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowAnimationOverlay(false)}
+                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                  data-testid="close-animation-overlay"
+                >
+                  <X className="w-8 h-8" />
+                </button>
+              </div>
+
+              {/* Animation Display Area */}
+              <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-8 mb-6">
+                <div className="flex items-center justify-center">
+                  {/* Animated Figure */}
+                  <div className="relative w-64 h-64 mx-auto">
+                    <div 
+                      className={`animated-figure ${getExerciseAnimation(animatingExercise.name).movement}`}
+                      data-testid="exercise-animation-figure"
+                    >
+                      {/* Exercise-specific animated elements */}
+                      {animatingExercise.name === "Dumbbell Press" && (
+                        <div className="dumbbell-press-figure">
+                          <div className="figure-body"></div>
+                          <div className="dumbbell left-dumbbell"></div>
+                          <div className="dumbbell right-dumbbell"></div>
+                        </div>
+                      )}
+                      {animatingExercise.name === "Dumbbell Curls" && (
+                        <div className="dumbbell-curl-figure">
+                          <div className="figure-body"></div>
+                          <div className="arm left-arm"></div>
+                          <div className="arm right-arm"></div>
+                          <div className="dumbbell left-dumbbell"></div>
+                          <div className="dumbbell right-dumbbell"></div>
+                        </div>
+                      )}
+                      {animatingExercise.name === "Dumbbell Shoulder Press" && (
+                        <div className="shoulder-press-figure">
+                          <div className="figure-body"></div>
+                          <div className="arm left-arm"></div>
+                          <div className="arm right-arm"></div>
+                          <div className="dumbbell left-dumbbell"></div>
+                          <div className="dumbbell right-dumbbell"></div>
+                        </div>
+                      )}
+                      {animatingExercise.name === "Dumbbell Rows" && (
+                        <div className="dumbbell-row-figure">
+                          <div className="figure-body"></div>
+                          <div className="arm left-arm"></div>
+                          <div className="arm right-arm"></div>
+                          <div className="dumbbell left-dumbbell"></div>
+                          <div className="dumbbell right-dumbbell"></div>
+                        </div>
+                      )}
+                      {animatingExercise.name === "Dumbbell Squats" && (
+                        <div className="dumbbell-squat-figure">
+                          <div className="figure-body"></div>
+                          <div className="leg left-leg"></div>
+                          <div className="leg right-leg"></div>
+                          <div className="dumbbell left-dumbbell"></div>
+                          <div className="dumbbell right-dumbbell"></div>
+                        </div>
+                      )}
+                      {animatingExercise.name === "Dumbbell Lunges" && (
+                        <div className="dumbbell-lunge-figure">
+                          <div className="figure-body"></div>
+                          <div className="leg left-leg"></div>
+                          <div className="leg right-leg"></div>
+                          <div className="dumbbell left-dumbbell"></div>
+                          <div className="dumbbell right-dumbbell"></div>
+                        </div>
+                      )}
+                      {/* Generic animation for other exercises */}
+                      {!["Dumbbell Press", "Dumbbell Curls", "Dumbbell Shoulder Press", "Dumbbell Rows", "Dumbbell Squats", "Dumbbell Lunges"].includes(animatingExercise.name) && (
+                        <div className="generic-exercise-figure">
+                          <div className="figure-body"></div>
+                          <div className="dumbbell left-dumbbell"></div>
+                          <div className="dumbbell right-dumbbell"></div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Animation Description */}
+                <div className="text-center mt-6">
+                  <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                    {getExerciseAnimation(animatingExercise.name).description}
+                  </h3>
+                  <p className="text-gray-600">Follow the animated movement pattern</p>
+                </div>
+              </div>
+
+              {/* Key Movement Points */}
+              <div className="grid md:grid-cols-2 gap-6 mb-6">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-800 mb-3">Key Movement Points</h3>
+                  <ul className="space-y-2">
+                    {getExerciseAnimation(animatingExercise.name).keypoints.map((point, index) => (
+                      <li key={index} className="flex items-start space-x-2">
+                        <span className="bg-blue-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-medium flex-shrink-0 mt-0.5">
+                          {index + 1}
+                        </span>
+                        <p className="text-gray-700">{point}</p>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-800 mb-3">Safety Tips</h3>
+                  <ul className="space-y-2">
+                    <li className="flex items-start space-x-2">
+                      <span className="text-yellow-500 mt-1">⚠️</span>
+                      <p className="text-gray-700">Start with lighter weights to master the form</p>
+                    </li>
+                    <li className="flex items-start space-x-2">
+                      <span className="text-green-500 mt-1">✅</span>
+                      <p className="text-gray-700">Maintain controlled movements throughout</p>
+                    </li>
+                    <li className="flex items-start space-x-2">
+                      <span className="text-blue-500 mt-1">💨</span>
+                      <p className="text-gray-700">Breathe out during the exertion phase</p>
+                    </li>
+                    <li className="flex items-start space-x-2">
+                      <span className="text-red-500 mt-1">🛑</span>
+                      <p className="text-gray-700">Stop if you feel any sharp pain</p>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex space-x-3">
+                <Button
+                  onClick={() => {
+                    setShowAnimationOverlay(false);
+                    setSelectedExercise(animatingExercise);
+                  }}
+                  className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                  data-testid="view-instructions-button"
+                >
+                  View Full Instructions
+                </Button>
+                <Button
+                  onClick={() => {
+                    setShowAnimationOverlay(false);
+                    setSelectedExercise(animatingExercise);
+                    setShowWorkoutForm(true);
+                  }}
+                  className="flex-1 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700"
+                  data-testid="start-workout-from-animation"
+                >
+                  Start This Workout
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => setShowAnimationOverlay(false)}
+                  className="px-6"
+                  data-testid="close-animation-button"
+                >
+                  Close
                 </Button>
               </div>
             </div>
