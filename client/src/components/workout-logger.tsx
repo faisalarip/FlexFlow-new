@@ -1229,17 +1229,49 @@ export default function WorkoutLogger() {
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleShowAnimation(exercise);
+                      if (animatingExercise?.name === exercise.name) {
+                        setAnimatingExercise(null);
+                        setShowAnimationOverlay(false);
+                      } else {
+                        setAnimatingExercise(exercise);
+                        setShowAnimationOverlay(true);
+                      }
                     }}
                     disabled={createWorkoutMutation.isPending}
                     className="flex items-center text-blue-600 hover:text-blue-800 transition-colors"
-                    data-testid={`animation-${exercise.name.toLowerCase().replace(/\s+/g, '-')}`}
+                    data-testid={`demo-${exercise.name.toLowerCase().replace(/\s+/g, '-')}`}
                   >
                     <Activity className="w-3 h-3 mr-1" />
-                    <span>Demo</span>
+                    <span>{animatingExercise?.name === exercise.name && showAnimationOverlay ? 'Hide' : 'Demo'}</span>
                   </button>
                 )}
               </div>
+              
+              {/* Inline Exercise Demo */}
+              {animatingExercise?.name === exercise.name && showAnimationOverlay && (
+                <div className="mt-3 pt-3 border-t border-gray-200">
+                  <div className="bg-gray-50 rounded-lg p-3">
+                    <h4 className="font-medium text-gray-800 mb-2 text-sm">Exercise Demonstration</h4>
+                    <img 
+                      src={dumbbellExercisesImage}
+                      alt={`${exercise.name} demonstration`}
+                      className="w-full h-32 object-cover rounded-md"
+                      data-testid={`demo-image-${exercise.name.toLowerCase().replace(/\s+/g, '-')}`}
+                    />
+                    <div className="mt-2">
+                      <p className="text-xs text-gray-600 mb-1">{getExerciseAnimation(exercise.name).description}</p>
+                      <div className="text-xs text-gray-500">
+                        <strong>Key Points:</strong>
+                        <ul className="list-disc list-inside mt-1 space-y-0.5">
+                          {getExerciseAnimation(exercise.name).keypoints.slice(0, 2).map((point, index) => (
+                            <li key={index}>{point}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           );
         }) : (
