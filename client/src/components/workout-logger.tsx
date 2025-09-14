@@ -1509,15 +1509,15 @@ export default function WorkoutLogger() {
       {/* Animated Exercise Demonstration Overlay */}
       {showAnimationOverlay && animatingExercise && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50" onClick={() => setShowAnimationOverlay(false)}>
-          <div className="bg-white rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-            <div className="p-8">
+          <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[75vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="p-5">
               {/* Header */}
-              <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center space-x-3">
-                  <animatingExercise.icon className={`text-${animatingExercise.color}-600 text-3xl`} />
+                  <animatingExercise.icon className={`text-${animatingExercise.color}-600 text-2xl`} />
                   <div>
-                    <h2 className="text-3xl font-bold text-gray-800">{animatingExercise.name}</h2>
-                    <p className="text-gray-600 mt-1">Animated Exercise Demonstration</p>
+                    <h2 className="text-2xl font-bold text-gray-800">{animatingExercise.name}</h2>
+                    <p className="text-gray-600 text-sm">Animated Exercise Demonstration</p>
                   </div>
                 </div>
                 <button
@@ -1530,10 +1530,10 @@ export default function WorkoutLogger() {
               </div>
 
               {/* Animation Display Area */}
-              <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-8 mb-6">
+              <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-5 mb-4">
                 <div className="flex items-center justify-center">
                   {/* Animated Figure */}
-                  <div className="relative w-64 h-64 mx-auto">
+                  <div className="relative w-48 h-48 mx-auto">
                     <div 
                       className={`animated-figure ${getExerciseAnimation(animatingExercise.name).movement}`}
                       data-testid="exercise-animation-figure"
