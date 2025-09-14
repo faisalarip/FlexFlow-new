@@ -10,6 +10,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import type { Exercise } from "@shared/schema";
 import dumbbellExercisesImage from "@assets/generated_images/Man_performing_dumbbell_exercises_1979e4be.png";
+import pushUpExerciseImage from "@assets/generated_images/Man_performing_push-up_exercise_19b36844.png";
 
 export default function WorkoutLogger() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -20,11 +21,20 @@ export default function WorkoutLogger() {
   const [perceivedExertion, setPerceivedExertion] = useState([5]);
   const [workoutDuration, setWorkoutDuration] = useState([30]);
   const [showWorkoutForm, setShowWorkoutForm] = useState(false);
-  const [showAnimationOverlay, setShowAnimationOverlay] = useState(false);
-  const [animatingExercise, setAnimatingExercise] = useState<any>(null);
+  const [expandedDemo, setExpandedDemo] = useState<string | null>(null);
   const [, setLocation] = useLocation();
   const queryClient = useQueryClient();
   const { toast } = useToast();
+
+  // Helper function to get the appropriate demo image based on exercise name
+  const getDemoImage = (exerciseName: string) => {
+    const exerciseNameLower = exerciseName.toLowerCase();
+    if (exerciseNameLower.includes('push-up') || exerciseNameLower.includes('pushup')) {
+      return pushUpExerciseImage;
+    }
+    // Default to dumbbell exercises image for other exercises
+    return dumbbellExercisesImage;
+  };
 
   const { data: exercises, isLoading } = useQuery<Exercise[]>({
     queryKey: ["/api/exercises", { category: selectedCategory, search: searchQuery }],
@@ -896,9 +906,9 @@ export default function WorkoutLogger() {
     setSelectedExercise(exercise);
   };
 
-  const handleShowAnimation = (exercise: any) => {
-    setAnimatingExercise(exercise);
-    setShowAnimationOverlay(true);
+  const handleToggleDemo = (exercise: any) => {
+    const exerciseKey = exercise.name;
+    setExpandedDemo(expandedDemo === exerciseKey ? null : exerciseKey);
   };
 
   const handleStartWorkout = (exerciseName: string) => {
@@ -1229,31 +1239,27 @@ export default function WorkoutLogger() {
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      if (animatingExercise?.name === exercise.name) {
-                        setAnimatingExercise(null);
-                        setShowAnimationOverlay(false);
-                      } else {
-                        setAnimatingExercise(exercise);
-                        setShowAnimationOverlay(true);
-                      }
+                      handleToggleDemo(exercise);
                     }}
                     disabled={createWorkoutMutation.isPending}
                     className="flex items-center text-blue-600 hover:text-blue-800 transition-colors"
                     data-testid={`demo-${exercise.name.toLowerCase().replace(/\s+/g, '-')}`}
+                    aria-expanded={expandedDemo === exercise.name}
+                    aria-controls={`demo-content-${exercise.name.toLowerCase().replace(/\s+/g, '-')}`}
                   >
                     <Activity className="w-3 h-3 mr-1" />
-                    <span>{animatingExercise?.name === exercise.name && showAnimationOverlay ? 'Hide' : 'Demo'}</span>
+                    <span>{expandedDemo === exercise.name ? 'Hide' : 'Demo'}</span>
                   </button>
                 )}
               </div>
               
               {/* Inline Exercise Demo */}
-              {animatingExercise?.name === exercise.name && showAnimationOverlay && (
-                <div className="mt-3 pt-3 border-t border-gray-200">
+              {expandedDemo === exercise.name && (
+                <div className="mt-3 pt-3 border-t border-gray-200" id={`demo-content-${exercise.name.toLowerCase().replace(/\s+/g, '-')}`}>
                   <div className="bg-gray-50 rounded-lg p-3">
                     <h4 className="font-medium text-gray-800 mb-2 text-sm">Exercise Demonstration</h4>
                     <img 
-                      src={dumbbellExercisesImage}
+                      src={getDemoImage(exercise.name)}
                       alt={`${exercise.name} demonstration`}
                       className="w-full h-32 object-cover rounded-md"
                       data-testid={`demo-image-${exercise.name.toLowerCase().replace(/\s+/g, '-')}`}
