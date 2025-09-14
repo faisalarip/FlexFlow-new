@@ -1509,8 +1509,8 @@ export default function WorkoutLogger() {
       {/* Animated Exercise Demonstration Overlay */}
       {showAnimationOverlay && animatingExercise && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50" onClick={() => setShowAnimationOverlay(false)}>
-          <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[75vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-            <div className="p-5">
+          <div className="bg-white rounded-3xl max-w-lg w-full max-h-[60vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="p-4">
               {/* Header */}
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center space-x-3">
@@ -1530,10 +1530,10 @@ export default function WorkoutLogger() {
               </div>
 
               {/* Animation Display Area */}
-              <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-5 mb-4">
+              <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-3 mb-3">
                 <div className="flex items-center justify-center">
                   {/* Animated Figure */}
-                  <div className="relative w-48 h-48 mx-auto">
+                  <div className="relative w-32 h-32 mx-auto">
                     <div 
                       className={`animated-figure ${getExerciseAnimation(animatingExercise.name).movement}`}
                       data-testid="exercise-animation-figure"
