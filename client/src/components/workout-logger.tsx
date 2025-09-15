@@ -16,6 +16,9 @@ import pullUpExerciseImage from "@assets/generated_images/Black_man_performing_p
 import chinUpExerciseImage from "@assets/generated_images/Black_man_and_woman_chin-ups_7848bb87.png";
 import dipExerciseImage from "@assets/generated_images/Man_and_woman_dips_e6984611.png";
 import overheadPressImage from "@assets/generated_images/Man_and_woman_overhead_press_0abad494.png";
+import bicepCurlsImage from "@assets/generated_images/Man_and_woman_bicep_curls_541824d6.png";
+import tricepExtensionsImage from "@assets/generated_images/Man_and_woman_tricep_extensions_e6ffba76.png";
+import latPulldownImage from "@assets/generated_images/Man_and_woman_lat_pulldown_dbce7bd1.png";
 
 export default function WorkoutLogger() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -51,6 +54,15 @@ export default function WorkoutLogger() {
     }
     if (exerciseNameLower.includes('overhead press') || exerciseNameLower.includes('military press') || exerciseNameLower.includes('shoulder press')) {
       return overheadPressImage;
+    }
+    if (exerciseNameLower.includes('bicep') && (exerciseNameLower.includes('curl') || exerciseNameLower.includes('curls'))) {
+      return bicepCurlsImage;
+    }
+    if (exerciseNameLower.includes('tricep') && (exerciseNameLower.includes('extension') || exerciseNameLower.includes('extensions'))) {
+      return tricepExtensionsImage;
+    }
+    if (exerciseNameLower.includes('lat pulldown') || exerciseNameLower.includes('lat pull down') || exerciseNameLower.includes('pulldown')) {
+      return latPulldownImage;
     }
     // Default to dumbbell exercises image for other exercises
     return dumbbellExercisesImage;
