@@ -69,13 +69,8 @@ export default function AuthPage({ mode = "signup" }: AuthPageProps) {
       });
       signIn(data.user, data.token);
       
-      // Check if user came from onboarding and redirect to dashboard
-      const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.get('from') === 'onboarding') {
-        setTimeout(() => setLocation('/dashboard'), 100);
-      } else {
-        setTimeout(() => setLocation('/'), 100);
-      }
+      // Redirect to dashboard (root path when authenticated)
+      setTimeout(() => setLocation('/'), 100);
     },
     onError: (error: any) => {
       const errorMessage = error.message || "Failed to create account";
