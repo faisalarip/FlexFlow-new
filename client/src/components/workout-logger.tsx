@@ -13,6 +13,9 @@ import dumbbellExercisesImage from "@assets/generated_images/Man_performing_dumb
 import pushUpExerciseImage from "@assets/generated_images/Man_performing_push-up_exercise_19b36844.png";
 import benchPressImage from "@assets/generated_images/Man_performing_bench_press_44e8cce3.png";
 import pullUpExerciseImage from "@assets/generated_images/Black_man_performing_pull-ups_3605874d.png";
+import chinUpExerciseImage from "@assets/generated_images/Man_and_woman_chin-ups_87d82af9.png";
+import dipExerciseImage from "@assets/generated_images/Man_and_woman_dips_e6984611.png";
+import overheadPressImage from "@assets/generated_images/Man_and_woman_overhead_press_0abad494.png";
 
 export default function WorkoutLogger() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -37,8 +40,17 @@ export default function WorkoutLogger() {
     if (exerciseNameLower.includes('bench press') || exerciseNameLower.includes('dumbbell press')) {
       return benchPressImage;
     }
-    if (exerciseNameLower.includes('pull-up') || exerciseNameLower.includes('pullup') || exerciseNameLower.includes('chin-up')) {
+    if (exerciseNameLower.includes('chin-up') || exerciseNameLower.includes('chinup')) {
+      return chinUpExerciseImage;
+    }
+    if (exerciseNameLower.includes('pull-up') || exerciseNameLower.includes('pullup')) {
       return pullUpExerciseImage;
+    }
+    if (exerciseNameLower.includes('dip') && !exerciseNameLower.includes('dumbbell')) {
+      return dipExerciseImage;
+    }
+    if (exerciseNameLower.includes('overhead press') || exerciseNameLower.includes('military press') || exerciseNameLower.includes('shoulder press')) {
+      return overheadPressImage;
     }
     // Default to dumbbell exercises image for other exercises
     return dumbbellExercisesImage;
