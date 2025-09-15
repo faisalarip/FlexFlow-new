@@ -819,6 +819,7 @@ export class MemStorage implements IStorage {
         subscriptionExpiresAt: freeTrialExpiry,
         stripeCustomerId: null,
         stripeSubscriptionId: null,
+        personalPlanData: userData.personalPlanData ? JSON.stringify(userData.personalPlanData) : null,
         createdAt: now,
         updatedAt: now,
       };

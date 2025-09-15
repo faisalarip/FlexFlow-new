@@ -35,6 +35,7 @@ export const users = pgTable("users", {
   subscriptionExpiresAt: timestamp("subscription_expires_at"),
   stripeCustomerId: varchar("stripe_customer_id"),
   stripeSubscriptionId: varchar("stripe_subscription_id"),
+  personalPlanData: text("personal_plan_data"), // JSON string storing the user's personal plan and onboarding data
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -178,6 +179,7 @@ export const signUpSchema = z.object({
   password: z.string().min(8).regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, "Password must contain at least one uppercase letter, one lowercase letter, and one number"),
   firstName: z.string().min(1).max(50),
   lastName: z.string().min(1).max(50),
+  personalPlanData: z.any().optional(), // Optional personal plan data from onboarding
 });
 
 export const signInSchema = z.object({

@@ -1,4 +1,4 @@
-import { Plus, Flame, User as UserIcon } from "lucide-react";
+import { Plus, Flame, User as UserIcon, Target, Zap } from "lucide-react";
 import { useNewAuth } from "@/hooks/useNewAuth";
 import { useQuery } from "@tanstack/react-query";
 import type { User } from "@shared/schema";
@@ -19,6 +19,15 @@ export default function WelcomeSection() {
   // Get user's current streak
   const userStreak = user?.streak || 0;
   const streakText = userStreak === 0 ? "Start today!" : userStreak === 1 ? "1 day" : `${userStreak} days`;
+
+  // Parse personal plan data if available
+  const personalPlan = user?.personalPlanData ? (() => {
+    try {
+      return JSON.parse(user.personalPlanData);
+    } catch {
+      return null;
+    }
+  })() : null;
 
   return (
     <section className="mb-8">
@@ -49,7 +58,17 @@ export default function WelcomeSection() {
                 {greeting}{userName ? `, ${userName}` : ''}!
               </h2>
               <p className="text-lg font-semibold text-black mb-2">Eat Clean, Think Smart, Train HARD!</p>
-              <p className="text-lg opacity-90">Ready to crush your fitness goals today?</p>
+              {personalPlan?.plan ? (
+                <div className="space-y-1">
+                  <p className="text-lg opacity-90">Your {personalPlan.plan.title} is ready!</p>
+                  <p className="text-sm opacity-75">
+                    {personalPlan.plan.workoutsPerWeek} workouts per week • {personalPlan.plan.sessionDuration}
+                    {personalPlan.plan.calories && ` • ${personalPlan.plan.calories.goal} calories/day`}
+                  </p>
+                </div>
+              ) : (
+                <p className="text-lg opacity-90">Ready to crush your fitness goals today?</p>
+              )}
             </div>
           </div>
           <div className="flex flex-col sm:flex-row gap-4">

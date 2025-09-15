@@ -283,8 +283,29 @@ export default function OnboardingPlan() {
     }, 1500); // Simulate plan generation time
   }, []);
 
-  const handleStartTrial = () => {
-    setLocation('/onboarding/payment');
+  const handleCreateAccount = () => {
+    // Store the plan data in localStorage so it can be accessed during account creation
+    if (plan) {
+      const planData = {
+        plan,
+        onboardingAnswers: {
+          fitnessGoal: new URLSearchParams(window.location.search).get('fitnessGoal') || '',
+          experience: new URLSearchParams(window.location.search).get('experience') || '',
+          consistency: new URLSearchParams(window.location.search).get('consistency') || '',
+          location: new URLSearchParams(window.location.search).get('location') || '',
+          age: new URLSearchParams(window.location.search).get('age') || '',
+          heightFeet: new URLSearchParams(window.location.search).get('heightFeet') || '',
+          heightInches: new URLSearchParams(window.location.search).get('heightInches') || '',
+          weight: new URLSearchParams(window.location.search).get('weight') || '',
+          weightUnit: new URLSearchParams(window.location.search).get('weightUnit') || 'lbs',
+          goalWeight: new URLSearchParams(window.location.search).get('goalWeight') || '',
+          workoutFrequency: new URLSearchParams(window.location.search).get('workoutFrequency') || '',
+          workoutDuration: new URLSearchParams(window.location.search).get('workoutDuration') || ''
+        }
+      };
+      localStorage.setItem('pendingPersonalPlan', JSON.stringify(planData));
+    }
+    setLocation('/auth?from=onboarding');
   };
 
   if (loading) {
@@ -444,14 +465,14 @@ export default function OnboardingPlan() {
               <Button 
                 size="lg" 
                 className="text-lg px-8 py-4 mb-4" 
-                onClick={handleStartTrial}
-                data-testid="start-trial-button"
+                onClick={handleCreateAccount}
+                data-testid="create-account-button"
               >
-                Start Your 7-Day Free Trial
+                Create Your Account
                 <ArrowRight className="ml-2" size={20} />
               </Button>
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                No commitment • Cancel anytime • Full access to all features
+                Get started with your personalized fitness plan
               </p>
             </div>
           </CardContent>

@@ -49,17 +49,33 @@ export default function AuthPage({ mode = "signup" }: AuthPageProps) {
   // Sign up mutation
   const signUpMutation = useMutation({
     mutationFn: async (userData: SignUpData) => {
-      const response = await apiRequest("POST", "/api/auth/signup", userData);
+      // Include personal plan data if available
+      const personalPlanData = localStorage.getItem('pendingPersonalPlan');
+      const signUpPayload = {
+        ...userData,
+        personalPlanData: personalPlanData ? JSON.parse(personalPlanData) : null
+      };
+      
+      const response = await apiRequest("POST", "/api/auth/signup", signUpPayload);
       return response.json();
     },
     onSuccess: (data) => {
+      // Clear the pending plan data after successful signup
+      localStorage.removeItem('pendingPersonalPlan');
+      
       toast({
         title: "🎉 Welcome to FlexFlow!",
         description: "Your account has been created successfully.",
       });
       signIn(data.user, data.token);
-      // Small delay to ensure state updates before navigation
-      setTimeout(() => setLocation('/'), 100);
+      
+      // Check if user came from onboarding and redirect to dashboard
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('from') === 'onboarding') {
+        setTimeout(() => setLocation('/dashboard'), 100);
+      } else {
+        setTimeout(() => setLocation('/'), 100);
+      }
     },
     onError: (error: any) => {
       const errorMessage = error.message || "Failed to create account";

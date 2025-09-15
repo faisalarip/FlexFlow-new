@@ -31,7 +31,7 @@ export class AuthService {
     
     try {
       
-      // Create user in storage
+      // Create user in storage with personal plan data if provided
       const user = await storage.createUserWithPassword(validatedData);
       
       
