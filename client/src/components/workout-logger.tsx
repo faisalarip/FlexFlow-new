@@ -17,7 +17,7 @@ import chinUpExerciseImage from "@assets/generated_images/Black_man_and_woman_ch
 import dipExerciseImage from "@assets/generated_images/Man_and_woman_dips_e6984611.png";
 import overheadPressImage from "@assets/generated_images/Man_and_woman_overhead_press_0abad494.png";
 import bicepCurlsImage from "@assets/generated_images/Man_and_woman_bicep_curls_541824d6.png";
-import tricepExtensionsImage from "@assets/generated_images/Man_and_woman_tricep_extensions_e6ffba76.png";
+import tricepExtensionsImage from "@assets/generated_images/Guy_and_lady_tricep_extensions_5d5e3b45.png";
 import latPulldownImage from "@assets/generated_images/Man_and_woman_lat_pulldown_dbce7bd1.png";
 
 export default function WorkoutLogger() {
