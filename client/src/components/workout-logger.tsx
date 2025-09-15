@@ -13,7 +13,7 @@ import dumbbellExercisesImage from "@assets/generated_images/Man_performing_dumb
 import pushUpExerciseImage from "@assets/generated_images/Man_performing_push-up_exercise_19b36844.png";
 import benchPressImage from "@assets/generated_images/Man_performing_bench_press_44e8cce3.png";
 import pullUpExerciseImage from "@assets/generated_images/Black_man_performing_pull-ups_3605874d.png";
-import chinUpExerciseImage from "@assets/generated_images/Man_and_woman_chin-ups_87d82af9.png";
+import chinUpExerciseImage from "@assets/generated_images/Black_man_and_woman_chin-ups_7848bb87.png";
 import dipExerciseImage from "@assets/generated_images/Man_and_woman_dips_e6984611.png";
 import overheadPressImage from "@assets/generated_images/Man_and_woman_overhead_press_0abad494.png";
 
