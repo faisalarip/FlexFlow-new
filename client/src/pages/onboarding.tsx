@@ -3,6 +3,9 @@ import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Activity, ArrowRight, ArrowLeft } from "lucide-react";
 
 interface OnboardingAnswers {
@@ -10,12 +13,21 @@ interface OnboardingAnswers {
   experience: string;
   consistency: string;
   location: string;
+  age: string;
+  heightFeet: string;
+  heightInches: string;
+  weight: string;
+  weightUnit: string;
+  goalWeight: string;
+  workoutFrequency: string;
+  workoutDuration: string;
 }
 
 const questions = [
   {
     id: 'fitnessGoal',
     question: 'What is your fitness goal?',
+    type: 'choice',
     options: [
       'Lose weight and burn fat',
       'Build muscle and gain strength', 
@@ -27,6 +39,7 @@ const questions = [
   {
     id: 'experience',
     question: 'How much strength training experience do you have?',
+    type: 'choice',
     options: [
       'Complete beginner - never lifted weights',
       'Some experience - less than 6 months',
@@ -36,8 +49,63 @@ const questions = [
     ]
   },
   {
+    id: 'age',
+    question: 'What is your age?',
+    type: 'input',
+    inputType: 'number',
+    placeholder: 'Enter your age (e.g., 25)',
+    min: 13,
+    max: 100
+  },
+  {
+    id: 'height',
+    question: 'What is your height?',
+    type: 'height',
+    description: 'This helps us calculate your personalized calorie needs'
+  },
+  {
+    id: 'weight',
+    question: 'What is your current weight?',
+    type: 'weight',
+    description: 'Used for accurate calorie and workout recommendations'
+  },
+  {
+    id: 'goalWeight',
+    question: 'What is your goal weight?',
+    type: 'input',
+    inputType: 'number',
+    placeholder: 'Enter your target weight',
+    min: 50,
+    max: 500
+  },
+  {
+    id: 'workoutFrequency',
+    question: 'How often would you like to workout per week?',
+    type: 'choice',
+    options: [
+      '2-3 times per week - I\'m just starting',
+      '3-4 times per week - I want steady progress',
+      '4-5 times per week - I\'m committed to fitness',
+      '5-6 times per week - Fitness is a priority',
+      '6-7 times per week - I love daily activity'
+    ]
+  },
+  {
+    id: 'workoutDuration',
+    question: 'How long would you like each workout to be?',
+    type: 'choice',
+    options: [
+      '15-30 minutes - Quick and efficient',
+      '30-45 minutes - Moderate workout time',
+      '45-60 minutes - Standard gym session',
+      '60-75 minutes - Extended training',
+      '75+ minutes - Marathon sessions'
+    ]
+  },
+  {
     id: 'consistency',
-    question: 'How consistent are you with working out?',
+    question: 'How consistent are you with working out currently?',
+    type: 'choice',
     options: [
       'Just getting started - no routine yet',
       '1-2 times per week when I can',
@@ -49,6 +117,7 @@ const questions = [
   {
     id: 'location',
     question: 'Where do you normally workout?',
+    type: 'choice',
     options: [
       'At home with no equipment',
       'At home with basic equipment',
@@ -66,7 +135,15 @@ export default function Onboarding() {
     fitnessGoal: '',
     experience: '',
     consistency: '',
-    location: ''
+    location: '',
+    age: '',
+    heightFeet: '',
+    heightInches: '',
+    weight: '',
+    weightUnit: 'lbs',
+    goalWeight: '',
+    workoutFrequency: '',
+    workoutDuration: ''
   });
 
   const currentQuestion = questions[currentStep];
@@ -76,6 +153,13 @@ export default function Onboarding() {
     setAnswers(prev => ({
       ...prev,
       [currentQuestion.id]: answer
+    }));
+  };
+
+  const handleInputChange = (field: string, value: string) => {
+    setAnswers(prev => ({
+      ...prev,
+      [field]: value
     }));
   };
 
@@ -98,7 +182,23 @@ export default function Onboarding() {
     }
   };
 
-  const isCurrentAnswered = answers[currentQuestion.id as keyof OnboardingAnswers] !== '';
+  const isCurrentAnswered = () => {
+    const questionId = currentQuestion.id as keyof OnboardingAnswers;
+    
+    if (currentQuestion.type === 'choice' || currentQuestion.type === 'input') {
+      return answers[questionId] !== '';
+    }
+    
+    if (currentQuestion.type === 'height') {
+      return answers.heightFeet !== '' && answers.heightInches !== '';
+    }
+    
+    if (currentQuestion.type === 'weight') {
+      return answers.weight !== '' && answers.weightUnit !== '';
+    }
+    
+    return false;
+  };
 
   return (
     <div className="relative min-h-screen bg-gradient-to-br from-primary/5 via-white to-secondary/5 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 overflow-hidden">
@@ -144,11 +244,12 @@ export default function Onboarding() {
               {currentQuestion.question}
             </CardTitle>
             <CardDescription className="text-center">
-              Select the option that best describes you
+              {currentQuestion.type === 'choice' ? 'Select the option that best describes you' : 
+               currentQuestion.description || 'Please provide your information below'}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
-            {currentQuestion.options.map((option, index) => (
+            {currentQuestion.type === 'choice' && currentQuestion.options?.map((option, index) => (
               <Button
                 key={index}
                 variant={answers[currentQuestion.id as keyof OnboardingAnswers] === option ? "default" : "outline"}
@@ -170,6 +271,92 @@ export default function Onboarding() {
                 </div>
               </Button>
             ))}
+
+            {currentQuestion.type === 'input' && (
+              <div className="space-y-4">
+                <Label htmlFor={currentQuestion.id} className="text-lg font-medium">
+                  {currentQuestion.placeholder}
+                </Label>
+                <Input
+                  id={currentQuestion.id}
+                  type={currentQuestion.inputType}
+                  placeholder={currentQuestion.placeholder}
+                  value={answers[currentQuestion.id as keyof OnboardingAnswers]}
+                  onChange={(e) => handleInputChange(currentQuestion.id, e.target.value)}
+                  min={currentQuestion.min}
+                  max={currentQuestion.max}
+                  className="text-lg p-4 h-14"
+                  data-testid={`input-${currentQuestion.id}`}
+                />
+              </div>
+            )}
+
+            {currentQuestion.type === 'height' && (
+              <div className="space-y-4">
+                <Label className="text-lg font-medium">Height</Label>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="heightFeet">Feet</Label>
+                    <Input
+                      id="heightFeet"
+                      type="number"
+                      placeholder="5"
+                      value={answers.heightFeet}
+                      onChange={(e) => handleInputChange('heightFeet', e.target.value)}
+                      min="3"
+                      max="8"
+                      className="text-lg p-4 h-14"
+                      data-testid="input-height-feet"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="heightInches">Inches</Label>
+                    <Input
+                      id="heightInches"
+                      type="number"
+                      placeholder="10"
+                      value={answers.heightInches}
+                      onChange={(e) => handleInputChange('heightInches', e.target.value)}
+                      min="0"
+                      max="11"
+                      className="text-lg p-4 h-14"
+                      data-testid="input-height-inches"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {currentQuestion.type === 'weight' && (
+              <div className="space-y-4">
+                <Label className="text-lg font-medium">Current Weight</Label>
+                <div className="flex gap-4">
+                  <div className="flex-1">
+                    <Input
+                      type="number"
+                      placeholder="Enter weight"
+                      value={answers.weight}
+                      onChange={(e) => handleInputChange('weight', e.target.value)}
+                      min="50"
+                      max="500"
+                      className="text-lg p-4 h-14"
+                      data-testid="input-weight"
+                    />
+                  </div>
+                  <div className="w-24">
+                    <Select value={answers.weightUnit} onValueChange={(value) => handleInputChange('weightUnit', value)}>
+                      <SelectTrigger className="h-14 text-lg" data-testid="select-weight-unit">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="lbs">lbs</SelectItem>
+                        <SelectItem value="kg">kg</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -188,7 +375,7 @@ export default function Onboarding() {
           
           <Button
             onClick={handleNext}
-            disabled={!isCurrentAnswered}
+            disabled={!isCurrentAnswered()}
             className="flex items-center space-x-2"
             data-testid="next-button"
           >

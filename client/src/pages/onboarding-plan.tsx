@@ -3,7 +3,7 @@ import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Activity, Target, Clock, MapPin, Star, ArrowRight, CheckCircle } from "lucide-react";
+import { Activity, Target, Clock, MapPin, Star, ArrowRight, CheckCircle, Zap } from "lucide-react";
 
 interface PersonalizedPlan {
   title: string;
@@ -13,7 +13,78 @@ interface PersonalizedPlan {
   equipment: string[];
   features: string[];
   planType: 'beginner' | 'intermediate' | 'advanced';
+  calories?: {
+    bmr: number;
+    tdee: number;
+    goal: number;
+    recommendation: string;
+  };
 }
+
+const calculateCalories = (answers: any) => {
+  const age = parseInt(answers.age) || 25;
+  const heightFeet = parseInt(answers.heightFeet) || 5;
+  const heightInches = parseInt(answers.heightInches) || 8;
+  const weight = parseFloat(answers.weight) || 160;
+  const weightUnit = answers.weightUnit || 'lbs';
+  const goalWeight = parseFloat(answers.goalWeight) || weight;
+  const fitnessGoal = answers.fitnessGoal || '';
+  const workoutFrequency = answers.workoutFrequency || '';
+
+  // Convert height to cm
+  const heightCm = (heightFeet * 12 + heightInches) * 2.54;
+  
+  // Convert weight to kg if needed
+  const weightKg = weightUnit === 'lbs' ? weight * 0.453592 : weight;
+  const goalWeightKg = weightUnit === 'lbs' ? goalWeight * 0.453592 : goalWeight;
+
+  // Calculate BMR using Mifflin-St Jeor Equation
+  // For simplicity, using male formula as average (female formula subtracts 161 instead of adding 5)
+  const bmr = (10 * weightKg) + (6.25 * heightCm) - (5 * age) + 5;
+
+  // Determine activity multiplier based on workout frequency
+  let activityMultiplier = 1.2; // Sedentary
+  if (workoutFrequency.includes('2-3 times')) {
+    activityMultiplier = 1.375; // Lightly active
+  } else if (workoutFrequency.includes('3-4 times')) {
+    activityMultiplier = 1.55; // Moderately active
+  } else if (workoutFrequency.includes('4-5 times')) {
+    activityMultiplier = 1.725; // Very active
+  } else if (workoutFrequency.includes('5-6 times') || workoutFrequency.includes('6-7 times')) {
+    activityMultiplier = 1.9; // Extremely active
+  }
+
+  const tdee = bmr * activityMultiplier;
+
+  // Calculate goal calories based on fitness goal
+  let goalCalories = tdee;
+  let recommendation = '';
+
+  if (fitnessGoal.includes('weight') || fitnessGoal.includes('fat')) {
+    // Weight loss: 500-750 calorie deficit
+    goalCalories = tdee - 500;
+    recommendation = 'calorie deficit for healthy weight loss (1-2 lbs per week)';
+  } else if (fitnessGoal.includes('muscle') || fitnessGoal.includes('strength')) {
+    // Muscle gain: 300-500 calorie surplus
+    goalCalories = tdee + 300;
+    recommendation = 'calorie surplus for muscle building and strength gains';
+  } else if (fitnessGoal.includes('endurance') || fitnessGoal.includes('performance')) {
+    // Endurance: maintenance calories
+    goalCalories = tdee;
+    recommendation = 'maintenance calories to fuel your endurance training';
+  } else {
+    // General health: maintenance calories
+    goalCalories = tdee;
+    recommendation = 'maintenance calories for overall health and wellness';
+  }
+
+  return {
+    bmr: Math.round(bmr),
+    tdee: Math.round(tdee),
+    goal: Math.round(goalCalories),
+    recommendation
+  };
+};
 
 const generatePlan = (answers: any): PersonalizedPlan => {
   // Get the actual user answers
@@ -21,11 +92,42 @@ const generatePlan = (answers: any): PersonalizedPlan => {
   const experience = answers.experience || '';
   const consistency = answers.consistency || '';
   const location = answers.location || '';
+  const workoutFrequency = answers.workoutFrequency || '';
+  const workoutDuration = answers.workoutDuration || '';
+
+  // Calculate personalized calorie recommendations
+  const calories = calculateCalories(answers);
 
   // Determine plan complexity based on experience and consistency
   let planType: 'beginner' | 'intermediate' | 'advanced' = 'beginner';
   let workoutsPerWeek = 2;
   let sessionDuration = "20-30 minutes";
+
+  // Use user's preferred workout frequency if provided
+  if (workoutFrequency.includes('2-3 times')) {
+    workoutsPerWeek = 3;
+  } else if (workoutFrequency.includes('3-4 times')) {
+    workoutsPerWeek = 4;
+  } else if (workoutFrequency.includes('4-5 times')) {
+    workoutsPerWeek = 5;
+  } else if (workoutFrequency.includes('5-6 times')) {
+    workoutsPerWeek = 6;
+  } else if (workoutFrequency.includes('6-7 times')) {
+    workoutsPerWeek = 7;
+  }
+
+  // Use user's preferred session duration if provided
+  if (workoutDuration.includes('15-30 minutes')) {
+    sessionDuration = "15-30 minutes";
+  } else if (workoutDuration.includes('30-45 minutes')) {
+    sessionDuration = "30-45 minutes";
+  } else if (workoutDuration.includes('45-60 minutes')) {
+    sessionDuration = "45-60 minutes";
+  } else if (workoutDuration.includes('60-75 minutes')) {
+    sessionDuration = "60-75 minutes";
+  } else if (workoutDuration.includes('75+ minutes')) {
+    sessionDuration = "75+ minutes";
+  }
 
   // Experience-based adjustments
   if (experience.includes('Advanced') || experience.includes('5+ years')) {
@@ -145,7 +247,8 @@ const generatePlan = (answers: any): PersonalizedPlan => {
     sessionDuration,
     equipment,
     features,
-    planType
+    planType,
+    calories
   };
 };
 
@@ -161,7 +264,15 @@ export default function OnboardingPlan() {
       fitnessGoal: urlParams.get('fitnessGoal') || '',
       experience: urlParams.get('experience') || '',
       consistency: urlParams.get('consistency') || '',
-      location: urlParams.get('location') || ''
+      location: urlParams.get('location') || '',
+      age: urlParams.get('age') || '',
+      heightFeet: urlParams.get('heightFeet') || '',
+      heightInches: urlParams.get('heightInches') || '',
+      weight: urlParams.get('weight') || '',
+      weightUnit: urlParams.get('weightUnit') || 'lbs',
+      goalWeight: urlParams.get('goalWeight') || '',
+      workoutFrequency: urlParams.get('workoutFrequency') || '',
+      workoutDuration: urlParams.get('workoutDuration') || ''
     };
 
     // Generate plan based on actual user answers
@@ -267,6 +378,35 @@ export default function OnboardingPlan() {
                 <div className="text-sm text-gray-600 dark:text-gray-400">Location options</div>
               </div>
             </div>
+
+            {/* Personalized Calorie Recommendations */}
+            {plan.calories && (
+              <div className="mb-8 p-6 bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 rounded-lg border border-green-200 dark:border-green-700">
+                <h3 className="text-lg font-semibold mb-4 flex items-center">
+                  <Zap className="w-5 h-5 mr-2 text-green-600" />
+                  Your Personalized Calorie Plan
+                </h3>
+                <div className="grid md:grid-cols-3 gap-4 mb-4">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-green-600">{plan.calories.bmr}</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400">BMR (Base Metabolic Rate)</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-blue-600">{plan.calories.tdee}</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400">TDEE (Total Daily Energy)</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-purple-600">{plan.calories.goal}</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400">Goal Calories</div>
+                  </div>
+                </div>
+                <div className="text-center">
+                  <p className="text-gray-700 dark:text-gray-300">
+                    We recommend consuming <strong>{plan.calories.goal} calories per day</strong> - a {plan.calories.recommendation}
+                  </p>
+                </div>
+              </div>
+            )}
 
             {/* Equipment */}
             <div className="mb-6">
