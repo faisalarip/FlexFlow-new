@@ -61,7 +61,7 @@ export default function Landing() {
             Starts Here
           </h1>
           
-          <p className="text-2xl font-bold text-red-400 mb-4">
+          <p className="text-2xl font-bold text-black mb-4">
             Eat Clean, Think Smart, Train HARD!
           </p>
           
