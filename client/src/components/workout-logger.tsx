@@ -19,6 +19,13 @@ import overheadPressImage from "@assets/generated_images/Man_and_woman_overhead_
 import bicepCurlsImage from "@assets/generated_images/Man_and_woman_bicep_curls_541824d6.png";
 import tricepExtensionsImage from "@assets/generated_images/Black_guy_and_lady_tricep_extensions_3cce0d7d.png";
 import latPulldownImage from "@assets/generated_images/Man_and_woman_lat_pulldown_dbce7bd1.png";
+import rowsImage from "@assets/generated_images/Black_guy_and_lady_rows_0acde538.png";
+import squatsImage from "@assets/generated_images/Black_guy_and_lady_squats_8da85d5d.png";
+import deadliftsImage from "@assets/generated_images/Black_guy_and_lady_deadlifts_3066fc1b.png";
+import lungesImage from "@assets/generated_images/Black_guy_and_lady_lunges_02d114c2.png";
+import legPressImage from "@assets/generated_images/Black_guy_and_lady_leg_press_06e2e1ce.png";
+import calfRaisesImage from "@assets/generated_images/Black_guy_and_lady_calf_raises_3cb5cf18.png";
+import romanianDeadliftsImage from "@assets/generated_images/Black_guy_and_lady_Romanian_deadlifts_cba72218.png";
 
 export default function WorkoutLogger() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -63,6 +70,27 @@ export default function WorkoutLogger() {
     }
     if (exerciseNameLower.includes('lat pulldown') || exerciseNameLower.includes('lat pull down') || exerciseNameLower.includes('pulldown')) {
       return latPulldownImage;
+    }
+    if (exerciseNameLower.includes('row') && !exerciseNameLower.includes('barrow')) {
+      return rowsImage;
+    }
+    if (exerciseNameLower.includes('squat') || exerciseNameLower.includes('squats')) {
+      return squatsImage;
+    }
+    if (exerciseNameLower.includes('deadlift') && !exerciseNameLower.includes('romanian')) {
+      return deadliftsImage;
+    }
+    if (exerciseNameLower.includes('romanian deadlift')) {
+      return romanianDeadliftsImage;
+    }
+    if (exerciseNameLower.includes('lunge') || exerciseNameLower.includes('lunges')) {
+      return lungesImage;
+    }
+    if (exerciseNameLower.includes('leg press')) {
+      return legPressImage;
+    }
+    if (exerciseNameLower.includes('calf raise') || exerciseNameLower.includes('calf raises')) {
+      return calfRaisesImage;
     }
     // Default to dumbbell exercises image for other exercises
     return dumbbellExercisesImage;
