@@ -12,6 +12,7 @@ import type { Exercise } from "@shared/schema";
 import dumbbellExercisesImage from "@assets/generated_images/Man_performing_dumbbell_exercises_1979e4be.png";
 import pushUpExerciseImage from "@assets/generated_images/Man_performing_push-up_exercise_19b36844.png";
 import benchPressImage from "@assets/generated_images/Man_performing_bench_press_44e8cce3.png";
+import pullUpExerciseImage from "@assets/generated_images/Man_performing_pull-ups_1da45f8d.png";
 
 export default function WorkoutLogger() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -35,6 +36,9 @@ export default function WorkoutLogger() {
     }
     if (exerciseNameLower.includes('bench press') || exerciseNameLower.includes('dumbbell press')) {
       return benchPressImage;
+    }
+    if (exerciseNameLower.includes('pull-up') || exerciseNameLower.includes('pullup') || exerciseNameLower.includes('chin-up')) {
+      return pullUpExerciseImage;
     }
     // Default to dumbbell exercises image for other exercises
     return dumbbellExercisesImage;
