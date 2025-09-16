@@ -1,4 +1,4 @@
-import { Activity, Play, Users, Star, Clock, Shield } from "lucide-react";
+import { Activity, Play, Users, Star, Clock, Shield, Target, BarChart3, Utensils, Brain, Dumbbell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function Landing() {
@@ -65,8 +65,10 @@ export default function Landing() {
             Eat Clean, Think Smart, Train HARD!
           </p>
           
-          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-            Track workouts, compete with friends, and achieve your fitness goals with FlexFlow.
+          <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
+            FlexFlow is your all-in-one fitness companion featuring AI-powered workout recommendations, 
+            personalized meal planning, progress tracking, and a supportive community to help you reach 
+            your health and fitness goals faster than ever before.
           </p>
 
           <div className="space-y-4">
@@ -80,48 +82,124 @@ export default function Landing() {
           </div>
         </div>
 
-        {/* Features Grid */}
-        <div className="relative z-10 grid md:grid-cols-2 lg:grid-cols-3 gap-8 mt-20">
-          <div className="text-center p-6 rounded-2xl bg-black border border-red-600/30 shadow-lg shadow-red-600/20">
-            <div className="w-16 h-16 bg-red-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Activity className="text-red-600" size={24} />
-            </div>
-            <h3 className="font-semibold text-lg mb-2 text-white">Workout Tracking</h3>
-            <p className="text-gray-300">
-              Log exercises, track progress, and hit your fitness goals with detailed analytics.
+        {/* App Features Section */}
+        <div className="relative z-10 mt-20">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold text-white mb-4">Complete Fitness Ecosystem</h2>
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+              Everything you need to transform your health and fitness journey in one powerful application
             </p>
           </div>
 
-
-
-          <div className="text-center p-6 rounded-2xl bg-black border border-red-600/30 shadow-lg shadow-red-600/20">
-            <div className="w-16 h-16 bg-red-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Clock className="text-red-600" size={24} />
+          {/* Core Features Grid */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+            <div className="text-center p-6 rounded-2xl bg-black border border-red-600/30 shadow-lg shadow-red-600/20">
+              <div className="w-16 h-16 bg-red-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Dumbbell className="text-red-600" size={24} />
+              </div>
+              <h3 className="font-semibold text-lg mb-2 text-white">Smart Workout Tracking</h3>
+              <p className="text-gray-300 text-sm">
+                Log exercises with sets, reps, and weights. AI automatically adjusts workout difficulty 
+                based on your performance and progress patterns.
+              </p>
             </div>
-            <h3 className="font-semibold text-lg mb-2 text-white">Mile Tracker</h3>
-            <p className="text-gray-300">
-              Track running and walking with timer functionality and detailed pace analytics.
-            </p>
+
+            <div className="text-center p-6 rounded-2xl bg-black border border-red-600/30 shadow-lg shadow-red-600/20">
+              <div className="w-16 h-16 bg-red-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Brain className="text-red-600" size={24} />
+              </div>
+              <h3 className="font-semibold text-lg mb-2 text-white">AI-Powered Plans</h3>
+              <p className="text-gray-300 text-sm">
+                Get personalized workout and nutrition plans based on your age, goals, fitness level, 
+                and preferences. Plans adapt as you progress.
+              </p>
+            </div>
+
+            <div className="text-center p-6 rounded-2xl bg-black border border-red-600/30 shadow-lg shadow-red-600/20">
+              <div className="w-16 h-16 bg-red-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <BarChart3 className="text-red-600" size={24} />
+              </div>
+              <h3 className="font-semibold text-lg mb-2 text-white">Advanced Analytics</h3>
+              <p className="text-gray-300 text-sm">
+                Track strength gains, endurance improvements, and body composition changes with 
+                detailed charts and performance insights.
+              </p>
+            </div>
+
+            <div className="text-center p-6 rounded-2xl bg-black border border-red-600/30 shadow-lg shadow-red-600/20">
+              <div className="w-16 h-16 bg-red-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Utensils className="text-red-600" size={24} />
+              </div>
+              <h3 className="font-semibold text-lg mb-2 text-white">Personalized Nutrition</h3>
+              <p className="text-gray-300 text-sm">
+                Custom meal plans with calorie and macro tracking. Barcode scanner for easy food logging 
+                and recipe recommendations based on your dietary goals.
+              </p>
+            </div>
+
+            <div className="text-center p-6 rounded-2xl bg-black border border-red-600/30 shadow-lg shadow-red-600/20">
+              <div className="w-16 h-16 bg-red-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Clock className="text-red-600" size={24} />
+              </div>
+              <h3 className="font-semibold text-lg mb-2 text-white">Activity Tracking</h3>
+              <p className="text-gray-300 text-sm">
+                Built-in mile tracker with GPS integration, workout timers, and comprehensive 
+                activity monitoring for running, walking, and cardio sessions.
+              </p>
+            </div>
+
+            <div className="text-center p-6 rounded-2xl bg-black border border-red-600/30 shadow-lg shadow-red-600/20">
+              <div className="w-16 h-16 bg-red-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Users className="text-red-600" size={24} />
+              </div>
+              <h3 className="font-semibold text-lg mb-2 text-white">Social Community</h3>
+              <p className="text-gray-300 text-sm">
+                Connect with fitness enthusiasts, compete on leaderboards, share achievements, 
+                and get motivated by a supportive community.
+              </p>
+            </div>
           </div>
 
-          <div className="text-center p-6 rounded-2xl bg-black border border-red-600/30 shadow-lg shadow-red-600/20">
-            <div className="w-16 h-16 bg-red-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Users className="text-red-600" size={24} />
+          {/* Premium Features Section */}
+          <div className="bg-gradient-to-r from-red-600/10 to-red-800/10 rounded-2xl p-8 border border-red-600/20">
+            <div className="text-center mb-8">
+              <div className="w-16 h-16 bg-red-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Shield className="text-red-600" size={32} />
+              </div>
+              <h3 className="text-2xl font-bold text-white mb-2">Premium Features</h3>
+              <p className="text-gray-300">Unlock the full potential of your fitness journey</p>
             </div>
-            <h3 className="font-semibold text-lg mb-2 text-white">Community</h3>
-            <p className="text-gray-300">
-              Share progress, compete on leaderboards, and stay motivated with friends.
-            </p>
-          </div>
-
-          <div className="text-center p-6 rounded-2xl bg-black border border-red-600/30 shadow-lg shadow-red-600/20">
-            <div className="w-16 h-16 bg-red-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Shield className="text-red-600" size={24} />
+            
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="flex items-start space-x-3">
+                <Star className="text-yellow-500 flex-shrink-0 mt-1" size={20} />
+                <div>
+                  <h4 className="font-semibold text-white">Advanced Meal Planning</h4>
+                  <p className="text-gray-300 text-sm">Custom recipes, shopping lists, and nutrition coaching</p>
+                </div>
+              </div>
+              <div className="flex items-start space-x-3">
+                <Target className="text-green-500 flex-shrink-0 mt-1" size={20} />
+                <div>
+                  <h4 className="font-semibold text-white">Personal Training</h4>
+                  <p className="text-gray-300 text-sm">Connect with certified trainers and book sessions</p>
+                </div>
+              </div>
+              <div className="flex items-start space-x-3">
+                <BarChart3 className="text-blue-500 flex-shrink-0 mt-1" size={20} />
+                <div>
+                  <h4 className="font-semibold text-white">Deep Analytics</h4>
+                  <p className="text-gray-300 text-sm">Detailed body composition tracking and trend analysis</p>
+                </div>
+              </div>
+              <div className="flex items-start space-x-3">
+                <Shield className="text-purple-500 flex-shrink-0 mt-1" size={20} />
+                <div>
+                  <h4 className="font-semibold text-white">Priority Support</h4>
+                  <p className="text-gray-300 text-sm">24/7 customer support and exclusive features access</p>
+                </div>
+              </div>
             </div>
-            <h3 className="font-semibold text-lg mb-2 text-white">Premium Features</h3>
-            <p className="text-gray-300">
-              Unlock meal plans, advanced analytics, and priority features.
-            </p>
           </div>
         </div>
 
@@ -141,11 +219,40 @@ export default function Landing() {
       </main>
 
       {/* Footer */}
-      <footer className="relative z-10 border-t bg-white/80 dark:bg-gray-800/80 backdrop-blur py-6">
-        <div className="container mx-auto px-4 text-center">
-          <p className="text-gray-600 dark:text-gray-400">
-            CEO Steven Bates Jr
-          </p>
+      <footer className="relative z-10 border-t bg-black/90 backdrop-blur py-8">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+            <div className="flex items-center space-x-2">
+              <Activity className="text-red-600" size={24} />
+              <span className="text-white font-semibold">FlexFlow</span>
+            </div>
+            
+            <div className="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-6">
+              <a 
+                href="/terms-of-service" 
+                className="text-gray-300 hover:text-white transition-colors text-sm"
+                data-testid="terms-link"
+              >
+                Terms of Service
+              </a>
+              <a 
+                href="/privacy-policy" 
+                className="text-gray-300 hover:text-white transition-colors text-sm"
+                data-testid="privacy-link"
+              >
+                Privacy Policy
+              </a>
+            </div>
+            
+            <div className="text-center md:text-right">
+              <p className="text-gray-400 text-sm">
+                © 2024 FlexFlow. All rights reserved.
+              </p>
+              <p className="text-gray-500 text-xs mt-1">
+                CEO Steven Bates Jr
+              </p>
+            </div>
+          </div>
         </div>
       </footer>
     </div>

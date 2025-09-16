@@ -26,6 +26,8 @@ import TrialSuccess from "@/pages/trial-success";
 import ProfileCompletionGuard from "@/components/profile-completion-guard";
 import AuthSelection from "@/pages/auth-selection";
 import Auth from "@/pages/auth";
+import TermsOfService from "@/pages/terms-of-service";
+import PrivacyPolicy from "@/pages/privacy-policy";
 import { useNewAuth } from "@/hooks/useNewAuth";
 
 function Router() {
@@ -44,6 +46,10 @@ function Router() {
       {isAuthenticated && <Navbar />}
       
       <Switch>
+        {/* Legal pages - accessible to all users */}
+        <Route path="/terms-of-service" component={TermsOfService} />
+        <Route path="/privacy-policy" component={PrivacyPolicy} />
+        
         {!isAuthenticated ? (
           <>
             <Route path="/" component={Landing} />
