@@ -59,7 +59,9 @@ import {
   type UserMealPreferences,
   type InsertUserMealPreferences,
   type AiDifficultyAdjustment,
-  type InsertAiDifficultyAdjustment
+  type InsertAiDifficultyAdjustment,
+  type UserActivityLog,
+  type InsertUserActivityLog
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 import * as bcrypt from "bcrypt";
@@ -777,6 +779,36 @@ export class MemStorage implements IStorage {
       return updatedUser;
     }
     return undefined;
+  }
+
+  // Activity logging methods
+  private userActivities = new Map<string, UserActivityLog[]>();
+
+  async createUserActivity(activityData: InsertUserActivityLog): Promise<UserActivityLog> {
+    const activity: UserActivityLog = {
+      id: randomUUID(),
+      ...activityData,
+      createdAt: new Date(),
+    };
+
+    if (!this.userActivities.has(activityData.userId)) {
+      this.userActivities.set(activityData.userId, []);
+    }
+    
+    const userActivityList = this.userActivities.get(activityData.userId)!;
+    userActivityList.unshift(activity); // Add to front for chronological order
+    
+    // Keep only the most recent 1000 activities per user to prevent memory issues
+    if (userActivityList.length > 1000) {
+      userActivityList.splice(1000);
+    }
+
+    return activity;
+  }
+
+  async getUserActivities(userId: string, limit: number = 100): Promise<UserActivityLog[]> {
+    const userActivityList = this.userActivities.get(userId) || [];
+    return userActivityList.slice(0, limit);
   }
 
   // Authentication methods

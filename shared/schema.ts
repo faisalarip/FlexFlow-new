@@ -163,6 +163,18 @@ export const trainerReviews = pgTable("trainer_reviews", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+// User activity logging for comprehensive tracking
+export const userActivityLog = pgTable("user_activity_log", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  actionType: varchar("action_type").notNull(), // login, logout, workout_logged, goal_set, profile_updated, etc.
+  actionDetails: text("action_details"), // JSON string with additional details
+  ipAddress: varchar("ip_address"),
+  userAgent: text("user_agent"),
+  sessionId: varchar("session_id"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 export type UpsertUser = typeof users.$inferInsert;
 
 // Insert schemas
@@ -214,6 +226,11 @@ export const insertGoalSchema = createInsertSchema(goals).omit({
   createdAt: true,
 });
 
+export const insertUserActivityLogSchema = createInsertSchema(userActivityLog).omit({
+  id: true,
+  createdAt: true,
+});
+
 export const insertPaymentSchema = createInsertSchema(payments).omit({
   id: true,
   createdAt: true,
@@ -260,6 +277,9 @@ export type WorkoutExercise = typeof workoutExercises.$inferSelect;
 
 export type InsertGoal = z.infer<typeof insertGoalSchema>;
 export type Goal = typeof goals.$inferSelect;
+
+export type InsertUserActivityLog = z.infer<typeof insertUserActivityLogSchema>;
+export type UserActivityLog = typeof userActivityLog.$inferSelect;
 
 export type InsertPayment = z.infer<typeof insertPaymentSchema>;
 export type Payment = typeof payments.$inferSelect;
