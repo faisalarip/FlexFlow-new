@@ -179,13 +179,6 @@ export default function Landing() {
                 </div>
               </div>
               <div className="flex items-start space-x-3">
-                <Target className="text-green-500 flex-shrink-0 mt-1" size={20} />
-                <div>
-                  <h4 className="font-semibold text-white">Personal Training</h4>
-                  <p className="text-gray-300 text-sm">Connect with certified trainers and book sessions</p>
-                </div>
-              </div>
-              <div className="flex items-start space-x-3">
                 <BarChart3 className="text-blue-500 flex-shrink-0 mt-1" size={20} />
                 <div>
                   <h4 className="font-semibold text-white">Deep Analytics</h4>
