@@ -32,6 +32,7 @@ import { autoDifficultyAdjuster } from "./auto-difficulty-adjuster";
 import { authService } from "./auth-service";
 import { authenticateToken, optionalAuth, getCurrentUserId as getAuthUserId } from "./auth-middleware";
 import { signUpSchema, signInSchema } from "@shared/schema";
+import { ActivityLogger } from "./activity-logger";
 import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { randomBytes } from "crypto";
@@ -145,6 +146,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userData = signUpSchema.parse(req.body);
       
       const result = await authService.signUp(userData);
+
+      // Log account creation activity
+      await ActivityLogger.logActivity({
+        userId: result.user.id,
+        actionType: 'signup',
+        actionDetails: {
+          method: 'email_password',
+          username: result.user.username,
+          email: result.user.email
+        },
+        ipAddress: req.ip,
+        userAgent: req.get('user-agent') || undefined
+      });
       
       res.status(201).json({
         message: "Account created successfully",
@@ -171,6 +185,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const credentials = signInSchema.parse(req.body);
       const result = await authService.signIn(credentials);
+
+      // Log login activity
+      await ActivityLogger.logLogin(result.user.id, req.ip, req.get('user-agent') || undefined);
       
       res.json({
         message: "Signed in successfully",
@@ -218,8 +235,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Logout route (clears auth cookie)
-  app.post('/api/auth/logout', (req, res) => {
+  app.post('/api/auth/logout', optionalAuth, async (req, res) => {
     try {
+      const userId = getAuthUserId(req);
+
+      // Log logout activity if user was authenticated
+      if (userId) {
+        await ActivityLogger.logLogout(userId);
+      }
+
       // Clear the auth cookie
       res.clearCookie('auth-token', {
         httpOnly: true,
@@ -309,9 +333,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       passport.authenticate('google', { session: false })(req, res, next);
-    }, (req: any, res) => {
+    }, async (req: any, res) => {
         try {
           const authResult = req.user;
+
+          // Log Google login activity
+          await ActivityLogger.logActivity({
+            userId: authResult.user.id,
+            actionType: 'login',
+            actionDetails: {
+              method: 'google',
+              email: authResult.user.email
+            },
+            ipAddress: req.ip,
+            userAgent: req.get('user-agent') || undefined
+          });
           
           // Set secure httpOnly cookie with JWT token
           const cookieOptions = {
@@ -400,6 +436,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       
       const workout = await storage.createWorkout(data);
+
+      // Log workout creation activity
+      await ActivityLogger.logWorkout(userId, {
+        name: workout.name,
+        duration: workout.duration,
+        caloriesBurned: workout.caloriesBurned,
+        exercises: req.body.exercises || []
+      });
+
       res.status(201).json(workout);
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -765,6 +810,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       
       const goal = await storage.createGoal(data);
+
+      // Log goal creation activity
+      await ActivityLogger.logGoalSet(userId, {
+        type: goal.type,
+        target: goal.target,
+        period: goal.period
+      });
+
       res.status(201).json(goal);
     } catch (error) {
       if (error instanceof z.ZodError) {

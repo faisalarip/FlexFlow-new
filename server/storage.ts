@@ -85,6 +85,10 @@ export interface IStorage {
   getUserByUsernameOrEmail(identifier: string): Promise<User | undefined>;
   upsertUserFromGoogle(googleData: GoogleAuthData): Promise<User>;
   verifyUserEmail(userId: string): Promise<User | undefined>;
+
+  // Activity logging methods
+  createUserActivity(activityData: InsertUserActivityLog): Promise<UserActivityLog>;
+  getUserActivities(userId: string, limit?: number): Promise<UserActivityLog[]>;
   
   
   // Exercises
