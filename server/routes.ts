@@ -33,9 +33,6 @@ import { authService } from "./auth-service";
 import { authenticateToken, optionalAuth, getCurrentUserId as getAuthUserId } from "./auth-middleware";
 import { signUpSchema, signInSchema } from "@shared/schema";
 import { ActivityLogger } from "./activity-logger";
-import passport from "passport";
-import { Strategy as GoogleStrategy } from "passport-google-oauth20";
-import { randomBytes } from "crypto";
 
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
@@ -44,84 +41,8 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2023-10-16",
 });
 
-// Custom state management for OAuth (without sessions)
-interface StateEntry {
-  timestamp: number;
-  ttl: number;
-}
-
-const oauthStates = new Map<string, StateEntry>();
-const STATE_TTL = 10 * 60 * 1000; // 10 minutes
-
-function generateState(): string {
-  const state = randomBytes(32).toString('hex');
-  oauthStates.set(state, {
-    timestamp: Date.now(),
-    ttl: STATE_TTL
-  });
-  return state;
-}
-
-function validateAndRemoveState(state: string): boolean {
-  const entry = oauthStates.get(state);
-  if (!entry) {
-    return false;
-  }
-  
-  // Check if expired
-  if (Date.now() - entry.timestamp > entry.ttl) {
-    oauthStates.delete(state);
-    return false;
-  }
-  
-  // Valid state, remove it (one-time use)
-  oauthStates.delete(state);
-  return true;
-}
-
-// Clean up expired states periodically
-setInterval(() => {
-  const now = Date.now();
-  for (const [state, entry] of oauthStates.entries()) {
-    if (now - entry.timestamp > entry.ttl) {
-      oauthStates.delete(state);
-    }
-  }
-}, 5 * 60 * 1000); // Clean up every 5 minutes
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Configure Google OAuth Strategy
-  if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
-    // Get the proper domain for callback URL
-    const domain = process.env.REPLIT_DOMAINS || 'localhost:5000';
-    const protocol = process.env.REPLIT_DOMAINS ? 'https' : 'http';
-    const callbackURL = `${protocol}://${domain}/auth/google/callback`;
-    
-    passport.use(new GoogleStrategy({
-      clientID: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: callbackURL
-      // Using custom state management instead of built-in state support
-    },
-    async (accessToken, refreshToken, profile, done) => {
-      try {
-        const googleData = {
-          googleId: profile.id,
-          email: profile.emails?.[0]?.value || "",
-          firstName: profile.name?.givenName || "",
-          lastName: profile.name?.familyName || "",
-          profileImageUrl: profile.photos?.[0]?.value || "",
-        };
-
-        const result = await authService.signInWithGoogle(googleData);
-        return done(null, result);
-      } catch (error) {
-        return done(error, null);
-      }
-    }));
-
-    app.use(passport.initialize());
-  }
 
   // Note: Removed Replit Auth integration as requested
 
@@ -312,67 +233,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Google OAuth Routes
-  if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
-    // Initiate Google OAuth with custom state management
-    app.get('/auth/google', (req, res, next) => {
-      const state = generateState();
-      passport.authenticate('google', {
-        scope: ['profile', 'email'],
-        state: state
-      })(req, res, next);
-    });
-
-    // Google OAuth callback with state validation
-    app.get('/auth/google/callback', (req: any, res, next) => {
-      // Validate state parameter
-      const state = req.query.state as string;
-      if (!state || !validateAndRemoveState(state)) {
-        console.error('Invalid or missing state parameter in OAuth callback');
-        return res.redirect('/?error=oauth_state_invalid');
-      }
-      
-      passport.authenticate('google', { session: false })(req, res, next);
-    }, async (req: any, res) => {
-        try {
-          const authResult = req.user;
-
-          // Log Google login activity
-          await ActivityLogger.logActivity({
-            userId: authResult.user.id,
-            actionType: 'login',
-            actionDetails: {
-              method: 'google',
-              email: authResult.user.email
-            },
-            ipAddress: req.ip,
-            userAgent: req.get('user-agent') || undefined
-          });
-          
-          // Set secure httpOnly cookie with JWT token
-          const cookieOptions = {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax' as const,
-            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-            path: '/'
-          };
-          
-          res.cookie('auth-token', authResult.token, cookieOptions);
-          
-          // Redirect to frontend without exposing token in URL
-          const domain = process.env.REPLIT_DOMAINS || 'localhost:5000';
-          const protocol = process.env.REPLIT_DOMAINS ? 'https' : 'http';
-          const frontendURL = `${protocol}://${domain}`;
-          
-          res.redirect(`${frontendURL}?auth=success`);
-        } catch (error) {
-          console.error("Google OAuth callback error:", error);
-          res.redirect('/?error=google_auth_failed');
-        }
-      }
-    );
-  }
 
 
   // Get exercises
