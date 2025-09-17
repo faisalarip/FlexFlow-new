@@ -2652,7 +2652,20 @@ export class DatabaseStorage implements IStorage {
   async getUserByUsername(username: string): Promise<User | undefined> { return this.memStorage.getUserByUsername(username); }
   async createUser(user: InsertUser): Promise<User> { return this.memStorage.createUser(user); }
   async updateUserStreak(id: string, streak: number): Promise<User | undefined> { return this.memStorage.updateUserStreak(id, streak); }
-  async updateUser(id: string, updates: Partial<User>): Promise<User | undefined> { return this.memStorage.updateUser(id, updates); }
+  
+  async updateUser(id: string, updates: Partial<User>): Promise<User | undefined> {
+    try {
+      const [user] = await db
+        .update(users)
+        .set({ ...updates, updatedAt: new Date() })
+        .where(eq(users.id, id))
+        .returning();
+      return user;
+    } catch (error) {
+      console.error('Database updateUser error:', error);
+      return undefined;
+    }
+  }
   
   // Exercise methods
   async getExercises(): Promise<Exercise[]> { return this.memStorage.getExercises(); }
