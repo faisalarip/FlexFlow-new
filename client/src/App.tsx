@@ -51,6 +51,9 @@ function Router() {
         <Route path="/terms-of-service" component={TermsOfService} />
         <Route path="/privacy-policy" component={PrivacyPolicy} />
         
+        {/* Tutorial page - always available but checks auth internally */}
+        <Route path="/tutorial" component={Tutorial} />
+        
         {!isAuthenticated ? (
           <>
             <Route path="/" component={Landing} />
@@ -64,7 +67,6 @@ function Router() {
         ) : (
           <ProfileCompletionGuard>
             <Route path="/" component={Dashboard} />
-            <Route path="/tutorial" component={Tutorial} />
             <Route path="/subscription" component={UserSubscription} />
             <Route path="/leaderboard" component={Leaderboard} />
             <Route path="/mile-tracker" component={MileTracker} />
