@@ -83,7 +83,7 @@ export default function ProfileEditor({ trigger, isOpen: externalIsOpen, setIsOp
         return response.json();
       }
     },
-    onSuccess: (updatedUser) => {
+    onSuccess: (updatedUser, profileData) => {
       // Update the cached user data
       queryClient.setQueryData(["/api/auth/user"], updatedUser);
       queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
