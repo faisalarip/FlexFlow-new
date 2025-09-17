@@ -1,7 +1,7 @@
 import * as bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { storage } from "./storage";
-import { signUpSchema, signInSchema, type SignUpData, type SignInData, type GoogleAuthData } from "@shared/schema";
+import { signUpSchema, signInSchema, type SignUpData, type SignInData } from "@shared/schema";
 
 // JWT secret - in production, this should be a long, random secret
 const JWT_SECRET = process.env.JWT_SECRET || "your-super-secret-jwt-key-change-in-production";
@@ -86,7 +86,7 @@ export class AuthService {
 
     // Check if user has a password (not OAuth-only user)
     if (!user.passwordHash) {
-      throw new Error("This account was created with Google. Please sign in with Google.");
+      throw new Error("This account requires a password. Please set a password to sign in.");
     }
 
     // Verify password
@@ -123,44 +123,6 @@ export class AuthService {
     };
   }
 
-  /**
-   * Handle Google OAuth sign in/up
-   */
-  async signInWithGoogle(googleData: GoogleAuthData): Promise<AuthResult> {
-    try {
-      // Create or update user from Google data
-      const user = await storage.upsertUserFromGoogle(googleData);
-      
-      // Generate JWT token
-      const token = jwt.sign(
-        { 
-          userId: user.id, 
-          email: user.email,
-          username: user.username,
-          authProvider: user.authProvider,
-          googleId: user.googleId 
-        },
-        JWT_SECRET,
-        { expiresIn: JWT_EXPIRES_IN }
-      );
-
-      return {
-        user: {
-          id: user.id,
-          email: user.email,
-          username: user.username,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          profileImageUrl: user.profileImageUrl,
-          authProvider: user.authProvider,
-          isEmailVerified: user.isEmailVerified,
-        },
-        token
-      };
-    } catch (error: any) {
-      throw new Error("Failed to sign in with Google. Please try again.");
-    }
-  }
 
   /**
    * Verify JWT token and return user data
@@ -236,7 +198,7 @@ export class AuthService {
     }
 
     if (!user.passwordHash) {
-      throw new Error("This account was created with Google and doesn't have a password");
+      throw new Error("This account doesn't have a password set. Please contact support to reset your password.");
     }
 
     // Verify current password
