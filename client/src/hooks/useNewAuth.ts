@@ -57,33 +57,6 @@ export function useNewAuth() {
     retry: false,
   });
 
-  // Handle OAuth callback (now cookie-based, no tokens in URL)
-  useEffect(() => {
-    const handleOAuthCallback = () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const authSuccess = urlParams.get('auth');
-      const authError = urlParams.get('error');
-      
-      if (authSuccess === 'success' && localStorage.getItem('oauth-in-progress')) {
-        // OAuth success - cookie is already set by server
-        localStorage.removeItem('oauth-in-progress');
-        
-        // Clear URL parameters
-        window.history.replaceState({}, document.title, window.location.pathname);
-        
-        // Invalidate queries to refetch with new cookie
-        queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
-      } else if (authError) {
-        console.error('OAuth error:', authError);
-        localStorage.removeItem('oauth-in-progress');
-        
-        // Clear URL parameters
-        window.history.replaceState({}, document.title, window.location.pathname);
-      }
-    };
-
-    handleOAuthCallback();
-  }, [queryClient]);
 
   const signIn = (user: AuthUser, authToken: string) => {
     localStorage.setItem('auth-token', authToken);
