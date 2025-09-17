@@ -90,10 +90,10 @@ const tutorialSteps: TutorialStep[] = [
   {
     id: 6,
     title: "Ready to Start!",
-    description: "You're all set to begin your fitness journey. Let's explore your personalized dashboard.",
+    description: "You're all set to begin your fitness journey. Let's explore your personalized home.",
     icon: <Trophy className="h-12 w-12 text-yellow-500" />,
     features: [
-      "Access your personalized dashboard",
+      "Access your personalized home",
       "View your fitness plan and goals",
       "Start logging workouts today",
       "Explore all features at your own pace"
@@ -133,7 +133,7 @@ export default function TutorialPage() {
 
   const handleNext = () => {
     if (isLastStep) {
-      // Complete tutorial and go to dashboard
+      // Complete tutorial and go to home
       setLocation('/');
     } else {
       setCurrentStep(prev => Math.min(prev + 1, tutorialSteps.length - 1));
@@ -252,11 +252,11 @@ export default function TutorialPage() {
               <Button 
                 onClick={handleNext}
                 className="bg-red-500 hover:bg-red-600 text-white"
-                data-testid={isLastStep ? "button-go-to-dashboard" : "button-next-step"}
+                data-testid={isLastStep ? "button-go-to-home" : "button-next-step"}
               >
                 {isLastStep ? (
                   <>
-                    Go to Dashboard
+                    Go to Home
                     <Home className="h-4 w-4 ml-1" />
                   </>
                 ) : (
@@ -279,7 +279,7 @@ export default function TutorialPage() {
                   🎉 You're Ready to Begin!
                 </h3>
                 <p className="text-gray-300 mb-4">
-                  Your personalized fitness dashboard is waiting. Start by setting your first goal or logging a workout.
+                  Your personalized fitness home is waiting. Start by setting your first goal or logging a workout.
                 </p>
                 <div className="flex justify-center space-x-3">
                   <Badge variant="secondary" className="bg-red-500/20 text-red-300 border-red-500/30">

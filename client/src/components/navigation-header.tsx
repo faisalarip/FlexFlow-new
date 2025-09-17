@@ -42,9 +42,9 @@ export default function NavigationHeader() {
                   ? "text-primary font-medium border-b-2 border-primary"
                   : "text-gray-600 hover:text-primary"
               }`}
-              data-testid="nav-dashboard"
+              data-testid="nav-home"
             >
-              Dashboard
+              Home
             </Link>
             <Link
               href="/workouts"
@@ -150,9 +150,9 @@ export default function NavigationHeader() {
                   : "text-gray-600 hover:text-primary hover:bg-gray-50"
               }`}
               onClick={() => setIsMobileMenuOpen(false)}
-              data-testid="mobile-nav-dashboard"
+              data-testid="mobile-nav-home"
             >
-              Dashboard
+              Home
             </Link>
             <Link
               href="/workouts"

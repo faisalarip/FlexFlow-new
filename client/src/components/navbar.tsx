@@ -16,7 +16,7 @@ export default function Navbar() {
   const mainNavItems = [
     { 
       path: "/", 
-      label: "Dashboard", 
+      label: "Home", 
       icon: Home 
     }
   ];

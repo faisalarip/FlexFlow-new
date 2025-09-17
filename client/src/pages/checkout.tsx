@@ -111,7 +111,7 @@ export default function Checkout() {
           <CardContent className="pt-6">
             <p className="text-center text-red-600">Payment initialization failed. Please try again.</p>
             <Button asChild className="w-full mt-4">
-              <Link href="/dashboard">Return to Dashboard</Link>
+              <Link href="/">Return to Home</Link>
             </Button>
           </CardContent>
         </Card>
@@ -124,9 +124,9 @@ export default function Checkout() {
     <div className="min-h-screen bg-gray-50 py-8 px-4">
       <div className="max-w-2xl mx-auto">
         <div className="mb-8">
-          <Link href="/dashboard" className="inline-flex items-center text-primary hover:text-primary/80 mb-4">
+          <Link href="/" className="inline-flex items-center text-primary hover:text-primary/80 mb-4">
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Dashboard
+            Back to Home
           </Link>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Complete Your Purchase</h1>
           <p className="text-gray-600">Unlock premium features with FlexFlow Premium</p>

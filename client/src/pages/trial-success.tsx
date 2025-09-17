@@ -140,7 +140,7 @@ export default function TrialSuccess() {
                 What's Next?
               </div>
               <div className="text-sm text-gray-600 dark:text-gray-400">
-                Create your account to access your personalized dashboard and start your fitness journey
+                Create your account to access your personalized home and start your fitness journey
               </div>
             </div>
 
