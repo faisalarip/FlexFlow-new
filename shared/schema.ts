@@ -25,8 +25,7 @@ export const users = pgTable("users", {
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),
-  authProvider: varchar("auth_provider").default("local"), // 'local', 'google', 'replit'
-  googleId: varchar("google_id").unique(), // Google OAuth ID
+  authProvider: varchar("auth_provider").default("local"), // 'local', 'replit'
   isEmailVerified: boolean("is_email_verified").default(false),
   streak: integer("streak").notNull().default(0),
   subscriptionStatus: varchar("subscription_status").default("free_trial"), // free_trial, active, inactive, expired
@@ -199,13 +198,6 @@ export const signInSchema = z.object({
   password: z.string().min(1),
 });
 
-export const googleAuthSchema = z.object({
-  email: z.string().email(),
-  firstName: z.string().optional(),
-  lastName: z.string().optional(),
-  profileImageUrl: z.string().url().optional(),
-  googleId: z.string(),
-});
 
 export const insertExerciseSchema = createInsertSchema(exercises).omit({
   id: true,
@@ -661,4 +653,3 @@ export type AiDifficultyAdjustment = typeof aiDifficultyAdjustments.$inferSelect
 // Authentication types
 export type SignUpData = z.infer<typeof signUpSchema>;
 export type SignInData = z.infer<typeof signInSchema>;
-export type GoogleAuthData = z.infer<typeof googleAuthSchema>;
