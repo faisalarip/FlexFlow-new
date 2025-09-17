@@ -63,8 +63,15 @@ export default function ProfileEditor({ trigger, isOpen: externalIsOpen, setIsOp
         formData.append('firstName', profileData.firstName);
         formData.append('lastName', profileData.lastName);
         
+        const token = localStorage.getItem('auth-token');
+        const headers: Record<string, string> = {};
+        if (token) {
+          headers["Authorization"] = `Bearer ${token}`;
+        }
+        
         const response = await fetch('/api/user/profile/upload', {
           method: 'POST',
+          headers,
           body: formData,
           credentials: 'include',
         });
