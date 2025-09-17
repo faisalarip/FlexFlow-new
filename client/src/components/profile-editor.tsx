@@ -66,6 +66,7 @@ export default function ProfileEditor({ trigger, isOpen: externalIsOpen, setIsOp
         const response = await fetch('/api/user/profile/upload', {
           method: 'POST',
           body: formData,
+          credentials: 'include',
         });
         
         if (!response.ok) {
@@ -88,8 +89,8 @@ export default function ProfileEditor({ trigger, isOpen: externalIsOpen, setIsOp
       queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
       
       toast({
-        title: "Profile Updated",
-        description: "Your name has been updated successfully!",
+        title: "Profile Updated", 
+        description: profileData.profileImage ? "Your profile picture and information have been updated successfully!" : "Your profile information has been updated successfully!",
       });
       
       setIsOpen(false);
