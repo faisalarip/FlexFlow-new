@@ -596,8 +596,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Serve profile images
-  app.get("/api/user/profile/image/:filename", authenticateToken, async (req, res) => {
+  // Serve profile images (no auth required for display)
+  app.get("/api/user/profile/image/:filename", async (req, res) => {
     try {
       const { filename } = req.params;
       const uploadsDir = path.join(process.cwd(), 'uploads', 'profiles');
