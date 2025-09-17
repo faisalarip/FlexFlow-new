@@ -844,7 +844,6 @@ export class MemStorage implements IStorage {
         lastName: userData.lastName,
         profileImageUrl: null,
         authProvider: "local",
-        googleId: null,
         isEmailVerified: false,
         streak: 0,
         subscriptionStatus: "free_trial",
