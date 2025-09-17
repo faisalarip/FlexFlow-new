@@ -4,7 +4,6 @@ import {
   type UpsertUser,
   type SignUpData,
   type SignInData,
-  type GoogleAuthData,
   type Exercise,
   type InsertExercise,
   type Workout,
@@ -83,7 +82,6 @@ export interface IStorage {
   createUserWithPassword(userData: SignUpData): Promise<User>;
   getUserByEmail(email: string): Promise<User | undefined>;
   getUserByUsernameOrEmail(identifier: string): Promise<User | undefined>;
-  upsertUserFromGoogle(googleData: GoogleAuthData): Promise<User>;
   verifyUserEmail(userId: string): Promise<User | undefined>;
 
   // Activity logging methods
@@ -877,60 +875,6 @@ export class MemStorage implements IStorage {
     );
   }
 
-  async upsertUserFromGoogle(googleData: GoogleAuthData): Promise<User> {
-    // Check if user already exists by Google ID or email
-    const existingUser = Array.from(this.users.values()).find(user => 
-      user.googleId === googleData.googleId || user.email === googleData.email
-    );
-
-    const now = new Date();
-
-    if (existingUser) {
-      // Update existing user with Google data
-      const updatedUser: User = {
-        ...existingUser,
-        googleId: googleData.googleId,
-        authProvider: "google",
-        firstName: googleData.firstName || existingUser.firstName,
-        lastName: googleData.lastName || existingUser.lastName,
-        profileImageUrl: googleData.profileImageUrl || existingUser.profileImageUrl,
-        isEmailVerified: true, // Google accounts are considered verified
-        updatedAt: now,
-      };
-      
-      this.users.set(existingUser.id, updatedUser);
-      return updatedUser;
-    } else {
-      // Create new user from Google data
-      const id = randomUUID();
-      const freeTrialExpiry = new Date(now.getTime() + (7 * 24 * 60 * 60 * 1000)); // 7 days from now
-      
-      const user: User = {
-        id,
-        email: googleData.email,
-        username: null,
-        passwordHash: null,
-        firstName: googleData.firstName || null,
-        lastName: googleData.lastName || null,
-        profileImageUrl: googleData.profileImageUrl || null,
-        authProvider: "google",
-        googleId: googleData.googleId,
-        isEmailVerified: true, // Google accounts are considered verified
-        streak: 0,
-        subscriptionStatus: "free_trial",
-        subscriptionStartDate: now,
-        lastPaymentDate: null,
-        subscriptionExpiresAt: freeTrialExpiry,
-        stripeCustomerId: null,
-        stripeSubscriptionId: null,
-        createdAt: now,
-        updatedAt: now,
-      };
-
-      this.users.set(id, user);
-      return user;
-    }
-  }
 
   async verifyUserEmail(userId: string): Promise<User | undefined> {
     const user = this.users.get(userId);
@@ -2691,51 +2635,6 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
-  async upsertUserFromGoogle(googleData: GoogleAuthData): Promise<User> {
-    // Try to find existing user by googleId or email
-    const existingUser = await db
-      .select()
-      .from(users)
-      .where(or(eq(users.googleId, googleData.googleId), eq(users.email, googleData.email)))
-      .limit(1);
-
-    if (existingUser.length > 0) {
-      // Update existing user
-      const [updatedUser] = await db
-        .update(users)
-        .set({
-          googleId: googleData.googleId,
-          email: googleData.email,
-          firstName: googleData.firstName,
-          lastName: googleData.lastName,
-          profileImageUrl: googleData.profileImageUrl,
-          isEmailVerified: true,
-          updatedAt: new Date(),
-        })
-        .where(eq(users.id, existingUser[0].id))
-        .returning();
-      
-      return updatedUser;
-    } else {
-      // Create new user
-      const [newUser] = await db
-        .insert(users)
-        .values({
-          googleId: googleData.googleId,
-          email: googleData.email,
-          firstName: googleData.firstName,
-          lastName: googleData.lastName,
-          profileImageUrl: googleData.profileImageUrl,
-          authProvider: "google",
-          isEmailVerified: true,
-          subscriptionStatus: "free_trial",
-          subscriptionExpiresAt: new Date(Date.now() + (7 * 24 * 60 * 60 * 1000)), // 7 days from now
-        })
-        .returning();
-      
-      return newUser;
-    }
-  }
 
   async verifyUserEmail(userId: string): Promise<User | undefined> {
     const [user] = await db
