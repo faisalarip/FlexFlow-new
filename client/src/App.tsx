@@ -26,6 +26,7 @@ import TrialSuccess from "@/pages/trial-success";
 import ProfileCompletionGuard from "@/components/profile-completion-guard";
 import AuthSelection from "@/pages/auth-selection";
 import Auth from "@/pages/auth";
+import Tutorial from "@/pages/tutorial";
 import TermsOfService from "@/pages/terms-of-service";
 import PrivacyPolicy from "@/pages/privacy-policy";
 import { useNewAuth } from "@/hooks/useNewAuth";
@@ -63,6 +64,7 @@ function Router() {
         ) : (
           <ProfileCompletionGuard>
             <Route path="/" component={Dashboard} />
+            <Route path="/tutorial" component={Tutorial} />
             <Route path="/subscription" component={UserSubscription} />
             <Route path="/leaderboard" component={Leaderboard} />
             <Route path="/mile-tracker" component={MileTracker} />

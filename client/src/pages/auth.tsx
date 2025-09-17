@@ -69,8 +69,8 @@ export default function AuthPage({ mode = "signup" }: AuthPageProps) {
       });
       signIn(data.user, data.token);
       
-      // Redirect to dashboard (root path when authenticated)
-      setTimeout(() => setLocation('/'), 100);
+      // Redirect new users to tutorial page
+      setTimeout(() => setLocation('/tutorial'), 100);
     },
     onError: (error: any) => {
       const errorMessage = error.message || "Failed to create account";
