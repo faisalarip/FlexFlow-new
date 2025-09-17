@@ -627,11 +627,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "First name or last name is required" });
       }
       
-      const updatedUser = await storage.updateUser(userId, {
-        firstName: firstName?.trim() || null,
-        lastName: lastName?.trim() || null,
-        updatedAt: new Date()
-      });
+      // Create safe updates object with only allowed profile fields
+      const safeUpdates: Partial<{ firstName: string | null; lastName: string | null; updatedAt: Date }> = {};
+      if (firstName?.trim()) safeUpdates.firstName = firstName.trim();
+      if (lastName?.trim()) safeUpdates.lastName = lastName.trim();
+      safeUpdates.updatedAt = new Date();
+      
+      const updatedUser = await storage.updateUser(userId, safeUpdates);
       
       if (!updatedUser) {
         return res.status(404).json({ message: "User not found" });
