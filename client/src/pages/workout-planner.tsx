@@ -91,6 +91,8 @@ export default function WorkoutPlannerPage() {
         title: "Preferences Saved! 🎯",
         description: "Your workout preferences have been saved successfully.",
       });
+      // After saving preferences, generate the plan
+      generatePlanMutation.mutate();
     },
   });
 
@@ -180,6 +182,20 @@ export default function WorkoutPlannerPage() {
         { value: "pilates", label: "Pilates", description: "Core strength and stability" },
         { value: "functional", label: "Functional Training", description: "Real-world movement patterns" }
       ]
+    },
+    {
+      key: "injuriesOrLimitations",
+      title: "Do you have any injuries or physical limitations?",
+      type: "checkbox",
+      options: [
+        { value: "none", label: "No injuries or limitations", description: "I can do all exercises" },
+        { value: "knee", label: "Knee issues", description: "Knee pain or limitations" },
+        { value: "back", label: "Back problems", description: "Lower or upper back issues" },
+        { value: "shoulder", label: "Shoulder issues", description: "Shoulder pain or mobility limits" },
+        { value: "ankle", label: "Ankle problems", description: "Ankle instability or pain" },
+        { value: "wrist", label: "Wrist/hand issues", description: "Wrist pain or grip limitations" },
+        { value: "other", label: "Other limitations", description: "Other physical restrictions" }
+      ]
     }
   ];
 
@@ -198,9 +214,8 @@ export default function WorkoutPlannerPage() {
     if (currentStep < questions.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
-      // Final step - save preferences and generate plan
+      // Final step - save preferences (which will trigger plan generation)
       savePreferencesMutation.mutate(questionnaire);
-      generatePlanMutation.mutate();
     }
   };
 
