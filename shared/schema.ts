@@ -84,6 +84,51 @@ export const workoutExercises = pgTable("workout_exercises", {
   difficultyAdjustment: integer("difficulty_adjustment").default(0), // -2 to +2 adjustment from base difficulty
 });
 
+// User workout preferences for the planner
+export const workoutPreferences = pgTable("workout_preferences", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id).notNull().unique(),
+  fitnessLevel: text("fitness_level").notNull(), // beginner, intermediate, advanced
+  primaryGoals: text("primary_goals").array().notNull(), // lose_weight, build_muscle, improve_endurance, etc.
+  workoutDaysPerWeek: integer("workout_days_per_week").notNull().default(3),
+  sessionDuration: integer("session_duration").notNull().default(45), // in minutes
+  availableEquipment: text("available_equipment").array().notNull().default(sql`ARRAY[]::text[]`), // dumbbells, barbell, resistance_bands, etc.
+  preferredWorkoutTypes: text("preferred_workout_types").array().notNull(), // strength, cardio, yoga, etc.
+  injuriesOrLimitations: text("injuries_or_limitations").array().default(sql`ARRAY[]::text[]`),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Generated workout plans
+export const workoutPlans = pgTable("workout_plans", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  name: text("name").notNull(),
+  description: text("description"),
+  durationWeeks: integer("duration_weeks").notNull().default(4),
+  isActive: boolean("is_active").default(false),
+  generatedAt: timestamp("generated_at").defaultNow().notNull(),
+  startDate: timestamp("start_date"),
+  endDate: timestamp("end_date"),
+});
+
+// Daily workout schedules within a plan
+export const plannedWorkouts = pgTable("planned_workouts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  planId: varchar("plan_id").references(() => workoutPlans.id).notNull(),
+  dayOfWeek: integer("day_of_week").notNull(), // 0-6 (Sunday-Saturday)
+  weekNumber: integer("week_number").notNull(), // 1-N within the plan
+  workoutType: text("workout_type").notNull(), // strength, cardio, yoga, rest
+  name: text("name").notNull(),
+  description: text("description"),
+  estimatedDuration: integer("estimated_duration").notNull(), // in minutes
+  targetCalories: integer("target_calories"),
+  exercises: text("exercises").array().default(sql`ARRAY[]::text[]`), // exercise IDs
+  isRestDay: boolean("is_rest_day").default(false),
+  completed: boolean("completed").default(false),
+  completedAt: timestamp("completed_at"),
+});
+
 export const goals = pgTable("goals", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: varchar("user_id").references(() => users.id).notNull(),
@@ -218,6 +263,21 @@ export const insertGoalSchema = createInsertSchema(goals).omit({
   createdAt: true,
 });
 
+export const insertWorkoutPreferencesSchema = createInsertSchema(workoutPreferences).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertWorkoutPlanSchema = createInsertSchema(workoutPlans).omit({
+  id: true,
+  generatedAt: true,
+});
+
+export const insertPlannedWorkoutSchema = createInsertSchema(plannedWorkouts).omit({
+  id: true,
+});
+
 export const insertUserActivityLogSchema = createInsertSchema(userActivityLog).omit({
   id: true,
   createdAt: true,
@@ -269,6 +329,15 @@ export type WorkoutExercise = typeof workoutExercises.$inferSelect;
 
 export type InsertGoal = z.infer<typeof insertGoalSchema>;
 export type Goal = typeof goals.$inferSelect;
+
+export type InsertWorkoutPreferences = z.infer<typeof insertWorkoutPreferencesSchema>;
+export type WorkoutPreferences = typeof workoutPreferences.$inferSelect;
+
+export type InsertWorkoutPlan = z.infer<typeof insertWorkoutPlanSchema>;
+export type WorkoutPlan = typeof workoutPlans.$inferSelect;
+
+export type InsertPlannedWorkout = z.infer<typeof insertPlannedWorkoutSchema>;
+export type PlannedWorkout = typeof plannedWorkouts.$inferSelect;
 
 export type InsertUserActivityLog = z.infer<typeof insertUserActivityLogSchema>;
 export type UserActivityLog = typeof userActivityLog.$inferSelect;

@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Home, Users, Calendar, Trophy, Activity, Camera, Award, MapPin, MessageSquare, ChefHat, CreditCard, Star, ChevronDown, Menu, LogOut, Settings } from "lucide-react";
+import { Home, Users, Calendar, Trophy, Activity, Camera, Award, MapPin, MessageSquare, ChefHat, CreditCard, Star, ChevronDown, Menu, LogOut, Settings, Target } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -26,6 +26,11 @@ export default function Navbar() {
       path: "/subscription", 
       label: "Premium", 
       icon: Star 
+    },
+    { 
+      path: "/workout-planner", 
+      label: "Workout Planner", 
+      icon: Target 
     },
     { 
       path: "/leaderboard", 
