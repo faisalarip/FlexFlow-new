@@ -45,7 +45,7 @@ Guidelines:
 - For ${mealType}, consider appropriate portion sizes for that meal type`;
 
     const response = await openai.chat.completions.create({
-      model: "gpt-5",
+      model: "gpt-4o",
       messages: [
         {
           role: "system",
@@ -68,7 +68,7 @@ Guidelines:
         },
       ],
       response_format: { type: "json_object" },
-      max_completion_tokens: 1000,
+      max_tokens: 1000,
     });
 
     const result = JSON.parse(response.choices[0].message.content || '{}');

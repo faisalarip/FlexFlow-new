@@ -257,6 +257,7 @@ export class MemStorage implements IStorage {
   private foodItems: Map<string, FoodItem> = new Map();
   private userFoodPreferences: Map<string, UserFoodPreference> = new Map();
   private aiDifficultyAdjustments: Map<string, AiDifficultyAdjustment> = new Map();
+  private mealEntries: Map<string, MealEntry> = new Map();
 
   constructor() {
     this.seedExercises();
@@ -2567,6 +2568,41 @@ export class MemStorage implements IStorage {
     
     this.aiDifficultyAdjustments.set(adjustmentId, updatedAdjustment);
     return true;
+  }
+
+  // Meal Tracking methods implementation
+  async getMealEntries(userId: string, date?: string): Promise<MealEntry[]> {
+    const entries = Array.from(this.mealEntries.values()).filter(entry => entry.userId === userId);
+    
+    if (date) {
+      const targetDate = new Date(date);
+      return entries.filter(entry => {
+        const entryDate = new Date(entry.loggedAt);
+        return entryDate.toDateString() === targetDate.toDateString();
+      });
+    }
+    
+    return entries.sort((a, b) => new Date(b.loggedAt).getTime() - new Date(a.loggedAt).getTime());
+  }
+
+  async createMealEntry(entry: InsertMealEntry): Promise<MealEntry> {
+    const id = randomUUID();
+    const newEntry: MealEntry = {
+      ...entry,
+      id,
+      loggedAt: entry.loggedAt || new Date(),
+    };
+    
+    this.mealEntries.set(id, newEntry);
+    return newEntry;
+  }
+
+  async getMealEntry(id: string): Promise<MealEntry | undefined> {
+    return this.mealEntries.get(id);
+  }
+
+  async deleteMealEntry(id: string): Promise<boolean> {
+    return this.mealEntries.delete(id);
   }
 }
 
