@@ -9,10 +9,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Camera, Upload, Loader2, Apple, Calendar, Target, TrendingUp } from "lucide-react";
+import { Camera, Upload, Loader2, Apple, Calendar, Target, TrendingUp, ScanLine } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import type { MealEntry, InsertMealEntry } from "@shared/schema";
+import BarcodeScanner from "@/components/barcode-scanner";
 
 interface NutritionalAnalysis {
   mealName: string;
@@ -42,6 +43,7 @@ export default function MealTrackerPage() {
   const [dragActive, setDragActive] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [analysisResult, setAnalysisResult] = useState<NutritionalAnalysis | null>(null);
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
@@ -75,6 +77,56 @@ export default function MealTrackerPage() {
         description: "Could not analyze the image. Please try again.",
         variant: "destructive",
       });
+    }
+  });
+
+  // Barcode lookup mutation
+  const barcodeLookupMutation = useMutation({
+    mutationFn: async (barcode: string) => {
+      const response = await apiRequest("POST", "/api/meal-entries/barcode-lookup", { barcode });
+      return response.json();
+    },
+    onSuccess: (data) => {
+      if (data.success && data.product) {
+        const nutritionData: NutritionalAnalysis = {
+          mealName: data.product.name,
+          description: `${data.product.brand} - ${data.product.servingSize}`,
+          totalCalories: data.product.calories,
+          protein: data.product.protein,
+          carbs: data.product.carbs,
+          fat: data.product.fat,
+          fiber: data.product.fiber,
+          sugar: data.product.sugar,
+          sodium: data.product.sodium,
+          confidence: 0.95 // High confidence for barcode lookup
+        };
+        setAnalysisResult(nutritionData);
+        toast({
+          title: "Barcode Found! 📊",
+          description: `${data.product.name} - ${data.product.calories} calories`,
+        });
+      } else {
+        toast({
+          title: "Barcode Not Found",
+          description: "This barcode is not in our database. Try manual entry instead.",
+          variant: "destructive",
+        });
+      }
+    },
+    onError: (error: any) => {
+      if (error?.status === 401) {
+        toast({
+          title: "Authentication Required",
+          description: "Please log in to use the barcode scanner.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Scanner Error",
+          description: "Could not lookup barcode. Please try again.",
+          variant: "destructive",
+        });
+      }
     }
   });
 
@@ -134,6 +186,11 @@ export default function MealTrackerPage() {
     formData.append('description', analysisForm.customDescription);
     
     analyzeMutation.mutate(formData);
+  };
+
+  const handleBarcodeScanned = (barcode: string) => {
+    setIsScannerOpen(false);
+    barcodeLookupMutation.mutate(barcode);
   };
 
   const handleSaveMeal = () => {
@@ -269,12 +326,23 @@ export default function MealTrackerPage() {
                       <p className="text-lg font-medium">Drop your meal photo here</p>
                       <p className="text-sm text-gray-500">or click to browse files</p>
                     </div>
-                    <Button 
-                      onClick={() => fileInputRef.current?.click()}
-                      data-testid="button-upload-image"
-                    >
-                      Choose File
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button 
+                        onClick={() => fileInputRef.current?.click()}
+                        data-testid="button-upload-image"
+                      >
+                        Choose File
+                      </Button>
+                      <Button 
+                        variant="outline"
+                        onClick={() => setIsScannerOpen(true)}
+                        data-testid="button-scan-barcode"
+                        className="flex items-center gap-2"
+                      >
+                        <ScanLine className="w-4 h-4" />
+                        Scan Barcode
+                      </Button>
+                    </div>
                   </div>
                 )}
               </div>
@@ -498,6 +566,13 @@ export default function MealTrackerPage() {
           </div>
         </TabsContent>
       </Tabs>
+      
+      {/* Barcode Scanner Modal */}
+      <BarcodeScanner
+        isOpen={isScannerOpen}
+        onScan={handleBarcodeScanned}
+        onClose={() => setIsScannerOpen(false)}
+      />
     </div>
   );
 }

@@ -81,6 +81,8 @@ export default function BarcodeScanner({ onScan, onClose, isOpen }: BarcodeScann
           const stream = video.srcObject as MediaStream;
           stream.getTracks().forEach(track => track.stop());
         }
+        // Reset the reader to release resources
+        readerRef.current.reset?.();
       } catch (e) {
         // Ignore errors when stopping
       }
