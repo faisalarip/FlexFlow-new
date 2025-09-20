@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, integer, timestamp, boolean, jsonb, index } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, integer, timestamp, boolean, jsonb, index, decimal } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -708,6 +708,29 @@ export const aiDifficultyAdjustments = pgTable("ai_difficulty_adjustments", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+// Meal Tracking Schema - AI-powered calorie and macro tracking
+export const mealEntries = pgTable("meal_entries", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  mealType: varchar("meal_type").notNull(), // breakfast, lunch, dinner, snack
+  mealName: varchar("meal_name").notNull(),
+  description: text("description"),
+  imageUrl: varchar("image_url"),
+  // Nutritional information from AI analysis
+  totalCalories: integer("total_calories").notNull(),
+  protein: decimal("protein", { precision: 8, scale: 2 }).notNull(), // in grams
+  carbs: decimal("carbs", { precision: 8, scale: 2 }).notNull(), // in grams
+  fat: decimal("fat", { precision: 8, scale: 2 }).notNull(), // in grams
+  fiber: decimal("fiber", { precision: 8, scale: 2 }).default("0"),
+  sugar: decimal("sugar", { precision: 8, scale: 2 }).default("0"),
+  sodium: decimal("sodium", { precision: 8, scale: 2 }).default("0"), // in mg
+  // Analysis metadata
+  confidence: decimal("confidence", { precision: 3, scale: 2 }).default("0.85"), // AI confidence score
+  analysisRaw: text("analysis_raw"), // Raw AI response for debugging
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  loggedAt: timestamp("logged_at").defaultNow().notNull() // When the meal was consumed
+});
+
 // AI Difficulty Adjustments insert schemas
 export const insertAiDifficultyAdjustmentSchema = createInsertSchema(aiDifficultyAdjustments).omit({
   id: true,
@@ -718,6 +741,16 @@ export const insertAiDifficultyAdjustmentSchema = createInsertSchema(aiDifficult
 // AI Difficulty Adjustments types
 export type InsertAiDifficultyAdjustment = z.infer<typeof insertAiDifficultyAdjustmentSchema>;
 export type AiDifficultyAdjustment = typeof aiDifficultyAdjustments.$inferSelect;
+
+// Meal Tracking insert schemas
+export const insertMealEntrySchema = createInsertSchema(mealEntries).omit({
+  id: true,
+  createdAt: true,
+});
+
+// Meal Tracking types
+export type InsertMealEntry = z.infer<typeof insertMealEntrySchema>;
+export type MealEntry = typeof mealEntries.$inferSelect;
 
 // Authentication types
 export type SignUpData = z.infer<typeof signUpSchema>;
