@@ -2181,6 +2181,162 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Workout Planner API routes
+  
+  // Get user workout preferences
+  app.get("/api/workout-preferences", authenticateToken, async (req, res) => {
+    try {
+      const userId = getAuthUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      
+      // For now, return a simple response since storage methods aren't implemented yet
+      res.json(null); // No preferences found initially
+    } catch (error) {
+      console.error('Get workout preferences error:', error);
+      res.status(500).json({ message: "Failed to fetch workout preferences" });
+    }
+  });
+
+  // Save user workout preferences
+  app.post("/api/workout-preferences", authenticateToken, async (req, res) => {
+    try {
+      const userId = getAuthUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      
+      const preferences = {
+        userId,
+        fitnessLevel: req.body.fitnessLevel,
+        primaryGoals: req.body.primaryGoals,
+        workoutDaysPerWeek: req.body.workoutDaysPerWeek,
+        sessionDuration: req.body.sessionDuration,
+        availableEquipment: req.body.availableEquipment,
+        preferredWorkoutTypes: req.body.preferredWorkoutTypes,
+        injuriesOrLimitations: req.body.injuriesOrLimitations || []
+      };
+      
+      // For now, just return the preferences as saved
+      res.json(preferences);
+    } catch (error) {
+      console.error('Save workout preferences error:', error);
+      res.status(500).json({ message: "Failed to save workout preferences" });
+    }
+  });
+
+  // Get user workout plan
+  app.get("/api/workout-plan", authenticateToken, async (req, res) => {
+    try {
+      const userId = getAuthUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      
+      // For now, return null - no plan generated yet
+      res.json(null);
+    } catch (error) {
+      console.error('Get workout plan error:', error);
+      res.status(500).json({ message: "Failed to fetch workout plan" });
+    }
+  });
+
+  // Generate new workout plan
+  app.post("/api/workout-plan/generate", authenticateToken, async (req, res) => {
+    try {
+      const userId = getAuthUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      
+      // Simple workout plan generation (mock for now)
+      const workoutPlan = {
+        id: `plan_${Date.now()}`,
+        userId,
+        name: "Personalized Workout Plan",
+        description: "A customized workout plan based on your preferences",
+        durationWeeks: 4,
+        isActive: true,
+        generatedAt: new Date(),
+        startDate: new Date(),
+        endDate: new Date(Date.now() + 28 * 24 * 60 * 60 * 1000), // 4 weeks from now
+        plannedWorkouts: generateWeeklySchedule()
+      };
+      
+      res.json(workoutPlan);
+    } catch (error) {
+      console.error('Generate workout plan error:', error);
+      res.status(500).json({ message: "Failed to generate workout plan" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
+}
+
+// Helper function to generate a sample weekly schedule
+function generateWeeklySchedule() {
+  const workouts = [];
+  const workoutTypes = ['strength', 'cardio', 'yoga', 'functional'];
+  const workoutNames = {
+    strength: ['Upper Body Strength', 'Lower Body Power', 'Full Body Strength'],
+    cardio: ['HIIT Cardio', 'Steady State Cardio', 'Interval Training'],
+    yoga: ['Morning Flow', 'Evening Stretch', 'Power Yoga'],
+    functional: ['Functional Movement', 'Core & Stability', 'Athletic Training']
+  };
+  
+  // Generate 4 weeks of workouts
+  for (let week = 1; week <= 4; week++) {
+    // Monday, Wednesday, Friday - workout days
+    // Tuesday, Thursday - lighter/yoga days  
+    // Saturday, Sunday - rest days or light activity
+    
+    const weekSchedule = [
+      { day: 1, type: 'strength', duration: 45 }, // Monday
+      { day: 2, type: 'yoga', duration: 30 }, // Tuesday  
+      { day: 3, type: 'cardio', duration: 40 }, // Wednesday
+      { day: 4, type: 'yoga', duration: 30 }, // Thursday
+      { day: 5, type: 'functional', duration: 45 }, // Friday
+      { day: 6, isRest: true }, // Saturday - Rest
+      { day: 0, isRest: true }, // Sunday - Rest
+    ];
+    
+    weekSchedule.forEach(({ day, type, duration, isRest }) => {
+      if (isRest) {
+        workouts.push({
+          id: `workout_${week}_${day}`,
+          dayOfWeek: day,
+          weekNumber: week,
+          workoutType: 'rest',
+          name: 'Rest Day',
+          description: 'Take a well-deserved rest or do some light stretching',
+          estimatedDuration: 0,
+          targetCalories: 0,
+          exercises: [],
+          isRestDay: true,
+          completed: false
+        });
+      } else {
+        const names = workoutNames[type as keyof typeof workoutNames];
+        const randomName = names[Math.floor(Math.random() * names.length)];
+        
+        workouts.push({
+          id: `workout_${week}_${day}`,
+          dayOfWeek: day,
+          weekNumber: week,
+          workoutType: type,
+          name: randomName,
+          description: `A ${duration}-minute ${type} workout tailored to your fitness level`,
+          estimatedDuration: duration,
+          targetCalories: Math.round(duration * 8), // Rough estimate
+          exercises: [], // Would contain actual exercise IDs
+          isRestDay: false,
+          completed: false
+        });
+      }
+    });
+  }
+  
+  return workouts;
 }

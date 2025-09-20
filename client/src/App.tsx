@@ -10,6 +10,7 @@ import Leaderboard from "@/pages/leaderboard";
 import MileTracker from "@/pages/mile-tracker";
 import Community from "@/pages/community";
 import MealPlans from "@/pages/meal-plans";
+import WorkoutPlanner from "@/pages/workout-planner";
 import Landing from "@/pages/landing";
 import Checkout from "@/pages/checkout";
 import Subscribe from "@/pages/subscribe";
@@ -72,6 +73,7 @@ function Router() {
             <Route path="/mile-tracker" component={MileTracker} />
             <Route path="/community" component={Community} />
             <Route path="/meal-plans" component={MealPlans} />
+            <Route path="/workout-planner" component={WorkoutPlanner} />
             <Route path="/settings" component={Settings} />
             <Route path="/workouts" component={Workouts} />
             <Route path="/progress" component={Progress} />

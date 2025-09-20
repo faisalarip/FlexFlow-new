@@ -60,7 +60,13 @@ import {
   type AiDifficultyAdjustment,
   type InsertAiDifficultyAdjustment,
   type UserActivityLog,
-  type InsertUserActivityLog
+  type InsertUserActivityLog,
+  type WorkoutPreferences,
+  type InsertWorkoutPreferences,
+  type WorkoutPlan,
+  type InsertWorkoutPlan,
+  type PlannedWorkout,
+  type InsertPlannedWorkout
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 import * as bcrypt from "bcrypt";
@@ -2689,6 +2695,13 @@ export class DatabaseStorage implements IStorage {
   async createGoal(goal: InsertGoal): Promise<Goal> { return this.memStorage.createGoal(goal); }
   async updateGoal(id: string, updates: Partial<Goal>): Promise<Goal | undefined> { return this.memStorage.updateGoal(id, updates); }
   async deleteGoal(id: string): Promise<boolean> { return this.memStorage.deleteGoal(id); }
+
+  // Workout Planner methods
+  async getWorkoutPreferences(userId: string): Promise<WorkoutPreferences | undefined> { return this.memStorage.getWorkoutPreferences(userId); }
+  async saveWorkoutPreferences(preferences: InsertWorkoutPreferences): Promise<WorkoutPreferences> { return this.memStorage.saveWorkoutPreferences(preferences); }
+  async getWorkoutPlan(userId: string): Promise<(WorkoutPlan & { plannedWorkouts: PlannedWorkout[] }) | undefined> { return this.memStorage.getWorkoutPlan(userId); }
+  async createWorkoutPlan(plan: InsertWorkoutPlan): Promise<WorkoutPlan> { return this.memStorage.createWorkoutPlan(plan); }
+  async createPlannedWorkouts(plannedWorkouts: InsertPlannedWorkout[]): Promise<PlannedWorkout[]> { return this.memStorage.createPlannedWorkouts(plannedWorkouts); }
   
   // Stats methods
   async getUserStats(userId: string): Promise<UserStats> { return this.memStorage.getUserStats(userId); }
