@@ -2291,6 +2291,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Meal Tracking API routes
   
+  // Lookup nutrition data by barcode
+  app.post("/api/meal-entries/barcode-lookup", authenticateToken, async (req, res) => {
+    try {
+      const { barcode } = req.body;
+      
+      if (!barcode) {
+        return res.status(400).json({ message: "Barcode is required" });
+      }
+
+      // For now, return mock data based on common barcode patterns
+      // In a production app, you would integrate with a real food database API
+      const mockNutritionData = generateMockNutritionData(barcode);
+      
+      res.json(mockNutritionData);
+    } catch (error) {
+      console.error('Barcode lookup error:', error);
+      res.status(500).json({ 
+        message: "Failed to lookup nutrition data",
+        details: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+  
   // Analyze meal image with OpenAI
   app.post("/api/meal-entries/analyze", authenticateToken, multer({ storage: multer.memoryStorage() }).single('image'), async (req, res) => {
     try {
@@ -2564,4 +2587,116 @@ function calculateTargetCalories(duration: number, workoutType: string, fitnessL
   const multiplier = levelMultiplier[fitnessLevel] || 1;
   
   return Math.round(duration * rate * multiplier);
+}
+
+// Helper function to generate mock nutrition data for barcode scanning
+function generateMockNutritionData(barcode: string) {
+  // Common food item patterns based on barcode prefixes
+  const mockFoods = [
+    {
+      pattern: /^01234/, // Bananas
+      product: {
+        name: "Fresh Banana",
+        brand: "Organic Farms",
+        servingSize: "1 medium (118g)",
+        calories: 105,
+        protein: 1.3,
+        carbs: 27,
+        fat: 0.4,
+        fiber: 3.1,
+        sugar: 14,
+        sodium: 1
+      }
+    },
+    {
+      pattern: /^(49000|7803)/, // Coca-Cola patterns
+      product: {
+        name: "Coca-Cola Classic",
+        brand: "The Coca-Cola Company",
+        servingSize: "1 can (355ml)",
+        calories: 140,
+        protein: 0,
+        carbs: 39,
+        fat: 0,
+        fiber: 0,
+        sugar: 39,
+        sodium: 45
+      }
+    },
+    {
+      pattern: /^(02840|7622)/, // Cereal patterns
+      product: {
+        name: "Whole Grain Cereal",
+        brand: "Healthy Choice",
+        servingSize: "3/4 cup (30g)",
+        calories: 110,
+        protein: 3,
+        carbs: 23,
+        fat: 1,
+        fiber: 4,
+        sugar: 5,
+        sodium: 160
+      }
+    },
+    {
+      pattern: /^(03600|3765)/, // Bread patterns
+      product: {
+        name: "Whole Wheat Bread",
+        brand: "Nature's Own",
+        servingSize: "2 slices (56g)",
+        calories: 140,
+        protein: 5,
+        carbs: 24,
+        fat: 2,
+        fiber: 4,
+        sugar: 2,
+        sodium: 240
+      }
+    },
+    {
+      pattern: /^(01111|8901)/, // Milk patterns
+      product: {
+        name: "2% Reduced Fat Milk",
+        brand: "Farm Fresh",
+        servingSize: "1 cup (240ml)",
+        calories: 130,
+        protein: 8,
+        carbs: 12,
+        fat: 5,
+        fiber: 0,
+        sugar: 12,
+        sodium: 130
+      }
+    }
+  ];
+
+  // Try to match the barcode to a known pattern
+  for (const mock of mockFoods) {
+    if (mock.pattern.test(barcode)) {
+      return {
+        success: true,
+        barcode,
+        product: mock.product
+      };
+    }
+  }
+
+  // Generate generic food data for unknown barcodes
+  const genericCalories = 150 + Math.floor(Math.random() * 200); // 150-350 calories
+  return {
+    success: true,
+    barcode,
+    product: {
+      name: "Generic Food Item",
+      brand: "Unknown Brand",
+      servingSize: "1 serving",
+      calories: genericCalories,
+      protein: Math.round(genericCalories * 0.1 / 4), // ~10% protein calories
+      carbs: Math.round(genericCalories * 0.6 / 4), // ~60% carb calories  
+      fat: Math.round(genericCalories * 0.3 / 9), // ~30% fat calories
+      fiber: Math.floor(Math.random() * 5) + 1,
+      sugar: Math.floor(Math.random() * 15) + 5,
+      sodium: Math.floor(Math.random() * 400) + 100
+    }
+  };
 }
