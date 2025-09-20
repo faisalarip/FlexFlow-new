@@ -2191,8 +2191,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "User not authenticated" });
       }
       
-      // For now, return a simple response since storage methods aren't implemented yet
-      res.json(null); // No preferences found initially
+      const preferences = await storage.getWorkoutPreferences(userId);
+      res.json(preferences);
     } catch (error) {
       console.error('Get workout preferences error:', error);
       res.status(500).json({ message: "Failed to fetch workout preferences" });
@@ -2218,8 +2218,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         injuriesOrLimitations: req.body.injuriesOrLimitations || []
       };
       
-      // For now, just return the preferences as saved
-      res.json(preferences);
+      const savedPreferences = await storage.saveWorkoutPreferences(preferences);
+      res.json(savedPreferences);
     } catch (error) {
       console.error('Save workout preferences error:', error);
       res.status(500).json({ message: "Failed to save workout preferences" });
@@ -2234,8 +2234,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "User not authenticated" });
       }
       
-      // For now, return null - no plan generated yet
-      res.json(null);
+      const workoutPlan = await storage.getWorkoutPlan(userId);
+      res.json(workoutPlan);
     } catch (error) {
       console.error('Get workout plan error:', error);
       res.status(500).json({ message: "Failed to fetch workout plan" });
@@ -2250,21 +2250,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "User not authenticated" });
       }
       
-      // Simple workout plan generation (mock for now)
+      // Fetch user's workout preferences
+      const preferences = await storage.getWorkoutPreferences(userId);
+      if (!preferences) {
+        return res.status(400).json({ message: "Please complete the workout questionnaire first" });
+      }
+      
+      // Generate personalized workout plan based on user preferences
+      const plannedWorkouts = generateWeeklySchedule(preferences);
+      
       const workoutPlan = {
-        id: `plan_${Date.now()}`,
         userId,
         name: "Personalized Workout Plan",
-        description: "A customized workout plan based on your preferences",
+        description: `A customized ${preferences.workoutDaysPerWeek}-day workout plan based on your ${preferences.fitnessLevel} fitness level`,
         durationWeeks: 4,
         isActive: true,
-        generatedAt: new Date(),
         startDate: new Date(),
         endDate: new Date(Date.now() + 28 * 24 * 60 * 60 * 1000), // 4 weeks from now
-        plannedWorkouts: generateWeeklySchedule()
       };
       
-      res.json(workoutPlan);
+      // Save the workout plan and planned workouts
+      const savedPlan = await storage.createWorkoutPlan(workoutPlan);
+      await storage.createPlannedWorkouts(plannedWorkouts.map(workout => ({
+        ...workout,
+        workoutPlanId: savedPlan.id
+      })));
+      
+      // Return the complete plan with workouts
+      const completePlan = {
+        ...savedPlan,
+        plannedWorkouts
+      };
+      
+      res.json(completePlan);
     } catch (error) {
       console.error('Generate workout plan error:', error);
       res.status(500).json({ message: "Failed to generate workout plan" });
@@ -2364,38 +2382,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
   return httpServer;
 }
 
-// Helper function to generate a sample weekly schedule
-function generateWeeklySchedule() {
-  const workouts = [];
-  const workoutTypes = ['strength', 'cardio', 'yoga', 'functional'];
+// Helper function to generate a personalized weekly schedule based on user preferences
+function generateWeeklySchedule(preferences: any) {
+  const workouts: any[] = [];
+  
+  // Determine workout types based on user goals
+  const workoutTypes = determineWorkoutTypes(preferences.primaryGoals, preferences.preferredWorkoutTypes);
+  const sessionDuration = parseInt(preferences.sessionDuration);
+  const workoutDaysPerWeek = parseInt(preferences.workoutDaysPerWeek);
+  
   const workoutNames = {
-    strength: ['Upper Body Strength', 'Lower Body Power', 'Full Body Strength'],
-    cardio: ['HIIT Cardio', 'Steady State Cardio', 'Interval Training'],
-    yoga: ['Morning Flow', 'Evening Stretch', 'Power Yoga'],
-    functional: ['Functional Movement', 'Core & Stability', 'Athletic Training']
+    strength: ['Upper Body Strength', 'Lower Body Power', 'Full Body Strength', 'Push Day', 'Pull Day', 'Leg Day'],
+    cardio: ['HIIT Cardio', 'Steady State Cardio', 'Interval Training', 'Fat Burn Cardio'],
+    yoga: ['Morning Flow', 'Evening Stretch', 'Power Yoga', 'Flexibility Focus'],
+    functional: ['Functional Movement', 'Core & Stability', 'Athletic Training', 'Mobility Work']
   };
+  
+  // Create workout schedule based on days per week
+  const weeklyPattern = createWeeklyPattern(workoutDaysPerWeek, workoutTypes, preferences.fitnessLevel);
   
   // Generate 4 weeks of workouts
   for (let week = 1; week <= 4; week++) {
-    // Monday, Wednesday, Friday - workout days
-    // Tuesday, Thursday - lighter/yoga days  
-    // Saturday, Sunday - rest days or light activity
-    
-    const weekSchedule = [
-      { day: 1, type: 'strength', duration: 45 }, // Monday
-      { day: 2, type: 'yoga', duration: 30 }, // Tuesday  
-      { day: 3, type: 'cardio', duration: 40 }, // Wednesday
-      { day: 4, type: 'yoga', duration: 30 }, // Thursday
-      { day: 5, type: 'functional', duration: 45 }, // Friday
-      { day: 6, isRest: true }, // Saturday - Rest
-      { day: 0, isRest: true }, // Sunday - Rest
-    ];
-    
-    weekSchedule.forEach(({ day, type, duration, isRest }) => {
-      if (isRest) {
+    weeklyPattern.forEach((dayPlan, dayIndex) => {
+      if (dayPlan.isRest) {
         workouts.push({
-          id: `workout_${week}_${day}`,
-          dayOfWeek: day,
+          id: `workout_${week}_${dayIndex}`,
+          dayOfWeek: dayIndex,
           weekNumber: week,
           workoutType: 'rest',
           name: 'Rest Day',
@@ -2407,19 +2419,20 @@ function generateWeeklySchedule() {
           completed: false
         });
       } else {
-        const names = workoutNames[type as keyof typeof workoutNames];
+        const names = workoutNames[dayPlan.type as keyof typeof workoutNames];
         const randomName = names[Math.floor(Math.random() * names.length)];
+        const adjustedDuration = adjustDurationForLevel(sessionDuration, preferences.fitnessLevel, week);
         
         workouts.push({
-          id: `workout_${week}_${day}`,
-          dayOfWeek: day,
+          id: `workout_${week}_${dayIndex}`,
+          dayOfWeek: dayIndex,
           weekNumber: week,
-          workoutType: type,
+          workoutType: dayPlan.type,
           name: randomName,
-          description: `A ${duration}-minute ${type} workout tailored to your fitness level`,
-          estimatedDuration: duration,
-          targetCalories: Math.round(duration * 8), // Rough estimate
-          exercises: [], // Would contain actual exercise IDs
+          description: generateWorkoutDescription(dayPlan.type, preferences),
+          estimatedDuration: adjustedDuration,
+          targetCalories: calculateTargetCalories(adjustedDuration, dayPlan.type, preferences.fitnessLevel),
+          exercises: [], // Would contain actual exercise IDs based on equipment
           isRestDay: false,
           completed: false
         });
@@ -2428,4 +2441,127 @@ function generateWeeklySchedule() {
   }
   
   return workouts;
+}
+
+// Helper function to determine workout types based on goals
+function determineWorkoutTypes(goals: string[], preferredTypes: string[]) {
+  const typeMapping: { [key: string]: string[] } = {
+    lose_weight: ['cardio', 'functional', 'strength'],
+    build_muscle: ['strength', 'functional'],
+    improve_endurance: ['cardio', 'functional'],
+    general_fitness: ['strength', 'cardio', 'yoga', 'functional'],
+    sport_specific: ['functional', 'strength', 'cardio']
+  };
+  
+  const recommendedTypes = new Set<string>();
+  goals.forEach(goal => {
+    typeMapping[goal]?.forEach(type => recommendedTypes.add(type));
+  });
+  
+  // Add preferred types
+  preferredTypes?.forEach((type: string) => recommendedTypes.add(type));
+  
+  // Ensure at least some variety
+  if (recommendedTypes.size === 0) {
+    return ['strength', 'cardio', 'functional'];
+  }
+  
+  return Array.from(recommendedTypes);
+}
+
+// Helper function to create weekly workout pattern
+function createWeeklyPattern(daysPerWeek: number, workoutTypes: string[], fitnessLevel: string) {
+  const pattern = Array(7).fill({ isRest: true });
+  
+  const workoutDays: number[] = [];
+  
+  // Distribute workout days based on frequency
+  switch (daysPerWeek) {
+    case 2:
+      workoutDays.push(1, 4); // Monday, Thursday
+      break;
+    case 3:
+      workoutDays.push(1, 3, 5); // Monday, Wednesday, Friday
+      break;
+    case 4:
+      workoutDays.push(1, 2, 4, 5); // Monday, Tuesday, Thursday, Friday
+      break;
+    case 5:
+      workoutDays.push(1, 2, 3, 4, 5); // Monday-Friday
+      break;
+    case 6:
+      workoutDays.push(1, 2, 3, 4, 5, 6); // Monday-Saturday
+      break;
+    default:
+      workoutDays.push(1, 3, 5); // Default to 3 days
+  }
+  
+  // Assign workout types to workout days
+  workoutDays.forEach((day, index) => {
+    const typeIndex = index % workoutTypes.length;
+    pattern[day] = {
+      isRest: false,
+      type: workoutTypes[typeIndex]
+    };
+  });
+  
+  return pattern;
+}
+
+// Helper function to adjust duration based on fitness level and progression
+function adjustDurationForLevel(baseDuration: number, fitnessLevel: string, week: number) {
+  let levelMultiplier = 1;
+  
+  switch (fitnessLevel) {
+    case 'beginner':
+      levelMultiplier = 0.8; // 20% shorter for beginners
+      break;
+    case 'intermediate':
+      levelMultiplier = 1;
+      break;
+    case 'advanced':
+      levelMultiplier = 1.2; // 20% longer for advanced
+      break;
+  }
+  
+  // Gradual progression over 4 weeks
+  const progressionMultiplier = 1 + (week - 1) * 0.05; // 5% increase per week
+  
+  return Math.round(baseDuration * levelMultiplier * progressionMultiplier);
+}
+
+// Helper function to generate workout descriptions
+function generateWorkoutDescription(workoutType: string, preferences: any) {
+  const level = preferences.fitnessLevel;
+  const equipment = preferences.availableEquipment?.join(', ') || 'bodyweight';
+  
+  const descriptions: { [key: string]: string } = {
+    strength: `${level} strength training session using ${equipment}`,
+    cardio: `${level} cardiovascular workout to improve endurance`,
+    yoga: `${level} yoga flow for flexibility and mindfulness`,
+    functional: `${level} functional movement training for everyday strength`
+  };
+  
+  return descriptions[workoutType] || `${level} workout session`;
+}
+
+// Helper function to calculate target calories
+function calculateTargetCalories(duration: number, workoutType: string, fitnessLevel: string) {
+  const baseRate: { [key: string]: number } = {
+    strength: 6,
+    cardio: 10,
+    yoga: 3,
+    functional: 8
+  };
+  
+  const levelMultiplier: { [key: string]: number } = {
+    beginner: 0.8,
+    intermediate: 1,
+    advanced: 1.2
+  };
+  
+  const rate = baseRate[workoutType] || 7;
+  const multiplier = levelMultiplier[fitnessLevel] || 1;
+  
+  return Math.round(duration * rate * multiplier);
 }
