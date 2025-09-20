@@ -66,7 +66,9 @@ import {
   type WorkoutPlan,
   type InsertWorkoutPlan,
   type PlannedWorkout,
-  type InsertPlannedWorkout
+  type InsertPlannedWorkout,
+  type MealEntry,
+  type InsertMealEntry
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 import * as bcrypt from "bcrypt";
@@ -93,6 +95,12 @@ export interface IStorage {
   // Activity logging methods
   createUserActivity(activityData: InsertUserActivityLog): Promise<UserActivityLog>;
   getUserActivities(userId: string, limit?: number): Promise<UserActivityLog[]>;
+
+  // Meal Tracking methods
+  getMealEntries(userId: string, date?: string): Promise<MealEntry[]>;
+  createMealEntry(entry: InsertMealEntry): Promise<MealEntry>;
+  getMealEntry(id: string): Promise<MealEntry | undefined>;
+  deleteMealEntry(id: string): Promise<boolean>;
   
   
   // Exercises
@@ -2702,6 +2710,12 @@ export class DatabaseStorage implements IStorage {
   async getWorkoutPlan(userId: string): Promise<(WorkoutPlan & { plannedWorkouts: PlannedWorkout[] }) | undefined> { return this.memStorage.getWorkoutPlan(userId); }
   async createWorkoutPlan(plan: InsertWorkoutPlan): Promise<WorkoutPlan> { return this.memStorage.createWorkoutPlan(plan); }
   async createPlannedWorkouts(plannedWorkouts: InsertPlannedWorkout[]): Promise<PlannedWorkout[]> { return this.memStorage.createPlannedWorkouts(plannedWorkouts); }
+
+  // Meal Tracking methods
+  async getMealEntries(userId: string, date?: string): Promise<MealEntry[]> { return this.memStorage.getMealEntries(userId, date); }
+  async createMealEntry(entry: InsertMealEntry): Promise<MealEntry> { return this.memStorage.createMealEntry(entry); }
+  async getMealEntry(id: string): Promise<MealEntry | undefined> { return this.memStorage.getMealEntry(id); }
+  async deleteMealEntry(id: string): Promise<boolean> { return this.memStorage.deleteMealEntry(id); }
   
   // Stats methods
   async getUserStats(userId: string): Promise<UserStats> { return this.memStorage.getUserStats(userId); }

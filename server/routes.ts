@@ -2271,6 +2271,95 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Meal Tracking API routes
+  
+  // Analyze meal image with OpenAI
+  app.post("/api/meal-entries/analyze", authenticateToken, multer({ storage: multer.memoryStorage() }).single('image'), async (req, res) => {
+    try {
+      const userId = getAuthUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+
+      if (!req.file) {
+        return res.status(400).json({ message: "No image file provided" });
+      }
+
+      const { mealType, description } = req.body;
+      if (!mealType) {
+        return res.status(400).json({ message: "Meal type is required" });
+      }
+
+      // Convert image to base64 for OpenAI
+      const base64Image = req.file.buffer.toString('base64');
+      
+      // Import and use OpenAI service
+      const { analyzeMealImage } = await import('./openai-service');
+      const analysis = await analyzeMealImage(base64Image, mealType, description);
+      
+      res.json(analysis);
+    } catch (error) {
+      console.error('Meal analysis error:', error);
+      res.status(500).json({ message: "Failed to analyze meal image" });
+    }
+  });
+
+  // Get meal entries for a user (optionally filtered by date)
+  app.get("/api/meal-entries", authenticateToken, async (req, res) => {
+    try {
+      const userId = getAuthUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+
+      const { date } = req.query;
+      const entries = await storage.getMealEntries(userId, date as string);
+      res.json(entries);
+    } catch (error) {
+      console.error('Get meal entries error:', error);
+      res.status(500).json({ message: "Failed to fetch meal entries" });
+    }
+  });
+
+  // Create a new meal entry
+  app.post("/api/meal-entries", authenticateToken, async (req, res) => {
+    try {
+      const userId = getAuthUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+
+      const mealData = { ...req.body, userId };
+      const entry = await storage.createMealEntry(mealData);
+      res.status(201).json(entry);
+    } catch (error) {
+      console.error('Create meal entry error:', error);
+      res.status(500).json({ message: "Failed to save meal entry" });
+    }
+  });
+
+  // Delete a meal entry
+  app.delete("/api/meal-entries/:id", authenticateToken, async (req, res) => {
+    try {
+      const userId = getAuthUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+
+      const { id } = req.params;
+      const success = await storage.deleteMealEntry(id);
+      
+      if (success) {
+        res.json({ message: "Meal entry deleted successfully" });
+      } else {
+        res.status(404).json({ message: "Meal entry not found" });
+      }
+    } catch (error) {
+      console.error('Delete meal entry error:', error);
+      res.status(500).json({ message: "Failed to delete meal entry" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

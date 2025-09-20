@@ -11,6 +11,7 @@ import MileTracker from "@/pages/mile-tracker";
 import Community from "@/pages/community";
 import MealPlans from "@/pages/meal-plans";
 import WorkoutPlanner from "@/pages/workout-planner";
+import MealTracker from "@/pages/meal-tracker";
 import Landing from "@/pages/landing";
 import Checkout from "@/pages/checkout";
 import Subscribe from "@/pages/subscribe";
@@ -74,6 +75,7 @@ function Router() {
             <Route path="/community" component={Community} />
             <Route path="/meal-plans" component={MealPlans} />
             <Route path="/workout-planner" component={WorkoutPlanner} />
+            <Route path="/meal-tracker" component={MealTracker} />
             <Route path="/settings" component={Settings} />
             <Route path="/workouts" component={Workouts} />
             <Route path="/progress" component={Progress} />
