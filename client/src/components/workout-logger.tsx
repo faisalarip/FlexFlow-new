@@ -23,7 +23,7 @@ import rowsImage from "@assets/generated_images/Black_guy_and_lady_rows_0acde538
 import squatsImage from "@assets/generated_images/Black_guy_and_lady_squats_8da85d5d.png";
 import deadliftsImage from "@assets/generated_images/Black_guy_and_lady_deadlifts_3066fc1b.png";
 import lungesImage from "@assets/generated_images/Black_guy_and_lady_lunges_02d114c2.png";
-import legPressImage from "@assets/generated_images/Black_guy_and_lady_leg_press_06e2e1ce.png";
+import legPressImage from "@assets/generated_images/Black_woman_leg_press_exercise_c612272f.png";
 import calfRaisesImage from "@assets/generated_images/Black_guy_and_lady_calf_raises_3cb5cf18.png";
 import romanianDeadliftsImage from "@assets/generated_images/Black_guy_and_lady_Romanian_deadlifts_cba72218.png";
 
