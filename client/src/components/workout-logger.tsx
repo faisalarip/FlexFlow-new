@@ -26,6 +26,13 @@ import lungesImage from "@assets/generated_images/Black_guy_and_lady_lunges_02d1
 import legPressImage from "@assets/generated_images/Black_woman_leg_press_exercise_c612272f.png";
 import calfRaisesImage from "@assets/generated_images/Black_guy_and_lady_calf_raises_3cb5cf18.png";
 import romanianDeadliftsImage from "@assets/generated_images/Black_guy_and_lady_Romanian_deadlifts_cba72218.png";
+import hipThrustsImage from "@assets/generated_images/Woman_performing_hip_thrusts_ee13dee1.png";
+import plankImage from "@assets/generated_images/Man_performing_plank_exercise_5bcbc71c.png";
+import crunchesImage from "@assets/generated_images/Woman_performing_crunches_exercise_2d16cfd0.png";
+import russianTwistsImage from "@assets/generated_images/Man_performing_Russian_twists_ca261386.png";
+import mountainClimbersImage from "@assets/generated_images/Woman_performing_mountain_climbers_35705bbe.png";
+import deadBugImage from "@assets/generated_images/Man_performing_dead_bug_7bdcdb1e.png";
+import hangingLegRaisesImage from "@assets/generated_images/Woman_performing_hanging_leg_raises_ef4d5db2.png";
 
 export default function WorkoutLogger() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -91,6 +98,27 @@ export default function WorkoutLogger() {
     }
     if (exerciseNameLower.includes('calf raise') || exerciseNameLower.includes('calf raises')) {
       return calfRaisesImage;
+    }
+    if (exerciseNameLower.includes('hip thrust') || exerciseNameLower.includes('hip thrusts')) {
+      return hipThrustsImage;
+    }
+    if (exerciseNameLower.includes('plank')) {
+      return plankImage;
+    }
+    if (exerciseNameLower.includes('crunch') || exerciseNameLower.includes('crunches')) {
+      return crunchesImage;
+    }
+    if (exerciseNameLower.includes('russian twist') || exerciseNameLower.includes('russian twists')) {
+      return russianTwistsImage;
+    }
+    if (exerciseNameLower.includes('mountain climber') || exerciseNameLower.includes('mountain climbers')) {
+      return mountainClimbersImage;
+    }
+    if (exerciseNameLower.includes('dead bug')) {
+      return deadBugImage;
+    }
+    if (exerciseNameLower.includes('hanging leg raise') || exerciseNameLower.includes('hanging leg raises')) {
+      return hangingLegRaisesImage;
     }
     // Default to dumbbell exercises image for other exercises
     return dumbbellExercisesImage;
