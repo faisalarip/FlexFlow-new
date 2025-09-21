@@ -26,7 +26,7 @@ import lungesImage from "@assets/generated_images/Black_guy_and_lady_lunges_02d1
 import legPressImage from "@assets/generated_images/Black_woman_leg_press_exercise_c612272f.png";
 import calfRaisesImage from "@assets/generated_images/Black_guy_and_lady_calf_raises_3cb5cf18.png";
 import romanianDeadliftsImage from "@assets/generated_images/Black_guy_and_lady_Romanian_deadlifts_cba72218.png";
-import hipThrustsImage from "@assets/generated_images/Woman_performing_hip_thrusts_ee13dee1.png";
+import hipThrustsImage from "@assets/generated_images/Black_woman_performing_hip_thrusts_ebc9e75c.png";
 import plankImage from "@assets/generated_images/Man_performing_plank_exercise_5bcbc71c.png";
 import crunchesImage from "@assets/generated_images/Woman_performing_crunches_exercise_2d16cfd0.png";
 import russianTwistsImage from "@assets/generated_images/Man_performing_Russian_twists_ca261386.png";
