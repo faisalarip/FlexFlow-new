@@ -407,7 +407,7 @@ export default function WorkoutPlannerPage() {
   return (
     <div className="container mx-auto px-4 py-8 max-w-3xl">
       <div className="text-center space-y-4 mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 flex items-center justify-center gap-3">
+        <h1 className="text-3xl font-bold text-white flex items-center justify-center gap-3">
           <Target className="w-8 h-8 text-primary" />
           Workout Planner
         </h1>

@@ -130,7 +130,7 @@ export default function Navbar() {
                         }`}
                       >
                         <Icon size={16} />
-                        <span>{item.label}</span>
+                        <span className={item.label === "Workout Planner" ? "text-white" : ""}>{item.label}</span>
                       </Link>
                     </DropdownMenuItem>
                   );
