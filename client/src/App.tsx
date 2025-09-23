@@ -28,7 +28,6 @@ import OnboardingPayment from "@/pages/onboarding-payment";
 import TrialSuccess from "@/pages/trial-success";
 import ProfileCompletionGuard from "@/components/profile-completion-guard";
 import AuthSelection from "@/pages/auth-selection";
-import Auth from "@/pages/auth";
 import Tutorial from "@/pages/tutorial";
 import TermsOfService from "@/pages/terms-of-service";
 import PrivacyPolicy from "@/pages/privacy-policy";
@@ -60,7 +59,6 @@ function Router() {
         {!isAuthenticated ? (
           <>
             <Route path="/" component={Landing} />
-            <Route path="/auth" component={() => <Auth />} />
             <Route path="/auth-selection" component={AuthSelection} />
             <Route path="/onboarding" component={Onboarding} />
             <Route path="/onboarding/plan" component={OnboardingPlan} />
