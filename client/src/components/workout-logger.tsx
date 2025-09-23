@@ -11,18 +11,20 @@ import { useToast } from "@/hooks/use-toast";
 import type { Exercise } from "@shared/schema";
 import dumbbellExercisesImage from "@assets/generated_images/Man_performing_dumbbell_exercises_1979e4be.png";
 import pushUpExerciseImage from "@assets/generated_images/Man_performing_push-up_exercise_19b36844.png";
-import benchPressImage from "@assets/generated_images/Man_performing_bench_press_44e8cce3.png";
+import benchPressImage from "@assets/stock_images/black_man_performing_dd4e297c.jpg";
 import pullUpExerciseImage from "@assets/generated_images/Black_man_performing_pull-ups_3605874d.png";
 import chinUpExerciseImage from "@assets/generated_images/Black_man_and_woman_chin-ups_7848bb87.png";
 import dipExerciseImage from "@assets/generated_images/Man_and_woman_dips_e6984611.png";
 import overheadPressImage from "@assets/generated_images/Man_and_woman_overhead_press_0abad494.png";
-import bicepCurlsImage from "@assets/generated_images/Man_and_woman_bicep_curls_541824d6.png";
+import bicepCurlsImage from "@assets/stock_images/black_woman_performi_641aeb43.jpg";
+import dumbbellFlyesImage from "@assets/stock_images/black_man_performing_a73f31ab.jpg";
+import dumbbellRollsImage from "@assets/stock_images/black_woman_performi_21123039.jpg";
 import tricepExtensionsImage from "@assets/generated_images/Black_guy_and_lady_tricep_extensions_3cce0d7d.png";
 import latPulldownImage from "@assets/generated_images/Man_and_woman_lat_pulldown_dbce7bd1.png";
 import rowsImage from "@assets/generated_images/Black_guy_and_lady_rows_0acde538.png";
-import squatsImage from "@assets/generated_images/Black_guy_and_lady_squats_8da85d5d.png";
+import squatsImage from "@assets/stock_images/black_woman_performi_0321f959.jpg";
 import deadliftsImage from "@assets/generated_images/Black_guy_and_lady_deadlifts_3066fc1b.png";
-import lungesImage from "@assets/generated_images/Black_guy_and_lady_lunges_02d114c2.png";
+import lungesImage from "@assets/stock_images/black_man_performing_f80b2cdb.jpg";
 import legPressImage from "@assets/generated_images/Black_woman_leg_press_exercise_c612272f.png";
 import calfRaisesImage from "@assets/generated_images/Black_guy_and_lady_calf_raises_3cb5cf18.png";
 import romanianDeadliftsImage from "@assets/generated_images/Black_guy_and_lady_Romanian_deadlifts_cba72218.png";
@@ -72,6 +74,15 @@ export default function WorkoutLogger() {
     if (exerciseNameLower.includes('bicep') && (exerciseNameLower.includes('curl') || exerciseNameLower.includes('curls'))) {
       return bicepCurlsImage;
     }
+    if (exerciseNameLower.includes('dumbbell') && (exerciseNameLower.includes('curl') || exerciseNameLower.includes('curls'))) {
+      return bicepCurlsImage;
+    }
+    if (exerciseNameLower.includes('dumbbell') && (exerciseNameLower.includes('fly') || exerciseNameLower.includes('flyes') || exerciseNameLower.includes('flys'))) {
+      return dumbbellFlyesImage;
+    }
+    if (exerciseNameLower.includes('dumbbell') && (exerciseNameLower.includes('roll') || exerciseNameLower.includes('rolls'))) {
+      return dumbbellRollsImage;
+    }
     if (exerciseNameLower.includes('tricep') && (exerciseNameLower.includes('extension') || exerciseNameLower.includes('extensions'))) {
       return tricepExtensionsImage;
     }
@@ -84,6 +95,9 @@ export default function WorkoutLogger() {
     if (exerciseNameLower.includes('squat') || exerciseNameLower.includes('squats')) {
       return squatsImage;
     }
+    if (exerciseNameLower.includes('dumbbell') && (exerciseNameLower.includes('squat') || exerciseNameLower.includes('squats'))) {
+      return squatsImage;
+    }
     if (exerciseNameLower.includes('deadlift') && !exerciseNameLower.includes('romanian')) {
       return deadliftsImage;
     }
@@ -91,6 +105,9 @@ export default function WorkoutLogger() {
       return romanianDeadliftsImage;
     }
     if (exerciseNameLower.includes('lunge') || exerciseNameLower.includes('lunges')) {
+      return lungesImage;
+    }
+    if (exerciseNameLower.includes('dumbbell') && (exerciseNameLower.includes('lunge') || exerciseNameLower.includes('lunges'))) {
       return lungesImage;
     }
     if (exerciseNameLower.includes('leg press')) {
