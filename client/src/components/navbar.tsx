@@ -18,12 +18,6 @@ export default function Navbar() {
       path: "/", 
       label: "Home", 
       icon: Home 
-    },
-    { 
-      path: "https://flex-flow.fitness/home", 
-      label: "FlexFlow.fitness", 
-      icon: Home,
-      external: true
     }
   ];
 
@@ -90,22 +84,6 @@ export default function Navbar() {
               const isActive = location === item.path || 
                 (item.path === "/trainers" && location.startsWith("/trainers"));
               
-              if (item.external) {
-                return (
-                  <a 
-                    key={item.path}
-                    href={item.path}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800"
-                    data-testid={`nav-external-${item.label.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}
-                  >
-                    <Icon size={18} />
-                    <span>{item.label}</span>
-                  </a>
-                );
-              }
-              
               return (
                 <Link 
                   key={item.path}
@@ -115,7 +93,6 @@ export default function Navbar() {
                       ? "text-primary bg-primary/10"
                       : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800"
                   }`}
-                  data-testid={`nav-${item.label.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}
                 >
                   <Icon size={18} />
                   <span>{item.label}</span>
