@@ -231,6 +231,23 @@ export interface IStorage {
   createAiDifficultyAdjustment(adjustment: InsertAiDifficultyAdjustment): Promise<AiDifficultyAdjustment>;
   getPendingAiAdjustments(userId: string): Promise<AiDifficultyAdjustment[]>;
   applyAiDifficultyAdjustment(adjustmentId: string): Promise<boolean>;
+
+  // Payment methods
+  createPayment(insertPayment: InsertPayment): Promise<Payment>;
+  updatePayment(id: string, updates: Partial<Payment>): Promise<Payment | undefined>;
+  updateStripeCustomerId(userId: string, stripeCustomerId: string): Promise<User | undefined>;
+  updateUserStripeInfo(userId: string, stripeCustomerId: string, stripeSubscriptionId: string): Promise<User | undefined>;
+
+  // Trainer subscription methods
+  getTrainerSubscriptionStatus(userId: string): Promise<{
+    subscriptionStatus: string;
+    lastPaymentDate?: Date;
+    subscriptionExpiresAt?: Date;
+    isActive: boolean;
+  } | null>;
+  activateTrainerSubscription(userId: string): Promise<Trainer | undefined>;
+  cancelTrainerSubscription(userId: string): Promise<Trainer | undefined>;
+  getTotalSubscriptionRevenue(): Promise<{ totalRevenue: number; activeTrainers: number }>;
 }
 
 export class MemStorage implements IStorage {
