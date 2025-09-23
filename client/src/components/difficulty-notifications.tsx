@@ -141,7 +141,7 @@ export default function DifficultyNotifications() {
 
       {/* Notifications Panel */}
       {showNotifications && (
-        <div className="absolute right-0 top-12 w-[calc(100vw-1rem)] sm:w-80 md:w-96 max-w-sm bg-white rounded-2xl shadow-2xl border border-gray-200 z-50 max-h-[70vh] md:max-h-[80vh] overflow-hidden -translate-x-2 sm:translate-x-0">
+        <div className="absolute right-0 top-12 w-72 sm:w-80 md:w-96 bg-white rounded-2xl shadow-2xl border border-gray-200 z-50 max-h-[50vh] md:max-h-[70vh] overflow-hidden -translate-x-2 sm:translate-x-0">
           {/* Header */}
           <div className="bg-gradient-to-r from-red-600 to-orange-600 text-white p-3 md:p-4 rounded-t-2xl">
             <div className="flex items-center justify-between">
@@ -165,7 +165,7 @@ export default function DifficultyNotifications() {
             </p>
           </div>
 
-          <div className="max-h-80 md:max-h-96 overflow-y-auto">
+          <div className="max-h-64 md:max-h-80 overflow-y-auto">
             {/* Overall Recommendation */}
             {recommendations?.overallRecommendation && (
               <div className="p-3 md:p-4 bg-gradient-to-r from-purple-50 to-blue-50 border-b">
