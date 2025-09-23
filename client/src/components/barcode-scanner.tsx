@@ -22,7 +22,7 @@ export default function BarcodeScanner({ onScan, onClose, isOpen }: BarcodeScann
       readerRef.current = new BrowserMultiFormatReader();
     }
 
-    if (isOpen && videoRef.current && readerRef.current) {
+    if (isOpen && videoRef.current && readerRef.current && !isScanning) {
       startScanning();
     }
 
@@ -57,10 +57,11 @@ export default function BarcodeScanner({ onScan, onClose, isOpen }: BarcodeScann
           if (result) {
             const barcode = result.getText();
             console.log("Barcode detected:", barcode);
-            onScan(barcode);
+            setIsScanning(false);
             stopScanning();
+            onScan(barcode);
           }
-          if (err) {
+          if (err && !err.message.includes('No MultiFormat Readers were able to detect the code')) {
             console.log("Scanning error:", err);
           }
         }
@@ -80,6 +81,7 @@ export default function BarcodeScanner({ onScan, onClose, isOpen }: BarcodeScann
         if (video && video.srcObject) {
           const stream = video.srcObject as MediaStream;
           stream.getTracks().forEach(track => track.stop());
+          video.srcObject = null;
         }
         // Reset the reader to release resources
         readerRef.current.reset?.();
