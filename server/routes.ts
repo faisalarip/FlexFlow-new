@@ -2300,11 +2300,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Barcode is required" });
       }
 
-      // For now, return mock data based on common barcode patterns
-      // In a production app, you would integrate with a real food database API
-      const mockNutritionData = generateMockNutritionData(barcode);
+      // Use Open Food Facts API for real nutrition data
+      const nutritionData = await lookupBarcodeNutrition(barcode);
       
-      res.json(mockNutritionData);
+      res.json(nutritionData);
     } catch (error) {
       console.error('Barcode lookup error:', error);
       res.status(500).json({ 
@@ -2589,114 +2588,66 @@ function calculateTargetCalories(duration: number, workoutType: string, fitnessL
   return Math.round(duration * rate * multiplier);
 }
 
-// Helper function to generate mock nutrition data for barcode scanning
-function generateMockNutritionData(barcode: string) {
-  // Common food item patterns based on barcode prefixes
-  const mockFoods = [
-    {
-      pattern: /^01234/, // Bananas
-      product: {
-        name: "Fresh Banana",
-        brand: "Organic Farms",
-        servingSize: "1 medium (118g)",
-        calories: 105,
-        protein: 1.3,
-        carbs: 27,
-        fat: 0.4,
-        fiber: 3.1,
-        sugar: 14,
-        sodium: 1
-      }
-    },
-    {
-      pattern: /^(49000|7803)/, // Coca-Cola patterns
-      product: {
-        name: "Coca-Cola Classic",
-        brand: "The Coca-Cola Company",
-        servingSize: "1 can (355ml)",
-        calories: 140,
-        protein: 0,
-        carbs: 39,
-        fat: 0,
-        fiber: 0,
-        sugar: 39,
-        sodium: 45
-      }
-    },
-    {
-      pattern: /^(02840|7622)/, // Cereal patterns
-      product: {
-        name: "Whole Grain Cereal",
-        brand: "Healthy Choice",
-        servingSize: "3/4 cup (30g)",
-        calories: 110,
-        protein: 3,
-        carbs: 23,
-        fat: 1,
-        fiber: 4,
-        sugar: 5,
-        sodium: 160
-      }
-    },
-    {
-      pattern: /^(03600|3765)/, // Bread patterns
-      product: {
-        name: "Whole Wheat Bread",
-        brand: "Nature's Own",
-        servingSize: "2 slices (56g)",
-        calories: 140,
-        protein: 5,
-        carbs: 24,
-        fat: 2,
-        fiber: 4,
-        sugar: 2,
-        sodium: 240
-      }
-    },
-    {
-      pattern: /^(01111|8901)/, // Milk patterns
-      product: {
-        name: "2% Reduced Fat Milk",
-        brand: "Farm Fresh",
-        servingSize: "1 cup (240ml)",
-        calories: 130,
-        protein: 8,
-        carbs: 12,
-        fat: 5,
-        fiber: 0,
-        sugar: 12,
-        sodium: 130
-      }
-    }
-  ];
-
-  // Try to match the barcode to a known pattern
-  for (const mock of mockFoods) {
-    if (mock.pattern.test(barcode)) {
+// Helper function to lookup nutrition data from Open Food Facts API
+async function lookupBarcodeNutrition(barcode: string) {
+  try {
+    // Call Open Food Facts API
+    const response = await fetch(`https://world.openfoodfacts.org/api/v2/product/${barcode}.json`);
+    const data = await response.json();
+    
+    if (data.status === 1 && data.product) {
+      const product = data.product;
+      const nutriments = product.nutriments || {};
+      
+      // Convert per 100g values to per serving if serving size is available
+      const servingSize = product.serving_size || product.product_quantity || "100g";
+      const servingMultiplier = parseFloat(servingSize) / 100 || 1;
+      
       return {
         success: true,
         barcode,
-        product: mock.product
+        product: {
+          name: product.product_name || product.product_name_en || "Unknown Product",
+          brand: product.brands || "Unknown Brand",
+          servingSize: servingSize,
+          calories: Math.round((nutriments.energy_kcal_100g || nutriments["energy-kcal_100g"] || 0) * servingMultiplier),
+          protein: Math.round((nutriments.proteins_100g || 0) * servingMultiplier * 10) / 10,
+          carbs: Math.round((nutriments.carbohydrates_100g || 0) * servingMultiplier * 10) / 10,
+          fat: Math.round((nutriments.fat_100g || 0) * servingMultiplier * 10) / 10,
+          fiber: Math.round((nutriments.fiber_100g || 0) * servingMultiplier * 10) / 10,
+          sugar: Math.round((nutriments.sugars_100g || 0) * servingMultiplier * 10) / 10,
+          sodium: Math.round((nutriments.sodium_100g || 0) * servingMultiplier * 1000) // Convert g to mg
+        }
+      };
+    } else {
+      // Product not found in Open Food Facts database
+      return {
+        success: false,
+        barcode,
+        message: "Product not found in nutrition database. Please add the nutritional information manually."
       };
     }
+  } catch (error) {
+    console.error('Open Food Facts API error:', error);
+    
+    // Fallback to generic food data if API fails
+    const genericCalories = 150 + Math.floor(Math.random() * 200);
+    return {
+      success: true,
+      barcode,
+      product: {
+        name: "Unknown Food Item",
+        brand: "Please edit product name",
+        servingSize: "1 serving",
+        calories: genericCalories,
+        protein: Math.round(genericCalories * 0.1 / 4),
+        carbs: Math.round(genericCalories * 0.6 / 4),
+        fat: Math.round(genericCalories * 0.3 / 9),
+        fiber: 2,
+        sugar: 5,
+        sodium: 100
+      },
+      note: "Nutrition data is estimated. Please verify and edit as needed."
+    };
   }
-
-  // Generate generic food data for unknown barcodes
-  const genericCalories = 150 + Math.floor(Math.random() * 200); // 150-350 calories
-  return {
-    success: true,
-    barcode,
-    product: {
-      name: "Generic Food Item",
-      brand: "Unknown Brand",
-      servingSize: "1 serving",
-      calories: genericCalories,
-      protein: Math.round(genericCalories * 0.1 / 4), // ~10% protein calories
-      carbs: Math.round(genericCalories * 0.6 / 4), // ~60% carb calories  
-      fat: Math.round(genericCalories * 0.3 / 9), // ~30% fat calories
-      fiber: Math.floor(Math.random() * 5) + 1,
-      sugar: Math.floor(Math.random() * 15) + 5,
-      sodium: Math.floor(Math.random() * 400) + 100
-    }
-  };
 }
