@@ -236,7 +236,7 @@ export default function MealTrackerPage() {
   return (
     <div className="container mx-auto px-4 py-8 space-y-8">
       <div className="text-center space-y-4">
-        <h1 className="text-3xl font-bold text-gray-900 flex items-center justify-center gap-3">
+        <h1 className="text-3xl font-bold text-white flex items-center justify-center gap-3">
           <Apple className="w-8 h-8 text-primary" />
           AI Meal Tracker
         </h1>
