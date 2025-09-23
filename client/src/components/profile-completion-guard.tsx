@@ -17,6 +17,9 @@ export default function ProfileCompletionGuard({ children }: ProfileCompletionGu
       const userData = user as User;
       const needsProfileCompletion = !userData.firstName || !userData.lastName;
       setShowProfileSetup(needsProfileCompletion);
+    } else if (!isLoading && !user) {
+      // User is not authenticated, let the router handle it
+      setShowProfileSetup(false);
     }
   }, [user, isLoading]);
 
