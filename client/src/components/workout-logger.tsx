@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import type { Exercise } from "@shared/schema";
-import dumbbellExercisesImage from "@assets/generated_images/Man_performing_dumbbell_exercises_1979e4be.png";
+import dumbbellExercisesImage from "@assets/Dumbbell_Row_Muscles_Worked_1758663676134.webp";
 import pushUpExerciseImage from "@assets/generated_images/Man_performing_push-up_exercise_19b36844.png";
 import benchPressImage from "@assets/stock_images/black_man_performing_dd4e297c.jpg";
 import pullUpExerciseImage from "@assets/generated_images/Black_man_performing_pull-ups_3605874d.png";
@@ -18,7 +18,7 @@ import dipExerciseImage from "@assets/generated_images/Man_and_woman_dips_e69846
 import overheadPressImage from "@assets/generated_images/Man_and_woman_overhead_press_0abad494.png";
 import bicepCurlsImage from "@assets/stock_images/black_woman_performi_641aeb43.jpg";
 import dumbbellFlyesImage from "@assets/stock_images/black_man_performing_a73f31ab.jpg";
-import dumbbellRollsImage from "@assets/Dumbbell_Row_Muscles_Worked_1758664071863.webp";
+import dumbbellRollsImage from "@assets/stock_images/black_woman_performi_21123039.jpg";
 import tricepExtensionsImage from "@assets/generated_images/Black_guy_and_lady_tricep_extensions_3cce0d7d.png";
 import latPulldownImage from "@assets/generated_images/Man_and_woman_lat_pulldown_dbce7bd1.png";
 import rowsImage from "@assets/generated_images/Black_guy_and_lady_rows_0acde538.png";
