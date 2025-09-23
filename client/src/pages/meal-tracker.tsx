@@ -44,6 +44,7 @@ export default function MealTrackerPage() {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [analysisResult, setAnalysisResult] = useState<NutritionalAnalysis | null>(null);
   const [isScannerOpen, setIsScannerOpen] = useState(false);
+  const [editingMealName, setEditingMealName] = useState<string>("");
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
@@ -66,6 +67,7 @@ export default function MealTrackerPage() {
     },
     onSuccess: (data: NutritionalAnalysis) => {
       setAnalysisResult(data);
+      setEditingMealName(data.mealName);
       toast({
         title: "Analysis Complete! 🍽️",
         description: `Found: ${data.mealName} with ${data.totalCalories} calories`,
@@ -101,6 +103,7 @@ export default function MealTrackerPage() {
           confidence: 0.95 // High confidence for barcode lookup
         };
         setAnalysisResult(nutritionData);
+        setEditingMealName(nutritionData.mealName);
         toast({
           title: "Barcode Found! 📊",
           description: `${data.product.name} - ${data.product.calories} calories`,
@@ -199,7 +202,7 @@ export default function MealTrackerPage() {
     const mealData: InsertMealEntry = {
       userId: "current-user", // Will be set by backend auth
       mealType: analysisForm.mealType,
-      mealName: analysisResult.mealName,
+      mealName: editingMealName || analysisResult.mealName,
       description: analysisResult.description || analysisForm.customDescription,
       imageUrl: null, // TODO: Upload to storage
       totalCalories: analysisResult.totalCalories,
@@ -394,6 +397,22 @@ export default function MealTrackerPage() {
                 <CardDescription>{analysisResult.description}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
+                {/* Food Name Edit Section */}
+                <div className="space-y-2">
+                  <Label htmlFor="meal-name-edit">Food Name</Label>
+                  <Input
+                    id="meal-name-edit"
+                    value={editingMealName}
+                    onChange={(e) => setEditingMealName(e.target.value)}
+                    placeholder="Enter food name"
+                    data-testid="input-meal-name-edit"
+                    className="font-medium"
+                  />
+                  <p className="text-sm text-gray-500">
+                    You can edit the food name before saving to your diary
+                  </p>
+                </div>
+
                 <div className="grid gap-6 md:grid-cols-2">
                   <div>
                     <h3 className="font-semibold mb-3">Macronutrients</h3>
