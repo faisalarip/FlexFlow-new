@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/hooks/useTheme";
 import Dashboard from "@/pages/dashboard";
+import Home from "@/pages/home";
 import UserSubscription from "@/pages/user-subscription";
 import Leaderboard from "@/pages/leaderboard";
 import MileTracker from "@/pages/mile-tracker";
@@ -68,7 +69,9 @@ function Router() {
           </>
         ) : (
           <ProfileCompletionGuard>
-            <Route path="/" component={Dashboard} />
+            <Route path="/" component={Home} />
+            <Route path="/home" component={Home} />
+            <Route path="/dashboard" component={Dashboard} />
             <Route path="/subscription" component={UserSubscription} />
             <Route path="/leaderboard" component={Leaderboard} />
             <Route path="/mile-tracker" component={MileTracker} />
