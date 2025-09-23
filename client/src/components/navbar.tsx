@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Home, Users, Calendar, Trophy, Activity, Camera, Award, MapPin, MessageSquare, ChefHat, CreditCard, Star, ChevronDown, Menu, LogOut, Settings, Target, Apple, LucideIcon } from "lucide-react";
+import { Home, Users, Calendar, Trophy, Activity, Camera, Award, MapPin, MessageSquare, ChefHat, CreditCard, Star, ChevronDown, Menu, LogOut, Settings, Target, Apple } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -9,32 +9,25 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useNewAuth } from "@/hooks/useNewAuth";
 
-interface NavItem {
-  path: string;
-  label: string;
-  icon: LucideIcon;
-  external?: boolean;
-}
-
 export default function Navbar() {
   const [location] = useLocation();
   const { signOut } = useNewAuth();
 
-  const mainNavItems: NavItem[] = [
+  const mainNavItems = [
     { 
       path: "/", 
       label: "Home", 
       icon: Home 
-    }
-  ];
-
-  const dropdownItems: NavItem[] = [
+    },
     { 
       path: "https://flex-flow.fitness/home", 
       label: "FlexFlow.fitness", 
       icon: Home,
       external: true
-    },
+    }
+  ];
+
+  const dropdownItems = [
     { 
       path: "/subscription", 
       label: "Premium", 
@@ -151,23 +144,6 @@ export default function Navbar() {
                   const Icon = item.icon;
                   const isActive = location === item.path;
                   
-                  if (item.external) {
-                    return (
-                      <DropdownMenuItem key={item.path} asChild>
-                        <a 
-                          href={item.path}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center space-x-3 px-2 py-2 w-full cursor-pointer"
-                          data-testid={`dropdown-external-${item.label.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}
-                        >
-                          <Icon size={16} />
-                          <span>{item.label}</span>
-                        </a>
-                      </DropdownMenuItem>
-                    );
-                  }
-                  
                   return (
                     <DropdownMenuItem key={item.path} asChild>
                       <Link 
@@ -175,7 +151,6 @@ export default function Navbar() {
                         className={`flex items-center space-x-3 px-2 py-2 w-full cursor-pointer ${
                           isActive ? "bg-primary/10 text-primary" : ""
                         }`}
-                        data-testid={`dropdown-${item.label.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}
                       >
                         <Icon size={16} />
                         <span>{item.label}</span>
