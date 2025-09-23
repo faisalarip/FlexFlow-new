@@ -141,7 +141,7 @@ export default function DifficultyNotifications() {
 
       {/* Notifications Panel */}
       {showNotifications && (
-        <div className="absolute -right-4 sm:right-0 top-12 w-72 sm:w-80 md:w-96 bg-white rounded-2xl shadow-2xl border border-gray-200 z-40 max-h-[50vh] md:max-h-[70vh] overflow-hidden">
+        <div className="absolute -right-20 sm:-right-16 md:-right-12 top-12 w-72 sm:w-80 md:w-96 bg-white rounded-2xl shadow-2xl border border-gray-200 z-40 max-h-[50vh] md:max-h-[70vh] overflow-hidden">
           {/* Header */}
           <div className="bg-gradient-to-r from-red-600 to-orange-600 text-white p-3 md:p-4 rounded-t-2xl">
             <div className="flex items-center justify-between">
