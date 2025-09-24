@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Trophy, Medal, Award, Users } from "lucide-react";
+import { Trophy, Medal, Award, Users, Crown, Star, Sparkles } from "lucide-react";
 import type { LeaderboardEntry } from "@shared/schema";
 
 export default function Leaderboard() {
@@ -8,14 +8,29 @@ export default function Leaderboard() {
     queryKey: ["/api/leaderboard"],
   });
 
-  const getRankIcon = (rank: number) => {
+  const getRankIcon = (rank: number, size: number = 24) => {
     switch (rank) {
       case 1:
-        return <Trophy className="text-yellow-500" size={24} />;
+        return (
+          <div className="relative">
+            <Crown className="text-yellow-400 drop-shadow-lg animate-bounce" size={size} />
+            <div className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-300 rounded-full animate-ping"></div>
+          </div>
+        );
       case 2:
-        return <Medal className="text-gray-400" size={24} />;
+        return (
+          <div className="relative">
+            <Trophy className="text-gray-400 drop-shadow-md" size={size} />
+            <Sparkles className="absolute -top-1 -right-1 w-3 h-3 text-gray-300 animate-pulse" />
+          </div>
+        );
       case 3:
-        return <Award className="text-amber-600" size={24} />;
+        return (
+          <div className="relative">
+            <Medal className="text-amber-600 drop-shadow-md" size={size} />
+            <Star className="absolute -top-1 -right-1 w-3 h-3 text-amber-400 animate-pulse" />
+          </div>
+        );
       default:
         return <div className="w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center text-sm font-bold text-gray-600">
           {rank}
@@ -26,13 +41,40 @@ export default function Leaderboard() {
   const getRankBgColor = (rank: number) => {
     switch (rank) {
       case 1:
-        return "bg-gradient-to-r from-yellow-50 to-yellow-100 border-yellow-200";
+        return "bg-gradient-to-br from-yellow-100 via-yellow-200 to-yellow-300 border-yellow-400 shadow-yellow-200/50";
       case 2:
-        return "bg-gradient-to-r from-gray-50 to-gray-100 border-gray-200";
+        return "bg-gradient-to-br from-gray-100 via-gray-200 to-gray-300 border-gray-400 shadow-gray-200/50";
       case 3:
-        return "bg-gradient-to-r from-amber-50 to-amber-100 border-amber-200";
+        return "bg-gradient-to-br from-amber-100 via-amber-200 to-amber-300 border-amber-400 shadow-amber-200/50";
       default:
         return "bg-white border-gray-200";
+    }
+  };
+
+  const getPodiumHeight = (rank: number) => {
+    switch (rank) {
+      case 1:
+        return "h-48"; // Tallest for gold
+      case 2:
+        return "h-36"; // Medium for silver  
+      case 3:
+        return "h-32"; // Shortest for bronze
+      default:
+        return "h-24";
+    }
+  };
+
+  const getPodiumOrder = (rank: number) => {
+    // Arrange podium: 2nd, 1st, 3rd (classic podium layout)
+    switch (rank) {
+      case 1:
+        return "order-2"; // Center position
+      case 2:
+        return "order-1"; // Left position
+      case 3:
+        return "order-3"; // Right position
+      default:
+        return "order-4";
     }
   };
 
@@ -134,40 +176,92 @@ export default function Leaderboard() {
           </Card>
         </div>
 
-        {/* Top 3 Podium */}
+        {/* Champions Podium */}
         {topThree.length > 0 && (
-          <Card className="mb-8">
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Trophy className="mr-2 text-yellow-500" size={24} />
-                Top Performers
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {topThree.map((entry) => (
-                  <div
-                    key={entry.userId}
-                    className={`p-6 rounded-lg border-2 ${getRankBgColor(entry.rank)} text-center`}
-                  >
-                    <div className="mb-3">
-                      {getRankIcon(entry.rank)}
+          <div className="mb-12 relative">
+            {/* Celebration Background */}
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-100 via-pink-50 to-yellow-50 rounded-3xl opacity-50"></div>
+            <div className="absolute top-4 left-8 w-2 h-2 bg-yellow-400 rounded-full animate-ping"></div>
+            <div className="absolute top-8 right-12 w-1 h-1 bg-pink-400 rounded-full animate-bounce"></div>
+            <div className="absolute bottom-6 left-16 w-1.5 h-1.5 bg-purple-400 rounded-full animate-pulse"></div>
+            
+            <Card className="relative z-10 border-2 border-gradient-to-r from-yellow-200 to-pink-200 shadow-2xl">
+              <CardHeader className="text-center pb-4">
+                <CardTitle className="flex items-center justify-center text-3xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-yellow-600 bg-clip-text text-transparent">
+                  <Crown className="mr-3 text-yellow-500 animate-pulse" size={36} />
+                  🏆 Champions Podium 🏆
+                  <Crown className="ml-3 text-yellow-500 animate-pulse" size={36} />
+                </CardTitle>
+                <p className="text-gray-600 mt-2">Our fitness legends of the week!</p>
+              </CardHeader>
+              <CardContent className="px-8 pb-8">
+                {/* Podium Container */}
+                <div className="flex items-end justify-center space-x-4 md:space-x-8">
+                  {topThree.map((entry) => (
+                    <div
+                      key={entry.userId}
+                      className={`${getPodiumOrder(entry.rank)} flex flex-col items-center transform transition-all duration-500 hover:scale-105`}
+                      data-testid={`podium-place-${entry.rank}`}
+                    >
+                      {/* Winner Avatar & Crown */}
+                      <div className="relative mb-4">
+                        <div className={`w-20 h-20 rounded-full border-4 ${entry.rank === 1 ? 'border-yellow-400 shadow-yellow-300/50' : entry.rank === 2 ? 'border-gray-400 shadow-gray-300/50' : 'border-amber-400 shadow-amber-300/50'} shadow-xl flex items-center justify-center bg-gradient-to-br ${entry.rank === 1 ? 'from-yellow-100 to-yellow-200' : entry.rank === 2 ? 'from-gray-100 to-gray-200' : 'from-amber-100 to-amber-200'}`}>
+                          <span className="text-2xl font-bold bg-gradient-to-r ${entry.rank === 1 ? 'from-yellow-700 to-yellow-900' : entry.rank === 2 ? 'from-gray-700 to-gray-900' : 'from-amber-700 to-amber-900'} bg-clip-text text-transparent">
+                            {entry.name.charAt(0)}
+                          </span>
+                        </div>
+                        {/* Floating Crown/Icon */}
+                        <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                          {getRankIcon(entry.rank, entry.rank === 1 ? 32 : 28)}
+                        </div>
+                        {/* Sparkle Effects */}
+                        {entry.rank === 1 && (
+                          <>
+                            <div className="absolute -top-2 -left-2 w-3 h-3 bg-yellow-300 rounded-full animate-ping"></div>
+                            <div className="absolute -bottom-1 -right-2 w-2 h-2 bg-yellow-400 rounded-full animate-bounce"></div>
+                          </>
+                        )}
+                      </div>
+                      
+                      {/* Winner Info */}
+                      <div className="text-center mb-4 px-2">
+                        <h3 className={`font-bold text-lg ${entry.rank === 1 ? 'text-yellow-800' : entry.rank === 2 ? 'text-gray-800' : 'text-amber-800'} mb-1`}>
+                          {entry.name}
+                        </h3>
+                        <p className="text-sm text-gray-600">@{entry.username}</p>
+                        <div className="mt-2">
+                          <p className={`text-2xl font-bold ${entry.rank === 1 ? 'text-yellow-700' : entry.rank === 2 ? 'text-gray-700' : 'text-amber-700'}`}>
+                            {entry.totalReps.toLocaleString()}
+                          </p>
+                          <p className="text-xs text-gray-500">total reps</p>
+                        </div>
+                      </div>
+                      
+                      {/* Podium Platform */}
+                      <div className={`w-24 ${getPodiumHeight(entry.rank)} ${getRankBgColor(entry.rank)} border-2 rounded-t-lg shadow-xl relative overflow-hidden`}>
+                        {/* Podium Rank Number */}
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <span className={`text-4xl font-black ${entry.rank === 1 ? 'text-yellow-800' : entry.rank === 2 ? 'text-gray-800' : 'text-amber-800'} opacity-30`}>
+                            {entry.rank}
+                          </span>
+                        </div>
+                        {/* Shimmer Effect */}
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse"></div>
+                        {/* Base Platform */}
+                        <div className={`absolute bottom-0 w-full h-2 ${entry.rank === 1 ? 'bg-yellow-500' : entry.rank === 2 ? 'bg-gray-500' : 'bg-amber-500'}`}></div>
+                      </div>
                     </div>
-                    <h3 className="text-lg font-bold text-gray-900 mb-1">
-                      {entry.name}
-                    </h3>
-                    <p className="text-sm text-gray-600 mb-3">@{entry.username}</p>
-                    <div className="space-y-1">
-                      <p className="text-3xl font-bold text-primary">
-                        {entry.totalReps.toLocaleString()}
-                      </p>
-                      <p className="text-sm text-gray-600">total reps</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+                  ))}
+                </div>
+                
+                {/* Celebration Message */}
+                <div className="text-center mt-8 p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl border border-purple-200">
+                  <p className="text-lg font-medium text-gray-800 mb-2">🎉 Congratulations Champions! 🎉</p>
+                  <p className="text-sm text-gray-600">Amazing dedication to fitness excellence!</p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         )}
 
         {/* Full Leaderboard */}
