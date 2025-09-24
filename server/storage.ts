@@ -292,6 +292,7 @@ export class MemStorage implements IStorage {
     this.seedMealPlans();
     this.seedFoodItems();
     this.seedCommunityPosts();
+    this.seedLeaderboardData();
   }
 
   private seedExercises() {
@@ -1505,7 +1506,9 @@ export class MemStorage implements IStorage {
       if (user) {
         leaderboardEntries.push({
           userId: user.id,
-          name: user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : user.email?.split('@')[0] || 'Anonymous',
+          firstName: user.firstName || user.email?.split('@')[0] || 'User',
+          lastName: user.lastName || '',
+          email: user.email || '',
           totalReps,
           rank: 0 // Will be set after sorting
         });
@@ -2496,6 +2499,84 @@ export class MemStorage implements IStorage {
         imageUrl: undefined
       };
       this.communityPosts.set(post.id, post);
+    });
+  }
+
+  private seedLeaderboardData() {
+    // Get the sample users created in seedCommunityPosts
+    const userIds = Array.from(this.users.keys()).slice(0, 5); // Get first 5 users
+    
+    if (userIds.length === 0) return; // No users to create workouts for
+    
+    // Get some exercises for the workouts
+    const exerciseIds = Array.from(this.exercises.keys()).slice(0, 5);
+    
+    // Create sample workouts for different users with varying rep counts
+    const workoutData = [
+      // User 1 - Gold position (highest reps)
+      {
+        userId: userIds[0],
+        workoutName: "Strength Training Session",
+        exercises: [
+          { exerciseId: exerciseIds[0], reps: 25 }, // Push-ups
+          { exerciseId: exerciseIds[1], reps: 30 }, // Squats  
+          { exerciseId: exerciseIds[2], reps: 20 }, // Lunges
+        ]
+      },
+      // User 2 - Silver position (medium reps)
+      {
+        userId: userIds[1],
+        workoutName: "Upper Body Workout",
+        exercises: [
+          { exerciseId: exerciseIds[0], reps: 20 }, // Push-ups
+          { exerciseId: exerciseIds[3], reps: 15 }, // Pull-ups
+          { exerciseId: exerciseIds[4], reps: 18 }, // Planks (as reps)
+        ]
+      },
+      // User 3 - Bronze position (lower reps)
+      {
+        userId: userIds[2],
+        workoutName: "Full Body Circuit",
+        exercises: [
+          { exerciseId: exerciseIds[1], reps: 15 }, // Squats
+          { exerciseId: exerciseIds[2], reps: 12 }, // Lunges
+          { exerciseId: exerciseIds[0], reps: 10 }, // Push-ups
+        ]
+      }
+    ];
+
+    // Create the workouts and workout exercises
+    workoutData.forEach((data, index) => {
+      const workoutId = randomUUID();
+      const workout = {
+        id: workoutId,
+        userId: data.userId,
+        name: data.workoutName,
+        category: "strength",
+        duration: 45,
+        caloriesBurned: 300 + (index * 50),
+        notes: "Sample workout for leaderboard demo",
+        date: new Date(Date.now() - (index * 24 * 60 * 60 * 1000)), // Different days
+        createdAt: new Date()
+      };
+      this.workouts.set(workoutId, workout);
+
+      // Add workout exercises with reps
+      data.exercises.forEach(exercise => {
+        const workoutExerciseId = randomUUID();
+        const workoutExercise = {
+          id: workoutExerciseId,
+          workoutId: workoutId,
+          exerciseId: exercise.exerciseId,
+          sets: 3,
+          reps: exercise.reps,
+          weight: null,
+          distance: null,
+          duration: null,
+          notes: null
+        };
+        this.workoutExercises.set(workoutExerciseId, workoutExercise);
+      });
     });
   }
 
