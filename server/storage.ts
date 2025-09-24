@@ -1587,9 +1587,15 @@ export class MemStorage implements IStorage {
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
       .slice(0, limit);
 
+    console.log(`Retrieved ${posts.length} posts from storage`);
+    console.log(`Posts:`, posts.map(p => ({ id: p.id, userId: p.userId, content: p.content })));
+    console.log(`Users in storage:`, Array.from(this.users.keys()));
+
     const postsWithUsers: CommunityPostWithUser[] = [];
     for (const post of posts) {
+      console.log(`Looking for user ${post.userId} for post ${post.id}`);
       const user = this.users.get(post.userId);
+      console.log(`User found:`, user ? `${user.firstName} ${user.lastName} (${user.email})` : 'null');
       if (user) {
         const postWithUser: CommunityPostWithUser = {
           ...post,
