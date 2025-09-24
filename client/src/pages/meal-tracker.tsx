@@ -8,8 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Camera, Upload, Loader2, Apple, Calendar, Target, TrendingUp, ScanLine } from "lucide-react";
+import { Loader2, Apple, Calendar, TrendingUp, ScanLine } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import type { MealEntry, InsertMealEntry } from "@shared/schema";
@@ -28,25 +27,21 @@ interface NutritionalAnalysis {
   confidence: number;
 }
 
-interface AnalysisFormData {
+interface BarcodeFormData {
   mealType: string;
-  imageFile: File | null;
   customDescription: string;
 }
 
 export default function MealTrackerPage() {
-  const [analysisForm, setAnalysisForm] = useState<AnalysisFormData>({
+  const [barcodeForm, setBarcodeForm] = useState<BarcodeFormData>({
     mealType: "",
-    imageFile: null,
     customDescription: ""
   });
-  const [dragActive, setDragActive] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [analysisResult, setAnalysisResult] = useState<NutritionalAnalysis | null>(null);
   const [isScannerOpen, setIsScannerOpen] = useState(false);
   const [editingMealName, setEditingMealName] = useState<string>("");
   
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const lastBarcodeRef = useRef<string | null>(null);
   const barcodeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { toast } = useToast();
@@ -61,28 +56,6 @@ export default function MealTrackerPage() {
     }
   });
 
-  // Analyze meal image mutation
-  const analyzeMutation = useMutation({
-    mutationFn: async (formData: FormData) => {
-      const response = await apiRequest("POST", "/api/meal-entries/analyze", formData);
-      return response.json();
-    },
-    onSuccess: (data: NutritionalAnalysis) => {
-      setAnalysisResult(data);
-      setEditingMealName(data.mealName);
-      toast({
-        title: "Analysis Complete! 🍽️",
-        description: `Found: ${data.mealName} with ${data.totalCalories} calories`,
-      });
-    },
-    onError: (error) => {
-      toast({
-        title: "Analysis Failed",
-        description: "Could not analyze the image. Please try again.",
-        variant: "destructive",
-      });
-    }
-  });
 
   // Barcode lookup mutation
   const barcodeLookupMutation = useMutation({
@@ -144,7 +117,7 @@ export default function MealTrackerPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/meal-entries"] });
       setAnalysisResult(null);
-      setAnalysisForm({ mealType: "", imageFile: null, customDescription: "" });
+      setBarcodeForm({ mealType: "", customDescription: "" });
       toast({
         title: "Meal Saved! ✅",
         description: "Your meal has been added to your diary.",
@@ -152,46 +125,6 @@ export default function MealTrackerPage() {
     }
   });
 
-  const handleFileUpload = (file: File) => {
-    if (!file.type.startsWith('image/')) {
-      toast({
-        title: "Invalid File",
-        description: "Please upload an image file.",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    setAnalysisForm(prev => ({ ...prev, imageFile: file }));
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setDragActive(false);
-    
-    const files = Array.from(e.dataTransfer.files);
-    if (files.length > 0) {
-      handleFileUpload(files[0]);
-    }
-  };
-
-  const handleAnalyze = () => {
-    if (!analysisForm.imageFile || !analysisForm.mealType) {
-      toast({
-        title: "Missing Information",
-        description: "Please select an image and meal type.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append('image', analysisForm.imageFile);
-    formData.append('mealType', analysisForm.mealType);
-    formData.append('description', analysisForm.customDescription);
-    
-    analyzeMutation.mutate(formData);
-  };
 
   const handleBarcodeScanned = (barcode: string) => {
     setIsScannerOpen(false);
@@ -221,10 +154,10 @@ export default function MealTrackerPage() {
 
     const mealData: InsertMealEntry = {
       userId: "current-user", // Will be set by backend auth
-      mealType: analysisForm.mealType,
+      mealType: barcodeForm.mealType,
       mealName: editingMealName || analysisResult.mealName,
-      description: analysisResult.description || analysisForm.customDescription,
-      imageUrl: null, // TODO: Upload to storage
+      description: analysisResult.description || barcodeForm.customDescription,
+      imageUrl: null,
       totalCalories: analysisResult.totalCalories,
       protein: analysisResult.protein.toString(),
       carbs: analysisResult.carbs.toString(),
@@ -258,28 +191,28 @@ export default function MealTrackerPage() {
       <div className="text-center space-y-4">
         <h1 className="text-3xl font-bold text-white flex items-center justify-center gap-3">
           <Apple className="w-8 h-8 text-primary" />
-          AI Meal Tracker
+          Barcode Meal Tracker
         </h1>
         <p className="text-gray-600 max-w-2xl mx-auto">
-          Upload photos of your meals and get instant nutritional analysis powered by AI.
+          Scan barcodes to instantly add packaged foods to your meal diary with accurate nutrition data.
         </p>
       </div>
 
-      <Tabs defaultValue="upload" className="w-full">
+      <Tabs defaultValue="scan" className="w-full">
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="upload">Upload Meal</TabsTrigger>
+          <TabsTrigger value="scan">Scan Barcode</TabsTrigger>
           <TabsTrigger value="history">Daily History</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="upload" className="space-y-6">
+        <TabsContent value="scan" className="space-y-6">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Camera className="w-5 h-5" />
-                Analyze Your Meal
+                <ScanLine className="w-5 h-5" />
+                Scan Barcode
               </CardTitle>
               <CardDescription>
-                Take a photo of your meal and get detailed nutritional information
+                Scan the barcode on packaged foods to get instant nutrition information
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -287,8 +220,8 @@ export default function MealTrackerPage() {
               <div className="space-y-2">
                 <Label htmlFor="meal-type">Meal Type</Label>
                 <Select 
-                  value={analysisForm.mealType} 
-                  onValueChange={(value) => setAnalysisForm(prev => ({ ...prev, mealType: value }))}
+                  value={barcodeForm.mealType} 
+                  onValueChange={(value) => setBarcodeForm(prev => ({ ...prev, mealType: value }))}
                 >
                   <SelectTrigger data-testid="select-meal-type">
                     <SelectValue placeholder="Select meal type" />
@@ -302,105 +235,37 @@ export default function MealTrackerPage() {
                 </Select>
               </div>
 
-              {/* Image Upload */}
-              <div
-                className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
-                  dragActive ? "border-primary bg-primary/5" : "border-gray-300"
-                }`}
-                onDragEnter={() => setDragActive(true)}
-                onDragLeave={() => setDragActive(false)}
-                onDragOver={(e) => e.preventDefault()}
-                onDrop={handleDrop}
-              >
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) handleFileUpload(file);
-                  }}
-                  data-testid="input-image-upload"
-                />
-                
-                {analysisForm.imageFile ? (
-                  <div className="space-y-2">
-                    <img
-                      src={URL.createObjectURL(analysisForm.imageFile)}
-                      alt="Uploaded meal"
-                      className="mx-auto max-h-48 rounded-lg"
-                      data-testid="img-uploaded-meal"
-                    />
-                    <p className="text-sm text-gray-600">{analysisForm.imageFile.name}</p>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => fileInputRef.current?.click()}
-                      data-testid="button-change-image"
-                    >
-                      Change Image
-                    </Button>
+              {/* Barcode Scanner */}
+              <div className="border-2 border-dashed rounded-lg p-8 text-center border-gray-300">
+                <div className="space-y-4">
+                  <ScanLine className="mx-auto h-12 w-12 text-gray-400" />
+                  <div>
+                    <p className="text-lg font-medium">Scan Product Barcode</p>
+                    <p className="text-sm text-gray-500">Point your camera at the barcode to get nutrition info</p>
                   </div>
-                ) : (
-                  <div className="space-y-4">
-                    <Upload className="mx-auto h-12 w-12 text-gray-400" />
-                    <div>
-                      <p className="text-lg font-medium">Drop your meal photo here</p>
-                      <p className="text-sm text-gray-500">or click to browse files</p>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button 
-                        onClick={() => fileInputRef.current?.click()}
-                        data-testid="button-upload-image"
-                      >
-                        Choose File
-                      </Button>
-                      <Button 
-                        variant="outline"
-                        onClick={() => setIsScannerOpen(true)}
-                        data-testid="button-scan-barcode"
-                        className="flex items-center gap-2"
-                      >
-                        <ScanLine className="w-4 h-4" />
-                        Scan Barcode
-                      </Button>
-                    </div>
-                  </div>
-                )}
+                  <Button 
+                    onClick={() => setIsScannerOpen(true)}
+                    data-testid="button-scan-barcode"
+                    className="flex items-center gap-2"
+                    disabled={!barcodeForm.mealType}
+                  >
+                    <ScanLine className="w-4 h-4" />
+                    {barcodeForm.mealType ? "Start Scanner" : "Select meal type first"}
+                  </Button>
+                </div>
               </div>
 
               {/* Custom Description */}
               <div className="space-y-2">
                 <Label htmlFor="description">Additional Notes (Optional)</Label>
-                <Textarea
+                <Input
                   id="description"
-                  placeholder="Add any details about preparation, ingredients, or portion size..."
-                  value={analysisForm.customDescription}
-                  onChange={(e) => setAnalysisForm(prev => ({ ...prev, customDescription: e.target.value }))}
-                  data-testid="textarea-meal-description"
+                  placeholder="Add any notes about preparation or portion size..."
+                  value={barcodeForm.customDescription}
+                  onChange={(e) => setBarcodeForm(prev => ({ ...prev, customDescription: e.target.value }))}
+                  data-testid="input-meal-description"
                 />
               </div>
-
-              {/* Analyze Button */}
-              <Button
-                onClick={handleAnalyze}
-                disabled={!analysisForm.imageFile || !analysisForm.mealType || analyzeMutation.isPending}
-                className="w-full"
-                data-testid="button-analyze-meal"
-              >
-                {analyzeMutation.isPending ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Analyzing...
-                  </>
-                ) : (
-                  <>
-                    <Target className="mr-2 h-4 w-4" />
-                    Analyze Meal
-                  </>
-                )}
-              </Button>
             </CardContent>
           </Card>
 

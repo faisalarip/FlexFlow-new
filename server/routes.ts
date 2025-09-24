@@ -2359,37 +2359,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
-  
-  // Analyze meal image with OpenAI
-  app.post("/api/meal-entries/analyze", authenticateToken, multer({ storage: multer.memoryStorage() }).single('image'), async (req, res) => {
-    try {
-      const userId = getAuthUserId(req);
-      if (!userId) {
-        return res.status(401).json({ message: "User not authenticated" });
-      }
-
-      if (!req.file) {
-        return res.status(400).json({ message: "No image file provided" });
-      }
-
-      const { mealType, description } = req.body;
-      if (!mealType) {
-        return res.status(400).json({ message: "Meal type is required" });
-      }
-
-      // Convert image to base64 for OpenAI
-      const base64Image = req.file.buffer.toString('base64');
-      
-      // Import and use OpenAI service
-      const { analyzeMealImage } = await import('./openai-service');
-      const analysis = await analyzeMealImage(base64Image, mealType, description);
-      
-      res.json(analysis);
-    } catch (error) {
-      console.error('Meal analysis error:', error);
-      res.status(500).json({ message: "Failed to analyze meal image" });
-    }
-  });
 
   // Get meal entries for a user (optionally filtered by date)
   app.get("/api/meal-entries", authenticateToken, async (req, res) => {
