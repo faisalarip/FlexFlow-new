@@ -189,7 +189,7 @@ export default function Community() {
                   <div className="flex items-start space-x-4">
                     <Avatar>
                       <AvatarFallback className="bg-primary text-white">
-                        {post.user.name.charAt(0).toUpperCase()}
+                        {(post.user.firstName?.charAt(0) || post.user.email?.charAt(0) || 'U').toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
                     
@@ -197,11 +197,15 @@ export default function Community() {
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-3">
                           <div>
-                            <p className="font-semibold text-gray-900">{post.user.name}</p>
-                            <div className="flex items-center space-x-2 text-sm text-gray-600">
-                              <span>@{post.user.username}</span>
+                            <p className="font-semibold text-gray-900 dark:text-white">
+                              {post.user.firstName && post.user.lastName 
+                                ? `${post.user.firstName} ${post.user.lastName}`
+                                : post.user.email?.split('@')[0] || 'Anonymous User'}
+                            </p>
+                            <div className="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400">
+                              <span>{post.user.email}</span>
                               <span>•</span>
-                              <span>{formatTimeAgo(post.createdAt)}</span>
+                              <span>{formatTimeAgo(post.createdAt.toString())}</span>
                               {post.user.streak > 0 && (
                                 <>
                                   <span>•</span>
@@ -220,7 +224,7 @@ export default function Community() {
                         </div>
                       </div>
                       
-                      <div className="text-gray-900 whitespace-pre-wrap">
+                      <div className="text-gray-900 dark:text-gray-100 whitespace-pre-wrap">
                         {post.content}
                       </div>
 

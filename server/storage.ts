@@ -1572,8 +1572,9 @@ export class MemStorage implements IStorage {
           ...post,
           user: {
             id: user.id,
-            name: user.name,
-            username: user.username,
+            firstName: user.firstName || "",
+            lastName: user.lastName || "",
+            email: user.email || "",
             streak: user.streak,
           }
         };
