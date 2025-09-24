@@ -85,7 +85,7 @@ export default function Community() {
         });
         const data = await response.json();
         
-        setUploadedImageUrl(data.objectPath);
+        setUploadedImageUrl(data.objectPath || null);
         setImagePreview(uploadURL);
         toast({ 
           title: "Image uploaded!", 
@@ -323,7 +323,7 @@ export default function Community() {
         </Card>
 
         {/* Posts Feed */}
-        <div className="space-y-8">
+        <div className="space-y-2">
           {isLoading ? (
             Array.from({ length: 3 }).map((_, i) => (
               <Card key={i} className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-700 shadow-lg">
@@ -354,8 +354,8 @@ export default function Community() {
                 {/* Animated gradient overlay on hover */}
                 <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-pink-500/5 to-red-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 
-                <CardContent className="pt-4 pb-3 px-3 relative z-10">
-                  <div className="flex items-start space-x-3">
+                <CardContent className="pt-2 pb-2 px-2 relative z-10">
+                  <div className="flex items-start space-x-2">
                     {/* Enhanced Avatar with status ring */}
                     <div className="relative">
                       <div className={`absolute -inset-1 rounded-full ${
@@ -363,30 +363,30 @@ export default function Community() {
                           ? 'bg-gradient-to-r from-yellow-400 to-orange-400 animate-pulse' 
                           : 'bg-gradient-to-r from-purple-400 to-pink-400'
                       }`}></div>
-                      <Avatar className="relative w-8 h-8 border border-white shadow-md">
+                      <Avatar className="relative w-6 h-6 border border-white shadow-sm">
                         <AvatarFallback className="bg-gradient-to-br from-purple-500 to-pink-500 text-white text-xs font-bold">
                           {(post.user.firstName?.charAt(0) || post.user.email?.charAt(0) || 'U').toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
                       {/* Status indicator */}
                       {post.user.streak > 0 && (
-                        <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-yellow-500 rounded-full flex items-center justify-center shadow-md">
-                          <span className="text-xs font-bold text-white">{post.user.streak}</span>
+                        <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-yellow-500 rounded-full flex items-center justify-center shadow-sm">
+                          <span className="text-xs font-bold text-white" style={{fontSize: '8px'}}>{post.user.streak}</span>
                         </div>
                       )}
                     </div>
                     
-                    <div className="flex-1 space-y-2">
+                    <div className="flex-1 space-y-1">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-2">
                           <div>
-                            <p className="text-sm font-bold bg-gradient-to-r from-purple-700 to-pink-700 bg-clip-text text-transparent">
+                            <p className="text-xs font-bold bg-gradient-to-r from-purple-700 to-pink-700 bg-clip-text text-transparent">
                               {post.user.firstName && post.user.lastName 
                                 ? `${post.user.firstName} ${post.user.lastName}`
                                 : post.user.email?.split('@')[0] || 'Fitness Warrior'}
                             </p>
-                            <div className="flex items-center space-x-1 text-xs text-gray-600 dark:text-gray-400">
-                              <span className="text-xs">{post.user.email}</span>
+                            <div className="flex items-center space-x-1 text-xs text-gray-600 dark:text-gray-400" style={{fontSize: '10px'}}>
+                              <span style={{fontSize: '10px'}}>{post.user.email}</span>
                               <span className="text-purple-400">•</span>
                               <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                                 {formatTimeAgo(post.createdAt.toString())}
@@ -411,7 +411,7 @@ export default function Community() {
                         </div>
                       </div>
                       
-                      <div className="text-gray-800 dark:text-gray-100 whitespace-pre-wrap text-xs leading-snug p-2 bg-gradient-to-br from-white/50 to-purple-50/50 dark:from-gray-700/50 dark:to-purple-900/20 rounded-md border border-purple-100 dark:border-purple-800">
+                      <div className="text-gray-800 dark:text-gray-100 whitespace-pre-wrap leading-tight p-1.5 bg-gradient-to-br from-white/50 to-purple-50/50 dark:from-gray-700/50 dark:to-purple-900/20 rounded-md border border-purple-100 dark:border-purple-800" style={{fontSize: '11px'}}>
                         {post.content}
                       </div>
 
@@ -421,7 +421,7 @@ export default function Community() {
                           <img
                             src={post.imageUrl}
                             alt="Post image"
-                            className="w-full max-w-xs h-32 object-cover rounded-lg border border-purple-200 dark:border-purple-700 shadow-md"
+                            className="w-full max-w-32 h-20 object-cover rounded border border-purple-200 dark:border-purple-700 shadow-sm"
                             data-testid={`img-post-${post.id}`}
                           />
                         </div>
@@ -429,37 +429,37 @@ export default function Community() {
 
                       {/* Enhanced workout info if it's a workout progress post */}
                       {post.workout && (
-                        <div className="bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:from-red-900/20 dark:via-orange-900/20 dark:to-yellow-900/20 rounded-lg p-3 border border-red-200 dark:border-red-700 shadow-inner">
+                        <div className="bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:from-red-900/20 dark:via-orange-900/20 dark:to-yellow-900/20 rounded p-2 border border-red-200 dark:border-red-700 shadow-inner">
                           <div className="flex items-center justify-between">
-                            <div className="space-y-2">
-                              <p className="text-sm font-bold text-red-700 dark:text-red-300 flex items-center">
-                                <Dumbbell className="w-4 h-4 mr-1" />
+                            <div className="space-y-1">
+                              <p className="font-bold text-red-700 dark:text-red-300 flex items-center" style={{fontSize: '11px'}}>
+                                <Dumbbell className="w-3 h-3 mr-1" />
                                 {post.workout.name}
                               </p>
-                              <p className="text-xs text-red-600 dark:text-red-400 capitalize font-medium px-2 py-1 bg-red-100 dark:bg-red-800 rounded-full">
+                              <p className="text-red-600 dark:text-red-400 capitalize font-medium px-1.5 py-0.5 bg-red-100 dark:bg-red-800 rounded-full" style={{fontSize: '10px'}}>
                                 {post.workout.category}
                               </p>
                             </div>
-                            <div className="text-right space-y-1">
-                              <div className="flex items-center justify-end space-x-1 text-orange-600 dark:text-orange-400">
-                                <Clock size={12} />
-                                <span className="text-xs font-bold">{post.workout.duration} min</span>
+                            <div className="text-right space-y-0.5">
+                              <div className="flex items-center justify-end space-x-0.5 text-orange-600 dark:text-orange-400">
+                                <Clock size={10} />
+                                <span className="font-bold" style={{fontSize: '10px'}}>{post.workout.duration}min</span>
                               </div>
-                              <div className="flex items-center justify-end space-x-1 text-yellow-600 dark:text-yellow-400">
-                                <span className="text-sm">🔥</span>
-                                <span className="text-xs font-bold">{post.workout.caloriesBurned} cal</span>
+                              <div className="flex items-center justify-end space-x-0.5 text-yellow-600 dark:text-yellow-400">
+                                <span style={{fontSize: '10px'}}>🔥</span>
+                                <span className="font-bold" style={{fontSize: '10px'}}>{post.workout.caloriesBurned}cal</span>
                               </div>
                             </div>
                           </div>
                         </div>
                       )}
                       
-                      <div className="flex items-center justify-between pt-2 border-t border-purple-100 dark:border-purple-800">
+                      <div className="flex items-center justify-between pt-1 border-t border-purple-100 dark:border-purple-800">
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => handleLike(post.id)}
-                          className={`transition-all duration-300 ${
+                          className={`transition-all duration-300 h-6 px-2 text-[10px] ${
                             post.likes > 0 
                               ? 'text-red-500 bg-red-50 hover:bg-red-100' 
                               : 'text-gray-600 hover:text-red-500 hover:bg-red-50'
@@ -471,16 +471,16 @@ export default function Community() {
                                 ? 'fill-red-500 text-red-500 animate-pulse' 
                                 : 'hover:fill-red-200'
                             }`} 
-                            size={14} 
+                            size={10} 
                           />
-                          <span className="font-bold text-xs">
-                            {post.likes > 0 ? `${post.likes} ❤️` : 'Show Love'}
+                          <span className="font-bold text-[10px]">
+                            {post.likes > 0 ? `${post.likes} ❤️` : 'Love'}
                           </span>
                         </Button>
                         
-                        <div className="flex items-center space-x-2">
-                          <div className="bg-gradient-to-r from-purple-100 to-pink-100 px-2 py-1 rounded-full">
-                            <span className="text-xs font-bold text-purple-700">
+                        <div className="flex items-center space-x-1">
+                          <div className="bg-gradient-to-r from-purple-100 to-pink-100 px-1.5 py-0.5 rounded-full">
+                            <span className="text-[10px] font-bold text-purple-700">
                               {post.likes} ❤️
                             </span>
                           </div>
