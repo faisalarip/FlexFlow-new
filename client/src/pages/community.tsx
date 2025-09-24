@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { MessageSquare, Heart, Trophy, Dumbbell, Send, Target, Clock, Sparkles, Zap, Users, TrendingUp } from "lucide-react";
+import { MessageSquare, Heart, Trophy, Dumbbell, Send, Target, Clock, Sparkles, Zap, Users, TrendingUp, Image, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -9,11 +9,15 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { ObjectUploader } from "@/components/ObjectUploader";
 import type { CommunityPostWithUser } from "@shared/schema";
+import type { UploadResult } from "@uppy/core";
 
 export default function Community() {
   const [newPostContent, setNewPostContent] = useState("");
   const [selectedPostType, setSelectedPostType] = useState<"message" | "workout_progress" | "goal_achievement">("message");
+  const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -23,7 +27,7 @@ export default function Community() {
   });
 
   const createPostMutation = useMutation({
-    mutationFn: async (postData: { content: string; postType: string; workoutId?: string }) => {
+    mutationFn: async (postData: { content: string; postType: string; workoutId?: string; imageUrl?: string }) => {
       const response = await apiRequest("POST", "/api/community/posts", postData);
       return response.json();
     },
@@ -31,6 +35,8 @@ export default function Community() {
       queryClient.invalidateQueries({ queryKey: ["/api/community/posts"] });
       setNewPostContent("");
       setSelectedPostType("message");
+      setUploadedImageUrl(null);
+      setImagePreview(null);
       toast({ title: "Post shared!", description: "Your post has been shared with the community." });
     },
     onError: () => {
@@ -54,7 +60,51 @@ export default function Community() {
     createPostMutation.mutate({
       content: newPostContent.trim(),
       postType: selectedPostType,
+      imageUrl: uploadedImageUrl || undefined,
     });
+  };
+
+  const handleGetUploadParameters = async () => {
+    const response = await apiRequest("POST", "/api/objects/upload");
+    const data = await response.json();
+    return {
+      method: "PUT" as const,
+      url: data.uploadURL,
+    };
+  };
+
+  const handleUploadComplete = async (result: UploadResult<Record<string, unknown>, Record<string, unknown>>) => {
+    if (result.successful && result.successful.length > 0) {
+      const uploadedFile = result.successful[0];
+      const uploadURL = uploadedFile.uploadURL;
+      
+      // Set ACL policy for the uploaded image
+      try {
+        const response = await apiRequest("PUT", "/api/community/post-images", {
+          imageURL: uploadURL
+        });
+        const data = await response.json();
+        
+        setUploadedImageUrl(data.objectPath);
+        setImagePreview(uploadURL);
+        toast({ 
+          title: "Image uploaded!", 
+          description: "Your image is ready to share with your post." 
+        });
+      } catch (error) {
+        console.error("Error setting image ACL:", error);
+        toast({ 
+          title: "Upload error", 
+          description: "Image uploaded but failed to process. Try again.", 
+          variant: "destructive" 
+        });
+      }
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setUploadedImageUrl(null);
+    setImagePreview(null);
   };
 
   const handleLike = (postId: string) => {
@@ -205,6 +255,49 @@ export default function Community() {
                 rows={4}
                 className="w-full bg-gradient-to-br from-white to-purple-50/30 border-purple-200 focus:border-purple-400 focus:ring-purple-400 transition-all duration-200 text-lg"
               />
+            </div>
+
+            {/* Image Upload Section */}
+            <div>
+              <label className="block text-lg font-semibold text-gray-700 dark:text-gray-200 mb-3 flex items-center">
+                <Image className="w-5 h-5 mr-2 text-orange-500" />
+                Add a Picture (Optional)
+              </label>
+              
+              {/* Image Preview */}
+              {imagePreview && (
+                <div className="mb-4 relative">
+                  <img 
+                    src={imagePreview}
+                    alt="Preview"
+                    className="w-full max-w-md h-48 object-cover rounded-lg border-2 border-purple-200 shadow-lg"
+                  />
+                  <Button
+                    onClick={handleRemoveImage}
+                    variant="destructive"
+                    size="sm"
+                    className="absolute top-2 right-2 rounded-full"
+                  >
+                    ×
+                  </Button>
+                </div>
+              )}
+              
+              {/* Upload Button */}
+              {!imagePreview && (
+                <ObjectUploader
+                  maxNumberOfFiles={1}
+                  maxFileSize={5242880} // 5MB
+                  onGetUploadParameters={handleGetUploadParameters}
+                  onComplete={handleUploadComplete}
+                  buttonClassName="w-full bg-gradient-to-r from-orange-400 to-yellow-400 hover:from-orange-500 hover:to-yellow-500 text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200"
+                >
+                  <div className="flex items-center justify-center space-x-2">
+                    <Upload className="w-5 h-5" />
+                    <span>Upload Photo</span>
+                  </div>
+                </ObjectUploader>
+              )}
             </div>
 
             <div className="flex justify-end">
