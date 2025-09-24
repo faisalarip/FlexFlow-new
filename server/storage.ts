@@ -291,6 +291,7 @@ export class MemStorage implements IStorage {
     this.seedTrainers();
     this.seedMealPlans();
     this.seedFoodItems();
+    this.seedCommunityPosts();
   }
 
   private seedExercises() {
@@ -1597,9 +1598,13 @@ export class MemStorage implements IStorage {
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
       .slice(0, limit);
 
+    console.log(`Memory storage: Found ${posts.length} community posts`);
+    console.log(`Memory storage: Total users: ${this.users.size}`);
+
     const postsWithUsers: CommunityPostWithUser[] = [];
     for (const post of posts) {
       const user = this.users.get(post.userId);
+      console.log(`Looking for user ${post.userId}: ${user ? 'found' : 'not found'}`);
       if (user) {
         const postWithUser: CommunityPostWithUser = {
           ...post,
@@ -2411,6 +2416,89 @@ export class MemStorage implements IStorage {
     });
   }
 
+  private seedCommunityPosts() {
+    // Create some sample users first for the community posts
+    const sampleUsers: { id: string; firstName: string; lastName: string; email: string; streak: number }[] = [
+      {
+        id: randomUUID(),
+        firstName: "Alex",
+        lastName: "Smith",
+        email: "alex@example.com",
+        streak: 5
+      },
+      {
+        id: randomUUID(),
+        firstName: "Maria",
+        lastName: "Garcia",
+        email: "maria@example.com",
+        streak: 12
+      },
+      {
+        id: randomUUID(),
+        firstName: "Jordan",
+        lastName: "Lee",
+        email: "jordan@example.com",
+        streak: 3
+      }
+    ];
+
+    // Store sample users in memory storage
+    sampleUsers.forEach(user => {
+      const fullUser = {
+        ...user,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        currentWeightKg: 70,
+        currentHeightCm: 170,
+        fitnessLevel: "intermediate" as const,
+        goalType: "weight_loss" as const,
+      };
+      this.users.set(user.id, fullUser);
+    });
+
+    // Create sample community posts
+    const samplePosts = [
+      {
+        userId: sampleUsers[0].id,
+        content: "Just finished an amazing 45-minute strength training session! 💪 Feeling stronger every day. The consistency is really paying off!",
+        postType: "workout_progress" as const
+      },
+      {
+        userId: sampleUsers[1].id, 
+        content: "Hit my goal of running 5K under 25 minutes today! 🏃‍♀️ Started from barely being able to run 1K just 3 months ago. Never give up on your dreams!",
+        postType: "goal_achievement" as const
+      },
+      {
+        userId: sampleUsers[2].id,
+        content: "Who else is struggling with motivation today? 😅 Some days are harder than others, but we've got this! What keeps you going when things get tough?",
+        postType: "message" as const
+      },
+      {
+        userId: sampleUsers[0].id,
+        content: "Meal prep Sunday is done! 🥗 Prepared healthy lunches for the entire week. Small steps lead to big changes!",
+        postType: "message" as const
+      },
+      {
+        userId: sampleUsers[1].id,
+        content: "New personal record on deadlifts today! 🎉 Added 10 more pounds to my max. Progress feels amazing when you work for it consistently.",
+        postType: "workout_progress" as const
+      }
+    ];
+
+    samplePosts.forEach((postData, index) => {
+      const post = {
+        id: randomUUID(),
+        ...postData,
+        likes: Math.floor(Math.random() * 15) + 1, // Random likes between 1-15
+        createdAt: new Date(Date.now() - (index * 24 * 60 * 60 * 1000)), // Spread posts over several days
+        updatedAt: new Date(),
+        workoutId: undefined,
+        imageUrl: undefined
+      };
+      this.communityPosts.set(post.id, post);
+    });
+  }
+
   private seedGeneralMealPlan(planId: string, goal: string, dailyCalories: number, duration: number) {
     // Create days for the meal plan with variety
     for (let day = 1; day <= duration; day++) {
@@ -2933,6 +3021,7 @@ export class DatabaseStorage implements IStorage {
   async getCommunityPosts(limit?: number): Promise<CommunityPostWithUser[]> { 
     // Get posts using memStorage's public API, then enrich with database users
     const memPosts = await this.memStorage.getCommunityPosts(limit);
+    console.log(`Found ${memPosts.length} posts in memory storage`);
     
     // Enrich posts by replacing memStorage users with database users when available
     const enrichedPosts: CommunityPostWithUser[] = [];
@@ -2958,6 +3047,7 @@ export class DatabaseStorage implements IStorage {
       }
     }
 
+    console.log(`Returning ${enrichedPosts.length} enriched posts`);
     return enrichedPosts;
   }
   async createCommunityPost(post: InsertCommunityPost): Promise<CommunityPost> { return this.memStorage.createCommunityPost(post); }
