@@ -132,45 +132,66 @@ export default function Leaderboard() {
   const others = leaderboard.slice(3);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-yellow-50 relative overflow-hidden">
+      {/* Floating Background Elements */}
+      <div className="absolute top-10 left-10 w-20 h-20 bg-yellow-300/20 rounded-full animate-pulse"></div>
+      <div className="absolute top-32 right-16 w-12 h-12 bg-purple-300/20 rounded-full animate-bounce"></div>
+      <div className="absolute bottom-20 left-1/4 w-16 h-16 bg-pink-300/20 rounded-full animate-ping"></div>
+      <div className="absolute bottom-40 right-1/3 w-8 h-8 bg-yellow-400/30 rounded-full animate-pulse"></div>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Leaderboard</h1>
-          <p className="text-gray-600">Rankings based on total reps completed across all workouts</p>
+        <div className="mb-8 text-center">
+          <h1 className="text-5xl font-black bg-gradient-to-r from-purple-600 via-pink-600 to-yellow-600 bg-clip-text text-transparent mb-4 animate-pulse">
+            🏅 FITNESS LEADERBOARD 🏅
+          </h1>
+          <p className="text-lg text-gray-700 font-medium">Champions ranked by total reps completed • Who will claim the crown?</p>
+          <div className="mt-4 flex justify-center space-x-2">
+            <div className="w-3 h-3 bg-yellow-400 rounded-full animate-bounce"></div>
+            <div className="w-3 h-3 bg-pink-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+            <div className="w-3 h-3 bg-purple-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+          </div>
         </div>
 
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card>
+          <Card className="bg-gradient-to-br from-yellow-50 to-yellow-100 border-yellow-200 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
             <CardContent className="pt-6">
               <div className="text-center">
-                <Trophy className="mx-auto mb-2 text-yellow-500" size={32} />
-                <p className="text-2xl font-bold text-gray-900">
+                <div className="relative">
+                  <Trophy className="mx-auto mb-2 text-yellow-500 animate-bounce" size={40} />
+                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-300 rounded-full animate-ping"></div>
+                </div>
+                <p className="text-3xl font-bold bg-gradient-to-r from-yellow-700 to-yellow-900 bg-clip-text text-transparent">
                   {topThree[0]?.totalReps.toLocaleString() || 0}
                 </p>
-                <p className="text-sm text-gray-600">Top Score</p>
+                <p className="text-sm font-semibold text-yellow-800">🏆 Champion Score</p>
               </div>
             </CardContent>
           </Card>
           
-          <Card>
+          <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
             <CardContent className="pt-6">
               <div className="text-center">
-                <Users className="mx-auto mb-2 text-blue-500" size={32} />
-                <p className="text-2xl font-bold text-gray-900">{leaderboard.length}</p>
-                <p className="text-sm text-gray-600">Total Users</p>
+                <div className="relative">
+                  <Users className="mx-auto mb-2 text-blue-500 animate-pulse" size={40} />
+                  <Sparkles className="absolute -top-1 -right-1 w-4 h-4 text-blue-300 animate-spin" />
+                </div>
+                <p className="text-3xl font-bold bg-gradient-to-r from-blue-700 to-blue-900 bg-clip-text text-transparent">{leaderboard.length}</p>
+                <p className="text-sm font-semibold text-blue-800">💪 Active Warriors</p>
               </div>
             </CardContent>
           </Card>
           
-          <Card>
+          <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
             <CardContent className="pt-6">
               <div className="text-center">
-                <Award className="mx-auto mb-2 text-green-500" size={32} />
-                <p className="text-2xl font-bold text-gray-900">
+                <div className="relative">
+                  <Award className="mx-auto mb-2 text-green-500 animate-pulse" size={40} />
+                  <Star className="absolute -top-1 -right-1 w-4 h-4 text-green-300 animate-bounce" />
+                </div>
+                <p className="text-3xl font-bold bg-gradient-to-r from-green-700 to-green-900 bg-clip-text text-transparent">
                   {Math.round(leaderboard.reduce((sum, entry) => sum + entry.totalReps, 0) / leaderboard.length).toLocaleString()}
                 </p>
-                <p className="text-sm text-gray-600">Average Reps</p>
+                <p className="text-sm font-semibold text-green-800">⚖️ Average Reps</p>
               </div>
             </CardContent>
           </Card>
@@ -207,7 +228,7 @@ export default function Leaderboard() {
                       <div className="relative mb-4">
                         <div className={`w-20 h-20 rounded-full border-4 ${entry.rank === 1 ? 'border-yellow-400 shadow-yellow-300/50' : entry.rank === 2 ? 'border-gray-400 shadow-gray-300/50' : 'border-amber-400 shadow-amber-300/50'} shadow-xl flex items-center justify-center bg-gradient-to-br ${entry.rank === 1 ? 'from-yellow-100 to-yellow-200' : entry.rank === 2 ? 'from-gray-100 to-gray-200' : 'from-amber-100 to-amber-200'}`}>
                           <span className="text-2xl font-bold bg-gradient-to-r ${entry.rank === 1 ? 'from-yellow-700 to-yellow-900' : entry.rank === 2 ? 'from-gray-700 to-gray-900' : 'from-amber-700 to-amber-900'} bg-clip-text text-transparent">
-                            {entry.name.charAt(0)}
+                            {entry.firstName?.charAt(0) || entry.email?.charAt(0) || 'U'}
                           </span>
                         </div>
                         {/* Floating Crown/Icon */}
@@ -226,9 +247,9 @@ export default function Leaderboard() {
                       {/* Winner Info */}
                       <div className="text-center mb-4 px-2">
                         <h3 className={`font-bold text-lg ${entry.rank === 1 ? 'text-yellow-800' : entry.rank === 2 ? 'text-gray-800' : 'text-amber-800'} mb-1`}>
-                          {entry.name}
+                          {entry.firstName && entry.lastName ? `${entry.firstName} ${entry.lastName}` : entry.email?.split('@')[0] || 'User'}
                         </h3>
-                        <p className="text-sm text-gray-600">@{entry.username}</p>
+                        <p className="text-sm text-gray-600">@{entry.email?.split('@')[0] || 'user'}</p>
                         <div className="mt-2">
                           <p className={`text-2xl font-bold ${entry.rank === 1 ? 'text-yellow-700' : entry.rank === 2 ? 'text-gray-700' : 'text-amber-700'}`}>
                             {entry.totalReps.toLocaleString()}
@@ -281,8 +302,10 @@ export default function Leaderboard() {
                       {getRankIcon(entry.rank)}
                     </div>
                     <div>
-                      <h4 className="font-semibold text-gray-900">{entry.name}</h4>
-                      <p className="text-sm text-gray-600">@{entry.username}</p>
+                      <h4 className="font-semibold text-gray-900">
+                        {entry.firstName && entry.lastName ? `${entry.firstName} ${entry.lastName}` : entry.email?.split('@')[0] || 'User'}
+                      </h4>
+                      <p className="text-sm text-gray-600">@{entry.email?.split('@')[0] || 'user'}</p>
                     </div>
                   </div>
                   
