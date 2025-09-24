@@ -253,7 +253,7 @@ export default function Community() {
                 value={newPostContent}
                 onChange={(e) => setNewPostContent(e.target.value)}
                 rows={4}
-                className="w-full bg-gradient-to-br from-white to-purple-50/30 border-purple-200 focus:border-purple-400 focus:ring-purple-400 transition-all duration-200 text-lg"
+                className="w-full bg-gradient-to-br from-white to-purple-50/30 border-purple-200 focus:border-purple-400 focus:ring-purple-400 transition-all duration-200 text-lg text-gray-900 dark:text-gray-100"
               />
             </div>
 
