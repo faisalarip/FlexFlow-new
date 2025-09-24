@@ -16,6 +16,8 @@ export default function BarcodeScanner({ onScan, onClose, isOpen }: BarcodeScann
   const readerRef = useRef<BrowserMultiFormatReader | null>(null);
   const [isScanning, setIsScanning] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const lastScannedBarcodeRef = useRef<string | null>(null);
+  const isProcessingRef = useRef<boolean>(false);
 
   useEffect(() => {
     if (isOpen && !readerRef.current) {
@@ -54,9 +56,18 @@ export default function BarcodeScanner({ onScan, onClose, isOpen }: BarcodeScann
         selectedDevice.deviceId,
         videoRef.current,
         (result?: Result, err?: Error) => {
-          if (result) {
+          if (result && !isProcessingRef.current) {
             const barcode = result.getText();
+            
+            // Prevent duplicate scans of the same barcode
+            if (lastScannedBarcodeRef.current === barcode) {
+              return;
+            }
+            
             console.log("Barcode detected:", barcode);
+            lastScannedBarcodeRef.current = barcode;
+            isProcessingRef.current = true;
+            
             setIsScanning(false);
             stopScanning();
             onScan(barcode);
@@ -94,6 +105,9 @@ export default function BarcodeScanner({ onScan, onClose, isOpen }: BarcodeScann
 
   const handleClose = () => {
     stopScanning();
+    // Reset scanning state when closing
+    lastScannedBarcodeRef.current = null;
+    isProcessingRef.current = false;
     onClose();
   };
 
