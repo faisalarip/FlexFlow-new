@@ -282,6 +282,9 @@ export class MemStorage implements IStorage {
   private userFoodPreferences: Map<string, UserFoodPreference> = new Map();
   private aiDifficultyAdjustments: Map<string, AiDifficultyAdjustment> = new Map();
   private mealEntries: Map<string, MealEntry> = new Map();
+  private workoutPreferences: Map<string, WorkoutPreferences> = new Map();
+  private workoutPlans: Map<string, WorkoutPlan> = new Map();
+  private plannedWorkouts: Map<string, PlannedWorkout> = new Map();
 
   constructor() {
     this.seedExercises();
