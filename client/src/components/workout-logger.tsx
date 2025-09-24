@@ -21,7 +21,7 @@ import dumbbellFlyesImage from "@assets/stock_images/black_man_performing_a73f31
 import dumbbellRollsImage from "@assets/stock_images/black_woman_performi_21123039.jpg";
 import tricepExtensionsImage from "@assets/generated_images/Black_guy_and_lady_tricep_extensions_3cce0d7d.png";
 import latPulldownImage from "@assets/generated_images/Man_and_woman_lat_pulldown_dbce7bd1.png";
-import rowsImage from "@assets/generated_images/Black_guy_and_lady_rows_0acde538.png";
+import rowsImage from "@assets/IMG_6694_1758675702051.jpeg";
 import squatsImage from "@assets/stock_images/black_woman_performi_0321f959.jpg";
 import deadliftsImage from "@assets/generated_images/Black_guy_and_lady_deadlifts_3066fc1b.png";
 import lungesImage from "@assets/stock_images/black_man_performing_f80b2cdb.jpg";
