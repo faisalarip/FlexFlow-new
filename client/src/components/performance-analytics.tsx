@@ -204,7 +204,7 @@ export default function PerformanceAnalytics() {
         </h3>
         
         <div className="space-y-4 max-h-80 overflow-y-auto">
-          {performanceData?.workouts?.length > 0 ? (
+          {performanceData?.workouts && performanceData.workouts.length > 0 ? (
             performanceData.workouts.map((workout) => (
               <div key={workout.id} className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-red-600/20">
                 <div className="flex items-center justify-between">
