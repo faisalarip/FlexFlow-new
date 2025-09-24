@@ -1349,7 +1349,7 @@ export default function WorkoutLogger() {
                     <img 
                       src={getDemoImage(exercise.name)}
                       alt={`${exercise.name} demonstration`}
-                      className="w-full h-32 object-cover rounded-md"
+                      className="w-auto max-w-full h-auto max-h-40 object-contain rounded-md mx-auto"
                       data-testid={`demo-image-${exercise.name.toLowerCase().replace(/\s+/g, '-')}`}
                     />
                     <div className="mt-2">
