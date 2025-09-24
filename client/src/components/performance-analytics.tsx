@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { TrendingUp, TrendingDown, Minus, Target, Zap, Award, BarChart3, Brain } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { apiRequest } from "@/lib/queryClient";
 
 interface WorkoutPerformanceData {
@@ -98,27 +99,38 @@ export default function PerformanceAnalytics() {
           </div>
           
           {/* Timeframe Selector */}
-          <div className="flex gap-2 bg-black/50 p-1 rounded-xl border border-red-600/30">
-            {[
-              { key: "7d", label: "7 Days" },
-              { key: "30d", label: "30 Days" },
-              { key: "90d", label: "3 Months" },
-            ].map((timeframe) => (
-              <Button
-                key={timeframe.key}
-                variant={selectedTimeframe === timeframe.key ? "default" : "ghost"}
-                size="sm"
-                onClick={() => setSelectedTimeframe(timeframe.key)}
-                className={`text-sm ${
-                  selectedTimeframe === timeframe.key
-                    ? "bg-red-600 hover:bg-red-700 text-white"
-                    : "text-red-200 hover:text-white hover:bg-red-600/20"
-                }`}
-                data-testid={`timeframe-${timeframe.key}`}
+          <div className="w-40">
+            <Select value={selectedTimeframe} onValueChange={setSelectedTimeframe}>
+              <SelectTrigger 
+                className="bg-black/50 border-red-600/30 text-white focus:ring-red-600 focus:border-red-600"
+                data-testid="timeframe-selector"
               >
-                {timeframe.label}
-              </Button>
-            ))}
+                <SelectValue placeholder="Select timeframe" />
+              </SelectTrigger>
+              <SelectContent className="bg-black/90 border-red-600/30">
+                <SelectItem 
+                  value="7d" 
+                  className="text-white hover:bg-red-600/20 focus:bg-red-600/30"
+                  data-testid="timeframe-7d"
+                >
+                  7 Days
+                </SelectItem>
+                <SelectItem 
+                  value="30d" 
+                  className="text-white hover:bg-red-600/20 focus:bg-red-600/30"
+                  data-testid="timeframe-30d"
+                >
+                  30 Days
+                </SelectItem>
+                <SelectItem 
+                  value="90d" 
+                  className="text-white hover:bg-red-600/20 focus:bg-red-600/30"
+                  data-testid="timeframe-90d"
+                >
+                  3 Months
+                </SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
       </div>
