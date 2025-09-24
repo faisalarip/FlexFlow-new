@@ -363,8 +363,8 @@ export default function Community() {
                           ? 'bg-gradient-to-r from-yellow-400 to-orange-400 animate-pulse' 
                           : 'bg-gradient-to-r from-purple-400 to-pink-400'
                       }`}></div>
-                      <Avatar className="relative w-12 h-12 border-2 border-white shadow-lg">
-                        <AvatarFallback className="bg-gradient-to-br from-purple-500 to-pink-500 text-white text-lg font-bold">
+                      <Avatar className="relative w-10 h-10 border-2 border-white shadow-lg">
+                        <AvatarFallback className="bg-gradient-to-br from-purple-500 to-pink-500 text-white text-sm font-bold">
                           {(post.user.firstName?.charAt(0) || post.user.email?.charAt(0) || 'U').toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
@@ -380,12 +380,12 @@ export default function Community() {
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-3">
                           <div>
-                            <p className="text-lg font-bold bg-gradient-to-r from-purple-700 to-pink-700 bg-clip-text text-transparent">
+                            <p className="text-base font-bold bg-gradient-to-r from-purple-700 to-pink-700 bg-clip-text text-transparent">
                               {post.user.firstName && post.user.lastName 
                                 ? `${post.user.firstName} ${post.user.lastName}`
                                 : post.user.email?.split('@')[0] || 'Fitness Warrior'}
                             </p>
-                            <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
+                            <div className="flex items-center space-x-2 text-xs text-gray-600 dark:text-gray-400">
                               <span className="font-medium">{post.user.email}</span>
                               <span className="text-purple-400">•</span>
                               <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent font-medium">
@@ -411,7 +411,7 @@ export default function Community() {
                         </div>
                       </div>
                       
-                      <div className="text-gray-800 dark:text-gray-100 whitespace-pre-wrap text-lg leading-relaxed p-4 bg-gradient-to-br from-white/50 to-purple-50/50 dark:from-gray-700/50 dark:to-purple-900/20 rounded-lg border border-purple-100 dark:border-purple-800">
+                      <div className="text-gray-800 dark:text-gray-100 whitespace-pre-wrap text-sm leading-normal p-3 bg-gradient-to-br from-white/50 to-purple-50/50 dark:from-gray-700/50 dark:to-purple-900/20 rounded-lg border border-purple-100 dark:border-purple-800">
                         {post.content}
                       </div>
 
@@ -478,9 +478,9 @@ export default function Community() {
                           </span>
                         </Button>
                         
-                        <div className="flex items-center space-x-4">
-                          <div className="bg-gradient-to-r from-purple-100 to-pink-100 px-4 py-2 rounded-full">
-                            <span className="text-sm font-bold text-purple-700">
+                        <div className="flex items-center space-x-3">
+                          <div className="bg-gradient-to-r from-purple-100 to-pink-100 px-3 py-1 rounded-full">
+                            <span className="text-xs font-bold text-purple-700">
                               {post.likes} {post.likes === 1 ? 'love' : 'loves'} ❤️
                             </span>
                           </div>
