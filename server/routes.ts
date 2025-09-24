@@ -2291,6 +2291,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Meal Tracking API routes
   
+  // Function to lookup nutrition data from Open Food Facts API
+  async function lookupBarcodeNutrition(barcode: string) {
+    try {
+      const response = await fetch(`https://world.openfoodfacts.org/api/v0/product/${barcode}.json`);
+      const data = await response.json();
+
+      if (data.status === 1 && data.product) {
+        const product = data.product;
+        const nutriments = product.nutriments || {};
+
+        // Extract nutrition data per 100g and convert to per serving if serving size is available
+        const servingSize = product.serving_size || '100g';
+        const servingQuantity = product.serving_quantity || 100;
+        
+        // Calculate multiplier for per-serving values (default to 100g if no serving info)
+        const multiplier = servingQuantity / 100;
+
+        return {
+          success: true,
+          product: {
+            name: product.product_name || product.generic_name || 'Unknown Product',
+            brand: product.brands || 'Unknown Brand',
+            servingSize: servingSize,
+            calories: Math.round((nutriments.energy_kcal_100g || nutriments['energy-kcal_100g'] || 0) * multiplier),
+            protein: Math.round((nutriments.proteins_100g || 0) * multiplier * 10) / 10,
+            carbs: Math.round((nutriments.carbohydrates_100g || 0) * multiplier * 10) / 10,
+            fat: Math.round((nutriments.fat_100g || 0) * multiplier * 10) / 10,
+            fiber: Math.round((nutriments.fiber_100g || 0) * multiplier * 10) / 10,
+            sugar: Math.round((nutriments.sugars_100g || 0) * multiplier * 10) / 10,
+            sodium: Math.round((nutriments.sodium_100g || 0) * multiplier * 1000), // Convert to mg
+          }
+        };
+      } else {
+        return {
+          success: false,
+          message: "Product not found in database"
+        };
+      }
+    } catch (error) {
+      console.error('Open Food Facts API error:', error);
+      return {
+        success: false,
+        message: "Failed to lookup product information"
+      };
+    }
+  }
+  
   // Lookup nutrition data by barcode
   app.post("/api/meal-entries/barcode-lookup", authenticateToken, async (req, res) => {
     try {

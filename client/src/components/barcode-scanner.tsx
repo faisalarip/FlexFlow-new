@@ -83,8 +83,8 @@ export default function BarcodeScanner({ onScan, onClose, isOpen }: BarcodeScann
           stream.getTracks().forEach(track => track.stop());
           video.srcObject = null;
         }
-        // Reset the reader to release resources
-        readerRef.current.reset?.();
+        // Note: BrowserMultiFormatReader doesn't have a reset method
+        // Resources are cleaned up when video stream is stopped
       } catch (e) {
         // Ignore errors when stopping
       }
