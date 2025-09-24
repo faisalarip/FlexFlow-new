@@ -1587,15 +1587,9 @@ export class MemStorage implements IStorage {
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
       .slice(0, limit);
 
-    console.log(`Retrieved ${posts.length} posts from storage`);
-    console.log(`Posts:`, posts.map(p => ({ id: p.id, userId: p.userId, content: p.content })));
-    console.log(`Users in storage:`, Array.from(this.users.keys()));
-
     const postsWithUsers: CommunityPostWithUser[] = [];
     for (const post of posts) {
-      console.log(`Looking for user ${post.userId} for post ${post.id}`);
       const user = this.users.get(post.userId);
-      console.log(`User found:`, user ? `${user.firstName} ${user.lastName} (${user.email})` : 'null');
       if (user) {
         const postWithUser: CommunityPostWithUser = {
           ...post,
@@ -2751,8 +2745,13 @@ export class DatabaseStorage implements IStorage {
   // Fallback to MemStorage for other methods not yet implemented
   private memStorage = new MemStorage();
 
-  // Delegate all other methods to MemStorage for now
-  async getUsers(): Promise<User[]> { return this.memStorage.getUsers(); }
+  // Delegate all other methods to MemStorage for now  
+  async getUsers(): Promise<User[]> { 
+    // Get users from both database and memStorage
+    const dbUsers = await db.select().from(users);
+    const memUsers = await this.memStorage.getUsers();
+    return [...dbUsers, ...memUsers];
+  }
   async getUserByUsername(username: string): Promise<User | undefined> { return this.memStorage.getUserByUsername(username); }
   async createUser(user: InsertUser): Promise<User> { return this.memStorage.createUser(user); }
   async updateUserStreak(id: string, streak: number): Promise<User | undefined> { return this.memStorage.updateUserStreak(id, streak); }
@@ -2843,7 +2842,36 @@ export class DatabaseStorage implements IStorage {
   async updateMileTrackerSession(id: string, updates: Partial<MileTrackerSession>): Promise<MileTrackerSession | undefined> { return this.memStorage.updateMileTrackerSession(id, updates); }
   async createMileTrackerSplit(split: InsertMileTrackerSplit): Promise<MileTrackerSplit> { return this.memStorage.createMileTrackerSplit(split); }
   async getMileTrackerSplits(sessionId: string): Promise<MileTrackerSplit[]> { return this.memStorage.getMileTrackerSplits(sessionId); }
-  async getCommunityPosts(limit?: number): Promise<CommunityPostWithUser[]> { return this.memStorage.getCommunityPosts(limit); }
+  async getCommunityPosts(limit?: number): Promise<CommunityPostWithUser[]> { 
+    // Get posts using memStorage's public API, then enrich with database users
+    const memPosts = await this.memStorage.getCommunityPosts(limit);
+    
+    // Enrich posts by replacing memStorage users with database users when available
+    const enrichedPosts: CommunityPostWithUser[] = [];
+    for (const post of memPosts) {
+      // Try to get user from database first
+      const dbUser = await this.getUser(post.userId);
+      if (dbUser) {
+        // Replace with database user data
+        const enrichedPost = {
+          ...post,
+          user: {
+            id: dbUser.id,
+            firstName: dbUser.firstName || "",
+            lastName: dbUser.lastName || "",
+            email: dbUser.email || "",
+            streak: dbUser.streak,
+          }
+        };
+        enrichedPosts.push(enrichedPost);
+      } else {
+        // Keep original post with memStorage user if database user not found
+        enrichedPosts.push(post);
+      }
+    }
+
+    return enrichedPosts;
+  }
   async createCommunityPost(post: InsertCommunityPost): Promise<CommunityPost> { return this.memStorage.createCommunityPost(post); }
   async likeCommunityPost(postId: string): Promise<CommunityPost | undefined> { return this.memStorage.likeCommunityPost(postId); }
   async getMealPlans(goal?: string): Promise<MealPlanWithDetails[]> { return this.memStorage.getMealPlans(goal); }
