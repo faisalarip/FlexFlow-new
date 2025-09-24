@@ -215,12 +215,12 @@ export default function Community() {
           </CardHeader>
           <CardContent className="space-y-6 p-6">
             <div>
-              <label className="block text-lg font-semibold text-gray-700 dark:text-gray-200 mb-3 flex items-center">
-                <Target className="w-5 h-5 mr-2 text-purple-500" />
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2 flex items-center">
+                <Target className="w-4 h-4 mr-2 text-purple-500" />
                 Choose Your Vibe
               </label>
               <Select value={selectedPostType} onValueChange={(value: "message" | "workout_progress" | "goal_achievement") => setSelectedPostType(value)}>
-                <SelectTrigger className="w-full h-12 bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200 hover:border-purple-300 transition-colors">
+                <SelectTrigger className="w-full h-10 bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200 hover:border-purple-300 transition-colors text-sm">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -238,8 +238,8 @@ export default function Community() {
             </div>
 
             <div>
-              <label className="block text-lg font-semibold text-gray-700 dark:text-gray-200 mb-3 flex items-center">
-                <MessageSquare className="w-5 h-5 mr-2 text-pink-500" />
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2 flex items-center">
+                <MessageSquare className="w-4 h-4 mr-2 text-pink-500" />
                 Express Yourself
               </label>
               <Textarea
@@ -252,25 +252,25 @@ export default function Community() {
                 }
                 value={newPostContent}
                 onChange={(e) => setNewPostContent(e.target.value)}
-                rows={4}
-                className="w-full bg-gradient-to-br from-gray-900 to-gray-800 dark:from-gray-800 dark:to-gray-700 border-purple-200 focus:border-purple-400 focus:ring-purple-400 transition-all duration-200 text-lg text-white"
+                rows={3}
+                className="w-full bg-gradient-to-br from-gray-900 to-gray-800 dark:from-gray-800 dark:to-gray-700 border-purple-200 focus:border-purple-400 focus:ring-purple-400 transition-all duration-200 text-sm text-white"
               />
             </div>
 
             {/* Image Upload Section */}
             <div>
-              <label className="block text-lg font-semibold text-gray-700 dark:text-gray-200 mb-3 flex items-center">
-                <Image className="w-5 h-5 mr-2 text-orange-500" />
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2 flex items-center">
+                <Image className="w-4 h-4 mr-2 text-orange-500" />
                 Add a Picture (Optional)
               </label>
               
               {/* Image Preview */}
               {imagePreview && (
-                <div className="mb-4 relative">
+                <div className="mb-3 relative">
                   <img 
                     src={imagePreview}
                     alt="Preview"
-                    className="w-full max-w-md h-48 object-cover rounded-lg border-2 border-purple-200 shadow-lg"
+                    className="w-full max-w-sm h-32 object-cover rounded-lg border-2 border-purple-200 shadow-lg"
                   />
                   <Button
                     onClick={handleRemoveImage}
@@ -304,7 +304,7 @@ export default function Community() {
               <Button 
                 onClick={handleSubmitPost}
                 disabled={!newPostContent.trim() || createPostMutation.isPending}
-                className="px-8 py-3 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 hover:from-purple-600 hover:via-pink-600 hover:to-red-600 text-white font-bold text-lg rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+                className="px-6 py-2 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 hover:from-purple-600 hover:via-pink-600 hover:to-red-600 text-white font-bold text-sm rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
               >
                 {createPostMutation.isPending ? (
                   <>
