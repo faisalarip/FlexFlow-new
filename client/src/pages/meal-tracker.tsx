@@ -54,7 +54,7 @@ export default function MealTrackerPage() {
   const { data: mealEntries = [], isLoading: entriesLoading } = useQuery<MealEntry[]>({
     queryKey: ["/api/meal-entries", selectedDate],
     queryFn: async () => {
-      const response = await apiRequest("GET", `/api/meal-entries?date=${selectedDate}`, {});
+      const response = await apiRequest("GET", `/api/meal-entries?date=${selectedDate}`);
       return response.json();
     }
   });
