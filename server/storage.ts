@@ -2662,6 +2662,84 @@ export class MemStorage implements IStorage {
   async deleteMealEntry(id: string): Promise<boolean> {
     return this.mealEntries.delete(id);
   }
+
+  // Workout Planner methods
+  async getWorkoutPreferences(userId: string): Promise<WorkoutPreferences | undefined> {
+    return Array.from(this.workoutPreferences.values()).find(p => p.userId === userId);
+  }
+
+  async saveWorkoutPreferences(preferences: InsertWorkoutPreferences): Promise<WorkoutPreferences> {
+    const id = randomUUID();
+    const workoutPreferences: WorkoutPreferences = {
+      ...preferences,
+      id,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    
+    // Remove any existing preferences for this user
+    for (const [key, existing] of this.workoutPreferences.entries()) {
+      if (existing.userId === preferences.userId) {
+        this.workoutPreferences.delete(key);
+        break;
+      }
+    }
+    
+    this.workoutPreferences.set(id, workoutPreferences);
+    return workoutPreferences;
+  }
+
+  async getWorkoutPlan(userId: string): Promise<(WorkoutPlan & { plannedWorkouts: PlannedWorkout[] }) | undefined> {
+    const plan = Array.from(this.workoutPlans.values()).find(p => p.userId === userId && p.isActive);
+    if (!plan) return undefined;
+    
+    const plannedWorkouts = Array.from(this.plannedWorkouts.values())
+      .filter(pw => pw.workoutPlanId === plan.id);
+    
+    return {
+      ...plan,
+      plannedWorkouts
+    };
+  }
+
+  async createWorkoutPlan(plan: InsertWorkoutPlan): Promise<WorkoutPlan> {
+    const id = randomUUID();
+    const workoutPlan: WorkoutPlan = {
+      ...plan,
+      id,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    
+    // Deactivate any existing active plans for this user
+    for (const [key, existing] of this.workoutPlans.entries()) {
+      if (existing.userId === plan.userId && existing.isActive) {
+        this.workoutPlans.set(key, { ...existing, isActive: false, updatedAt: new Date() });
+      }
+    }
+    
+    this.workoutPlans.set(id, workoutPlan);
+    return workoutPlan;
+  }
+
+  async createPlannedWorkouts(plannedWorkouts: InsertPlannedWorkout[]): Promise<PlannedWorkout[]> {
+    const result: PlannedWorkout[] = [];
+    
+    for (const plannedWorkout of plannedWorkouts) {
+      const id = randomUUID();
+      const workout: PlannedWorkout = {
+        ...plannedWorkout,
+        id,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      
+      this.plannedWorkouts.set(id, workout);
+      result.push(workout);
+    }
+    
+    return result;
+  }
 }
 
 // Database Storage Implementation
