@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Workout } from "@shared/schema";
 
 interface WeightProgressData {
@@ -15,6 +15,8 @@ declare global {
 }
 
 export default function ProgressCharts() {
+  const [selectedPeriod, setSelectedPeriod] = useState<'7' | '30' | '90'>('7');
+  
   const { data: workouts } = useQuery<Workout[]>({
     queryKey: ["/api/workouts"],
   });
@@ -40,7 +42,7 @@ export default function ProgressCharts() {
     } else {
       initializeCharts();
     }
-  }, [workouts, weightProgress]);
+  }, [workouts, weightProgress, selectedPeriod]);
 
   const initializeCharts = () => {
     if (!workouts || !window.Chart) return;
@@ -54,24 +56,35 @@ export default function ProgressCharts() {
           frequencyChartInstance.current.destroy();
         }
         
-        // Process workout data for the last 7 days
-        const last7Days = Array.from({ length: 7 }, (_, i) => {
+        // Process workout data based on selected period
+        const days = parseInt(selectedPeriod);
+        const periodDays = Array.from({ length: days }, (_, i) => {
           const date = new Date();
-          date.setDate(date.getDate() - (6 - i));
+          date.setDate(date.getDate() - (days - 1 - i));
           return date;
         });
 
-        const dailyWorkouts = last7Days.map(date => {
+        const dailyWorkouts = periodDays.map(date => {
           return workouts.filter(workout => {
             const workoutDate = new Date(workout.date);
             return workoutDate.toDateString() === date.toDateString();
           }).length;
         });
 
+        // Generate labels based on period
+        let labels: string[];
+        if (selectedPeriod === '7') {
+          labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+        } else if (selectedPeriod === '30') {
+          labels = periodDays.map(date => `${date.getMonth() + 1}/${date.getDate()}`);
+        } else {
+          labels = periodDays.map(date => `${date.getMonth() + 1}/${date.getDate()}`);
+        }
+
         frequencyChartInstance.current = new window.Chart(ctx, {
           type: 'line',
           data: {
-            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            labels: labels,
             datasets: [{
               label: 'Workouts',
               data: dailyWorkouts,
@@ -178,10 +191,15 @@ export default function ProgressCharts() {
     <section className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-xl font-bold text-gray-800">Progress Overview</h3>
-        <select className="text-sm border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none">
-          <option>Last 7 days</option>
-          <option>Last 30 days</option>
-          <option>Last 3 months</option>
+        <select 
+          value={selectedPeriod}
+          onChange={(e) => setSelectedPeriod(e.target.value as '7' | '30' | '90')}
+          className="text-sm border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
+          data-testid="progress-period-selector"
+        >
+          <option value="7">Last 7 days</option>
+          <option value="30">Last 30 days</option>
+          <option value="90">Last 3 months</option>
         </select>
       </div>
 
