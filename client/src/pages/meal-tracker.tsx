@@ -47,6 +47,8 @@ export default function MealTrackerPage() {
   const [editingMealName, setEditingMealName] = useState<string>("");
   
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const lastBarcodeRef = useRef<string | null>(null);
+  const barcodeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -193,6 +195,24 @@ export default function MealTrackerPage() {
 
   const handleBarcodeScanned = (barcode: string) => {
     setIsScannerOpen(false);
+    
+    // Prevent spam by checking for duplicate barcodes within a short time window
+    if (lastBarcodeRef.current === barcode) {
+      return;
+    }
+    
+    // Clear any pending timeout and set a new one
+    if (barcodeTimeoutRef.current) {
+      clearTimeout(barcodeTimeoutRef.current);
+    }
+    
+    lastBarcodeRef.current = barcode;
+    
+    // Reset after 3 seconds to allow scanning the same barcode again later
+    barcodeTimeoutRef.current = setTimeout(() => {
+      lastBarcodeRef.current = null;
+    }, 3000);
+    
     barcodeLookupMutation.mutate(barcode);
   };
 
