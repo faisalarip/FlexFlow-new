@@ -25,7 +25,8 @@ import {
   insertUserFoodPreferenceSchema
 } from "@shared/schema";
 import { z } from "zod";
-import { ObjectStorageService } from "./objectStorage";
+import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
+import { ObjectPermission } from "./objectAcl";
 import { analyzeFoodImage } from "./foodRecognition";
 import { generatePersonalizedMealPlan, generateWeeklyMealPlan } from "./mealPlanGenerator";
 import { autoDifficultyAdjuster } from "./auto-difficulty-adjuster";
@@ -1512,6 +1513,62 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error liking community post:", error);
       res.status(500).json({ message: "Failed to like post" });
+    }
+  });
+
+  // Object Storage Routes for Community Post Images
+
+  // Get upload URL for community post images
+  app.post("/api/objects/upload", async (req, res) => {
+    try {
+      const objectStorageService = new ObjectStorageService();
+      const uploadURL = await objectStorageService.getObjectEntityUploadURL();
+      res.json({ uploadURL });
+    } catch (error) {
+      console.error("Error getting upload URL:", error);
+      res.status(500).json({ error: "Failed to get upload URL" });
+    }
+  });
+
+  // Serve uploaded objects (public access for community images)
+  app.get("/objects/:objectPath(*)", async (req, res) => {
+    const objectStorageService = new ObjectStorageService();
+    try {
+      const objectFile = await objectStorageService.getObjectEntityFile(
+        req.path,
+      );
+      objectStorageService.downloadObject(objectFile, res);
+    } catch (error) {
+      console.error("Error accessing object:", error);
+      if (error instanceof ObjectNotFoundError) {
+        return res.sendStatus(404);
+      }
+      return res.sendStatus(500);
+    }
+  });
+
+  // Update community post with image URL after upload
+  app.put("/api/community/post-images", async (req, res) => {
+    if (!req.body.imageURL) {
+      return res.status(400).json({ error: "imageURL is required" });
+    }
+
+    try {
+      const objectStorageService = new ObjectStorageService();
+      const objectPath = await objectStorageService.trySetObjectEntityAclPolicy(
+        req.body.imageURL,
+        {
+          owner: "system", // For public community images
+          visibility: "public", // Community images are public by default
+        },
+      );
+
+      res.status(200).json({
+        objectPath: objectPath,
+      });
+    } catch (error) {
+      console.error("Error setting community post image:", error);
+      res.status(500).json({ error: "Internal server error" });
     }
   });
 

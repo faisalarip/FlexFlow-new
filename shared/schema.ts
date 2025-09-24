@@ -475,6 +475,7 @@ export const communityPosts = pgTable("community_posts", {
   content: text("content").notNull(),
   postType: text("post_type").notNull().default("message"), // message, workout_progress, goal_achievement
   workoutId: varchar("workout_id").references(() => workouts.id), // optional, for workout progress posts
+  imageUrl: varchar("image_url"), // optional, for posts with images
   likes: integer("likes").notNull().default(0),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
