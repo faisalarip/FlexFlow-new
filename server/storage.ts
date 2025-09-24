@@ -248,6 +248,13 @@ export interface IStorage {
   activateTrainerSubscription(userId: string): Promise<Trainer | undefined>;
   cancelTrainerSubscription(userId: string): Promise<Trainer | undefined>;
   getTotalSubscriptionRevenue(): Promise<{ totalRevenue: number; activeTrainers: number }>;
+
+  // Workout Planner methods
+  getWorkoutPreferences(userId: string): Promise<WorkoutPreferences | undefined>;
+  saveWorkoutPreferences(preferences: InsertWorkoutPreferences): Promise<WorkoutPreferences>;
+  getWorkoutPlan(userId: string): Promise<(WorkoutPlan & { plannedWorkouts: PlannedWorkout[] }) | undefined>;
+  createWorkoutPlan(plan: InsertWorkoutPlan): Promise<WorkoutPlan>;
+  createPlannedWorkouts(plannedWorkouts: InsertPlannedWorkout[]): Promise<PlannedWorkout[]>;
 }
 
 export class MemStorage implements IStorage {
