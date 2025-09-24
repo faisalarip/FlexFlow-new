@@ -1166,7 +1166,11 @@ export class MemStorage implements IStorage {
       return {
         ...trainer,
         services,
-        user: { name: user!.name, username: user!.username }
+        user: { 
+          email: user!.email || "", 
+          firstName: user!.firstName || "", 
+          lastName: user!.lastName || ""
+        }
       };
     }));
   }
@@ -1180,7 +1184,11 @@ export class MemStorage implements IStorage {
     return {
       ...trainer,
       services,
-      user: { name: user!.name, username: user!.username }
+      user: { 
+        email: user!.email || "", 
+        firstName: user!.firstName || "", 
+        lastName: user!.lastName || ""
+      }
     };
   }
 
@@ -1266,7 +1274,11 @@ export class MemStorage implements IStorage {
           totalReviews: trainer.totalReviews
         },
         service,
-        user: { name: user.name, username: user.username }
+        user: { 
+          email: user.email || "", 
+          firstName: user.firstName || "", 
+          lastName: user.lastName || ""
+        }
       };
     }));
   }
@@ -1291,7 +1303,11 @@ export class MemStorage implements IStorage {
           totalReviews: trainer.totalReviews
         },
         service,
-        user: { name: user.name, username: user.username }
+        user: { 
+          email: user.email || "", 
+          firstName: user.firstName || "", 
+          lastName: user.lastName || ""
+        }
       };
     }));
   }
@@ -1314,7 +1330,11 @@ export class MemStorage implements IStorage {
         totalReviews: trainer.totalReviews
       },
       service,
-      user: { name: user.name, username: user.username }
+      user: { 
+        email: user.email || "", 
+        firstName: user.firstName || "", 
+        lastName: user.lastName || ""
+      }
     };
   }
 
@@ -1352,7 +1372,11 @@ export class MemStorage implements IStorage {
       const user = this.users.get(review.userId)!;
       return {
         ...review,
-        user: { name: user.name, username: user.username }
+        user: { 
+          email: user.email || "", 
+          firstName: user.firstName || "", 
+          lastName: user.lastName || ""
+        }
       };
     });
   }
@@ -1470,8 +1494,7 @@ export class MemStorage implements IStorage {
       if (user) {
         leaderboardEntries.push({
           userId: user.id,
-          username: user.username,
-          name: user.name,
+          name: user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : user.email?.split('@')[0] || 'Anonymous',
           totalReps,
           rank: 0 // Will be set after sorting
         });
