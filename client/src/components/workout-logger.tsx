@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import type { Exercise } from "@shared/schema";
-import dumbbellExercisesImage from "@assets/Dumbbell_Row_Muscles_Worked_1758664185754.webp";
+import dumbbellExercisesImage from "@assets/IMG_6694_1758675702051.jpeg";
 import pushUpExerciseImage from "@assets/generated_images/Man_performing_push-up_exercise_19b36844.png";
 import benchPressImage from "@assets/stock_images/black_man_performing_dd4e297c.jpg";
 import pullUpExerciseImage from "@assets/generated_images/Black_man_performing_pull-ups_3605874d.png";
