@@ -415,6 +415,18 @@ export default function Community() {
                         {post.content}
                       </div>
 
+                      {/* Display image if available */}
+                      {post.imageUrl && (
+                        <div className="mt-4">
+                          <img
+                            src={post.imageUrl}
+                            alt="Post image"
+                            className="w-full max-w-lg h-64 object-cover rounded-xl border-2 border-purple-200 dark:border-purple-700 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.02]"
+                            data-testid={`img-post-${post.id}`}
+                          />
+                        </div>
+                      )}
+
                       {/* Enhanced workout info if it's a workout progress post */}
                       {post.workout && (
                         <div className="bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:from-red-900/20 dark:via-orange-900/20 dark:to-yellow-900/20 rounded-xl p-6 border border-red-200 dark:border-red-700 shadow-inner">
