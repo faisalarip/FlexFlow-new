@@ -348,14 +348,14 @@ export default function Community() {
             posts.map((post, index) => (
               <Card 
                 key={post.id} 
-                className="bg-gradient-to-br from-white via-purple-50/30 to-pink-50/30 dark:from-gray-800 dark:via-purple-900/10 dark:to-pink-900/10 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:scale-102 border-purple-100 dark:border-purple-700/50 overflow-hidden relative group"
+                className="bg-gradient-to-br from-white via-purple-50/30 to-pink-50/30 dark:from-gray-800 dark:via-purple-900/10 dark:to-pink-900/10 shadow-md hover:shadow-lg transition-all duration-300 border-purple-100 dark:border-purple-700/50 overflow-hidden relative group"
                 style={{animationDelay: `${index * 100}ms`}}
               >
                 {/* Animated gradient overlay on hover */}
                 <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-pink-500/5 to-red-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 
-                <CardContent className="pt-6 relative z-10">
-                  <div className="flex items-start space-x-4">
+                <CardContent className="pt-4 pb-3 px-3 relative z-10">
+                  <div className="flex items-start space-x-3">
                     {/* Enhanced Avatar with status ring */}
                     <div className="relative">
                       <div className={`absolute -inset-1 rounded-full ${
@@ -363,32 +363,32 @@ export default function Community() {
                           ? 'bg-gradient-to-r from-yellow-400 to-orange-400 animate-pulse' 
                           : 'bg-gradient-to-r from-purple-400 to-pink-400'
                       }`}></div>
-                      <Avatar className="relative w-10 h-10 border-2 border-white shadow-lg">
-                        <AvatarFallback className="bg-gradient-to-br from-purple-500 to-pink-500 text-white text-sm font-bold">
+                      <Avatar className="relative w-8 h-8 border border-white shadow-md">
+                        <AvatarFallback className="bg-gradient-to-br from-purple-500 to-pink-500 text-white text-xs font-bold">
                           {(post.user.firstName?.charAt(0) || post.user.email?.charAt(0) || 'U').toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
                       {/* Status indicator */}
                       {post.user.streak > 0 && (
-                        <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center shadow-lg animate-bounce">
+                        <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-yellow-500 rounded-full flex items-center justify-center shadow-md">
                           <span className="text-xs font-bold text-white">{post.user.streak}</span>
                         </div>
                       )}
                     </div>
                     
-                    <div className="flex-1 space-y-4">
+                    <div className="flex-1 space-y-2">
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3">
+                        <div className="flex items-center space-x-2">
                           <div>
-                            <p className="text-base font-bold bg-gradient-to-r from-purple-700 to-pink-700 bg-clip-text text-transparent">
+                            <p className="text-sm font-bold bg-gradient-to-r from-purple-700 to-pink-700 bg-clip-text text-transparent">
                               {post.user.firstName && post.user.lastName 
                                 ? `${post.user.firstName} ${post.user.lastName}`
                                 : post.user.email?.split('@')[0] || 'Fitness Warrior'}
                             </p>
-                            <div className="flex items-center space-x-2 text-xs text-gray-600 dark:text-gray-400">
-                              <span className="font-medium">{post.user.email}</span>
+                            <div className="flex items-center space-x-1 text-xs text-gray-600 dark:text-gray-400">
+                              <span className="text-xs">{post.user.email}</span>
                               <span className="text-purple-400">•</span>
-                              <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent font-medium">
+                              <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                                 {formatTimeAgo(post.createdAt.toString())}
                               </span>
                               {post.user.streak > 0 && (
@@ -411,17 +411,17 @@ export default function Community() {
                         </div>
                       </div>
                       
-                      <div className="text-gray-800 dark:text-gray-100 whitespace-pre-wrap text-sm leading-normal p-3 bg-gradient-to-br from-white/50 to-purple-50/50 dark:from-gray-700/50 dark:to-purple-900/20 rounded-lg border border-purple-100 dark:border-purple-800">
+                      <div className="text-gray-800 dark:text-gray-100 whitespace-pre-wrap text-xs leading-snug p-2 bg-gradient-to-br from-white/50 to-purple-50/50 dark:from-gray-700/50 dark:to-purple-900/20 rounded-md border border-purple-100 dark:border-purple-800">
                         {post.content}
                       </div>
 
                       {/* Display image if available */}
                       {post.imageUrl && (
-                        <div className="mt-4">
+                        <div className="mt-2">
                           <img
                             src={post.imageUrl}
                             alt="Post image"
-                            className="w-full max-w-lg h-64 object-cover rounded-xl border-2 border-purple-200 dark:border-purple-700 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.02]"
+                            className="w-full max-w-xs h-32 object-cover rounded-lg border border-purple-200 dark:border-purple-700 shadow-md"
                             data-testid={`img-post-${post.id}`}
                           />
                         </div>
@@ -429,59 +429,59 @@ export default function Community() {
 
                       {/* Enhanced workout info if it's a workout progress post */}
                       {post.workout && (
-                        <div className="bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:from-red-900/20 dark:via-orange-900/20 dark:to-yellow-900/20 rounded-xl p-6 border border-red-200 dark:border-red-700 shadow-inner">
+                        <div className="bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:from-red-900/20 dark:via-orange-900/20 dark:to-yellow-900/20 rounded-lg p-3 border border-red-200 dark:border-red-700 shadow-inner">
                           <div className="flex items-center justify-between">
                             <div className="space-y-2">
-                              <p className="text-xl font-bold text-red-700 dark:text-red-300 flex items-center">
-                                <Dumbbell className="w-5 h-5 mr-2" />
+                              <p className="text-sm font-bold text-red-700 dark:text-red-300 flex items-center">
+                                <Dumbbell className="w-4 h-4 mr-1" />
                                 {post.workout.name}
                               </p>
-                              <p className="text-sm text-red-600 dark:text-red-400 capitalize font-medium px-3 py-1 bg-red-100 dark:bg-red-800 rounded-full">
+                              <p className="text-xs text-red-600 dark:text-red-400 capitalize font-medium px-2 py-1 bg-red-100 dark:bg-red-800 rounded-full">
                                 {post.workout.category}
                               </p>
                             </div>
-                            <div className="text-right space-y-2">
-                              <div className="flex items-center justify-end space-x-2 text-orange-600 dark:text-orange-400">
-                                <Clock size={16} />
-                                <span className="text-lg font-bold">{post.workout.duration} min</span>
+                            <div className="text-right space-y-1">
+                              <div className="flex items-center justify-end space-x-1 text-orange-600 dark:text-orange-400">
+                                <Clock size={12} />
+                                <span className="text-xs font-bold">{post.workout.duration} min</span>
                               </div>
-                              <div className="flex items-center justify-end space-x-2 text-yellow-600 dark:text-yellow-400">
-                                <span className="text-2xl">🔥</span>
-                                <span className="text-lg font-bold">{post.workout.caloriesBurned} cal</span>
+                              <div className="flex items-center justify-end space-x-1 text-yellow-600 dark:text-yellow-400">
+                                <span className="text-sm">🔥</span>
+                                <span className="text-xs font-bold">{post.workout.caloriesBurned} cal</span>
                               </div>
                             </div>
                           </div>
                         </div>
                       )}
                       
-                      <div className="flex items-center justify-between pt-4 border-t border-purple-100 dark:border-purple-800">
+                      <div className="flex items-center justify-between pt-2 border-t border-purple-100 dark:border-purple-800">
                         <Button
                           variant="ghost"
-                          size="lg"
+                          size="sm"
                           onClick={() => handleLike(post.id)}
-                          className={`transition-all duration-300 transform hover:scale-110 ${
+                          className={`transition-all duration-300 ${
                             post.likes > 0 
                               ? 'text-red-500 bg-red-50 hover:bg-red-100' 
                               : 'text-gray-600 hover:text-red-500 hover:bg-red-50'
                           }`}
                         >
                           <Heart 
-                            className={`mr-2 transition-all duration-300 ${
+                            className={`mr-1 transition-all duration-300 ${
                               post.likes > 0 
                                 ? 'fill-red-500 text-red-500 animate-pulse' 
                                 : 'hover:fill-red-200'
                             }`} 
-                            size={20} 
+                            size={14} 
                           />
-                          <span className="font-bold text-lg">
+                          <span className="font-bold text-xs">
                             {post.likes > 0 ? `${post.likes} ❤️` : 'Show Love'}
                           </span>
                         </Button>
                         
-                        <div className="flex items-center space-x-3">
-                          <div className="bg-gradient-to-r from-purple-100 to-pink-100 px-3 py-1 rounded-full">
+                        <div className="flex items-center space-x-2">
+                          <div className="bg-gradient-to-r from-purple-100 to-pink-100 px-2 py-1 rounded-full">
                             <span className="text-xs font-bold text-purple-700">
-                              {post.likes} {post.likes === 1 ? 'love' : 'loves'} ❤️
+                              {post.likes} ❤️
                             </span>
                           </div>
                         </div>
