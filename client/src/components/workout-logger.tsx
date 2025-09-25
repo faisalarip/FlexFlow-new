@@ -15,7 +15,7 @@ import benchPressImage from "@assets/stock_images/black_man_performing_dd4e297c.
 import pullUpExerciseImage from "@assets/generated_images/Black_man_performing_pull-ups_3605874d.png";
 import chinUpExerciseImage from "@assets/generated_images/Black_man_and_woman_chin-ups_7848bb87.png";
 import dipExerciseImage from "@assets/generated_images/Man_and_woman_dips_e6984611.png";
-import overheadPressImage from "@assets/generated_images/Man_and_woman_overhead_press_0abad494.png";
+import overheadPressImage from "@assets/generated_images/Man_and_woman_dumbbell_shoulder_press_0adea308.png";
 import bicepCurlsImage from "@assets/generated_images/Man_and_woman_dumbbell_curls_f43bb36e.png";
 import dumbbellFlyesImage from "@assets/generated_images/Man_and_woman_dumbbell_flyes_de771e8c.png";
 import dumbbellRollsImage from "@assets/stock_images/black_woman_performi_21123039.jpg";
@@ -35,6 +35,8 @@ import russianTwistsImage from "@assets/generated_images/Man_performing_Russian_
 import mountainClimbersImage from "@assets/generated_images/Woman_performing_mountain_climbers_35705bbe.png";
 import deadBugImage from "@assets/generated_images/Man_performing_dead_bug_7bdcdb1e.png";
 import hangingLegRaisesImage from "@assets/generated_images/Woman_performing_hanging_leg_raises_ef4d5db2.png";
+import lateralRaisesImage from "@assets/generated_images/Man_and_woman_dumbbell_lateral_raises_a9e51d80.png";
+import frontRaisesImage from "@assets/generated_images/Man_and_woman_dumbbell_front_raises_f19c02ce.png";
 
 export default function WorkoutLogger() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -70,6 +72,12 @@ export default function WorkoutLogger() {
     }
     if (exerciseNameLower.includes('overhead press') || exerciseNameLower.includes('military press') || exerciseNameLower.includes('shoulder press')) {
       return overheadPressImage;
+    }
+    if (exerciseNameLower.includes('lateral raise') || exerciseNameLower.includes('lateral raises')) {
+      return lateralRaisesImage;
+    }
+    if (exerciseNameLower.includes('front raise') || exerciseNameLower.includes('front raises')) {
+      return frontRaisesImage;
     }
     if (exerciseNameLower.includes('bicep') && (exerciseNameLower.includes('curl') || exerciseNameLower.includes('curls'))) {
       return bicepCurlsImage;
