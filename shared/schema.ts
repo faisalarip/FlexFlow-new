@@ -756,6 +756,40 @@ export const insertMealEntrySchema = createInsertSchema(mealEntries).omit({
 export type InsertMealEntry = z.infer<typeof insertMealEntrySchema>;
 export type MealEntry = typeof mealEntries.$inferSelect;
 
+// Progress Photos for before/after tracking
+export const progressPhotos = pgTable("progress_photos", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  imageUrl: varchar("image_url").notNull(),
+  photoType: varchar("photo_type").notNull().default("progress"), // before, after, progress, milestone
+  workoutId: varchar("workout_id").references(() => workouts.id), // optional link to specific workout
+  notes: text("notes"), // user notes about their progress
+  weight: decimal("weight", { precision: 5, scale: 2 }), // optional weight at time of photo
+  bodyPart: varchar("body_part"), // front, side, back, specific_muscle_group
+  isPublic: boolean("is_public").default(false), // allow sharing in community
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// Progress Photos insert schemas
+export const insertProgressPhotoSchema = createInsertSchema(progressPhotos).omit({
+  id: true,
+  createdAt: true,
+});
+
+// Progress Photos types
+export type InsertProgressPhoto = z.infer<typeof insertProgressPhotoSchema>;
+export type ProgressPhoto = typeof progressPhotos.$inferSelect;
+
+// Extended types for API responses
+export type ProgressPhotoWithWorkout = ProgressPhoto & {
+  workout?: {
+    id: string;
+    name: string;
+    category: string;
+    date: Date;
+  };
+};
+
 // Authentication types
 export type SignUpData = z.infer<typeof signUpSchema>;
 export type SignInData = z.infer<typeof signInSchema>;
