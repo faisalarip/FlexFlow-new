@@ -1311,6 +1311,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Seed leaderboard with sample data
+  app.post("/api/leaderboard/seed", async (req, res) => {
+    try {
+      await storage.seedLeaderboardData();
+      const leaderboard = await storage.getLeaderboard();
+      res.json({ 
+        message: "Leaderboard seeded successfully", 
+        count: leaderboard.length,
+        leaderboard 
+      });
+    } catch (error) {
+      console.error("Error seeding leaderboard:", error);
+      res.status(500).json({ message: "Failed to seed leaderboard" });
+    }
+  });
+
   // Get current user's trainer profile
   app.get("/api/trainers/me", authenticateToken, async (req, res) => {
     try {

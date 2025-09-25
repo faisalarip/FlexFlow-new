@@ -273,6 +273,9 @@ export interface IStorage {
   getWorkoutPlan(userId: string): Promise<(WorkoutPlan & { plannedWorkouts: PlannedWorkout[] }) | undefined>;
   createWorkoutPlan(plan: InsertWorkoutPlan): Promise<WorkoutPlan>;
   createPlannedWorkouts(plannedWorkouts: InsertPlannedWorkout[]): Promise<PlannedWorkout[]>;
+
+  // Leaderboard seeding
+  seedLeaderboardData(): Promise<void>;
 }
 
 export class MemStorage implements IStorage {
@@ -1554,6 +1557,279 @@ export class MemStorage implements IStorage {
 
   async deleteFoodEntry(id: string): Promise<boolean> {
     return this.foodEntries.delete(id);
+  }
+
+  async seedLeaderboardData(): Promise<void> {
+    console.log("Starting leaderboard seeding...");
+    
+    // Create diverse sample users for the leaderboard
+    const sampleUsers = [
+      { email: "alex.runner@fitness.com", firstName: "Alex", lastName: "Runner", profile: "endurance" },
+      { email: "sarah.lifter@fitness.com", firstName: "Sarah", lastName: "Strong", profile: "strength" },
+      { email: "mike.crossfit@fitness.com", firstName: "Mike", lastName: "Cross", profile: "crossfit" },
+      { email: "emma.yoga@fitness.com", firstName: "Emma", lastName: "Zen", profile: "flexibility" },
+      { email: "david.boxer@fitness.com", firstName: "David", lastName: "Boxer", profile: "combat" },
+      { email: "lisa.dancer@fitness.com", firstName: "Lisa", lastName: "Move", profile: "cardio" },
+      { email: "james.athlete@fitness.com", firstName: "James", lastName: "Peak", profile: "athlete" },
+      { email: "maria.hiit@fitness.com", firstName: "Maria", lastName: "Burn", profile: "hiit" },
+      { email: "tom.calisthenics@fitness.com", firstName: "Tom", lastName: "Flow", profile: "bodyweight" },
+      { email: "anna.powerlifter@fitness.com", firstName: "Anna", lastName: "Power", profile: "powerlifting" }
+    ];
+
+    // Get current week date range (Monday to Sunday)
+    const now = new Date();
+    const currentDay = now.getDay();
+    const mondayOffset = currentDay === 0 ? -6 : 1 - currentDay;
+    const weekStart = new Date(now);
+    weekStart.setDate(now.getDate() + mondayOffset);
+    weekStart.setHours(0, 0, 0, 0);
+
+    // Force seeding to populate diverse leaderboard data
+    console.log("Forcing leaderboard seeding with", sampleUsers.length, "sample users");
+
+    // Create users if they don't exist
+    for (const userData of sampleUsers) {
+      const existingUser = Array.from(this.users.values()).find(u => u.email === userData.email);
+      if (!existingUser) {
+        const userId = randomUUID();
+        const user: User = {
+          id: userId,
+          email: userData.email,
+          firstName: userData.firstName,
+          lastName: userData.lastName,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          streak: Math.floor(Math.random() * 30) + 1,
+          longestStreak: Math.floor(Math.random() * 60) + 10,
+          trialStartDate: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000),
+          subscriptionStatus: Math.random() > 0.7 ? 'active' : 'trial'
+        };
+        this.users.set(userId, user);
+
+        // Create workouts for each user within the current week
+        const workoutCount = Math.floor(Math.random() * 3) + 3; // 3-5 workouts per week
+        const profileWorkouts = this.getWorkoutsForProfile(userData.profile);
+        
+        for (let i = 0; i < workoutCount; i++) {
+          const workoutData = profileWorkouts[Math.floor(Math.random() * profileWorkouts.length)];
+          const workoutDate = new Date(weekStart);
+          workoutDate.setDate(weekStart.getDate() + Math.floor(Math.random() * 7));
+          workoutDate.setHours(Math.floor(Math.random() * 12) + 6, Math.floor(Math.random() * 60));
+
+          const workoutId = randomUUID();
+          const workout: Workout = {
+            id: workoutId,
+            userId: userId,
+            date: workoutDate.toISOString(),
+            name: workoutData.name,
+            category: workoutData.category,
+            duration: workoutData.duration + Math.floor(Math.random() * 20) - 10,
+            caloriesBurned: workoutData.calories + Math.floor(Math.random() * 100) - 50,
+            notes: workoutData.notes,
+            completedAt: workoutDate.toISOString(),
+            perceivedExertion: Math.floor(Math.random() * 4) + 6 // 6-9 RPE
+          };
+          this.workouts.set(workoutId, workout);
+
+          // Add workout exercises with realistic rep patterns
+          for (const exerciseData of workoutData.exercises) {
+            const exerciseId = randomUUID();
+            const workoutExercise: WorkoutExercise = {
+              id: exerciseId,
+              workoutId: workoutId,
+              exerciseId: exerciseData.exerciseId,
+              sets: exerciseData.sets,
+              reps: exerciseData.reps + Math.floor(Math.random() * 20) - 10,
+              weight: exerciseData.weight ? exerciseData.weight + Math.floor(Math.random() * 40) - 20 : undefined,
+              duration: exerciseData.duration ? exerciseData.duration + Math.floor(Math.random() * 60) - 30 : undefined,
+              restTime: 60 + Math.floor(Math.random() * 120),
+              notes: ""
+            };
+            this.workoutExercises.set(exerciseId, workoutExercise);
+          }
+        }
+      }
+    }
+  }
+
+  private getWorkoutsForProfile(profile: string) {
+    const workoutTemplates: Record<string, any[]> = {
+      endurance: [
+        {
+          name: "Long Distance Run",
+          category: "Cardio",
+          duration: 45,
+          calories: 400,
+          notes: "Steady pace endurance training",
+          exercises: [
+            { exerciseId: "running", sets: 1, reps: 350 }
+          ]
+        },
+        {
+          name: "Interval Running",
+          category: "Cardio",
+          duration: 35,
+          calories: 350,
+          notes: "Speed intervals",
+          exercises: [
+            { exerciseId: "running", sets: 8, reps: 280 }
+          ]
+        }
+      ],
+      strength: [
+        {
+          name: "Upper Body Strength",
+          category: "Strength",
+          duration: 50,
+          calories: 300,
+          notes: "Heavy compound movements",
+          exercises: [
+            { exerciseId: "bench-press", sets: 4, reps: 48, weight: 185 },
+            { exerciseId: "pull-ups", sets: 4, reps: 32 },
+            { exerciseId: "shoulder-press", sets: 3, reps: 36, weight: 135 }
+          ]
+        },
+        {
+          name: "Lower Body Power",
+          category: "Strength",
+          duration: 55,
+          calories: 350,
+          notes: "Leg day focused training",
+          exercises: [
+            { exerciseId: "squats", sets: 4, reps: 60, weight: 225 },
+            { exerciseId: "deadlifts", sets: 4, reps: 32, weight: 275 },
+            { exerciseId: "lunges", sets: 3, reps: 45 }
+          ]
+        }
+      ],
+      crossfit: [
+        {
+          name: "WOD: Cindy",
+          category: "CrossFit",
+          duration: 40,
+          calories: 450,
+          notes: "20 min AMRAP",
+          exercises: [
+            { exerciseId: "pull-ups", sets: 15, reps: 75 },
+            { exerciseId: "push-ups", sets: 15, reps: 150 },
+            { exerciseId: "squats", sets: 15, reps: 300 }
+          ]
+        },
+        {
+          name: "WOD: Fran",
+          category: "CrossFit", 
+          duration: 25,
+          calories: 380,
+          notes: "21-15-9 for time",
+          exercises: [
+            { exerciseId: "thrusters", sets: 3, reps: 135, weight: 95 },
+            { exerciseId: "pull-ups", sets: 3, reps: 135 }
+          ]
+        }
+      ],
+      hiit: [
+        {
+          name: "HIIT Circuit",
+          category: "HIIT",
+          duration: 30,
+          calories: 400,
+          notes: "High intensity intervals",
+          exercises: [
+            { exerciseId: "burpees", sets: 6, reps: 72 },
+            { exerciseId: "mountain-climbers", sets: 6, reps: 180 },
+            { exerciseId: "jump-squats", sets: 6, reps: 90 }
+          ]
+        }
+      ],
+      athlete: [
+        {
+          name: "Performance Training",
+          category: "Performance",
+          duration: 60,
+          calories: 500,
+          notes: "Competition preparation",
+          exercises: [
+            { exerciseId: "squats", sets: 5, reps: 75, weight: 315 },
+            { exerciseId: "bench-press", sets: 5, reps: 60, weight: 225 },
+            { exerciseId: "pull-ups", sets: 5, reps: 75 },
+            { exerciseId: "rows", sets: 4, reps: 80, weight: 185 }
+          ]
+        }
+      ],
+      powerlifting: [
+        {
+          name: "Heavy Singles",
+          category: "Powerlifting",
+          duration: 75,
+          calories: 300,
+          notes: "Max effort training",
+          exercises: [
+            { exerciseId: "deadlifts", sets: 6, reps: 18, weight: 405 },
+            { exerciseId: "squats", sets: 5, reps: 20, weight: 365 },
+            { exerciseId: "bench-press", sets: 5, reps: 20, weight: 275 }
+          ]
+        }
+      ],
+      bodyweight: [
+        {
+          name: "Calisthenics Flow",
+          category: "Bodyweight",
+          duration: 35,
+          calories: 280,
+          notes: "Movement quality focus",
+          exercises: [
+            { exerciseId: "push-ups", sets: 5, reps: 125 },
+            { exerciseId: "pull-ups", sets: 5, reps: 65 },
+            { exerciseId: "squats", sets: 4, reps: 120 },
+            { exerciseId: "dips", sets: 4, reps: 80 }
+          ]
+        }
+      ],
+      cardio: [
+        {
+          name: "Dance Cardio",
+          category: "Cardio", 
+          duration: 40,
+          calories: 350,
+          notes: "High energy dance workout",
+          exercises: [
+            { exerciseId: "jumping-jacks", sets: 8, reps: 320 },
+            { exerciseId: "high-knees", sets: 6, reps: 240 },
+            { exerciseId: "butt-kickers", sets: 6, reps: 180 }
+          ]
+        }
+      ],
+      flexibility: [
+        {
+          name: "Yoga Flow",
+          category: "Flexibility",
+          duration: 50,
+          calories: 200,
+          notes: "Mind-body connection",
+          exercises: [
+            { exerciseId: "sun-salutations", sets: 10, reps: 100 },
+            { exerciseId: "warrior-poses", sets: 8, reps: 80 },
+            { exerciseId: "planks", sets: 5, reps: 50 }
+          ]
+        }
+      ],
+      combat: [
+        {
+          name: "Boxing Training", 
+          category: "Combat",
+          duration: 45,
+          calories: 450,
+          notes: "Heavy bag work",
+          exercises: [
+            { exerciseId: "punching-bag", sets: 12, reps: 360 },
+            { exerciseId: "jump-rope", sets: 6, reps: 600 },
+            { exerciseId: "shadowboxing", sets: 4, reps: 200 }
+          ]
+        }
+      ]
+    };
+
+    return workoutTemplates[profile] || workoutTemplates.strength;
   }
 
   async getLeaderboard(): Promise<LeaderboardEntry[]> {
@@ -3645,6 +3921,7 @@ export class DatabaseStorage implements IStorage {
   async createAiDifficultyAdjustment(adjustment: InsertAiDifficultyAdjustment): Promise<AiDifficultyAdjustment> { return this.memStorage.createAiDifficultyAdjustment(adjustment); }
   async getPendingAiAdjustments(userId: string): Promise<AiDifficultyAdjustment[]> { return this.memStorage.getPendingAiAdjustments(userId); }
   async applyAiDifficultyAdjustment(adjustmentId: string): Promise<boolean> { return this.memStorage.applyAiDifficultyAdjustment(adjustmentId); }
+  async seedLeaderboardData(): Promise<void> { return this.memStorage.seedLeaderboardData(); }
 }
 
 export const storage = new DatabaseStorage();
