@@ -33,6 +33,8 @@ export const users = pgTable("users", {
   subscriptionStartDate: timestamp("subscription_start_date"),
   lastPaymentDate: timestamp("last_payment_date"),
   subscriptionExpiresAt: timestamp("subscription_expires_at"),
+  trialStartDate: timestamp("trial_start_date").defaultNow(),
+  trialEndDate: timestamp("trial_end_date").default(sql`NOW() + INTERVAL '7 days'`),
   stripeCustomerId: varchar("stripe_customer_id"),
   stripeSubscriptionId: varchar("stripe_subscription_id"),
   personalPlanData: text("personal_plan_data"), // JSON string storing the user's personal plan and onboarding data
@@ -788,6 +790,56 @@ export type ProgressPhotoWithWorkout = ProgressPhoto & {
     category: string;
     date: Date;
   };
+};
+
+// Subscription Audit Table for tracking subscription state changes
+export const subscriptionAudit = pgTable("subscription_audit", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  fromStatus: varchar("from_status").notNull(),
+  toStatus: varchar("to_status").notNull(),
+  reason: varchar("reason").notNull(), // trial_expired, payment_success, payment_failed, cancelled, etc.
+  timestamp: timestamp("timestamp").defaultNow().notNull(),
+  metadata: jsonb("metadata"), // Additional data like Stripe event ID, error details, etc.
+});
+
+// Subscription Audit insert schema
+export const insertSubscriptionAuditSchema = createInsertSchema(subscriptionAudit).omit({
+  id: true,
+  timestamp: true,
+});
+
+// Subscription Audit types
+export type InsertSubscriptionAudit = z.infer<typeof insertSubscriptionAuditSchema>;
+export type SubscriptionAudit = typeof subscriptionAudit.$inferSelect;
+
+// Premium Features Definition
+export const PREMIUM_FEATURES = {
+  WORKOUT_PLANNER: 'workout_planner',
+  MILE_TRACKER: 'mile_tracker',
+  MEAL_PLANS: 'meal_plans',
+  MEAL_TRACKER: 'meal_tracker',
+  PROGRESS_PHOTOS: 'progress_photos'
+} as const;
+
+export type PremiumFeature = typeof PREMIUM_FEATURES[keyof typeof PREMIUM_FEATURES];
+
+// Feature access helper function
+export const isPremiumFeature = (feature: string): feature is PremiumFeature => {
+  return Object.values(PREMIUM_FEATURES).includes(feature as PremiumFeature);
+};
+
+// Trial expiration checker
+export const isTrialExpired = (user: { trialEndDate: Date | null; subscriptionStatus: string }): boolean => {
+  if (!user.trialEndDate) return true;
+  return user.subscriptionStatus === 'free_trial' && new Date() > new Date(user.trialEndDate);
+};
+
+// Feature access checker
+export const hasFeatureAccess = (user: { subscriptionStatus: string; trialEndDate: Date | null }, feature: PremiumFeature): boolean => {
+  if (user.subscriptionStatus === 'active') return true;
+  if (user.subscriptionStatus === 'free_trial' && !isTrialExpired(user)) return true;
+  return false;
 };
 
 // Authentication types
