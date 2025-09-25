@@ -17,14 +17,14 @@ import chinUpExerciseImage from "@assets/generated_images/Black_man_and_woman_ch
 import dipExerciseImage from "@assets/generated_images/Man_and_woman_dips_e6984611.png";
 import overheadPressImage from "@assets/generated_images/Man_and_woman_overhead_press_0abad494.png";
 import bicepCurlsImage from "@assets/generated_images/Man_and_woman_dumbbell_curls_f43bb36e.png";
-import dumbbellFlyesImage from "@assets/stock_images/black_man_performing_a73f31ab.jpg";
+import dumbbellFlyesImage from "@assets/generated_images/Man_and_woman_dumbbell_flyes_de771e8c.png";
 import dumbbellRollsImage from "@assets/stock_images/black_woman_performi_21123039.jpg";
 import tricepExtensionsImage from "@assets/generated_images/Black_guy_and_lady_tricep_extensions_3cce0d7d.png";
 import latPulldownImage from "@assets/generated_images/Man_and_woman_lat_pulldown_dbce7bd1.png";
 import rowsImage from "@assets/IMG_6694_1758675702051.jpeg";
-import squatsImage from "@assets/stock_images/black_woman_performi_0321f959.jpg";
+import squatsImage from "@assets/generated_images/Man_and_woman_dumbbell_squats_2743b80a.png";
 import deadliftsImage from "@assets/generated_images/Black_guy_and_lady_deadlifts_3066fc1b.png";
-import lungesImage from "@assets/stock_images/black_man_performing_f80b2cdb.jpg";
+import lungesImage from "@assets/generated_images/Man_and_woman_dumbbell_lunges_c5474eaf.png";
 import legPressImage from "@assets/generated_images/Black_woman_leg_press_exercise_c612272f.png";
 import calfRaisesImage from "@assets/generated_images/Black_guy_and_lady_calf_raises_3cb5cf18.png";
 import romanianDeadliftsImage from "@assets/generated_images/Black_guy_and_lady_Romanian_deadlifts_cba72218.png";
