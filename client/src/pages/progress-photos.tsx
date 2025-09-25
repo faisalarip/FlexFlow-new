@@ -340,7 +340,7 @@ export default function ProgressPhotos() {
         </div>
       ) : (
         photos.map((photo: ProgressPhotoWithWorkout) => (
-          <Card key={photo.id} className="overflow-hidden" data-testid={`card-photo-${photo.id}`}>
+          <Card key={photo.id} className="overflow-hidden bg-gradient-to-br from-gray-900 to-black border border-red-600/30 shadow-xl shadow-red-500/10" data-testid={`card-photo-${photo.id}`}>
             {photo.imageUrl && (
               <div className="aspect-square overflow-hidden">
                 <img
@@ -433,16 +433,16 @@ export default function ProgressPhotos() {
                 </div>
               ) : (
                 <div>
-                  <p className="text-sm text-gray-700 dark:text-gray-300 mb-2" data-testid={`text-description-${photo.id}`}>
+                  <p className="text-sm text-gray-200 mb-2" data-testid={`text-description-${photo.id}`}>
                     {photo.description}
                   </p>
                   {photo.workout && (
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-1" data-testid={`text-workout-${photo.id}`}>
+                    <p className="text-xs text-gray-400 mb-1" data-testid={`text-workout-${photo.id}`}>
                       Linked to: {photo.workout.name}
                     </p>
                   )}
-                  <div className="flex items-center text-xs text-gray-500 dark:text-gray-400">
-                    <Calendar className="mr-1 h-3 w-3" />
+                  <div className="flex items-center text-xs text-gray-400">
+                    <Calendar className="mr-1 h-3 w-3 text-red-500" />
                     <span data-testid={`text-date-${photo.id}`}>
                       {format(new Date(photo.createdAt), 'MMM d, yyyy')}
                     </span>
@@ -460,14 +460,14 @@ export default function ProgressPhotos() {
     <div className="space-y-6">
       {comparisonPairs.length === 0 ? (
         <div className="text-center py-12">
-          <Eye className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No photos to compare</h3>
-          <p className="text-gray-600 dark:text-gray-400 mb-4">
+          <Eye className="mx-auto h-12 w-12 text-red-500/60 mb-4" />
+          <h3 className="text-lg font-medium text-white mb-2">No photos to compare</h3>
+          <p className="text-gray-300 mb-4">
             Add both "before" and "after" photos to start comparing your progress
           </p>
           <Button
             onClick={() => setIsDialogOpen(true)}
-            className="bg-red-600 hover:bg-red-700"
+            className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white shadow-lg shadow-red-500/25"
             data-testid="button-add-comparison-photo"
           >
             <Plus className="mr-2 h-4 w-4" />
@@ -484,12 +484,13 @@ export default function ProgressPhotos() {
                 size="sm"
                 onClick={() => setCurrentComparisonIndex(Math.max(0, currentComparisonIndex - 1))}
                 disabled={currentComparisonIndex === 0}
+                className="border-red-600/30 text-gray-300 hover:bg-red-600/20 hover:text-white disabled:opacity-50 disabled:hover:bg-transparent"
                 data-testid="button-prev-comparison"
               >
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 Previous
               </Button>
-              <span className="text-sm text-gray-600 dark:text-gray-400" data-testid="text-comparison-counter">
+              <span className="text-sm text-gray-300" data-testid="text-comparison-counter">
                 {currentComparisonIndex + 1} of {comparisonPairs.length}
               </span>
               <Button
@@ -497,6 +498,7 @@ export default function ProgressPhotos() {
                 size="sm"
                 onClick={() => setCurrentComparisonIndex(Math.min(comparisonPairs.length - 1, currentComparisonIndex + 1))}
                 disabled={currentComparisonIndex === comparisonPairs.length - 1}
+                className="border-red-600/30 text-gray-300 hover:bg-red-600/20 hover:text-white disabled:opacity-50 disabled:hover:bg-transparent"
                 data-testid="button-next-comparison"
               >
                 Next
@@ -507,6 +509,7 @@ export default function ProgressPhotos() {
               variant="outline"
               size="sm"
               onClick={() => setCurrentComparisonIndex(0)}
+              className="border-red-600/30 text-gray-300 hover:bg-red-600/20 hover:text-white"
               data-testid="button-reset-comparison"
             >
               <RotateCcw className="mr-2 h-4 w-4" />
@@ -516,7 +519,7 @@ export default function ProgressPhotos() {
 
           {/* Current Comparison Pair */}
           {comparisonPairs[currentComparisonIndex] && (
-            <Card className="p-6" data-testid={`card-comparison-${currentComparisonIndex}`}>
+            <Card className="p-6 bg-gradient-to-br from-gray-900 to-black border border-red-600/30 shadow-xl shadow-red-500/10" data-testid={`card-comparison-${currentComparisonIndex}`}>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Before Photo */}
                 <div className="space-y-4">
@@ -538,18 +541,18 @@ export default function ProgressPhotos() {
                         </div>
                       )}
                       <div className="text-center space-y-2">
-                        <p className="text-sm text-gray-700 dark:text-gray-300" data-testid="text-before-description">
+                        <p className="text-sm text-gray-200" data-testid="text-before-description">
                           {comparisonPairs[currentComparisonIndex].before!.description}
                         </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400" data-testid="text-before-date">
+                        <p className="text-xs text-gray-400" data-testid="text-before-date">
                           {format(new Date(comparisonPairs[currentComparisonIndex].before!.createdAt), 'MMM d, yyyy')}
                         </p>
                       </div>
                     </div>
                   ) : (
-                    <div className="aspect-square border-2 border-dashed border-blue-200 rounded-lg flex items-center justify-center">
+                    <div className="aspect-square border-2 border-dashed border-red-600/30 rounded-lg flex items-center justify-center bg-black/20">
                       <div className="text-center text-gray-400">
-                        <Camera className="mx-auto h-12 w-12 mb-2" />
+                        <Camera className="mx-auto h-12 w-12 mb-2 text-red-500/50" />
                         <p className="text-sm">No "before" photo</p>
                       </div>
                     </div>
@@ -576,18 +579,18 @@ export default function ProgressPhotos() {
                         </div>
                       )}
                       <div className="text-center space-y-2">
-                        <p className="text-sm text-gray-700 dark:text-gray-300" data-testid="text-after-description">
+                        <p className="text-sm text-gray-200" data-testid="text-after-description">
                           {comparisonPairs[currentComparisonIndex].after!.description}
                         </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400" data-testid="text-after-date">
+                        <p className="text-xs text-gray-400" data-testid="text-after-date">
                           {format(new Date(comparisonPairs[currentComparisonIndex].after!.createdAt), 'MMM d, yyyy')}
                         </p>
                       </div>
                     </div>
                   ) : (
-                    <div className="aspect-square border-2 border-dashed border-green-200 rounded-lg flex items-center justify-center">
+                    <div className="aspect-square border-2 border-dashed border-red-600/30 rounded-lg flex items-center justify-center bg-black/20">
                       <div className="text-center text-gray-400">
-                        <Camera className="mx-auto h-12 w-12 mb-2" />
+                        <Camera className="mx-auto h-12 w-12 mb-2 text-red-500/50" />
                         <p className="text-sm">No "after" photo</p>
                       </div>
                     </div>
@@ -666,15 +669,15 @@ export default function ProgressPhotos() {
         
           <div className="flex items-center gap-4">
           {/* View Mode Toggle */}
-          <div className="flex bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
+          <div className="flex bg-black/60 border border-red-600/30 rounded-lg p-1 backdrop-blur-sm">
             <Button
-              variant={viewMode === "grid" ? "default" : "ghost"}
+              variant="ghost"
               size="sm"
               onClick={() => setViewMode("grid")}
               className={`${
                 viewMode === "grid" 
-                  ? "bg-white dark:bg-gray-700 shadow-sm" 
-                  : "hover:bg-gray-200 dark:hover:bg-gray-700"
+                  ? "bg-gradient-to-r from-red-600 to-red-700 text-white shadow-lg shadow-red-500/25" 
+                  : "text-gray-300 hover:bg-red-600/20 hover:text-white"
               }`}
               data-testid="button-grid-view"
             >
@@ -682,13 +685,13 @@ export default function ProgressPhotos() {
               Grid
             </Button>
             <Button
-              variant={viewMode === "comparison" ? "default" : "ghost"}
+              variant="ghost"
               size="sm"
               onClick={() => setViewMode("comparison")}
               className={`${
                 viewMode === "comparison" 
-                  ? "bg-white dark:bg-gray-700 shadow-sm" 
-                  : "hover:bg-gray-200 dark:hover:bg-gray-700"
+                  ? "bg-gradient-to-r from-red-600 to-red-700 text-white shadow-lg shadow-red-500/25" 
+                  : "text-gray-300 hover:bg-red-600/20 hover:text-white"
               }`}
               data-testid="button-comparison-view"
             >
