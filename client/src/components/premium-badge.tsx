@@ -24,13 +24,12 @@ export default function PremiumBadge() {
   return (
     <Button
       asChild
-      size="sm"
-      className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white border-none shadow-md"
+      className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white border-none shadow-sm px-2 py-1 h-auto text-xs"
       data-testid="upgrade-button"
     >
       <Link href="/subscription">
-        <Sparkles className="w-4 h-4 mr-1" />
-        Upgrade to Premium
+        <Sparkles className="w-3 h-3 mr-1" />
+        Upgrade
       </Link>
     </Button>
   );
