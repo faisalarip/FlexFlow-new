@@ -119,7 +119,7 @@ export default function Community() {
         const data = await response.json();
         
         setUploadedImageUrl(data.objectPath || null);
-        setImagePreview(uploadURL);
+        setImagePreview(uploadURL || null);
         toast({ 
           title: "Image uploaded!", 
           description: "Your image is ready to share with your post." 
@@ -426,11 +426,9 @@ export default function Community() {
                             <p className="text-xs font-bold bg-gradient-to-r from-purple-700 to-pink-700 bg-clip-text text-transparent">
                               {post.user.firstName && post.user.lastName 
                                 ? `${post.user.firstName} ${post.user.lastName}`
-                                : post.user.email?.split('@')[0] || 'Fitness Warrior'}
+                                : 'Fitness Warrior'}
                             </p>
                             <div className="flex items-center space-x-1 text-xs text-gray-600 dark:text-gray-400" style={{fontSize: '10px'}}>
-                              <span style={{fontSize: '10px'}}>{post.user.email}</span>
-                              <span className="text-purple-400">•</span>
                               <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                                 {formatTimeAgo(post.createdAt.toString())}
                               </span>
@@ -446,11 +444,23 @@ export default function Community() {
                             </div>
                           </div>
                         </div>
-                        <div className="flex items-center space-x-3">
+                        <div className="flex items-center space-x-2">
                           {getPostTypeBadge(post.postType)}
                           <div className="w-8 h-8 bg-gradient-to-br from-purple-100 to-pink-100 rounded-full flex items-center justify-center">
                             {getPostTypeIcon(post.postType)}
                           </div>
+                          {/* Delete button - only show for user's own posts */}
+                          {currentUser && post.userId === currentUser.id && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleDeletePost(post.id)}
+                              className="h-6 w-6 p-0 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-full"
+                              data-testid={`button-delete-post-${post.id}`}
+                            >
+                              <Trash2 size={12} />
+                            </Button>
+                          )}
                         </div>
                       </div>
                       
@@ -498,33 +508,55 @@ export default function Community() {
                       )}
                       
                       <div className="flex items-center justify-between pt-1 border-t border-purple-100 dark:border-purple-800">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleLike(post.id)}
-                          className={`transition-all duration-300 h-6 px-2 text-[10px] ${
-                            post.likes > 0 
-                              ? 'text-red-500 bg-red-50 hover:bg-red-100' 
-                              : 'text-gray-600 hover:text-red-500 hover:bg-red-50'
-                          }`}
-                        >
-                          <Heart 
-                            className={`mr-1 transition-all duration-300 ${
-                              post.likes > 0 
-                                ? 'fill-red-500 text-red-500 animate-pulse' 
-                                : 'hover:fill-red-200'
-                            }`} 
-                            size={10} 
-                          />
-                          <span className="font-bold text-[10px]">
-                            {post.likes > 0 ? `${post.likes} ❤️` : 'Love'}
-                          </span>
-                        </Button>
+                        <div className="flex items-center space-x-1">
+                          {/* Like Button */}
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleLike(post.id)}
+                            disabled={likeMutation.isPending}
+                            className="transition-all duration-300 h-6 px-2 text-[10px] text-gray-600 hover:text-red-500 hover:bg-red-50"
+                            data-testid={`button-like-post-${post.id}`}
+                          >
+                            <Heart 
+                              className="mr-1 transition-all duration-300 hover:fill-red-200" 
+                              size={10} 
+                            />
+                            <span className="font-bold text-[10px]">
+                              Like
+                            </span>
+                          </Button>
+                          
+                          {/* Dislike Button */}
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDislike(post.id)}
+                            disabled={dislikeMutation.isPending}
+                            className="transition-all duration-300 h-6 px-2 text-[10px] text-gray-600 hover:text-blue-500 hover:bg-blue-50"
+                            data-testid={`button-dislike-post-${post.id}`}
+                          >
+                            <ThumbsDown 
+                              className="mr-1 transition-all duration-300 hover:fill-blue-200" 
+                              size={10} 
+                            />
+                            <span className="font-bold text-[10px]">
+                              Dislike
+                            </span>
+                          </Button>
+                        </div>
                         
                         <div className="flex items-center space-x-1">
-                          <div className="bg-gradient-to-r from-purple-100 to-pink-100 px-1.5 py-0.5 rounded-full">
-                            <span className="text-[10px] font-bold text-purple-700">
+                          {/* Likes Count */}
+                          <div className="bg-gradient-to-r from-red-100 to-pink-100 px-1.5 py-0.5 rounded-full">
+                            <span className="text-[10px] font-bold text-red-700" data-testid={`text-likes-${post.id}`}>
                               {post.likes} ❤️
+                            </span>
+                          </div>
+                          {/* Dislikes Count */}
+                          <div className="bg-gradient-to-r from-blue-100 to-indigo-100 px-1.5 py-0.5 rounded-full">
+                            <span className="text-[10px] font-bold text-blue-700" data-testid={`text-dislikes-${post.id}`}>
+                              {post.dislikes || 0} 👎
                             </span>
                           </div>
                         </div>
