@@ -73,8 +73,8 @@ import {
 import { randomUUID } from "crypto";
 import * as bcrypt from "bcrypt";
 import { db } from "./db";
-import { users } from "@shared/schema";
-import { eq, or } from "drizzle-orm";
+import { users, communityPosts, workouts } from "@shared/schema";
+import { eq, or, desc, sql } from "drizzle-orm";
 
 export interface IStorage {
   // Users (IMPORTANT) these user operations are mandatory for Replit Auth.
@@ -3150,40 +3150,109 @@ export class DatabaseStorage implements IStorage {
   async updateMileTrackerSession(id: string, updates: Partial<MileTrackerSession>): Promise<MileTrackerSession | undefined> { return this.memStorage.updateMileTrackerSession(id, updates); }
   async createMileTrackerSplit(split: InsertMileTrackerSplit): Promise<MileTrackerSplit> { return this.memStorage.createMileTrackerSplit(split); }
   async getMileTrackerSplits(sessionId: string): Promise<MileTrackerSplit[]> { return this.memStorage.getMileTrackerSplits(sessionId); }
-  async getCommunityPosts(limit?: number): Promise<CommunityPostWithUser[]> { 
-    // Get posts using memStorage's public API, then enrich with database users
-    const memPosts = await this.memStorage.getCommunityPosts(limit);
-    console.log(`Found ${memPosts.length} posts in memory storage`);
-    
-    // Enrich posts by replacing memStorage users with database users when available
-    const enrichedPosts: CommunityPostWithUser[] = [];
-    for (const post of memPosts) {
-      // Try to get user from database first
-      const dbUser = await this.getUser(post.userId);
-      if (dbUser) {
-        // Replace with database user data
-        const enrichedPost = {
-          ...post,
+  async getCommunityPosts(limit: number = 50): Promise<CommunityPostWithUser[]> {
+    try {
+      const posts = await db
+        .select({
+          id: communityPosts.id,
+          userId: communityPosts.userId,
+          content: communityPosts.content,
+          postType: communityPosts.postType,
+          workoutId: communityPosts.workoutId,
+          imageUrl: communityPosts.imageUrl,
+          likes: communityPosts.likes,
+          createdAt: communityPosts.createdAt,
+          // User data
+          userFirstName: users.firstName,
+          userLastName: users.lastName,
+          userEmail: users.email,
+          userStreak: users.streak,
+        })
+        .from(communityPosts)
+        .innerJoin(users, eq(communityPosts.userId, users.id))
+        .orderBy(desc(communityPosts.createdAt))
+        .limit(limit);
+
+      const postsWithUsers: CommunityPostWithUser[] = [];
+      
+      for (const row of posts) {
+        const postWithUser: CommunityPostWithUser = {
+          id: row.id,
+          userId: row.userId,
+          content: row.content,
+          postType: row.postType,
+          workoutId: row.workoutId,
+          imageUrl: row.imageUrl,
+          likes: row.likes,
+          createdAt: row.createdAt,
           user: {
-            id: dbUser.id,
-            firstName: dbUser.firstName || "",
-            lastName: dbUser.lastName || "",
-            email: dbUser.email || "",
-            streak: dbUser.streak,
+            id: row.userId,
+            firstName: row.userFirstName || "",
+            lastName: row.userLastName || "",
+            email: row.userEmail || "",
+            streak: row.userStreak,
           }
         };
-        enrichedPosts.push(enrichedPost);
-      } else {
-        // Keep original post with memStorage user if database user not found
-        enrichedPosts.push(post);
-      }
-    }
 
-    console.log(`Returning ${enrichedPosts.length} enriched posts`);
-    return enrichedPosts;
+        // Add workout info if it's a workout progress post
+        if (row.workoutId) {
+          const [workout] = await db
+            .select()
+            .from(workouts)
+            .where(eq(workouts.id, row.workoutId));
+          
+          if (workout) {
+            postWithUser.workout = {
+              id: workout.id,
+              name: workout.name,
+              category: workout.category,
+              duration: workout.duration,
+              caloriesBurned: workout.caloriesBurned,
+            };
+          }
+        }
+
+        postsWithUsers.push(postWithUser);
+      }
+
+      console.log(`Returning ${postsWithUsers.length} posts from database`);
+      return postsWithUsers;
+    } catch (error) {
+      console.error("Error getting community posts from database:", error);
+      throw error;
+    }
   }
-  async createCommunityPost(post: InsertCommunityPost): Promise<CommunityPost> { return this.memStorage.createCommunityPost(post); }
-  async likeCommunityPost(postId: string): Promise<CommunityPost | undefined> { return this.memStorage.likeCommunityPost(postId); }
+  async createCommunityPost(post: InsertCommunityPost): Promise<CommunityPost> {
+    try {
+      const [newPost] = await db
+        .insert(communityPosts)
+        .values(post)
+        .returning();
+      
+      console.log(`Created community post with ID: ${newPost.id}`);
+      return newPost;
+    } catch (error) {
+      console.error("Error creating community post in database:", error);
+      throw error;
+    }
+  }
+  async likeCommunityPost(postId: string): Promise<CommunityPost | undefined> {
+    try {
+      const [updatedPost] = await db
+        .update(communityPosts)
+        .set({ 
+          likes: sql`${communityPosts.likes} + 1`
+        })
+        .where(eq(communityPosts.id, postId))
+        .returning();
+      
+      console.log(`Liked community post with ID: ${postId}, new likes: ${updatedPost?.likes}`);
+      return updatedPost;
+    } catch (error) {
+      console.error("Error liking community post in database:", error);
+      throw error;
+    }
+  }
   async getMealPlans(goal?: string): Promise<MealPlanWithDetails[]> { return this.memStorage.getMealPlans(goal); }
   async getMealPlan(id: string): Promise<MealPlanWithDetails | undefined> { return this.memStorage.getMealPlan(id); }
   async createMealPlan(mealPlan: InsertMealPlan): Promise<MealPlan> { return this.memStorage.createMealPlan(mealPlan); }
