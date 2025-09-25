@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import FeatureGate from "@/components/feature-gate";
 import { 
   Target, 
   Clock, 
@@ -299,7 +300,8 @@ export default function WorkoutPlannerPage() {
 
   if (showPlan && preferences) {
     return (
-      <div className="container mx-auto px-4 py-8 space-y-8">
+      <FeatureGate feature="workout_planner">
+        <div className="container mx-auto px-4 py-8 space-y-8">
         <div className="text-center space-y-4">
           <h1 className="text-3xl font-bold text-gray-900 flex items-center justify-center gap-3">
             <Target className="w-8 h-8 text-primary" />
@@ -397,6 +399,7 @@ export default function WorkoutPlannerPage() {
           </TabsContent>
         </Tabs>
       </div>
+      </FeatureGate>
     );
   }
 
@@ -405,7 +408,8 @@ export default function WorkoutPlannerPage() {
   const progress = ((currentStep + 1) / questions.length) * 100;
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-3xl">
+    <FeatureGate feature="workout_planner">
+      <div className="container mx-auto px-4 py-8 max-w-3xl">
       <div className="text-center space-y-4 mb-8">
         <h1 className="text-3xl font-bold text-white flex items-center justify-center gap-3">
           <Target className="w-8 h-8 text-primary" />
@@ -498,5 +502,6 @@ export default function WorkoutPlannerPage() {
         </Button>
       </div>
     </div>
+    </FeatureGate>
   );
 }

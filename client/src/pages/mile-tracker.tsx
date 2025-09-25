@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import FeatureGate from "@/components/feature-gate";
 import type { MileTrackerSessionWithSplits } from "@shared/schema";
 
 export default function MileTracker() {
@@ -323,7 +324,8 @@ export default function MileTracker() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-red-950 relative overflow-hidden">
+    <FeatureGate feature="mile_tracker">
+      <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-red-950 relative overflow-hidden">
       {/* Animated background effects */}
       <div className="absolute inset-0 bg-gradient-to-r from-red-500/5 to-transparent animate-pulse"></div>
       <div className="absolute top-10 left-10 text-red-500/20 text-9xl">🔥</div>
@@ -536,5 +538,6 @@ export default function MileTracker() {
         )}
       </div>
     </div>
+    </FeatureGate>
   );
 }

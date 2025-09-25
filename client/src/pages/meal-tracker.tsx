@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Loader2, Apple, Calendar, TrendingUp, ScanLine } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import FeatureGate from "@/components/feature-gate";
 import type { MealEntry, InsertMealEntry } from "@shared/schema";
 import BarcodeScanner from "@/components/barcode-scanner";
 
@@ -187,7 +188,8 @@ export default function MealTrackerPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-red-950">
+    <FeatureGate feature="meal_tracker">
+      <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-red-950">
       <div className="container mx-auto px-4 py-8 space-y-8">
         <div className="text-center space-y-4">
           <h1 className="text-4xl font-bold text-white flex items-center justify-center gap-3">
@@ -526,5 +528,6 @@ export default function MealTrackerPage() {
         />
       </div>
     </div>
+    </FeatureGate>
   );
 }

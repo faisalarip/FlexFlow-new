@@ -17,6 +17,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { apiRequest } from "@/lib/queryClient";
+import FeatureGate from "@/components/feature-gate";
 import type { MealPlanWithDetails, UserMealPlanWithDetails, UserMealPreferences } from "@shared/schema";
 
 const mealPlanGenerationSchema = z.object({
@@ -223,7 +224,8 @@ export default function MealPlans() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <FeatureGate feature="meal_plans">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Meal Plans</h1>
@@ -744,5 +746,6 @@ export default function MealPlans() {
         </Tabs>
       </div>
     </div>
+    </FeatureGate>
   );
 }

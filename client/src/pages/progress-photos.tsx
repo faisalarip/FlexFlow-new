@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Camera, Plus, Calendar, Trash2, Edit3, X, Check, Grid3X3, Eye, ArrowLeft, ArrowRight, RotateCcw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import FeatureGate from "@/components/feature-gate";
 import type { ProgressPhotoWithWorkout, Workout } from "@shared/schema";
 import { format } from "date-fns";
 
@@ -614,7 +615,8 @@ export default function ProgressPhotos() {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-red-950 relative overflow-hidden" data-testid="progress-photos-page">
+    <FeatureGate feature="progress_photos">
+      <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-red-950 relative overflow-hidden" data-testid="progress-photos-page">
       {/* Hexagonal animated background elements */}
       <div className="fixed inset-0 pointer-events-none z-0">
         <div className="absolute top-20 left-10 w-32 h-28 opacity-20 animate-pulse" style={{animationDuration: '6s'}}>
@@ -881,5 +883,6 @@ export default function ProgressPhotos() {
         {viewMode === "grid" ? renderGridView() : renderComparisonView()}
       </div>
     </div>
+    </FeatureGate>
   );
 }
