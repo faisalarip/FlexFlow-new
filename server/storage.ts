@@ -1551,15 +1551,32 @@ export class MemStorage implements IStorage {
   }
 
   async getLeaderboard(): Promise<LeaderboardEntry[]> {
-    // Calculate total reps for each user
+    // Get the current week's date range (Monday to Sunday)
+    const now = new Date();
+    const currentDay = now.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+    const mondayOffset = currentDay === 0 ? -6 : 1 - currentDay; // If Sunday, go back 6 days, else go to Monday
+    
+    const weekStart = new Date(now);
+    weekStart.setDate(now.getDate() + mondayOffset);
+    weekStart.setHours(0, 0, 0, 0); // Start of Monday
+    
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekStart.getDate() + 6); // End of Sunday
+    weekEnd.setHours(23, 59, 59, 999);
+
+    // Calculate total reps for each user FROM THIS WEEK ONLY
     const userReps = new Map<string, number>();
     
-    // Iterate through all workout exercises to sum up reps per user
+    // Iterate through all workout exercises to sum up reps per user (only from this week)
     for (const workoutExercise of Array.from(this.workoutExercises.values())) {
       const workout = this.workouts.get(workoutExercise.workoutId);
       if (workout && workoutExercise.reps) {
-        const currentReps = userReps.get(workout.userId) || 0;
-        userReps.set(workout.userId, currentReps + workoutExercise.reps);
+        // Only count workouts from the current week
+        const workoutDate = new Date(workout.date);
+        if (workoutDate >= weekStart && workoutDate <= weekEnd) {
+          const currentReps = userReps.get(workout.userId) || 0;
+          userReps.set(workout.userId, currentReps + workoutExercise.reps);
+        }
       }
     }
 

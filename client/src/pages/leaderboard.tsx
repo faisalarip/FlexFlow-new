@@ -141,9 +141,9 @@ export default function Leaderboard() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8 text-center">
           <h1 className="text-5xl font-black bg-gradient-to-r from-purple-600 via-pink-600 to-yellow-600 bg-clip-text text-transparent mb-4 animate-pulse">
-            🏅 FITNESS LEADERBOARD 🏅
+            🏅 WEEKLY FITNESS LEADERBOARD 🏅
           </h1>
-          <p className="text-lg text-gray-700 font-medium">Champions ranked by total reps completed • Who will claim the crown?</p>
+          <p className="text-lg text-gray-700 font-medium">Weekly champions ranked by reps completed • Resets every Monday!</p>
           <div className="mt-4 flex justify-center space-x-2">
             <div className="w-3 h-3 bg-yellow-400 rounded-full animate-bounce"></div>
             <div className="w-3 h-3 bg-pink-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
