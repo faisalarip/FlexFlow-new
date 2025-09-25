@@ -114,40 +114,47 @@ export default function BarcodeScanner({ onScan, onClose, isOpen }: BarcodeScann
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
-      <Card className="w-full max-w-lg">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-          <CardTitle className="flex items-center gap-2">
-            <ScanLine className="w-5 h-5" />
-            Scan Barcode
+    <div className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <Card className="w-full max-w-lg bg-black/95 border-red-600/50 shadow-2xl">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 border-b border-red-800/30">
+          <CardTitle className="flex items-center gap-3 text-white">
+            <div className="p-2 bg-gradient-to-r from-red-600 to-red-800 rounded-lg shadow-lg">
+              <ScanLine className="w-5 h-5 text-white" />
+            </div>
+            <span className="font-bold">Professional Scanner</span>
           </CardTitle>
           <Button 
             variant="ghost" 
             size="sm" 
             onClick={handleClose}
             data-testid="button-close-scanner"
+            className="text-gray-300 hover:text-white hover:bg-red-600/20 border border-red-800/30 hover:border-red-600"
           >
             <X className="w-4 h-4" />
           </Button>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-6 p-6">
           {error ? (
-            <div className="text-center space-y-4">
-              <div className="text-red-500">
-                <Camera className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                <p className="text-sm">{error}</p>
+            <div className="text-center space-y-6">
+              <div className="bg-red-950/50 border border-red-800/50 rounded-lg p-6">
+                <div className="w-16 h-16 bg-red-900/50 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Camera className="w-8 h-8 text-red-400" />
+                </div>
+                <p className="text-red-300 font-medium">{error}</p>
+                <p className="text-gray-400 text-sm mt-2">Please check camera permissions and try again</p>
               </div>
               <Button 
                 onClick={startScanning} 
-                variant="outline"
+                className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold px-6 py-3 rounded-lg shadow-lg transform hover:scale-105 transition-all duration-200"
                 data-testid="button-retry-scanner"
               >
-                Try Again
+                <Camera className="w-4 h-4 mr-2" />
+                Retry Scanner
               </Button>
             </div>
           ) : (
-            <div className="space-y-4">
-              <div className="relative bg-black rounded-lg overflow-hidden" style={{ aspectRatio: '4/3' }}>
+            <div className="space-y-6">
+              <div className="relative bg-black rounded-xl overflow-hidden border-2 border-red-600/30 shadow-2xl" style={{ aspectRatio: '4/3' }}>
                 <video
                   ref={videoRef}
                   className="w-full h-full object-cover"
@@ -156,20 +163,50 @@ export default function BarcodeScanner({ onScan, onClose, isOpen }: BarcodeScann
                 />
                 {isScanning && (
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-48 h-32 border-2 border-primary rounded-lg relative">
-                      <div className="absolute inset-x-0 top-1/2 h-0.5 bg-primary animate-pulse" />
-                      <div className="absolute -top-6 left-1/2 transform -translate-x-1/2">
-                        <p className="text-white text-sm bg-black bg-opacity-50 px-2 py-1 rounded">
-                          Position barcode in the frame
-                        </p>
+                    <div className="relative">
+                      {/* Scanning Frame */}
+                      <div className="w-56 h-36 border-2 border-red-500 rounded-lg relative shadow-lg">
+                        {/* Corner decorations */}
+                        <div className="absolute -top-1 -left-1 w-6 h-6 border-t-4 border-l-4 border-red-400 rounded-tl-lg"></div>
+                        <div className="absolute -top-1 -right-1 w-6 h-6 border-t-4 border-r-4 border-red-400 rounded-tr-lg"></div>
+                        <div className="absolute -bottom-1 -left-1 w-6 h-6 border-b-4 border-l-4 border-red-400 rounded-bl-lg"></div>
+                        <div className="absolute -bottom-1 -right-1 w-6 h-6 border-b-4 border-r-4 border-red-400 rounded-br-lg"></div>
+                        
+                        {/* Scanning line */}
+                        <div className="absolute inset-x-0 top-1/2 h-0.5 bg-gradient-to-r from-transparent via-red-400 to-transparent animate-pulse shadow-lg" />
+                        
+                        {/* Pulsing glow effect */}
+                        <div className="absolute inset-0 border-2 border-red-400/50 rounded-lg animate-ping"></div>
+                      </div>
+                      
+                      {/* Instructions */}
+                      <div className="absolute -top-12 left-1/2 transform -translate-x-1/2">
+                        <div className="bg-black/80 backdrop-blur-sm px-4 py-2 rounded-lg border border-red-600/30">
+                          <p className="text-white text-sm font-medium whitespace-nowrap">
+                            Position barcode within frame
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </div>
                 )}
+                
+                {/* Status indicator */}
+                <div className="absolute top-4 right-4">
+                  <div className="flex items-center gap-2 bg-black/80 backdrop-blur-sm px-3 py-2 rounded-lg border border-red-600/30">
+                    <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+                    <span className="text-white text-xs font-medium">SCANNING</span>
+                  </div>
+                </div>
               </div>
-              <div className="text-center text-sm text-gray-600">
-                <p>Hold your device steady and position the barcode within the frame.</p>
-                <p>The barcode will be scanned automatically.</p>
+              
+              <div className="text-center bg-gray-900/50 rounded-lg p-4 border border-red-800/20">
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <ScanLine className="w-4 h-4 text-red-400" />
+                  <span className="text-white font-semibold text-sm">Professional Barcode Scanner</span>
+                </div>
+                <p className="text-gray-300 text-sm mb-1">Hold device steady and ensure good lighting</p>
+                <p className="text-gray-400 text-xs">Automatic detection • High precision scanning</p>
               </div>
             </div>
           )}
