@@ -187,296 +187,344 @@ export default function MealTrackerPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 space-y-8">
-      <div className="text-center space-y-4">
-        <h1 className="text-3xl font-bold text-white flex items-center justify-center gap-3">
-          <Apple className="w-8 h-8 text-primary" />
-          Barcode Meal Tracker
-        </h1>
-        <p className="text-gray-600 max-w-2xl mx-auto">
-          Scan barcodes to instantly add packaged foods to your meal diary with accurate nutrition data.
-        </p>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-red-950">
+      <div className="container mx-auto px-4 py-8 space-y-8">
+        <div className="text-center space-y-4">
+          <h1 className="text-4xl font-bold text-white flex items-center justify-center gap-3">
+            <div className="p-2 bg-gradient-to-r from-red-600 to-red-800 rounded-lg shadow-lg">
+              <ScanLine className="w-8 h-8 text-white" />
+            </div>
+            Professional Barcode Scanner
+          </h1>
+          <p className="text-gray-300 max-w-2xl mx-auto text-lg">
+            Advanced barcode scanning technology for precise nutritional tracking and professional meal management.
+          </p>
+        </div>
 
-      <Tabs defaultValue="scan" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="scan">Scan Barcode</TabsTrigger>
-          <TabsTrigger value="history">Daily History</TabsTrigger>
-        </TabsList>
+        <Tabs defaultValue="scan" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 bg-black/50 border border-red-800/30">
+            <TabsTrigger value="scan" className="data-[state=active]:bg-red-600 data-[state=active]:text-white text-gray-300 hover:text-white transition-colors">
+              <ScanLine className="w-4 h-4 mr-2" />
+              Scan Barcode
+            </TabsTrigger>
+            <TabsTrigger value="history" className="data-[state=active]:bg-red-600 data-[state=active]:text-white text-gray-300 hover:text-white transition-colors">
+              <Calendar className="w-4 h-4 mr-2" />
+              Daily History
+            </TabsTrigger>
+          </TabsList>
 
-        <TabsContent value="scan" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <ScanLine className="w-5 h-5" />
-                Scan Barcode
-              </CardTitle>
-              <CardDescription>
-                Scan the barcode on packaged foods to get instant nutrition information
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {/* Meal Type Selection */}
-              <div className="space-y-2">
-                <Label htmlFor="meal-type">Meal Type</Label>
-                <Select 
-                  value={barcodeForm.mealType} 
-                  onValueChange={(value) => setBarcodeForm(prev => ({ ...prev, mealType: value }))}
-                >
-                  <SelectTrigger data-testid="select-meal-type">
-                    <SelectValue placeholder="Select meal type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="breakfast">🌅 Breakfast</SelectItem>
-                    <SelectItem value="lunch">☀️ Lunch</SelectItem>
-                    <SelectItem value="dinner">🌙 Dinner</SelectItem>
-                    <SelectItem value="snack">🍎 Snack</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Barcode Scanner */}
-              <div className="border-2 border-dashed rounded-lg p-8 text-center border-gray-300">
-                <div className="space-y-4">
-                  <ScanLine className="mx-auto h-12 w-12 text-gray-400" />
-                  <div>
-                    <p className="text-lg font-medium">Scan Product Barcode</p>
-                    <p className="text-sm text-gray-500">Point your camera at the barcode to get nutrition info</p>
+          <TabsContent value="scan" className="space-y-6">
+            <Card className="bg-black/80 border-red-800/30 shadow-2xl">
+              <CardHeader className="border-b border-red-800/20">
+                <CardTitle className="flex items-center gap-2 text-white">
+                  <div className="p-1 bg-red-600 rounded">
+                    <ScanLine className="w-5 h-5 text-white" />
                   </div>
-                  <Button 
-                    onClick={() => setIsScannerOpen(true)}
-                    data-testid="button-scan-barcode"
-                    className="flex items-center gap-2"
-                    disabled={!barcodeForm.mealType}
+                  Professional Barcode Scanner
+                </CardTitle>
+                <CardDescription className="text-gray-300">
+                  Advanced scanning technology for instant, accurate nutritional analysis
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6 p-6">
+                {/* Meal Type Selection */}
+                <div className="space-y-3">
+                  <Label htmlFor="meal-type" className="text-white font-semibold">Meal Category</Label>
+                  <Select 
+                    value={barcodeForm.mealType} 
+                    onValueChange={(value) => setBarcodeForm(prev => ({ ...prev, mealType: value }))}
                   >
-                    <ScanLine className="w-4 h-4" />
-                    {barcodeForm.mealType ? "Start Scanner" : "Select meal type first"}
-                  </Button>
+                    <SelectTrigger data-testid="select-meal-type" className="bg-gray-900 border-red-800/30 text-white hover:border-red-600 focus:border-red-500">
+                      <SelectValue placeholder="Select meal category" className="text-gray-400" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-gray-900 border-red-800/30">
+                      <SelectItem value="breakfast" className="text-white hover:bg-red-900/50">🌅 Breakfast</SelectItem>
+                      <SelectItem value="lunch" className="text-white hover:bg-red-900/50">☀️ Lunch</SelectItem>
+                      <SelectItem value="dinner" className="text-white hover:bg-red-900/50">🌙 Dinner</SelectItem>
+                      <SelectItem value="snack" className="text-white hover:bg-red-900/50">🍎 Snack</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
-              </div>
 
-              {/* Custom Description */}
-              <div className="space-y-2">
-                <Label htmlFor="description">Additional Notes (Optional)</Label>
-                <Input
-                  id="description"
-                  placeholder="Add any notes about preparation or portion size..."
-                  value={barcodeForm.customDescription}
-                  onChange={(e) => setBarcodeForm(prev => ({ ...prev, customDescription: e.target.value }))}
-                  data-testid="input-meal-description"
-                />
-              </div>
+                {/* Barcode Scanner */}
+                <div className="border-2 border-dashed rounded-xl p-8 text-center border-red-600/40 bg-gradient-to-br from-red-950/20 to-black/20">
+                  <div className="space-y-6">
+                    <div className="relative">
+                      <div className="mx-auto h-16 w-16 bg-gradient-to-r from-red-600 to-red-800 rounded-full flex items-center justify-center shadow-lg">
+                        <ScanLine className="h-8 w-8 text-white animate-pulse" />
+                      </div>
+                      <div className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 rounded-full animate-ping opacity-75"></div>
+                    </div>
+                    <div>
+                      <p className="text-xl font-bold text-white mb-2">Professional Barcode Scanner</p>
+                      <p className="text-gray-300">Advanced camera technology for instant product identification</p>
+                    </div>
+                    <Button 
+                      onClick={() => setIsScannerOpen(true)}
+                      data-testid="button-scan-barcode"
+                      className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold px-8 py-3 rounded-lg shadow-lg transform hover:scale-105 transition-all duration-200 flex items-center gap-3"
+                      disabled={!barcodeForm.mealType}
+                    >
+                      <ScanLine className="w-5 h-5" />
+                      {barcodeForm.mealType ? "Launch Scanner" : "Select meal category first"}
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Custom Description */}
+                <div className="space-y-3">
+                  <Label htmlFor="description" className="text-white font-semibold">Additional Notes (Optional)</Label>
+                  <Input
+                    id="description"
+                    placeholder="Add preparation details, portion adjustments, or special notes..."
+                    value={barcodeForm.customDescription}
+                    onChange={(e) => setBarcodeForm(prev => ({ ...prev, customDescription: e.target.value }))}
+                    data-testid="input-meal-description"
+                    className="bg-gray-900 border-red-800/30 text-white placeholder:text-gray-500 hover:border-red-600 focus:border-red-500"
+                  />
+                </div>
             </CardContent>
           </Card>
 
-          {/* Analysis Results */}
-          {analysisResult && (
-            <Card data-testid="card-analysis-results">
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <span>Nutritional Analysis</span>
-                  <Badge variant="secondary">
-                    {Math.round(analysisResult.confidence * 100)}% confident
-                  </Badge>
-                </CardTitle>
-                <CardDescription>{analysisResult.description}</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {/* Food Name Edit Section */}
-                <div className="space-y-2">
-                  <Label htmlFor="meal-name-edit">Food Name</Label>
-                  <Input
-                    id="meal-name-edit"
-                    value={editingMealName}
-                    onChange={(e) => setEditingMealName(e.target.value)}
-                    placeholder="Enter food name"
-                    data-testid="input-meal-name-edit"
-                    className="font-medium"
-                  />
-                  <p className="text-sm text-gray-500">
-                    You can edit the food name before saving to your diary
-                  </p>
-                </div>
-
-                <div className="grid gap-6 md:grid-cols-2">
-                  <div>
-                    <h3 className="font-semibold mb-3">Macronutrients</h3>
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Nutrient</TableHead>
-                          <TableHead>Amount</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        <TableRow>
-                          <TableCell>Calories</TableCell>
-                          <TableCell className="font-medium">{analysisResult.totalCalories} kcal</TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell>Protein</TableCell>
-                          <TableCell>{analysisResult.protein}g</TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell>Carbohydrates</TableCell>
-                          <TableCell>{analysisResult.carbs}g</TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell>Fat</TableCell>
-                          <TableCell>{analysisResult.fat}g</TableCell>
-                        </TableRow>
-                      </TableBody>
-                    </Table>
-                  </div>
-
-                  <div>
-                    <h3 className="font-semibold mb-3">Additional Details</h3>
-                    <Table>
-                      <TableBody>
-                        <TableRow>
-                          <TableCell>Fiber</TableCell>
-                          <TableCell>{analysisResult.fiber}g</TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell>Sugar</TableCell>
-                          <TableCell>{analysisResult.sugar}g</TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell>Sodium</TableCell>
-                          <TableCell>{analysisResult.sodium}mg</TableCell>
-                        </TableRow>
-                      </TableBody>
-                    </Table>
-                  </div>
-                </div>
-
-                <Button
-                  onClick={handleSaveMeal}
-                  disabled={saveMutation.isPending}
-                  className="w-full"
-                  data-testid="button-save-meal"
-                >
-                  {saveMutation.isPending ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Saving...
-                    </>
-                  ) : (
-                    "Save to Diary"
-                  )}
-                </Button>
-              </CardContent>
-            </Card>
-          )}
-        </TabsContent>
-
-        <TabsContent value="history" className="space-y-6">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <Calendar className="w-5 h-5" />
-              <Label htmlFor="date-select">Date:</Label>
-            </div>
-            <Input
-              id="date-select"
-              type="date"
-              value={selectedDate}
-              onChange={(e) => setSelectedDate(e.target.value)}
-              className="w-auto"
-              data-testid="input-date-select"
-            />
-          </div>
-
-          {/* Daily Summary */}
-          {mealEntries.length > 0 && (
-            <Card data-testid="card-daily-summary">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5" />
-                  Daily Summary
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid gap-4 md:grid-cols-4">
-                  {(() => {
-                    const totals = getTotalNutrition();
-                    return (
-                      <>
-                        <div className="text-center">
-                          <p className="text-2xl font-bold text-primary">{totals.calories}</p>
-                          <p className="text-sm text-gray-600">Calories</p>
-                        </div>
-                        <div className="text-center">
-                          <p className="text-2xl font-bold text-blue-600">{Math.round(totals.protein)}g</p>
-                          <p className="text-sm text-gray-600">Protein</p>
-                        </div>
-                        <div className="text-center">
-                          <p className="text-2xl font-bold text-green-600">{Math.round(totals.carbs)}g</p>
-                          <p className="text-sm text-gray-600">Carbs</p>
-                        </div>
-                        <div className="text-center">
-                          <p className="text-2xl font-bold text-orange-600">{Math.round(totals.fat)}g</p>
-                          <p className="text-sm text-gray-600">Fat</p>
-                        </div>
-                      </>
-                    );
-                  })()}
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Meal History by Type */}
-          <div className="grid gap-6">
-            {['breakfast', 'lunch', 'dinner', 'snack'].map((mealType) => {
-              const meals = getMealsByType(mealType);
-              return (
-                <Card key={mealType} data-testid={`card-${mealType}-meals`}>
-                  <CardHeader>
-                    <CardTitle className="capitalize">
-                      {mealType === 'breakfast' && '🌅'} 
-                      {mealType === 'lunch' && '☀️'} 
-                      {mealType === 'dinner' && '🌙'} 
-                      {mealType === 'snack' && '🍎'} 
-                      {' '}{mealType}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {meals.length > 0 ? (
-                      <div className="space-y-4">
-                        {meals.map((meal) => (
-                          <div key={meal.id} className="flex justify-between items-start p-4 border rounded-lg">
-                            <div>
-                              <h4 className="font-medium">{meal.mealName}</h4>
-                              {meal.description && (
-                                <p className="text-sm text-gray-600 mt-1">{meal.description}</p>
-                              )}
-                            </div>
-                            <div className="text-right">
-                              <p className="font-semibold">{meal.totalCalories} cal</p>
-                              <p className="text-xs text-gray-500">
-                                P: {meal.protein}g | C: {meal.carbs}g | F: {meal.fat}g
-                              </p>
-                            </div>
-                          </div>
-                        ))}
+            {/* Analysis Results */}
+            {analysisResult && (
+              <Card data-testid="card-analysis-results" className="bg-black/90 border-red-600/50 shadow-2xl">
+                <CardHeader className="border-b border-red-800/30">
+                  <CardTitle className="flex items-center justify-between text-white">
+                    <span className="flex items-center gap-2">
+                      <div className="p-1 bg-green-600 rounded">
+                        <TrendingUp className="w-4 h-4 text-white" />
                       </div>
+                      Nutritional Analysis
+                    </span>
+                    <Badge className="bg-red-600 text-white hover:bg-red-700">
+                      {Math.round(analysisResult.confidence * 100)}% confidence
+                    </Badge>
+                  </CardTitle>
+                  <CardDescription className="text-gray-300">{analysisResult.description}</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6 p-6">
+                  {/* Food Name Edit Section */}
+                  <div className="space-y-3">
+                    <Label htmlFor="meal-name-edit" className="text-white font-semibold">Product Name</Label>
+                    <Input
+                      id="meal-name-edit"
+                      value={editingMealName}
+                      onChange={(e) => setEditingMealName(e.target.value)}
+                      placeholder="Enter product name"
+                      data-testid="input-meal-name-edit"
+                      className="font-medium bg-gray-900 border-red-800/30 text-white hover:border-red-600 focus:border-red-500"
+                    />
+                    <p className="text-sm text-gray-400">
+                      Customize the product name before saving to your diary
+                    </p>
+                  </div>
+
+                  <div className="grid gap-6 md:grid-cols-2">
+                    <div className="bg-gray-900/50 rounded-lg p-4 border border-red-800/20">
+                      <h3 className="font-semibold mb-4 text-white flex items-center gap-2">
+                        <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                        Macronutrients
+                      </h3>
+                      <Table>
+                        <TableHeader>
+                          <TableRow className="border-red-800/20">
+                            <TableHead className="text-gray-300">Nutrient</TableHead>
+                            <TableHead className="text-gray-300">Amount</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          <TableRow className="border-red-800/10">
+                            <TableCell className="text-gray-300">Calories</TableCell>
+                            <TableCell className="font-medium text-red-400">{analysisResult.totalCalories} kcal</TableCell>
+                          </TableRow>
+                          <TableRow className="border-red-800/10">
+                            <TableCell className="text-gray-300">Protein</TableCell>
+                            <TableCell className="text-white">{analysisResult.protein}g</TableCell>
+                          </TableRow>
+                          <TableRow className="border-red-800/10">
+                            <TableCell className="text-gray-300">Carbohydrates</TableCell>
+                            <TableCell className="text-white">{analysisResult.carbs}g</TableCell>
+                          </TableRow>
+                          <TableRow className="border-red-800/10">
+                            <TableCell className="text-gray-300">Fat</TableCell>
+                            <TableCell className="text-white">{analysisResult.fat}g</TableCell>
+                          </TableRow>
+                        </TableBody>
+                      </Table>
+                    </div>
+
+                    <div className="bg-gray-900/50 rounded-lg p-4 border border-red-800/20">
+                      <h3 className="font-semibold mb-4 text-white flex items-center gap-2">
+                        <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                        Additional Details
+                      </h3>
+                      <Table>
+                        <TableBody>
+                          <TableRow className="border-red-800/10">
+                            <TableCell className="text-gray-300">Fiber</TableCell>
+                            <TableCell className="text-white">{analysisResult.fiber}g</TableCell>
+                          </TableRow>
+                          <TableRow className="border-red-800/10">
+                            <TableCell className="text-gray-300">Sugar</TableCell>
+                            <TableCell className="text-white">{analysisResult.sugar}g</TableCell>
+                          </TableRow>
+                          <TableRow className="border-red-800/10">
+                            <TableCell className="text-gray-300">Sodium</TableCell>
+                            <TableCell className="text-white">{analysisResult.sodium}mg</TableCell>
+                          </TableRow>
+                        </TableBody>
+                      </Table>
+                    </div>
+                  </div>
+
+                  <Button
+                    onClick={handleSaveMeal}
+                    disabled={saveMutation.isPending}
+                    className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold py-3 rounded-lg shadow-lg transform hover:scale-105 transition-all duration-200"
+                    data-testid="button-save-meal"
+                  >
+                    {saveMutation.isPending ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Saving to Diary...
+                      </>
                     ) : (
-                      <p className="text-gray-500 text-center py-4">No {mealType} logged yet</p>
+                      <>
+                        <Apple className="mr-2 h-4 w-4" />
+                        Save to Diary
+                      </>
                     )}
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
+                  </Button>
+              </CardContent>
+            </Card>
+          )}
         </TabsContent>
-      </Tabs>
-      
-      {/* Barcode Scanner Modal */}
-      <BarcodeScanner
-        isOpen={isScannerOpen}
-        onScan={handleBarcodeScanned}
-        onClose={() => setIsScannerOpen(false)}
-      />
+
+          <TabsContent value="history" className="space-y-6">
+            <div className="flex items-center gap-4 p-4 bg-black/60 rounded-lg border border-red-800/30">
+              <div className="flex items-center gap-3">
+                <div className="p-1 bg-red-600 rounded">
+                  <Calendar className="w-5 h-5 text-white" />
+                </div>
+                <Label htmlFor="date-select" className="text-white font-semibold">Select Date:</Label>
+              </div>
+              <Input
+                id="date-select"
+                type="date"
+                value={selectedDate}
+                onChange={(e) => setSelectedDate(e.target.value)}
+                className="w-auto bg-gray-900 border-red-800/30 text-white hover:border-red-600 focus:border-red-500"
+                data-testid="input-date-select"
+              />
+            </div>
+
+            {/* Daily Summary */}
+            {mealEntries.length > 0 && (
+              <Card data-testid="card-daily-summary" className="bg-black/90 border-red-600/50 shadow-2xl">
+                <CardHeader className="border-b border-red-800/30">
+                  <CardTitle className="flex items-center gap-2 text-white">
+                    <div className="p-1 bg-red-600 rounded">
+                      <TrendingUp className="w-5 h-5 text-white" />
+                    </div>
+                    Daily Nutrition Summary
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-6">
+                  <div className="grid gap-6 md:grid-cols-4">
+                    {(() => {
+                      const totals = getTotalNutrition();
+                      return (
+                        <>
+                          <div className="text-center bg-gray-900/50 p-4 rounded-lg border border-red-800/20">
+                            <p className="text-3xl font-bold text-red-400 mb-1">{totals.calories}</p>
+                            <p className="text-sm text-gray-300 font-medium">Calories</p>
+                          </div>
+                          <div className="text-center bg-gray-900/50 p-4 rounded-lg border border-red-800/20">
+                            <p className="text-3xl font-bold text-blue-400 mb-1">{Math.round(totals.protein)}g</p>
+                            <p className="text-sm text-gray-300 font-medium">Protein</p>
+                          </div>
+                          <div className="text-center bg-gray-900/50 p-4 rounded-lg border border-red-800/20">
+                            <p className="text-3xl font-bold text-green-400 mb-1">{Math.round(totals.carbs)}g</p>
+                            <p className="text-sm text-gray-300 font-medium">Carbs</p>
+                          </div>
+                          <div className="text-center bg-gray-900/50 p-4 rounded-lg border border-red-800/20">
+                            <p className="text-3xl font-bold text-orange-400 mb-1">{Math.round(totals.fat)}g</p>
+                            <p className="text-sm text-gray-300 font-medium">Fat</p>
+                          </div>
+                        </>
+                      );
+                    })()}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Meal History by Type */}
+            <div className="grid gap-6">
+              {['breakfast', 'lunch', 'dinner', 'snack'].map((mealType) => {
+                const meals = getMealsByType(mealType);
+                return (
+                  <Card key={mealType} data-testid={`card-${mealType}-meals`} className="bg-black/80 border-red-800/30 shadow-xl">
+                    <CardHeader className="border-b border-red-800/20">
+                      <CardTitle className="capitalize text-white flex items-center gap-2">
+                        <span className="text-xl">
+                          {mealType === 'breakfast' && '🌅'} 
+                          {mealType === 'lunch' && '☀️'} 
+                          {mealType === 'dinner' && '🌙'} 
+                          {mealType === 'snack' && '🍎'}
+                        </span>
+                        <span className="font-semibold">{mealType}</span>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-6">
+                      {meals.length > 0 ? (
+                        <div className="space-y-4">
+                          {meals.map((meal) => (
+                            <div key={meal.id} className="flex justify-between items-start p-4 bg-gray-900/50 border border-red-800/20 rounded-lg hover:border-red-600/40 transition-colors">
+                              <div>
+                                <h4 className="font-medium text-white">{meal.mealName}</h4>
+                                {meal.description && (
+                                  <p className="text-sm text-gray-400 mt-1">{meal.description}</p>
+                                )}
+                              </div>
+                              <div className="text-right">
+                                <p className="font-semibold text-red-400">{meal.totalCalories} cal</p>
+                                <p className="text-xs text-gray-400">
+                                  P: {meal.protein}g | C: {meal.carbs}g | F: {meal.fat}g
+                                </p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="text-center py-8">
+                          <div className="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <span className="text-2xl opacity-50">
+                              {mealType === 'breakfast' && '🌅'} 
+                              {mealType === 'lunch' && '☀️'} 
+                              {mealType === 'dinner' && '🌙'} 
+                              {mealType === 'snack' && '🍎'}
+                            </span>
+                          </div>
+                          <p className="text-gray-400 text-center">No {mealType} logged yet</p>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+        </TabsContent>
+        </Tabs>
+        
+        {/* Barcode Scanner Modal */}
+        <BarcodeScanner
+          isOpen={isScannerOpen}
+          onScan={handleBarcodeScanned}
+          onClose={() => setIsScannerOpen(false)}
+        />
+      </div>
     </div>
   );
 }
