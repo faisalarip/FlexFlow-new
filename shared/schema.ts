@@ -28,6 +28,7 @@ export const users = pgTable("users", {
   authProvider: varchar("auth_provider").default("local"), // 'local', 'replit'
   isEmailVerified: boolean("is_email_verified").default(false),
   streak: integer("streak").notNull().default(0),
+  lastWorkoutDate: timestamp("last_workout_date"),
   subscriptionStatus: varchar("subscription_status").default("free_trial"), // free_trial, active, inactive, expired
   subscriptionStartDate: timestamp("subscription_start_date"),
   lastPaymentDate: timestamp("last_payment_date"),

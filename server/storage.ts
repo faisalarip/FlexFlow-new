@@ -545,9 +545,33 @@ export class MemStorage implements IStorage {
     return undefined;
   }
 
+  async updateUserStreakAndDate(id: string, streak: number, lastWorkoutDate: Date): Promise<User | undefined> {
+    const user = this.users.get(id);
+    if (user) {
+      const updatedUser = { ...user, streak, lastWorkoutDate };
+      this.users.set(id, updatedUser);
+      return updatedUser;
+    }
+    return undefined;
+  }
+
   async calculateUserStreak(userId: string): Promise<number> {
     const userWorkouts = await this.getWorkouts(userId);
+    const user = this.users.get(userId);
+    
     if (userWorkouts.length === 0) return 0;
+
+    // Check if more than 24 hours have passed since last workout
+    if (user?.lastWorkoutDate) {
+      const now = new Date();
+      const lastWorkout = new Date(user.lastWorkoutDate);
+      const hoursSinceLastWorkout = (now.getTime() - lastWorkout.getTime()) / (1000 * 60 * 60);
+      
+      // If more than 24 hours have passed since last workout, reset streak
+      if (hoursSinceLastWorkout > 24) {
+        return 0;
+      }
+    }
 
     // Sort workouts by date (newest first)
     const sortedWorkouts = userWorkouts.sort((a, b) => b.date.getTime() - a.date.getTime());
@@ -1000,9 +1024,9 @@ export class MemStorage implements IStorage {
     };
     this.workouts.set(id, workout);
     
-    // Recalculate and update user streak after adding workout
+    // Update user's last workout date and recalculate streak
     const newStreak = await this.calculateUserStreak(insertWorkout.userId);
-    await this.updateUserStreak(insertWorkout.userId, newStreak);
+    await this.updateUserStreakAndDate(insertWorkout.userId, newStreak, workout.date);
     
     return workout;
   }
