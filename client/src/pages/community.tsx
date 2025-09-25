@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { MessageSquare, Heart, Trophy, Dumbbell, Send, Target, Clock, Sparkles, Zap, Users, TrendingUp, Image, Upload } from "lucide-react";
+import { MessageSquare, Heart, Trophy, Dumbbell, Send, Target, Clock, Sparkles, Zap, Users, TrendingUp, Image, Upload, ThumbsDown, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -10,6 +10,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { ObjectUploader } from "@/components/ObjectUploader";
+import { useNewAuth } from "@/hooks/useNewAuth";
 import type { CommunityPostWithUser } from "@shared/schema";
 import type { UploadResult } from "@uppy/core";
 
@@ -21,6 +22,7 @@ export default function Community() {
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { user: currentUser } = useNewAuth();
 
   const { data: posts = [], isLoading } = useQuery<CommunityPostWithUser[]>({
     queryKey: ["/api/community/posts"],
@@ -51,6 +53,37 @@ export default function Community() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/community/posts"] });
+    }
+  });
+
+  const dislikeMutation = useMutation({
+    mutationFn: async (postId: string) => {
+      const response = await apiRequest("POST", `/api/community/posts/${postId}/dislike`);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/community/posts"] });
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Failed to dislike post", variant: "destructive" });
+    }
+  });
+
+  const deletePostMutation = useMutation({
+    mutationFn: async (postId: string) => {
+      const response = await apiRequest("DELETE", `/api/community/posts/${postId}`);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/community/posts"] });
+      toast({ title: "Post deleted", description: "Your post has been deleted successfully." });
+    },
+    onError: (error: any) => {
+      toast({ 
+        title: "Error", 
+        description: error.message || "Failed to delete post", 
+        variant: "destructive" 
+      });
     }
   });
 
@@ -109,6 +142,16 @@ export default function Community() {
 
   const handleLike = (postId: string) => {
     likeMutation.mutate(postId);
+  };
+
+  const handleDislike = (postId: string) => {
+    dislikeMutation.mutate(postId);
+  };
+
+  const handleDeletePost = (postId: string) => {
+    if (confirm("Are you sure you want to delete this post? This action cannot be undone.")) {
+      deletePostMutation.mutate(postId);
+    }
   };
 
   const formatTimeAgo = (date: string) => {
