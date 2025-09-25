@@ -16,7 +16,7 @@ import pullUpExerciseImage from "@assets/generated_images/Black_man_performing_p
 import chinUpExerciseImage from "@assets/generated_images/Black_man_and_woman_chin-ups_7848bb87.png";
 import dipExerciseImage from "@assets/generated_images/Man_and_woman_dips_e6984611.png";
 import overheadPressImage from "@assets/generated_images/Man_and_woman_overhead_press_0abad494.png";
-import bicepCurlsImage from "@assets/stock_images/black_woman_performi_641aeb43.jpg";
+import bicepCurlsImage from "@assets/generated_images/Man_and_woman_dumbbell_curls_f43bb36e.png";
 import dumbbellFlyesImage from "@assets/stock_images/black_man_performing_a73f31ab.jpg";
 import dumbbellRollsImage from "@assets/stock_images/black_woman_performi_21123039.jpg";
 import tricepExtensionsImage from "@assets/generated_images/Black_guy_and_lady_tricep_extensions_3cce0d7d.png";
