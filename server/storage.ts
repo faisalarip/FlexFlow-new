@@ -68,12 +68,15 @@ import {
   type PlannedWorkout,
   type InsertPlannedWorkout,
   type MealEntry,
-  type InsertMealEntry
+  type InsertMealEntry,
+  type ProgressPhoto,
+  type InsertProgressPhoto,
+  type ProgressPhotoWithWorkout
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 import * as bcrypt from "bcrypt";
 import { db } from "./db";
-import { users, communityPosts, workouts } from "@shared/schema";
+import { users, communityPosts, workouts, progressPhotos } from "@shared/schema";
 import { eq, or, desc, sql, and } from "drizzle-orm";
 
 export interface IStorage {
@@ -192,6 +195,14 @@ export interface IStorage {
   dislikeCommunityPost(postId: string): Promise<CommunityPost | undefined>;
   deleteCommunityPost(postId: string, userId: string): Promise<boolean>;
 
+  // Progress Photos
+  getProgressPhotos(userId: string, limit?: number): Promise<ProgressPhotoWithWorkout[]>;
+  createProgressPhoto(photo: InsertProgressPhoto): Promise<ProgressPhoto>;
+  getProgressPhoto(id: string): Promise<ProgressPhoto | undefined>;
+  updateProgressPhoto(id: string, updates: Partial<ProgressPhoto>): Promise<ProgressPhoto | undefined>;
+  deleteProgressPhoto(id: string, userId: string): Promise<boolean>;
+  getProgressPhotosByDateRange(userId: string, startDate: Date, endDate: Date): Promise<ProgressPhotoWithWorkout[]>;
+
   // Meal Plans
   getMealPlans(goal?: string): Promise<MealPlanWithDetails[]>;
   getMealPlan(id: string): Promise<MealPlanWithDetails | undefined>;
@@ -274,6 +285,7 @@ export class MemStorage implements IStorage {
   private mileTrackerSessions: Map<string, MileTrackerSession> = new Map();
   private mileTrackerSplits: Map<string, MileTrackerSplit> = new Map();
   private communityPosts: Map<string, CommunityPost> = new Map();
+  private progressPhotos: Map<string, ProgressPhoto> = new Map();
   private mealPlans: Map<string, MealPlan> = new Map();
   private mealPlanDays: Map<string, MealPlanDay> = new Map();
   private mealPlanMeals: Map<string, MealPlanMeal> = new Map();
@@ -1731,6 +1743,88 @@ export class MemStorage implements IStorage {
 
     this.communityPosts.delete(postId);
     return true;
+  }
+
+  // Progress Photos
+  async getProgressPhotos(userId: string, limit: number = 50): Promise<ProgressPhotoWithWorkout[]> {
+    const photos = Array.from(this.progressPhotos.values())
+      .filter(photo => photo.userId === userId)
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .slice(0, limit);
+
+    const photosWithWorkouts: ProgressPhotoWithWorkout[] = [];
+    for (const photo of photos) {
+      const workout = photo.workoutId ? this.workouts.get(photo.workoutId) : undefined;
+      photosWithWorkouts.push({
+        ...photo,
+        workout: workout ? {
+          id: workout.id,
+          name: workout.name,
+          category: workout.category,
+          date: workout.date,
+        } : undefined,
+      });
+    }
+
+    return photosWithWorkouts;
+  }
+
+  async createProgressPhoto(photo: InsertProgressPhoto): Promise<ProgressPhoto> {
+    const newPhoto: ProgressPhoto = {
+      id: randomUUID(),
+      ...photo,
+      createdAt: new Date(),
+    };
+    
+    this.progressPhotos.set(newPhoto.id, newPhoto);
+    return newPhoto;
+  }
+
+  async getProgressPhoto(id: string): Promise<ProgressPhoto | undefined> {
+    return this.progressPhotos.get(id);
+  }
+
+  async updateProgressPhoto(id: string, updates: Partial<ProgressPhoto>): Promise<ProgressPhoto | undefined> {
+    const photo = this.progressPhotos.get(id);
+    if (!photo) return undefined;
+
+    const updatedPhoto = { ...photo, ...updates };
+    this.progressPhotos.set(id, updatedPhoto);
+    return updatedPhoto;
+  }
+
+  async deleteProgressPhoto(id: string, userId: string): Promise<boolean> {
+    const photo = this.progressPhotos.get(id);
+    if (!photo || photo.userId !== userId) return false;
+
+    this.progressPhotos.delete(id);
+    return true;
+  }
+
+  async getProgressPhotosByDateRange(userId: string, startDate: Date, endDate: Date): Promise<ProgressPhotoWithWorkout[]> {
+    const photos = Array.from(this.progressPhotos.values())
+      .filter(photo => 
+        photo.userId === userId &&
+        new Date(photo.createdAt) >= startDate &&
+        new Date(photo.createdAt) <= endDate
+      )
+      .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+
+    const photosWithWorkouts: ProgressPhotoWithWorkout[] = [];
+    for (const photo of photos) {
+      const workout = photo.workoutId ? this.workouts.get(photo.workoutId) : undefined;
+      photosWithWorkouts.push({
+        ...photo,
+        workout: workout ? {
+          id: workout.id,
+          name: workout.name,
+          category: workout.category,
+          date: workout.date,
+        } : undefined,
+      });
+    }
+
+    return photosWithWorkouts;
   }
 
   // Meal Plans
@@ -3312,6 +3406,166 @@ export class DatabaseStorage implements IStorage {
       throw error;
     }
   }
+
+  // Progress Photos
+  async getProgressPhotos(userId: string, limit: number = 50): Promise<ProgressPhotoWithWorkout[]> {
+    try {
+      const photos = await db
+        .select()
+        .from(progressPhotos)
+        .where(eq(progressPhotos.userId, userId))
+        .orderBy(desc(progressPhotos.createdAt))
+        .limit(limit);
+
+      const photosWithWorkouts: ProgressPhotoWithWorkout[] = [];
+      
+      for (const photo of photos) {
+        let workout = undefined;
+        if (photo.workoutId) {
+          const [workoutData] = await db
+            .select()
+            .from(workouts)
+            .where(eq(workouts.id, photo.workoutId));
+          
+          if (workoutData) {
+            workout = {
+              id: workoutData.id,
+              name: workoutData.name,
+              category: workoutData.category,
+              date: workoutData.date,
+            };
+          }
+        }
+
+        photosWithWorkouts.push({
+          ...photo,
+          workout,
+        });
+      }
+
+      console.log(`Returning ${photosWithWorkouts.length} progress photos from database`);
+      return photosWithWorkouts;
+    } catch (error) {
+      console.error("Error getting progress photos from database:", error);
+      throw error;
+    }
+  }
+
+  async createProgressPhoto(photo: InsertProgressPhoto): Promise<ProgressPhoto> {
+    try {
+      const [newPhoto] = await db
+        .insert(progressPhotos)
+        .values(photo)
+        .returning();
+      
+      console.log(`Created progress photo with ID: ${newPhoto.id}`);
+      return newPhoto;
+    } catch (error) {
+      console.error("Error creating progress photo in database:", error);
+      throw error;
+    }
+  }
+
+  async getProgressPhoto(id: string): Promise<ProgressPhoto | undefined> {
+    try {
+      const [photo] = await db
+        .select()
+        .from(progressPhotos)
+        .where(eq(progressPhotos.id, id));
+      
+      return photo;
+    } catch (error) {
+      console.error("Error getting progress photo from database:", error);
+      throw error;
+    }
+  }
+
+  async updateProgressPhoto(id: string, updates: Partial<ProgressPhoto>): Promise<ProgressPhoto | undefined> {
+    try {
+      const [updatedPhoto] = await db
+        .update(progressPhotos)
+        .set(updates)
+        .where(eq(progressPhotos.id, id))
+        .returning();
+      
+      if (updatedPhoto) {
+        console.log(`Updated progress photo with ID: ${id}`);
+      }
+      return updatedPhoto;
+    } catch (error) {
+      console.error("Error updating progress photo in database:", error);
+      throw error;
+    }
+  }
+
+  async deleteProgressPhoto(id: string, userId: string): Promise<boolean> {
+    try {
+      const result = await db
+        .delete(progressPhotos)
+        .where(and(eq(progressPhotos.id, id), eq(progressPhotos.userId, userId)))
+        .returning();
+      
+      const deleted = result.length > 0;
+      if (deleted) {
+        console.log(`Deleted progress photo with ID: ${id}`);
+      } else {
+        console.log(`Failed to delete progress photo with ID: ${id} (not found or unauthorized)`);
+      }
+      
+      return deleted;
+    } catch (error) {
+      console.error("Error deleting progress photo in database:", error);
+      throw error;
+    }
+  }
+
+  async getProgressPhotosByDateRange(userId: string, startDate: Date, endDate: Date): Promise<ProgressPhotoWithWorkout[]> {
+    try {
+      const photos = await db
+        .select()
+        .from(progressPhotos)
+        .where(
+          and(
+            eq(progressPhotos.userId, userId),
+            sql`${progressPhotos.createdAt} >= ${startDate}`,
+            sql`${progressPhotos.createdAt} <= ${endDate}`
+          )
+        )
+        .orderBy(progressPhotos.createdAt);
+
+      const photosWithWorkouts: ProgressPhotoWithWorkout[] = [];
+      
+      for (const photo of photos) {
+        let workout = undefined;
+        if (photo.workoutId) {
+          const [workoutData] = await db
+            .select()
+            .from(workouts)
+            .where(eq(workouts.id, photo.workoutId));
+          
+          if (workoutData) {
+            workout = {
+              id: workoutData.id,
+              name: workoutData.name,
+              category: workoutData.category,
+              date: workoutData.date,
+            };
+          }
+        }
+
+        photosWithWorkouts.push({
+          ...photo,
+          workout,
+        });
+      }
+
+      return photosWithWorkouts;
+    } catch (error) {
+      console.error("Error getting progress photos by date range from database:", error);
+      throw error;
+    }
+  }
+
   async getMealPlans(goal?: string): Promise<MealPlanWithDetails[]> { return this.memStorage.getMealPlans(goal); }
   async getMealPlan(id: string): Promise<MealPlanWithDetails | undefined> { return this.memStorage.getMealPlan(id); }
   async createMealPlan(mealPlan: InsertMealPlan): Promise<MealPlan> { return this.memStorage.createMealPlan(mealPlan); }
