@@ -19,6 +19,7 @@ import Subscribe from "@/pages/subscribe";
 import Settings from "@/pages/settings";
 import Workouts from "@/pages/workouts";
 import Progress from "@/pages/progress";
+import ProgressPhotos from "@/pages/progress-photos";
 import Calendar from "@/pages/calendar";
 import NotFound from "@/pages/not-found";
 import Navbar from "@/components/navbar";
@@ -80,6 +81,7 @@ function Router() {
             <Route path="/settings" component={Settings} />
             <Route path="/workouts" component={Workouts} />
             <Route path="/progress" component={Progress} />
+            <Route path="/progress-photos" component={ProgressPhotos} />
             <Route path="/calendar" component={Calendar} />
             <Route path="/checkout" component={Checkout} />
             <Route path="/subscribe" component={Subscribe} />

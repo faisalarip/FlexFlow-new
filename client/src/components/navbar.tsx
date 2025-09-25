@@ -58,6 +58,11 @@ export default function Navbar() {
       icon: Apple 
     },
     { 
+      path: "/progress-photos", 
+      label: "Progress Photos", 
+      icon: Camera 
+    },
+    { 
       path: "/settings", 
       label: "Settings", 
       icon: Settings 
