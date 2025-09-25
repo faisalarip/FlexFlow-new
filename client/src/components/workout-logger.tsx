@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Search, Expand, Hand, Activity, ArrowUpDown, Leaf, Weight, Bike, Dumbbell, X, Play, Star, TrendingUp } from "lucide-react";
+import { Search, Expand, Hand, Activity, ArrowUpDown, Leaf, Weight, Bike, Dumbbell, X, Play, Star, TrendingUp, Camera, CheckCircle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -48,6 +48,8 @@ export default function WorkoutLogger() {
   const [workoutDuration, setWorkoutDuration] = useState([30]);
   const [showWorkoutForm, setShowWorkoutForm] = useState(false);
   const [expandedDemo, setExpandedDemo] = useState<string | null>(null);
+  const [showProgressPhotoPrompt, setShowProgressPhotoPrompt] = useState(false);
+  const [lastCompletedWorkout, setLastCompletedWorkout] = useState<any>(null);
   const [, setLocation] = useLocation();
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -166,9 +168,13 @@ export default function WorkoutLogger() {
       const response = await apiRequest("POST", "/api/workouts", workout);
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (workoutData) => {
       queryClient.invalidateQueries({ queryKey: ["/api/workouts"] });
       queryClient.invalidateQueries({ queryKey: ["/api/stats"] });
+      
+      // Store completed workout data and show progress photo prompt
+      setLastCompletedWorkout(workoutData);
+      setShowProgressPhotoPrompt(true);
       toast({
         title: "Workout Logged! 🔥",
         description: "Your workout has been successfully recorded with AI difficulty tracking.",
@@ -1634,6 +1640,71 @@ export default function WorkoutLogger() {
                 >
                   Cancel
                 </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Progress Photo Prompt Modal */}
+      {showProgressPhotoPrompt && lastCompletedWorkout && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+            <div className="p-6">
+              {/* Header */}
+              <div className="text-center mb-6">
+                <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
+                  <CheckCircle className="w-8 h-8 text-green-600" />
+                </div>
+                <h2 className="text-2xl font-bold text-gray-800 mb-2">Workout Complete! 🎉</h2>
+                <p className="text-gray-600">
+                  Great job on completing "{lastCompletedWorkout.name}"! 
+                  Want to capture your progress with a photo?
+                </p>
+              </div>
+
+              {/* Workout Summary */}
+              <div className="bg-gray-50 rounded-lg p-4 mb-6">
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div className="text-center">
+                    <div className="font-semibold text-gray-800">{lastCompletedWorkout.duration} min</div>
+                    <div className="text-gray-600">Duration</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="font-semibold text-gray-800">{lastCompletedWorkout.caloriesBurned} kcal</div>
+                    <div className="text-gray-600">Calories</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="space-y-3">
+                <Button
+                  onClick={() => {
+                    setShowProgressPhotoPrompt(false);
+                    setLocation("/progress-photos");
+                  }}
+                  className="w-full bg-red-600 hover:bg-red-700 text-white"
+                  data-testid="button-add-progress-photo"
+                >
+                  <Camera className="mr-2 h-4 w-4" />
+                  Take Progress Photo
+                </Button>
+                <Button
+                  onClick={() => setShowProgressPhotoPrompt(false)}
+                  variant="outline"
+                  className="w-full"
+                  data-testid="button-skip-photo"
+                >
+                  Skip for Now
+                </Button>
+              </div>
+
+              {/* Tip */}
+              <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+                <p className="text-sm text-blue-700">
+                  💡 <strong>Tip:</strong> Regular progress photos help you see changes that the scale might not show!
+                </p>
               </div>
             </div>
           </div>
