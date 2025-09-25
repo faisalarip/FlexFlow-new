@@ -1516,6 +1516,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Dislike a community post
+  app.post("/api/community/posts/:id/dislike", async (req, res) => {
+    try {
+      const post = await storage.dislikeCommunityPost(req.params.id);
+      if (!post) {
+        return res.status(404).json({ message: "Post not found" });
+      }
+      res.json(post);
+    } catch (error) {
+      console.error("Error disliking community post:", error);
+      res.status(500).json({ message: "Failed to dislike post" });
+    }
+  });
+
+  // Delete a community post (only by the post author)
+  app.delete("/api/community/posts/:id", authenticateToken, async (req, res) => {
+    try {
+      const userId = getAuthUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      
+      const deleted = await storage.deleteCommunityPost(req.params.id, userId);
+      if (!deleted) {
+        return res.status(403).json({ message: "You can only delete your own posts" });
+      }
+      
+      res.status(200).json({ message: "Post deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting community post:", error);
+      res.status(500).json({ message: "Failed to delete post" });
+    }
+  });
+
   // Object Storage Routes for Community Post Images
 
   // Get upload URL for community post images
