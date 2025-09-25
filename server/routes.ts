@@ -33,6 +33,8 @@ import { generatePersonalizedMealPlan, generateWeeklyMealPlan } from "./mealPlan
 import { autoDifficultyAdjuster } from "./auto-difficulty-adjuster";
 import { authService } from "./auth-service";
 import { authenticateToken, optionalAuth, getCurrentUserId as getAuthUserId } from "./auth-middleware";
+import { requireFeatureAccess } from "./services/subscription.js";
+import { PREMIUM_FEATURES } from "@shared/schema";
 import { signUpSchema, signInSchema } from "@shared/schema";
 import { ActivityLogger } from "./activity-logger";
 
@@ -1359,7 +1361,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Mile Tracker Routes
 
   // Get all mile tracker sessions for user
-  app.get("/api/mile-tracker/sessions", authenticateToken, async (req, res) => {
+  app.get("/api/mile-tracker/sessions", authenticateToken, requireFeatureAccess(PREMIUM_FEATURES.MILE_TRACKER), async (req, res) => {
     try {
       const userId = getAuthUserId(req);
       if (!userId) {
@@ -1374,7 +1376,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get active mile tracker session
-  app.get("/api/mile-tracker/sessions/active", authenticateToken, async (req, res) => {
+  app.get("/api/mile-tracker/sessions/active", authenticateToken, requireFeatureAccess(PREMIUM_FEATURES.MILE_TRACKER), async (req, res) => {
     try {
       const userId = getAuthUserId(req);
       if (!userId) {
@@ -1406,7 +1408,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Start new mile tracker session
-  app.post("/api/mile-tracker/sessions", authenticateToken, async (req, res) => {
+  app.post("/api/mile-tracker/sessions", authenticateToken, requireFeatureAccess(PREMIUM_FEATURES.MILE_TRACKER), async (req, res) => {
     try {
       const userId = getAuthUserId(req);
       if (!userId) {
@@ -1624,7 +1626,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Progress Photos Routes
 
   // Get progress photos for user
-  app.get("/api/progress-photos", authenticateToken, async (req, res) => {
+  app.get("/api/progress-photos", authenticateToken, requireFeatureAccess(PREMIUM_FEATURES.PROGRESS_PHOTOS), async (req, res) => {
     try {
       const userId = getAuthUserId(req);
       if (!userId) {
@@ -1680,7 +1682,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create new progress photo
-  app.post("/api/progress-photos", authenticateToken, async (req, res) => {
+  app.post("/api/progress-photos", authenticateToken, requireFeatureAccess(PREMIUM_FEATURES.PROGRESS_PHOTOS), async (req, res) => {
     try {
       const userId = getAuthUserId(req);
       if (!userId) {
@@ -2383,7 +2385,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Generate AI meal plan based on food preferences
-  app.post("/api/generate-personalized-meal-plan", authenticateToken, async (req, res) => {
+  app.post("/api/generate-personalized-meal-plan", authenticateToken, requireFeatureAccess(PREMIUM_FEATURES.MEAL_PLANS), async (req, res) => {
     try {
       const userId = getAuthUserId(req);
       if (!userId) {
@@ -2461,7 +2463,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Workout Planner API routes
   
   // Get user workout preferences
-  app.get("/api/workout-preferences", authenticateToken, async (req, res) => {
+  app.get("/api/workout-preferences", authenticateToken, requireFeatureAccess(PREMIUM_FEATURES.WORKOUT_PLANNER), async (req, res) => {
     try {
       const userId = getAuthUserId(req);
       if (!userId) {
@@ -2477,7 +2479,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Save user workout preferences
-  app.post("/api/workout-preferences", authenticateToken, async (req, res) => {
+  app.post("/api/workout-preferences", authenticateToken, requireFeatureAccess(PREMIUM_FEATURES.WORKOUT_PLANNER), async (req, res) => {
     try {
       const userId = getAuthUserId(req);
       if (!userId) {
@@ -2655,7 +2657,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create a new meal entry
-  app.post("/api/meal-entries", authenticateToken, async (req, res) => {
+  app.post("/api/meal-entries", authenticateToken, requireFeatureAccess(PREMIUM_FEATURES.MEAL_TRACKER), async (req, res) => {
     try {
       const userId = getAuthUserId(req);
       if (!userId) {
@@ -2672,7 +2674,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Delete a meal entry
-  app.delete("/api/meal-entries/:id", authenticateToken, async (req, res) => {
+  app.delete("/api/meal-entries/:id", authenticateToken, requireFeatureAccess(PREMIUM_FEATURES.MEAL_TRACKER), async (req, res) => {
     try {
       const userId = getAuthUserId(req);
       if (!userId) {
