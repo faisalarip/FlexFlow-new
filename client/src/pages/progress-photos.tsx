@@ -611,14 +611,60 @@ export default function ProgressPhotos() {
   );
 
   return (
-    <div className="container mx-auto p-6" data-testid="progress-photos-page">
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Progress Photos</h1>
-          <p className="text-gray-600 dark:text-gray-400">Track your transformation journey with before and after photos</p>
+    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-red-950 relative overflow-hidden" data-testid="progress-photos-page">
+      {/* Hexagonal animated background elements */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <div className="absolute top-20 left-10 w-32 h-28 opacity-20 animate-pulse" style={{animationDuration: '6s'}}>
+          <svg viewBox="0 0 120 104" className="w-full h-full">
+            <polygon points="30,2 90,2 120,52 90,102 30,102 0,52" fill="#dc2626" stroke="#dc2626" strokeWidth="2" opacity="0.3"/>
+          </svg>
         </div>
+        <div className="absolute top-40 right-16 w-24 h-21 opacity-15 animate-bounce" style={{animationDuration: '8s'}}>
+          <svg viewBox="0 0 120 104" className="w-full h-full">
+            <polygon points="30,2 90,2 120,52 90,102 30,102 0,52" fill="none" stroke="#dc2626" strokeWidth="1" opacity="0.4"/>
+          </svg>
+        </div>
+        <div className="absolute top-96 left-1/4 w-28 h-24 opacity-25 animate-ping" style={{animationDuration: '10s'}}>
+          <svg viewBox="0 0 120 104" className="w-full h-full">
+            <polygon points="30,2 90,2 120,52 90,102 30,102 0,52" fill="#000000" stroke="#dc2626" strokeWidth="2" opacity="0.6"/>
+          </svg>
+        </div>
+        <div className="absolute bottom-80 right-1/3 w-20 h-17 opacity-30 animate-bounce" style={{animationDuration: '7s'}}>
+          <svg viewBox="0 0 120 104" className="w-full h-full">
+            <polygon points="30,2 90,2 120,52 90,102 30,102 0,52" fill="#dc2626" stroke="#000000" strokeWidth="1" opacity="0.5"/>
+          </svg>
+        </div>
+        <div className="absolute bottom-40 left-20 w-36 h-31 opacity-20 animate-pulse" style={{animationDuration: '9s'}}>
+          <svg viewBox="0 0 120 104" className="w-full h-full">
+            <polygon points="30,2 90,2 120,52 90,102 30,102 0,52" fill="none" stroke="#dc2626" strokeWidth="2" opacity="0.3"/>
+          </svg>
+        </div>
+        <div className="absolute top-1/3 right-1/4 w-26 h-22 opacity-15 animate-ping" style={{animationDuration: '12s'}}>
+          <svg viewBox="0 0 120 104" className="w-full h-full">
+            <polygon points="30,2 90,2 120,52 90,102 30,102 0,52" fill="#000000" stroke="#dc2626" strokeWidth="1" opacity="0.4"/>
+          </svg>
+        </div>
+        {/* Floating emojis */}
+        <div className="absolute top-10 left-10 text-red-500/20 text-6xl">📸</div>
+        <div className="absolute bottom-10 right-10 text-red-500/20 text-6xl">🔥</div>
+        <div className="absolute top-1/2 left-20 text-red-500/15 text-5xl">💪</div>
+        <div className="absolute bottom-1/4 right-20 text-red-500/15 text-5xl">⚡</div>
+      </div>
+
+      {/* Animated background gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-r from-red-500/5 to-transparent animate-pulse"></div>
+      
+      <div className="relative z-10 container mx-auto px-6 py-8">
+        <div className="flex justify-between items-center mb-12">
+          <div>
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-red-500 to-red-300 bg-clip-text text-transparent mb-4 flex items-center">
+              <Camera className="mr-3 text-red-500" size={40} />
+              Progress Photos
+            </h1>
+            <p className="text-gray-300 text-lg">Track your transformation journey with before and after photos</p>
+          </div>
         
-        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4">
           {/* View Mode Toggle */}
           <div className="flex bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
             <Button
@@ -828,8 +874,9 @@ export default function ProgressPhotos() {
         </div>
       </div>
 
-      {/* Main Content */}
-      {viewMode === "grid" ? renderGridView() : renderComparisonView()}
+        {/* Main Content */}
+        {viewMode === "grid" ? renderGridView() : renderComparisonView()}
+      </div>
     </div>
   );
 }
