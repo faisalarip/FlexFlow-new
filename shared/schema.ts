@@ -478,6 +478,7 @@ export const communityPosts = pgTable("community_posts", {
   workoutId: varchar("workout_id").references(() => workouts.id), // optional, for workout progress posts
   imageUrl: varchar("image_url"), // optional, for posts with images
   likes: integer("likes").notNull().default(0),
+  dislikes: integer("dislikes").notNull().default(0),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -485,6 +486,7 @@ export const communityPosts = pgTable("community_posts", {
 export const insertCommunityPostSchema = createInsertSchema(communityPosts).omit({
   id: true,
   likes: true,
+  dislikes: true,
   createdAt: true,
 });
 
