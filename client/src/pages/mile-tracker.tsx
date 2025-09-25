@@ -330,22 +330,22 @@ export default function MileTracker() {
       <div className="absolute bottom-10 right-10 text-red-500/20 text-9xl">⚡</div>
       
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-5xl font-bold bg-gradient-to-r from-red-500 via-red-400 to-yellow-400 bg-clip-text text-transparent mb-2 flex items-center animate-pulse">
+        <div className="mb-8">
+          <div className="flex items-center gap-4 mb-2">
+            <h1 className="text-5xl font-bold bg-gradient-to-r from-red-500 via-red-400 to-yellow-400 bg-clip-text text-transparent flex items-center animate-pulse">
               <Flame className="mr-3 text-red-500" size={50} />
               🏁 SPEED DEMON TRACKER 🔥
             </h1>
-            <p className="text-red-300 font-bold text-lg">⚡ Unleash your inner speed demon and dominate every mile! 💨</p>
+            <Button 
+              variant="outline" 
+              onClick={() => setShowHistory(true)}
+              className="bg-gradient-to-r from-red-600 to-red-800 text-white border border-red-500 hover:from-red-700 hover:to-red-900 shadow-lg shadow-red-500/25"
+            >
+              <Trophy className="mr-2" size={16} />
+              📜 Hall of Fame
+            </Button>
           </div>
-          <Button 
-            variant="outline" 
-            onClick={() => setShowHistory(true)}
-            className="bg-gradient-to-r from-red-600 to-red-800 text-white border border-red-500 hover:from-red-700 hover:to-red-900 shadow-lg shadow-red-500/25"
-          >
-            <Trophy className="mr-2" size={16} />
-            📜 Hall of Fame
-          </Button>
+          <p className="text-red-300 font-bold text-lg">⚡ Unleash your inner speed demon and dominate every mile! 💨</p>
         </div>
 
         {!activeSession ? (
