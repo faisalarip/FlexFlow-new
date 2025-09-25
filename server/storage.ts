@@ -490,14 +490,22 @@ export class MemStorage implements IStorage {
       const user: User = {
         id: userData.id!,
         email: userData.email || null,
+        username: null,
+        passwordHash: null,
         firstName: userData.firstName || null,
         lastName: userData.lastName || null,
         profileImageUrl: userData.profileImageUrl || null,
+        authProvider: "replit",
+        isEmailVerified: false,
         streak: userData.streak || 0,
+        lastWorkoutDate: userData.lastWorkoutDate || null,
         subscriptionStatus: userData.subscriptionStatus || "free_trial",
         subscriptionStartDate: userData.subscriptionStartDate || now,
         lastPaymentDate: userData.lastPaymentDate || null,
         subscriptionExpiresAt: userData.subscriptionExpiresAt || freeTrialExpiry,
+        stripeCustomerId: null,
+        stripeSubscriptionId: null,
+        personalPlanData: null,
         createdAt: userData.createdAt || now,
         updatedAt: now,
       };
@@ -524,6 +532,7 @@ export class MemStorage implements IStorage {
       ...insertUser,
       id,
       streak: insertUser.streak || 0,
+      lastWorkoutDate: insertUser.lastWorkoutDate || null,
       subscriptionStatus: insertUser.subscriptionStatus || "free_trial",
       subscriptionStartDate: insertUser.subscriptionStartDate || now,
       lastPaymentDate: insertUser.lastPaymentDate || null,
@@ -620,6 +629,24 @@ export class MemStorage implements IStorage {
     }
 
     return streak;
+  }
+
+  // Reset streaks for users who haven't logged workouts in 24+ hours
+  async resetInactiveUserStreaks(): Promise<void> {
+    const now = new Date();
+    const users = Array.from(this.users.values());
+    
+    for (const user of users) {
+      if (user.lastWorkoutDate && user.streak > 0) {
+        const lastWorkout = new Date(user.lastWorkoutDate);
+        const hoursSinceLastWorkout = (now.getTime() - lastWorkout.getTime()) / (1000 * 60 * 60);
+        
+        // If more than 24 hours have passed since last workout, reset streak
+        if (hoursSinceLastWorkout > 24) {
+          await this.updateUserStreak(user.id, 0);
+        }
+      }
+    }
   }
 
   async getAdvancedProgressMetrics(userId: string): Promise<{
