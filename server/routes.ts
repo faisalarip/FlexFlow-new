@@ -17,6 +17,7 @@ import {
   insertMileTrackerSessionSchema,
   insertMileTrackerSplitSchema,
   insertCommunityPostSchema,
+  insertProgressPhotoSchema,
   insertMealPlanSchema,
   insertUserMealPlanSchema,
   insertPaymentSchema,
@@ -1602,6 +1603,177 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       console.error("Error setting community post image:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  // Progress Photos Routes
+
+  // Get progress photos for user
+  app.get("/api/progress-photos", authenticateToken, async (req, res) => {
+    try {
+      const userId = getAuthUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : undefined;
+      const photos = await storage.getProgressPhotos(userId, limit);
+      res.json(photos);
+    } catch (error) {
+      console.error("Error fetching progress photos:", error);
+      res.status(500).json({ message: "Failed to fetch progress photos" });
+    }
+  });
+
+  // Get progress photos by date range
+  app.get("/api/progress-photos/date-range", authenticateToken, async (req, res) => {
+    try {
+      const userId = getAuthUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      
+      const { startDate, endDate } = req.query;
+      if (!startDate || !endDate) {
+        return res.status(400).json({ message: "startDate and endDate are required" });
+      }
+      
+      const photos = await storage.getProgressPhotosByDateRange(
+        userId, 
+        new Date(startDate as string), 
+        new Date(endDate as string)
+      );
+      res.json(photos);
+    } catch (error) {
+      console.error("Error fetching progress photos by date range:", error);
+      res.status(500).json({ message: "Failed to fetch progress photos by date range" });
+    }
+  });
+
+  // Get specific progress photo
+  app.get("/api/progress-photos/:id", async (req, res) => {
+    try {
+      const photo = await storage.getProgressPhoto(req.params.id);
+      if (!photo) {
+        return res.status(404).json({ message: "Progress photo not found" });
+      }
+      res.json(photo);
+    } catch (error) {
+      console.error("Error fetching progress photo:", error);
+      res.status(500).json({ message: "Failed to fetch progress photo" });
+    }
+  });
+
+  // Create new progress photo
+  app.post("/api/progress-photos", authenticateToken, async (req, res) => {
+    try {
+      const userId = getAuthUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      
+      const data = insertProgressPhotoSchema.parse({
+        ...req.body,
+        userId: userId
+      });
+      
+      const photo = await storage.createProgressPhoto(data);
+      res.status(201).json(photo);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid progress photo data", errors: error.errors });
+      }
+      console.error("Error creating progress photo:", error);
+      res.status(500).json({ message: "Failed to create progress photo" });
+    }
+  });
+
+  // Update progress photo
+  app.put("/api/progress-photos/:id", authenticateToken, async (req, res) => {
+    try {
+      const userId = getAuthUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      
+      // First verify the photo belongs to the user
+      const existingPhoto = await storage.getProgressPhoto(req.params.id);
+      if (!existingPhoto || existingPhoto.userId !== userId) {
+        return res.status(403).json({ message: "You can only update your own progress photos" });
+      }
+      
+      const updates = req.body;
+      const updatedPhoto = await storage.updateProgressPhoto(req.params.id, updates);
+      
+      if (!updatedPhoto) {
+        return res.status(404).json({ message: "Progress photo not found" });
+      }
+      
+      res.json(updatedPhoto);
+    } catch (error) {
+      console.error("Error updating progress photo:", error);
+      res.status(500).json({ message: "Failed to update progress photo" });
+    }
+  });
+
+  // Delete progress photo (only by the photo owner)
+  app.delete("/api/progress-photos/:id", authenticateToken, async (req, res) => {
+    try {
+      const userId = getAuthUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      
+      const deleted = await storage.deleteProgressPhoto(req.params.id, userId);
+      if (!deleted) {
+        return res.status(403).json({ message: "You can only delete your own progress photos" });
+      }
+      
+      res.json({ message: "Progress photo deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting progress photo:", error);
+      res.status(500).json({ message: "Failed to delete progress photo" });
+    }
+  });
+
+  // Update progress photo with image URL after upload
+  app.put("/api/progress-photos/image-url", authenticateToken, async (req, res) => {
+    try {
+      const userId = getAuthUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      
+      const { photoId, imageURL } = req.body;
+      if (!photoId || !imageURL) {
+        return res.status(400).json({ error: "photoId and imageURL are required" });
+      }
+
+      // Verify the photo belongs to the user
+      const existingPhoto = await storage.getProgressPhoto(photoId);
+      if (!existingPhoto || existingPhoto.userId !== userId) {
+        return res.status(403).json({ message: "You can only update your own progress photos" });
+      }
+
+      const objectStorageService = new ObjectStorageService();
+      const objectPath = await objectStorageService.trySetObjectEntityAclPolicy(
+        imageURL,
+        {
+          owner: userId, // Progress photos are private to the user
+          visibility: "private",
+        },
+      );
+
+      // Update the photo with the image URL
+      const updatedPhoto = await storage.updateProgressPhoto(photoId, { imageUrl: imageURL });
+
+      res.status(200).json({
+        objectPath: objectPath,
+        photo: updatedPhoto
+      });
+    } catch (error) {
+      console.error("Error setting progress photo image:", error);
       res.status(500).json({ error: "Internal server error" });
     }
   });
