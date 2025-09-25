@@ -71,12 +71,14 @@ import {
   type InsertMealEntry,
   type ProgressPhoto,
   type InsertProgressPhoto,
-  type ProgressPhotoWithWorkout
+  type ProgressPhotoWithWorkout,
+  type SubscriptionAudit,
+  type InsertSubscriptionAudit
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 import * as bcrypt from "bcrypt";
 import { db } from "./db";
-import { users, communityPosts, workouts, progressPhotos } from "@shared/schema";
+import { users, communityPosts, workouts, progressPhotos, subscriptionAudit } from "@shared/schema";
 import { eq, or, desc, sql, and } from "drizzle-orm";
 
 export interface IStorage {
@@ -203,6 +205,9 @@ export interface IStorage {
   deleteProgressPhoto(id: string, userId: string): Promise<boolean>;
   getProgressPhotosByDateRange(userId: string, startDate: Date, endDate: Date): Promise<ProgressPhotoWithWorkout[]>;
 
+  // Subscription Audit
+  createSubscriptionAudit(audit: InsertSubscriptionAudit): Promise<SubscriptionAudit>;
+
   // Meal Plans
   getMealPlans(goal?: string): Promise<MealPlanWithDetails[]>;
   getMealPlan(id: string): Promise<MealPlanWithDetails | undefined>;
@@ -286,6 +291,7 @@ export class MemStorage implements IStorage {
   private mileTrackerSplits: Map<string, MileTrackerSplit> = new Map();
   private communityPosts: Map<string, CommunityPost> = new Map();
   private progressPhotos: Map<string, ProgressPhoto> = new Map();
+  private subscriptionAudits: Map<string, SubscriptionAudit> = new Map();
   private mealPlans: Map<string, MealPlan> = new Map();
   private mealPlanDays: Map<string, MealPlanDay> = new Map();
   private mealPlanMeals: Map<string, MealPlanMeal> = new Map();
@@ -1842,6 +1848,18 @@ export class MemStorage implements IStorage {
     }
 
     return photosWithWorkouts;
+  }
+
+  // Subscription Audit
+  async createSubscriptionAudit(audit: InsertSubscriptionAudit): Promise<SubscriptionAudit> {
+    const newAudit: SubscriptionAudit = {
+      id: randomUUID(),
+      ...audit,
+      timestamp: new Date(),
+    };
+    
+    this.subscriptionAudits.set(newAudit.id, newAudit);
+    return newAudit;
   }
 
   // Meal Plans
@@ -3579,6 +3597,22 @@ export class DatabaseStorage implements IStorage {
       return photosWithWorkouts;
     } catch (error) {
       console.error("Error getting progress photos by date range from database:", error);
+      throw error;
+    }
+  }
+
+  // Subscription Audit
+  async createSubscriptionAudit(audit: InsertSubscriptionAudit): Promise<SubscriptionAudit> {
+    try {
+      const [newAudit] = await db
+        .insert(subscriptionAudit)
+        .values(audit)
+        .returning();
+      
+      console.log(`Created subscription audit with ID: ${newAudit.id}`);
+      return newAudit;
+    } catch (error) {
+      console.error("Error creating subscription audit in database:", error);
       throw error;
     }
   }
