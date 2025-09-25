@@ -74,7 +74,7 @@ import { randomUUID } from "crypto";
 import * as bcrypt from "bcrypt";
 import { db } from "./db";
 import { users, communityPosts, workouts } from "@shared/schema";
-import { eq, or, desc, sql } from "drizzle-orm";
+import { eq, or, desc, sql, and } from "drizzle-orm";
 
 export interface IStorage {
   // Users (IMPORTANT) these user operations are mandatory for Replit Auth.
@@ -189,6 +189,8 @@ export interface IStorage {
   getCommunityPosts(limit?: number): Promise<CommunityPostWithUser[]>;
   createCommunityPost(post: InsertCommunityPost): Promise<CommunityPost>;
   likeCommunityPost(postId: string): Promise<CommunityPost | undefined>;
+  dislikeCommunityPost(postId: string): Promise<CommunityPost | undefined>;
+  deleteCommunityPost(postId: string, userId: string): Promise<boolean>;
 
   // Meal Plans
   getMealPlans(goal?: string): Promise<MealPlanWithDetails[]>;
@@ -1697,6 +1699,7 @@ export class MemStorage implements IStorage {
       id: randomUUID(),
       ...post,
       likes: 0,
+      dislikes: 0,
       createdAt: new Date(),
     };
     
@@ -1711,6 +1714,23 @@ export class MemStorage implements IStorage {
     const updatedPost = { ...post, likes: post.likes + 1 };
     this.communityPosts.set(postId, updatedPost);
     return updatedPost;
+  }
+
+  async dislikeCommunityPost(postId: string): Promise<CommunityPost | undefined> {
+    const post = this.communityPosts.get(postId);
+    if (!post) return undefined;
+
+    const updatedPost = { ...post, dislikes: post.dislikes + 1 };
+    this.communityPosts.set(postId, updatedPost);
+    return updatedPost;
+  }
+
+  async deleteCommunityPost(postId: string, userId: string): Promise<boolean> {
+    const post = this.communityPosts.get(postId);
+    if (!post || post.userId !== userId) return false;
+
+    this.communityPosts.delete(postId);
+    return true;
   }
 
   // Meal Plans
@@ -3250,6 +3270,45 @@ export class DatabaseStorage implements IStorage {
       return updatedPost;
     } catch (error) {
       console.error("Error liking community post in database:", error);
+      throw error;
+    }
+  }
+
+  async dislikeCommunityPost(postId: string): Promise<CommunityPost | undefined> {
+    try {
+      const [updatedPost] = await db
+        .update(communityPosts)
+        .set({ 
+          dislikes: sql`${communityPosts.dislikes} + 1`
+        })
+        .where(eq(communityPosts.id, postId))
+        .returning();
+      
+      console.log(`Disliked community post with ID: ${postId}, new dislikes: ${updatedPost?.dislikes}`);
+      return updatedPost;
+    } catch (error) {
+      console.error("Error disliking community post in database:", error);
+      throw error;
+    }
+  }
+
+  async deleteCommunityPost(postId: string, userId: string): Promise<boolean> {
+    try {
+      const result = await db
+        .delete(communityPosts)
+        .where(and(eq(communityPosts.id, postId), eq(communityPosts.userId, userId)))
+        .returning();
+      
+      const deleted = result.length > 0;
+      if (deleted) {
+        console.log(`Deleted community post with ID: ${postId}`);
+      } else {
+        console.log(`Failed to delete community post with ID: ${postId} (not found or unauthorized)`);
+      }
+      
+      return deleted;
+    } catch (error) {
+      console.error("Error deleting community post in database:", error);
       throw error;
     }
   }
