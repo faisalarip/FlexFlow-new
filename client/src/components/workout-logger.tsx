@@ -50,9 +50,49 @@ export default function WorkoutLogger() {
   const [expandedDemo, setExpandedDemo] = useState<string | null>(null);
   const [showProgressPhotoPrompt, setShowProgressPhotoPrompt] = useState(false);
   const [lastCompletedWorkout, setLastCompletedWorkout] = useState<any>(null);
+  
+  // Exercise-specific input states
+  const [exerciseSets, setExerciseSets] = useState(3);
+  const [exerciseReps, setExerciseReps] = useState(10);
+  const [exerciseWeight, setExerciseWeight] = useState(0);
+  const [exerciseDuration, setExerciseDuration] = useState(0);
+  const [exerciseNotes, setExerciseNotes] = useState("");
   const [, setLocation] = useLocation();
   const queryClient = useQueryClient();
   const { toast } = useToast();
+
+  // Helper function to calculate calories based on exercise details
+  const calculateExerciseCalories = (exercise: any, sets: number, reps: number, weight: number, duration: number, difficultyLevel: number) => {
+    let baseCalories = 0;
+    const exerciseName = exercise.name.toLowerCase();
+    const category = exercise.category.toLowerCase();
+
+    // Base calorie calculation by exercise category
+    if (category === 'strength') {
+      // Strength training: ~5-8 calories per minute, plus weight factor
+      baseCalories = (sets * reps * 0.5) + (weight * 0.1) + (workoutDuration[0] * 6);
+      if (exerciseName.includes('squat') || exerciseName.includes('deadlift')) {
+        baseCalories *= 1.3; // Compound movements burn more
+      }
+    } else if (category === 'cardio') {
+      // Cardio: ~8-12 calories per minute based on intensity
+      baseCalories = workoutDuration[0] * (8 + difficultyLevel * 0.8);
+      if (duration > 0) {
+        baseCalories = duration / 60 * (8 + difficultyLevel * 0.8); // Use actual duration if provided
+      }
+    } else if (category === 'yoga' || category === 'flexibility') {
+      // Yoga/Flexibility: ~3-5 calories per minute
+      baseCalories = workoutDuration[0] * (3 + difficultyLevel * 0.4);
+    } else {
+      // Default: moderate intensity
+      baseCalories = workoutDuration[0] * (5 + difficultyLevel * 0.6);
+    }
+
+    // Apply difficulty multiplier
+    baseCalories *= (0.8 + difficultyLevel * 0.1);
+    
+    return Math.round(baseCalories);
+  };
 
   // Helper function to get the appropriate demo image based on exercise name
   const getDemoImage = (exerciseName: string) => {
@@ -1035,7 +1075,9 @@ export default function WorkoutLogger() {
   };
 
   const handleSubmitWorkout = () => {
-    const estimatedCalories = Math.round(workoutDuration[0] * (2 + difficultyLevel[0] * 0.8));
+    const estimatedCalories = selectedExercise ? 
+      calculateExerciseCalories(selectedExercise, exerciseSets, exerciseReps, exerciseWeight, exerciseDuration, difficultyLevel[0]) :
+      Math.round(workoutDuration[0] * (2 + difficultyLevel[0] * 0.8));
     
     createWorkoutMutation.mutate({
       name: selectedExercise.name,
@@ -1045,6 +1087,15 @@ export default function WorkoutLogger() {
       difficultyLevel: difficultyLevel[0],
       perceivedExertion: perceivedExertion[0],
       completionRate: 100, // Default to 100% for completed workouts
+      // Include exercise details for workout exercise creation
+      exerciseData: {
+        exerciseId: selectedExercise.id,
+        sets: exerciseSets,
+        reps: exerciseReps,
+        weight: exerciseWeight || null,
+        duration: exerciseDuration > 0 ? exerciseDuration * 60 : null, // Convert minutes to seconds
+        notes: exerciseNotes || null,
+      }
     });
     
     setSelectedExercise(null);
@@ -1053,6 +1104,12 @@ export default function WorkoutLogger() {
     setDifficultyLevel([3]);
     setPerceivedExertion([5]);
     setWorkoutDuration([30]);
+    // Reset exercise-specific values
+    setExerciseSets(3);
+    setExerciseReps(10);
+    setExerciseWeight(0);
+    setExerciseDuration(0);
+    setExerciseNotes("");
   };
 
   const getDifficultyLabel = (level: number) => {
@@ -1514,11 +1571,93 @@ export default function WorkoutLogger() {
 
               {/* Workout Form */}
               <div className="space-y-6">
-                {/* Duration Slider */}
+                {/* Exercise Details Section */}
+                <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-6">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                    <Dumbbell className="w-5 h-5 text-blue-600" />
+                    Exercise Details for {selectedExercise.name}
+                  </h3>
+                  
+                  {/* Exercise Input Grid */}
+                  <div className="grid grid-cols-2 gap-4 mb-4">
+                    {/* Sets Input */}
+                    <div>
+                      <Label className="text-sm font-semibold text-gray-700">Sets</Label>
+                      <Input
+                        type="number"
+                        min="1"
+                        max="10"
+                        value={exerciseSets}
+                        onChange={(e) => setExerciseSets(parseInt(e.target.value) || 1)}
+                        className="mt-1"
+                        data-testid="input-sets"
+                      />
+                    </div>
+
+                    {/* Reps Input */}
+                    <div>
+                      <Label className="text-sm font-semibold text-gray-700">Reps per Set</Label>
+                      <Input
+                        type="number"
+                        min="1"
+                        max="100"
+                        value={exerciseReps}
+                        onChange={(e) => setExerciseReps(parseInt(e.target.value) || 1)}
+                        className="mt-1"
+                        data-testid="input-reps"
+                      />
+                    </div>
+
+                    {/* Weight Input */}
+                    <div>
+                      <Label className="text-sm font-semibold text-gray-700">Weight (lbs)</Label>
+                      <Input
+                        type="number"
+                        min="0"
+                        max="1000"
+                        value={exerciseWeight}
+                        onChange={(e) => setExerciseWeight(parseInt(e.target.value) || 0)}
+                        placeholder="0 for bodyweight"
+                        className="mt-1"
+                        data-testid="input-weight"
+                      />
+                    </div>
+
+                    {/* Exercise Duration Input */}
+                    <div>
+                      <Label className="text-sm font-semibold text-gray-700">Duration (minutes)</Label>
+                      <Input
+                        type="number"
+                        min="0"
+                        max="60"
+                        value={exerciseDuration}
+                        onChange={(e) => setExerciseDuration(parseInt(e.target.value) || 0)}
+                        placeholder="0 for rep-based"
+                        className="mt-1"
+                        data-testid="input-exercise-duration"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Exercise Notes */}
+                  <div>
+                    <Label className="text-sm font-semibold text-gray-700">Exercise Notes (optional)</Label>
+                    <Input
+                      type="text"
+                      value={exerciseNotes}
+                      onChange={(e) => setExerciseNotes(e.target.value)}
+                      placeholder="e.g., form notes, modifications, how it felt..."
+                      className="mt-1"
+                      data-testid="input-exercise-notes"
+                    />
+                  </div>
+                </div>
+
+                {/* Overall Workout Duration Slider */}
                 <div>
                   <Label className="text-base font-semibold text-gray-800 flex items-center gap-2">
                     <Activity className="w-4 h-4" />
-                    Duration: {workoutDuration[0]} minutes
+                    Total Workout Duration: {workoutDuration[0]} minutes
                   </Label>
                   <div className="mt-3">
                     <Slider
@@ -1599,12 +1738,35 @@ export default function WorkoutLogger() {
                   <div className="flex items-center justify-between">
                     <div>
                       <h3 className="font-semibold text-gray-800">Estimated Calories Burned</h3>
-                      <p className="text-sm text-gray-600">Based on duration and difficulty</p>
+                      <p className="text-sm text-gray-600">Based on sets, reps, weight, and intensity</p>
                     </div>
                     <div className="text-2xl font-bold text-red-600">
-                      {Math.round(workoutDuration[0] * (2 + difficultyLevel[0] * 0.8))} kcal
+                      {selectedExercise ? calculateExerciseCalories(selectedExercise, exerciseSets, exerciseReps, exerciseWeight, exerciseDuration, difficultyLevel[0]) : 0} kcal
                     </div>
                   </div>
+                  {/* Exercise Summary */}
+                  {selectedExercise && (
+                    <div className="mt-3 pt-3 border-t border-red-200">
+                      <div className="grid grid-cols-4 gap-2 text-xs text-gray-600">
+                        <div className="text-center">
+                          <div className="font-semibold text-gray-800">{exerciseSets}</div>
+                          <div>Sets</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="font-semibold text-gray-800">{exerciseReps}</div>
+                          <div>Reps</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="font-semibold text-gray-800">{exerciseWeight || 'BW'}</div>
+                          <div>Weight</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="font-semibold text-gray-800">{exerciseDuration || 'N/A'}</div>
+                          <div>Duration</div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* AI Features Preview */}

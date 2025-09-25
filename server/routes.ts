@@ -299,6 +299,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const workout = await storage.createWorkout(data);
 
+      // If exercise data is provided, create workout exercise entry
+      if (req.body.exerciseData) {
+        try {
+          const exerciseData = insertWorkoutExerciseSchema.parse({
+            ...req.body.exerciseData,
+            workoutId: workout.id
+          });
+          await storage.createWorkoutExercise(exerciseData);
+        } catch (exerciseError) {
+          console.error("Error creating workout exercise:", exerciseError);
+          // Continue execution - workout is created, exercise data is optional
+        }
+      }
+
       // Log workout creation activity
       await ActivityLogger.logWorkout(userId, {
         name: workout.name,
