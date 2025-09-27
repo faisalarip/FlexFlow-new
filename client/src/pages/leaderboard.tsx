@@ -13,26 +13,26 @@ export default function Leaderboard() {
       case 1:
         return (
           <div className="relative">
-            <Crown className="text-yellow-400 drop-shadow-lg animate-bounce" size={size} />
-            <div className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-300 rounded-full animate-ping"></div>
+            <Crown className="text-red-500 drop-shadow-lg animate-pulse" size={size} />
+            <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-400 rounded-full animate-ping"></div>
           </div>
         );
       case 2:
         return (
           <div className="relative">
-            <Trophy className="text-gray-400 drop-shadow-md" size={size} />
-            <Sparkles className="absolute -top-1 -right-1 w-3 h-3 text-gray-300 animate-pulse" />
+            <Trophy className="text-red-400 drop-shadow-md" size={size} />
+            <Sparkles className="absolute -top-1 -right-1 w-3 h-3 text-red-300 animate-pulse" />
           </div>
         );
       case 3:
         return (
           <div className="relative">
-            <Medal className="text-amber-600 drop-shadow-md" size={size} />
-            <Star className="absolute -top-1 -right-1 w-3 h-3 text-amber-400 animate-pulse" />
+            <Medal className="text-red-300 drop-shadow-md" size={size} />
+            <Star className="absolute -top-1 -right-1 w-3 h-3 text-red-200 animate-pulse" />
           </div>
         );
       default:
-        return <div className="w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center text-sm font-bold text-gray-600">
+        return <div className="w-6 h-6 bg-gray-800 rounded-full flex items-center justify-center text-sm font-bold text-white border border-red-800">
           {rank}
         </div>;
     }
@@ -41,13 +41,13 @@ export default function Leaderboard() {
   const getRankBgColor = (rank: number) => {
     switch (rank) {
       case 1:
-        return "bg-gradient-to-br from-yellow-100 via-yellow-200 to-yellow-300 border-yellow-400 shadow-yellow-200/50";
+        return "bg-gradient-to-br from-red-950 via-red-900 to-black border-red-500 shadow-red-500/30";
       case 2:
-        return "bg-gradient-to-br from-gray-100 via-gray-200 to-gray-300 border-gray-400 shadow-gray-200/50";
+        return "bg-gradient-to-br from-red-900 via-red-800 to-gray-900 border-red-400 shadow-red-400/20";
       case 3:
-        return "bg-gradient-to-br from-amber-100 via-amber-200 to-amber-300 border-amber-400 shadow-amber-200/50";
+        return "bg-gradient-to-br from-red-800 via-red-700 to-gray-800 border-red-300 shadow-red-300/20";
       default:
-        return "bg-white border-gray-200";
+        return "bg-gradient-to-br from-gray-900 via-gray-800 to-black border-red-900";
     }
   };
 
@@ -80,19 +80,19 @@ export default function Leaderboard() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-black">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Leaderboard</h1>
-            <p className="text-gray-600">See how you rank against other users</p>
+            <h1 className="text-3xl font-bold text-white mb-2">Elite Leaderboard</h1>
+            <p className="text-red-400">Champions ranked by total reps this week</p>
           </div>
           
-          <Card>
+          <Card className="bg-gray-900 border-red-800">
             <CardContent className="pt-6">
               <div className="space-y-4">
                 {[1, 2, 3, 4, 5].map((i) => (
                   <div key={i} className="animate-pulse">
-                    <div className="h-16 bg-gray-200 rounded-lg"></div>
+                    <div className="h-16 bg-gray-800 rounded-lg"></div>
                   </div>
                 ))}
               </div>
@@ -105,20 +105,20 @@ export default function Leaderboard() {
 
   if (!leaderboard || leaderboard.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-black">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Leaderboard</h1>
-            <p className="text-gray-600">See how you rank against other users</p>
+            <h1 className="text-3xl font-bold text-white mb-2">Elite Leaderboard</h1>
+            <p className="text-red-400">Champions ranked by total reps this week</p>
           </div>
           
-          <Card>
+          <Card className="bg-gray-900 border-red-800">
             <CardContent className="pt-6">
               <div className="text-center py-8">
-                <Users className="mx-auto mb-4 text-gray-400" size={48} />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No workout data yet</h3>
-                <p className="text-gray-600">
-                  Complete some workouts with exercises and reps to appear on the leaderboard!
+                <Users className="mx-auto mb-4 text-red-400" size={48} />
+                <h3 className="text-lg font-medium text-white mb-2">Start Your Journey</h3>
+                <p className="text-gray-400">
+                  Complete workouts with exercises and reps to earn your place among the elite!
                 </p>
               </div>
             </CardContent>
@@ -132,66 +132,66 @@ export default function Leaderboard() {
   const others = leaderboard.slice(3);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-yellow-50 relative overflow-hidden">
-      {/* Floating Background Elements */}
-      <div className="absolute top-10 left-10 w-20 h-20 bg-yellow-300/20 rounded-full animate-pulse"></div>
-      <div className="absolute top-32 right-16 w-12 h-12 bg-purple-300/20 rounded-full animate-bounce"></div>
-      <div className="absolute bottom-20 left-1/4 w-16 h-16 bg-pink-300/20 rounded-full animate-ping"></div>
-      <div className="absolute bottom-40 right-1/3 w-8 h-8 bg-yellow-400/30 rounded-full animate-pulse"></div>
+    <div className="min-h-screen bg-black relative overflow-hidden">
+      {/* Floating Background Elements - Red Theme */}
+      <div className="absolute top-10 left-10 w-20 h-20 bg-red-500/10 rounded-full animate-pulse"></div>
+      <div className="absolute top-32 right-16 w-12 h-12 bg-red-400/10 rounded-full animate-bounce"></div>
+      <div className="absolute bottom-20 left-1/4 w-16 h-16 bg-red-600/10 rounded-full animate-ping"></div>
+      <div className="absolute bottom-40 right-1/3 w-8 h-8 bg-red-500/20 rounded-full animate-pulse"></div>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8 text-center">
-          <h1 className="text-5xl font-black bg-gradient-to-r from-purple-600 via-pink-600 to-yellow-600 bg-clip-text text-transparent mb-4 animate-pulse">
-            🏅 WEEKLY FITNESS LEADERBOARD 🏅
+          <h1 className="text-5xl font-black bg-gradient-to-r from-red-500 to-red-300 bg-clip-text text-transparent mb-4">
+            🏆 ELITE LEADERBOARD 🏆
           </h1>
-          <p className="text-lg text-gray-700 font-medium">Weekly champions ranked by reps completed • Resets every Monday!</p>
+          <p className="text-lg text-red-400 font-medium">Champions ranked by total reps • Elite performance tracker</p>
           <div className="mt-4 flex justify-center space-x-2">
-            <div className="w-3 h-3 bg-yellow-400 rounded-full animate-bounce"></div>
-            <div className="w-3 h-3 bg-pink-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-            <div className="w-3 h-3 bg-purple-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+            <div className="w-3 h-3 bg-red-500 rounded-full animate-bounce"></div>
+            <div className="w-3 h-3 bg-red-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+            <div className="w-3 h-3 bg-red-300 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
           </div>
         </div>
 
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card className="bg-gradient-to-br from-yellow-50 to-yellow-100 border-yellow-200 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
+          <Card className="bg-gradient-to-br from-red-950 to-black border-red-500 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
             <CardContent className="pt-6">
               <div className="text-center">
                 <div className="relative">
-                  <Trophy className="mx-auto mb-2 text-yellow-500 animate-bounce" size={40} />
-                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-300 rounded-full animate-ping"></div>
+                  <Trophy className="mx-auto mb-2 text-red-500 animate-bounce" size={40} />
+                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-400 rounded-full animate-ping"></div>
                 </div>
-                <p className="text-3xl font-bold bg-gradient-to-r from-yellow-700 to-yellow-900 bg-clip-text text-transparent">
+                <p className="text-3xl font-bold text-red-400">
                   {topThree[0]?.totalReps.toLocaleString() || 0}
                 </p>
-                <p className="text-sm font-semibold text-yellow-800">🏆 Champion Score</p>
+                <p className="text-sm font-semibold text-red-300">🏆 Champion Score</p>
               </div>
             </CardContent>
           </Card>
           
-          <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
+          <Card className="bg-gradient-to-br from-gray-900 to-black border-red-800 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
             <CardContent className="pt-6">
               <div className="text-center">
                 <div className="relative">
-                  <Users className="mx-auto mb-2 text-blue-500 animate-pulse" size={40} />
-                  <Sparkles className="absolute -top-1 -right-1 w-4 h-4 text-blue-300 animate-spin" />
+                  <Users className="mx-auto mb-2 text-red-400 animate-pulse" size={40} />
+                  <Sparkles className="absolute -top-1 -right-1 w-4 h-4 text-red-300 animate-spin" />
                 </div>
-                <p className="text-3xl font-bold bg-gradient-to-r from-blue-700 to-blue-900 bg-clip-text text-transparent">{leaderboard.length}</p>
-                <p className="text-sm font-semibold text-blue-800">💪 Active Warriors</p>
+                <p className="text-3xl font-bold text-white">{leaderboard.length}</p>
+                <p className="text-sm font-semibold text-red-300">💪 Elite Athletes</p>
               </div>
             </CardContent>
           </Card>
           
-          <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
+          <Card className="bg-gradient-to-br from-red-900 to-black border-red-700 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
             <CardContent className="pt-6">
               <div className="text-center">
                 <div className="relative">
-                  <Award className="mx-auto mb-2 text-green-500 animate-pulse" size={40} />
-                  <Star className="absolute -top-1 -right-1 w-4 h-4 text-green-300 animate-bounce" />
+                  <Award className="mx-auto mb-2 text-red-400 animate-pulse" size={40} />
+                  <Star className="absolute -top-1 -right-1 w-4 h-4 text-red-300 animate-bounce" />
                 </div>
-                <p className="text-3xl font-bold bg-gradient-to-r from-green-700 to-green-900 bg-clip-text text-transparent">
+                <p className="text-3xl font-bold text-red-300">
                   {Math.round(leaderboard.reduce((sum, entry) => sum + entry.totalReps, 0) / leaderboard.length).toLocaleString()}
                 </p>
-                <p className="text-sm font-semibold text-green-800">⚖️ Average Reps</p>
+                <p className="text-sm font-semibold text-red-400">⚖️ Average Reps</p>
               </div>
             </CardContent>
           </Card>
@@ -201,19 +201,19 @@ export default function Leaderboard() {
         {topThree.length > 0 && (
           <div className="mb-12 relative">
             {/* Celebration Background */}
-            <div className="absolute inset-0 bg-gradient-to-br from-purple-100 via-pink-50 to-yellow-50 rounded-3xl opacity-50"></div>
-            <div className="absolute top-4 left-8 w-2 h-2 bg-yellow-400 rounded-full animate-ping"></div>
-            <div className="absolute top-8 right-12 w-1 h-1 bg-pink-400 rounded-full animate-bounce"></div>
-            <div className="absolute bottom-6 left-16 w-1.5 h-1.5 bg-purple-400 rounded-full animate-pulse"></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-red-950 via-black to-gray-900 rounded-3xl opacity-70"></div>
+            <div className="absolute top-4 left-8 w-2 h-2 bg-red-500 rounded-full animate-ping"></div>
+            <div className="absolute top-8 right-12 w-1 h-1 bg-red-400 rounded-full animate-bounce"></div>
+            <div className="absolute bottom-6 left-16 w-1.5 h-1.5 bg-red-300 rounded-full animate-pulse"></div>
             
-            <Card className="relative z-10 border-2 border-gradient-to-r from-yellow-200 to-pink-200 shadow-2xl">
+            <Card className="relative z-10 border-2 border-red-500 shadow-2xl bg-gray-900">
               <CardHeader className="text-center pb-4">
-                <CardTitle className="flex items-center justify-center text-3xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-yellow-600 bg-clip-text text-transparent">
-                  <Crown className="mr-3 text-yellow-500 animate-pulse" size={36} />
-                  🏆 Champions Podium 🏆
-                  <Crown className="ml-3 text-yellow-500 animate-pulse" size={36} />
+                <CardTitle className="flex items-center justify-center text-3xl font-bold bg-gradient-to-r from-red-500 to-red-300 bg-clip-text text-transparent">
+                  <Crown className="mr-3 text-red-500 animate-pulse" size={36} />
+                  🏆 Elite Podium 🏆
+                  <Crown className="ml-3 text-red-500 animate-pulse" size={36} />
                 </CardTitle>
-                <p className="text-gray-600 mt-2">Our fitness legends of the week!</p>
+                <p className="text-red-400 mt-2">Our elite fitness champions!</p>
               </CardHeader>
               <CardContent className="px-8 pb-8">
                 {/* Podium Container */}
@@ -226,8 +226,8 @@ export default function Leaderboard() {
                     >
                       {/* Winner Avatar & Crown */}
                       <div className="relative mb-4">
-                        <div className={`w-20 h-20 rounded-full border-4 ${entry.rank === 1 ? 'border-yellow-400 shadow-yellow-300/50' : entry.rank === 2 ? 'border-gray-400 shadow-gray-300/50' : 'border-amber-400 shadow-amber-300/50'} shadow-xl flex items-center justify-center bg-gradient-to-br ${entry.rank === 1 ? 'from-yellow-100 to-yellow-200' : entry.rank === 2 ? 'from-gray-100 to-gray-200' : 'from-amber-100 to-amber-200'}`}>
-                          <span className="text-2xl font-bold bg-gradient-to-r ${entry.rank === 1 ? 'from-yellow-700 to-yellow-900' : entry.rank === 2 ? 'from-gray-700 to-gray-900' : 'from-amber-700 to-amber-900'} bg-clip-text text-transparent">
+                        <div className={`w-20 h-20 rounded-full border-4 ${entry.rank === 1 ? 'border-red-500 shadow-red-500/50' : entry.rank === 2 ? 'border-red-400 shadow-red-400/50' : 'border-red-300 shadow-red-300/50'} shadow-xl flex items-center justify-center bg-gradient-to-br ${entry.rank === 1 ? 'from-red-950 to-black' : entry.rank === 2 ? 'from-red-900 to-gray-900' : 'from-red-800 to-gray-800'}`}>
+                          <span className={`text-2xl font-bold ${entry.rank === 1 ? 'text-red-300' : entry.rank === 2 ? 'text-red-400' : 'text-red-500'}`}>
                             {entry.firstName?.charAt(0) || entry.email?.charAt(0) || 'U'}
                           </span>
                         </div>
@@ -238,20 +238,20 @@ export default function Leaderboard() {
                         {/* Sparkle Effects */}
                         {entry.rank === 1 && (
                           <>
-                            <div className="absolute -top-2 -left-2 w-3 h-3 bg-yellow-300 rounded-full animate-ping"></div>
-                            <div className="absolute -bottom-1 -right-2 w-2 h-2 bg-yellow-400 rounded-full animate-bounce"></div>
+                            <div className="absolute -top-2 -left-2 w-3 h-3 bg-red-400 rounded-full animate-ping"></div>
+                            <div className="absolute -bottom-1 -right-2 w-2 h-2 bg-red-500 rounded-full animate-bounce"></div>
                           </>
                         )}
                       </div>
                       
                       {/* Winner Info */}
                       <div className="text-center mb-4 px-2">
-                        <h3 className={`font-bold text-lg ${entry.rank === 1 ? 'text-yellow-800' : entry.rank === 2 ? 'text-gray-800' : 'text-amber-800'} mb-1`}>
+                        <h3 className={`font-bold text-lg ${entry.rank === 1 ? 'text-white' : entry.rank === 2 ? 'text-red-200' : 'text-red-300'} mb-1`}>
                           {entry.firstName && entry.lastName ? `${entry.firstName} ${entry.lastName}` : entry.email?.split('@')[0] || 'User'}
                         </h3>
-                        <p className="text-sm text-gray-600">@{entry.email?.split('@')[0] || 'user'}</p>
+                        <p className="text-sm text-gray-400">@{entry.email?.split('@')[0] || 'user'}</p>
                         <div className="mt-2">
-                          <p className={`text-2xl font-bold ${entry.rank === 1 ? 'text-yellow-700' : entry.rank === 2 ? 'text-gray-700' : 'text-amber-700'}`}>
+                          <p className={`text-2xl font-bold ${entry.rank === 1 ? 'text-red-400' : entry.rank === 2 ? 'text-red-500' : 'text-red-600'}`}>
                             {entry.totalReps.toLocaleString()}
                           </p>
                           <p className="text-xs text-gray-500">total reps</p>
@@ -262,23 +262,23 @@ export default function Leaderboard() {
                       <div className={`w-24 ${getPodiumHeight(entry.rank)} ${getRankBgColor(entry.rank)} border-2 rounded-t-lg shadow-xl relative overflow-hidden`}>
                         {/* Podium Rank Number */}
                         <div className="absolute inset-0 flex items-center justify-center">
-                          <span className={`text-4xl font-black ${entry.rank === 1 ? 'text-yellow-800' : entry.rank === 2 ? 'text-gray-800' : 'text-amber-800'} opacity-30`}>
+                          <span className={`text-4xl font-black ${entry.rank === 1 ? 'text-red-600' : entry.rank === 2 ? 'text-red-700' : 'text-red-800'} opacity-40`}>
                             {entry.rank}
                           </span>
                         </div>
                         {/* Shimmer Effect */}
-                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse"></div>
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-red-500/10 to-transparent animate-pulse"></div>
                         {/* Base Platform */}
-                        <div className={`absolute bottom-0 w-full h-2 ${entry.rank === 1 ? 'bg-yellow-500' : entry.rank === 2 ? 'bg-gray-500' : 'bg-amber-500'}`}></div>
+                        <div className={`absolute bottom-0 w-full h-2 ${entry.rank === 1 ? 'bg-red-500' : entry.rank === 2 ? 'bg-red-400' : 'bg-red-300'}`}></div>
                       </div>
                     </div>
                   ))}
                 </div>
                 
                 {/* Celebration Message */}
-                <div className="text-center mt-8 p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl border border-purple-200">
-                  <p className="text-lg font-medium text-gray-800 mb-2">🎉 Congratulations Champions! 🎉</p>
-                  <p className="text-sm text-gray-600">Amazing dedication to fitness excellence!</p>
+                <div className="text-center mt-8 p-4 bg-gradient-to-r from-red-950 to-gray-900 rounded-xl border border-red-500">
+                  <p className="text-lg font-medium text-white mb-2">🎆 Elite Performance! 🎆</p>
+                  <p className="text-sm text-red-400">Unmatched dedication to excellence!</p>
                 </div>
               </CardContent>
             </Card>
@@ -286,9 +286,9 @@ export default function Leaderboard() {
         )}
 
         {/* Full Leaderboard */}
-        <Card>
+        <Card className="bg-gray-900 border-red-800">
           <CardHeader>
-            <CardTitle>Full Rankings</CardTitle>
+            <CardTitle className="text-white">Elite Rankings</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
@@ -296,24 +296,25 @@ export default function Leaderboard() {
                 <div
                   key={entry.userId}
                   className={`flex items-center justify-between p-4 rounded-lg border ${getRankBgColor(entry.rank)} transition-all hover:shadow-md`}
+                  data-testid={`leaderboard-entry-${entry.rank}`}
                 >
                   <div className="flex items-center space-x-4">
                     <div className="flex-shrink-0">
                       {getRankIcon(entry.rank)}
                     </div>
                     <div>
-                      <h4 className="font-semibold text-gray-900">
+                      <h4 className="font-semibold text-white">
                         {entry.firstName && entry.lastName ? `${entry.firstName} ${entry.lastName}` : entry.email?.split('@')[0] || 'User'}
                       </h4>
-                      <p className="text-sm text-gray-600">@{entry.email?.split('@')[0] || 'user'}</p>
+                      <p className="text-sm text-gray-400">@{entry.email?.split('@')[0] || 'user'}</p>
                     </div>
                   </div>
                   
                   <div className="text-right">
-                    <p className="text-2xl font-bold text-primary">
+                    <p className="text-2xl font-bold text-red-400">
                       {entry.totalReps.toLocaleString()}
                     </p>
-                    <p className="text-sm text-gray-600">reps</p>
+                    <p className="text-sm text-gray-500">reps</p>
                   </div>
                 </div>
               ))}
@@ -322,17 +323,17 @@ export default function Leaderboard() {
         </Card>
 
         {/* Tips */}
-        <Card className="mt-8">
+        <Card className="mt-8 bg-gray-900 border-red-800">
           <CardContent className="pt-6">
             <div className="text-center">
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Want to climb the ranks?</h3>
-              <p className="text-gray-600 mb-4">
-                Log more workouts with exercises that include rep counts to increase your total and move up the leaderboard!
+              <h3 className="text-lg font-medium text-white mb-2">Claim Your Elite Status</h3>
+              <p className="text-red-400 mb-4">
+                Log workouts with high rep counts to dominate the leaderboard and join the elite!
               </p>
-              <div className="flex flex-wrap justify-center gap-4 text-sm text-gray-500">
-                <span>• Track strength training workouts</span>
-                <span>• Log bodyweight exercises</span>
-                <span>• Include rep counts in your exercises</span>
+              <div className="flex flex-wrap justify-center gap-4 text-sm text-gray-400">
+                <span>• High-intensity workouts</span>
+                <span>• Maximum rep counts</span>
+                <span>• Consistent training</span>
               </div>
             </div>
           </CardContent>
