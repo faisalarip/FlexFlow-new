@@ -315,7 +315,7 @@ export class MemStorage implements IStorage {
     this.seedMealPlans();
     this.seedFoodItems();
     this.seedCommunityPosts();
-    // Note: leaderboard seeding moved to API endpoint to avoid conflicts
+    this.seedRealisticLeaderboardData();
   }
 
   private seedExercises() {
@@ -3059,6 +3059,86 @@ export class MemStorage implements IStorage {
         };
         this.workoutExercises.set(workoutExerciseId, workoutExercise);
       });
+    });
+  }
+
+  private seedRealisticLeaderboardData() {
+    // Get current week date range (Monday to Sunday)
+    const now = new Date();
+    const currentDay = now.getDay();
+    const mondayOffset = currentDay === 0 ? -6 : 1 - currentDay;
+    const weekStart = new Date(now);
+    weekStart.setDate(now.getDate() + mondayOffset);
+    weekStart.setHours(0, 0, 0, 0);
+
+    // Create realistic diverse leaderboard users with varied rep totals
+    const realisticLeaderboardUsers = [
+      { firstName: "Derek", lastName: "Chen", email: "derek.chen.powerlifter@outlook.com", totalReps: 287, specialty: "Powerlifting" },
+      { firstName: "Zoe", lastName: "Patel", email: "zoe.endurance.runner@yahoo.com", totalReps: 245, specialty: "Endurance Running" },
+      { firstName: "Riley", lastName: "Johnson", email: "riley.hiit.specialist@hotmail.com", totalReps: 223, specialty: "HIIT Training" },
+      { firstName: "Ava", lastName: "Rodriguez", email: "ava.calisthenics.expert@gmail.com", totalReps: 198, specialty: "Calisthenics" },
+      { firstName: "Noah", lastName: "Kim", email: "noah.strength.athlete@outlook.com", totalReps: 176, specialty: "Strength Training" },
+      { firstName: "Sophia", lastName: "Brown", email: "sophia.cardio.dancer@yahoo.com", totalReps: 154, specialty: "Dance Cardio" },
+      { firstName: "Ethan", lastName: "Davis", email: "ethan.combat.fighter@gmail.com", totalReps: 132, specialty: "Combat Sports" },
+      { firstName: "Chloe", lastName: "Garcia", email: "chloe.crossfit.pro@outlook.com", totalReps: 119, specialty: "CrossFit" },
+      { firstName: "Luke", lastName: "Taylor", email: "luke.functional.trainer@gmail.com", totalReps: 95, specialty: "Functional Training" },
+      { firstName: "Isabella", lastName: "Wilson", email: "isabella.yoga.master@hotmail.com", totalReps: 73, specialty: "Yoga" }
+    ];
+
+    // Create each user with realistic workout data
+    realisticLeaderboardUsers.forEach(userData => {
+      const userId = randomUUID();
+      
+      // Create user
+      const user: any = {
+        id: userId,
+        email: userData.email,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        streak: Math.floor(Math.random() * 15) + 10, // 10-25 day streaks
+        subscriptionStatus: 'active',
+        trialStartDate: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000)
+      };
+      this.users.set(userId, user);
+
+      // Create 3-5 workouts for this user during the current week
+      const workoutCount = Math.floor(Math.random() * 3) + 3;
+      for (let i = 0; i < workoutCount; i++) {
+        const workoutDate = new Date(weekStart);
+        workoutDate.setDate(weekStart.getDate() + i);
+        workoutDate.setHours(Math.floor(Math.random() * 6) + 7); // 7-13 PM
+
+        const workoutId = randomUUID();
+        const workout: any = {
+          id: workoutId,
+          userId: userId,
+          date: workoutDate.toISOString(),
+          name: `${userData.specialty} Session`,
+          category: userData.specialty.split(' ')[0],
+          duration: 45 + Math.floor(Math.random() * 30), // 45-75 minutes
+          caloriesBurned: 300 + Math.floor(Math.random() * 200), // 300-500 calories
+          notes: `${userData.specialty} training session`,
+          completedAt: workoutDate.toISOString(),
+          perceivedExertion: 7 + Math.floor(Math.random() * 2) // 7-8 RPE
+        };
+        this.workouts.set(workoutId, workout);
+
+        // Add workout exercises that total to the user's target reps
+        const repsPerWorkout = Math.floor(userData.totalReps / workoutCount);
+        const exerciseId = randomUUID();
+        const workoutExercise: any = {
+          id: exerciseId,
+          workoutId: workoutId,
+          exerciseId: userData.specialty.toLowerCase().replace(/\s+/g, '-'),
+          sets: Math.ceil(repsPerWorkout / 30), // Calculate sets
+          reps: repsPerWorkout + (i === workoutCount - 1 ? userData.totalReps % workoutCount : 0), // Add remainder to last workout
+          restTime: 90,
+          notes: `${userData.specialty} exercises`
+        };
+        this.workoutExercises.set(exerciseId, workoutExercise);
+      }
     });
   }
 
