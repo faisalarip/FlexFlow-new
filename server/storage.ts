@@ -315,7 +315,7 @@ export class MemStorage implements IStorage {
     this.seedMealPlans();
     this.seedFoodItems();
     this.seedCommunityPosts();
-    this.seedLeaderboardData();
+    // Note: leaderboard seeding moved to API endpoint to avoid conflicts
   }
 
   private seedExercises() {
@@ -450,9 +450,9 @@ export class MemStorage implements IStorage {
       const isYogaTrainer = trainerInfo.specialties[0] === "yoga";
       const user: User = {
         id: trainerInfo.userId,
-        email: isYogaTrainer ? "sarah@yogastudio.com" : "mike@fitnessclub.com",
-        firstName: isYogaTrainer ? "Sarah" : "Mike",
-        lastName: isYogaTrainer ? "Johnson" : "Thompson",
+        email: isYogaTrainer ? "maya.singh.yoga@hotmail.com" : "marcus.williams.athlete@gmail.com",
+        firstName: isYogaTrainer ? "Maya" : "Marcus",
+        lastName: isYogaTrainer ? "Singh" : "Williams",
         profileImageUrl: null,
         streak: 0,
         subscriptionStatus: "free_trial",
@@ -1560,22 +1560,9 @@ export class MemStorage implements IStorage {
   }
 
   async seedLeaderboardData(): Promise<void> {
-    console.log("Starting leaderboard seeding...");
+    console.log("=== MEMSTORAGE SEEDING FUNCTION CALLED ===");
+    console.log("🚀 Starting competitive leaderboard seeding...");
     
-    // Create diverse sample users for the leaderboard
-    const sampleUsers = [
-      { email: "alex.runner@fitness.com", firstName: "Alex", lastName: "Runner", profile: "endurance" },
-      { email: "sarah.lifter@fitness.com", firstName: "Sarah", lastName: "Strong", profile: "strength" },
-      { email: "mike.crossfit@fitness.com", firstName: "Mike", lastName: "Cross", profile: "crossfit" },
-      { email: "emma.yoga@fitness.com", firstName: "Emma", lastName: "Zen", profile: "flexibility" },
-      { email: "david.boxer@fitness.com", firstName: "David", lastName: "Boxer", profile: "combat" },
-      { email: "lisa.dancer@fitness.com", firstName: "Lisa", lastName: "Move", profile: "cardio" },
-      { email: "james.athlete@fitness.com", firstName: "James", lastName: "Peak", profile: "athlete" },
-      { email: "maria.hiit@fitness.com", firstName: "Maria", lastName: "Burn", profile: "hiit" },
-      { email: "tom.calisthenics@fitness.com", firstName: "Tom", lastName: "Flow", profile: "bodyweight" },
-      { email: "anna.powerlifter@fitness.com", firstName: "Anna", lastName: "Power", profile: "powerlifting" }
-    ];
-
     // Get current week date range (Monday to Sunday)
     const now = new Date();
     const currentDay = now.getDay();
@@ -1583,73 +1570,92 @@ export class MemStorage implements IStorage {
     const weekStart = new Date(now);
     weekStart.setDate(now.getDate() + mondayOffset);
     weekStart.setHours(0, 0, 0, 0);
+    
+    console.log(`📅 Week calculation: Today=${now.toDateString()}, Day=${currentDay}, WeekStart=${weekStart.toDateString()}`);
 
-    // Force seeding to populate diverse leaderboard data
-    console.log("Forcing leaderboard seeding with", sampleUsers.length, "sample users");
+    // Clear ALL existing workout exercises to reset leaderboard
+    console.log(`🧹 Clearing ${this.workoutExercises.size} existing workout exercises for clean leaderboard`);
+    this.workoutExercises.clear();
+    
+    // Add diverse competitive users to dominate the leaderboard  
+    const competitiveUsers = [
+      { email: "derek.chen.powerlifter@outlook.com", firstName: "Derek", lastName: "Chen", totalReps: 1500 },
+      { email: "zoe.endurance.runner@yahoo.com", firstName: "Zoe", lastName: "Patel", totalReps: 1400 },
+      { email: "riley.hiit.specialist@hotmail.com", firstName: "Riley", lastName: "Johnson", totalReps: 1300 },
+      { email: "ava.calisthenics.expert@gmail.com", firstName: "Ava", lastName: "Rodriguez", totalReps: 1200 },
+      { email: "noah.strength.athlete@outlook.com", firstName: "Noah", lastName: "Kim", totalReps: 1100 },
+      { email: "sophia.cardio.dancer@yahoo.com", firstName: "Sophia", lastName: "Brown", totalReps: 1000 },
+      { email: "ethan.combat.fighter@gmail.com", firstName: "Ethan", lastName: "Davis", totalReps: 900 },
+      { email: "chloe.crossfit.pro@outlook.com", firstName: "Chloe", lastName: "Garcia", totalReps: 800 },
+      { email: "luke.functional.trainer@gmail.com", firstName: "Luke", lastName: "Taylor", totalReps: 700 },
+      { email: "isabella.yoga.master@hotmail.com", firstName: "Isabella", lastName: "Wilson", totalReps: 600 }
+    ];
 
-    // Create users if they don't exist
-    for (const userData of sampleUsers) {
-      const existingUser = Array.from(this.users.values()).find(u => u.email === userData.email);
-      if (!existingUser) {
-        const userId = randomUUID();
-        const user: User = {
-          id: userId,
-          email: userData.email,
-          firstName: userData.firstName,
-          lastName: userData.lastName,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          streak: Math.floor(Math.random() * 30) + 1,
-          longestStreak: Math.floor(Math.random() * 60) + 10,
-          trialStartDate: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000),
-          subscriptionStatus: Math.random() > 0.7 ? 'active' : 'trial'
+    console.log(`👥 Adding ${competitiveUsers.length} competitive users to leaderboard`);
+
+    // Add each competitive user with workout data that creates their rep totals
+    for (const userData of competitiveUsers) {
+      const userId = randomUUID();
+      
+      // Create user
+      const user: any = {
+        id: userId,
+        email: userData.email,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        streak: Math.floor(Math.random() * 30) + 10, // 10-40 day streaks
+        subscriptionStatus: 'active', // All competitive users are active subscribers
+        trialStartDate: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000)
+      };
+      this.users.set(userId, user);
+      console.log(`✅ Created user: ${userData.firstName} ${userData.lastName} (${userId}) - Target reps: ${userData.totalReps}`);
+
+      // Create multiple high-rep workouts for this user to achieve their total
+      const workoutsNeeded = Math.ceil(userData.totalReps / 300); // Split reps across multiple workouts
+      for (let i = 0; i < workoutsNeeded; i++) {
+        const workoutDate = new Date(weekStart);
+        workoutDate.setDate(weekStart.getDate() + i); // Spread across week
+        workoutDate.setHours(Math.floor(Math.random() * 6) + 6); // 6-12 PM
+
+        const workoutId = randomUUID();
+        const workout: any = {
+          id: workoutId,
+          userId: userId,
+          date: workoutDate.toISOString(),
+          name: `${userData.firstName}'s Training Session ${i + 1}`,
+          category: "High Intensity",
+          duration: 60 + Math.floor(Math.random() * 30), // 60-90 minutes
+          caloriesBurned: 400 + Math.floor(Math.random() * 200), // 400-600 calories
+          notes: "Competitive training session",
+          completedAt: workoutDate.toISOString(),
+          perceivedExertion: 8 + Math.floor(Math.random() * 2) // 8-9 RPE (high intensity)
         };
-        this.users.set(userId, user);
+        this.workouts.set(workoutId, workout);
 
-        // Create workouts for each user within the current week
-        const workoutCount = Math.floor(Math.random() * 3) + 3; // 3-5 workouts per week
-        const profileWorkouts = this.getWorkoutsForProfile(userData.profile);
-        
-        for (let i = 0; i < workoutCount; i++) {
-          const workoutData = profileWorkouts[Math.floor(Math.random() * profileWorkouts.length)];
-          const workoutDate = new Date(weekStart);
-          workoutDate.setDate(weekStart.getDate() + Math.floor(Math.random() * 7));
-          workoutDate.setHours(Math.floor(Math.random() * 12) + 6, Math.floor(Math.random() * 60));
+        // Calculate reps for this specific workout (distribute total across workouts)
+        const repsForThisWorkout = i === workoutsNeeded - 1 
+          ? userData.totalReps - (i * Math.floor(userData.totalReps / workoutsNeeded)) // Remainder for last workout
+          : Math.floor(userData.totalReps / workoutsNeeded);
 
-          const workoutId = randomUUID();
-          const workout: Workout = {
-            id: workoutId,
-            userId: userId,
-            date: workoutDate.toISOString(),
-            name: workoutData.name,
-            category: workoutData.category,
-            duration: workoutData.duration + Math.floor(Math.random() * 20) - 10,
-            caloriesBurned: workoutData.calories + Math.floor(Math.random() * 100) - 50,
-            notes: workoutData.notes,
-            completedAt: workoutDate.toISOString(),
-            perceivedExertion: Math.floor(Math.random() * 4) + 6 // 6-9 RPE
-          };
-          this.workouts.set(workoutId, workout);
-
-          // Add workout exercises with realistic rep patterns
-          for (const exerciseData of workoutData.exercises) {
-            const exerciseId = randomUUID();
-            const workoutExercise: WorkoutExercise = {
-              id: exerciseId,
-              workoutId: workoutId,
-              exerciseId: exerciseData.exerciseId,
-              sets: exerciseData.sets,
-              reps: exerciseData.reps + Math.floor(Math.random() * 20) - 10,
-              weight: exerciseData.weight ? exerciseData.weight + Math.floor(Math.random() * 40) - 20 : undefined,
-              duration: exerciseData.duration ? exerciseData.duration + Math.floor(Math.random() * 60) - 30 : undefined,
-              restTime: 60 + Math.floor(Math.random() * 120),
-              notes: ""
-            };
-            this.workoutExercises.set(exerciseId, workoutExercise);
-          }
-        }
+        // Add workout exercise with calculated reps
+        const exerciseId = randomUUID();
+        const workoutExercise: any = {
+          id: exerciseId,
+          workoutId: workoutId,
+          exerciseId: `exercise-${userData.firstName.toLowerCase()}`,
+          sets: Math.ceil(repsForThisWorkout / 100), // Calculate sets
+          reps: repsForThisWorkout,
+          restTime: 90,
+          notes: `Competitive ${userData.firstName} training`
+        };
+        this.workoutExercises.set(exerciseId, workoutExercise);
+        console.log(`  💪 Created exercise: ${repsForThisWorkout} reps on ${workoutDate.toDateString()}`);
       }
     }
+
+    console.log("Competitive leaderboard seeding completed successfully");
   }
 
   private getWorkoutsForProfile(profile: string) {
@@ -2900,10 +2906,10 @@ export class MemStorage implements IStorage {
     const sampleUsers: { id: string; firstName: string; lastName: string; email: string; streak: number }[] = [
       {
         id: randomUUID(),
-        firstName: "Alex",
-        lastName: "Smith",
-        email: "alex@example.com",
-        streak: 5
+        firstName: "Jessica",
+        lastName: "Martinez",
+        email: "jessica.m.fit@gmail.com",
+        streak: 12
       },
       {
         id: randomUUID(),
@@ -3921,7 +3927,10 @@ export class DatabaseStorage implements IStorage {
   async createAiDifficultyAdjustment(adjustment: InsertAiDifficultyAdjustment): Promise<AiDifficultyAdjustment> { return this.memStorage.createAiDifficultyAdjustment(adjustment); }
   async getPendingAiAdjustments(userId: string): Promise<AiDifficultyAdjustment[]> { return this.memStorage.getPendingAiAdjustments(userId); }
   async applyAiDifficultyAdjustment(adjustmentId: string): Promise<boolean> { return this.memStorage.applyAiDifficultyAdjustment(adjustmentId); }
-  async seedLeaderboardData(): Promise<void> { return this.memStorage.seedLeaderboardData(); }
+  async seedLeaderboardData(): Promise<void> { 
+    console.log("🔥 DatabaseStorage.seedLeaderboardData() called - delegating to MemStorage");
+    return this.memStorage.seedLeaderboardData(); 
+  }
 }
 
 export const storage = new DatabaseStorage();
