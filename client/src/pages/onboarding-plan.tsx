@@ -305,7 +305,7 @@ export default function OnboardingPlan() {
       };
       localStorage.setItem('pendingPersonalPlan', JSON.stringify(planData));
     }
-    setLocation('/auth?from=onboarding');
+    setLocation('/auth-selection?from=onboarding');
   };
 
   if (loading) {
