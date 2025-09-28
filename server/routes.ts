@@ -487,7 +487,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get AI difficulty recommendations for user
-  app.get("/api/ai-recommendations", authenticateToken, async (req, res) => {
+  app.get("/api/ai-recommendations", authenticateToken, requireFeatureAccess(PREMIUM_FEATURES.WORKOUT_PLANNER), async (req, res) => {
     try {
       const userId = getAuthUserId(req);
       if (!userId) {
