@@ -365,7 +365,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get advanced progress metrics
-  app.get("/api/progress/metrics", authenticateToken, async (req, res) => {
+  app.get("/api/progress/metrics", authenticateToken, requireFeatureAccess(PREMIUM_FEATURES.WORKOUT_PLANNER), async (req, res) => {
     try {
       const userId = getAuthUserId(req);
       if (!userId) {
