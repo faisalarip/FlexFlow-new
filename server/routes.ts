@@ -351,7 +351,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get user stats
-  app.get("/api/stats", authenticateToken, async (req, res) => {
+  app.get("/api/stats", authenticateToken, requireFeatureAccess(PREMIUM_FEATURES.WORKOUT_PLANNER), async (req, res) => {
     try {
       const userId = getAuthUserId(req);
       if (!userId) {
@@ -503,7 +503,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Apply AI difficulty adjustments
-  app.post("/api/ai-adjustments/apply", authenticateToken, async (req, res) => {
+  app.post("/api/ai-adjustments/apply", authenticateToken, requireFeatureAccess(PREMIUM_FEATURES.WORKOUT_PLANNER), async (req, res) => {
     try {
       const userId = getAuthUserId(req);
       if (!userId) {
@@ -531,7 +531,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get pending AI difficulty adjustments for user
-  app.get("/api/ai-adjustments/pending", authenticateToken, async (req, res) => {
+  app.get("/api/ai-adjustments/pending", authenticateToken, requireFeatureAccess(PREMIUM_FEATURES.WORKOUT_PLANNER), async (req, res) => {
     try {
       const userId = getAuthUserId(req);
       if (!userId) {
@@ -664,7 +664,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get goals
-  app.get("/api/goals", authenticateToken, async (req, res) => {
+  app.get("/api/goals", authenticateToken, requireFeatureAccess(PREMIUM_FEATURES.WORKOUT_PLANNER), async (req, res) => {
     try {
       const userId = getAuthUserId(req);
       if (!userId) {
@@ -678,7 +678,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create goal
-  app.post("/api/goals", authenticateToken, async (req, res) => {
+  app.post("/api/goals", authenticateToken, requireFeatureAccess(PREMIUM_FEATURES.WORKOUT_PLANNER), async (req, res) => {
     try {
       const userId = getAuthUserId(req);
       if (!userId) {
