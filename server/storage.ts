@@ -90,6 +90,7 @@ export interface IStorage {
   createUser(user: InsertUser): Promise<User>;
   updateUserStreak(id: string, streak: number): Promise<User | undefined>;
   updateUser(id: string, updates: Partial<User>): Promise<User | undefined>;
+  updateUserActivity(id: string, activityDate: Date): Promise<User | undefined>;
 
   // Authentication methods
   createUserWithPassword(userData: SignUpData): Promise<User>;
@@ -587,7 +588,20 @@ export class MemStorage implements IStorage {
   async updateUserStreakAndDate(id: string, streak: number, lastWorkoutDate: Date): Promise<User | undefined> {
     const user = this.users.get(id);
     if (user) {
-      const updatedUser = { ...user, streak, lastWorkoutDate };
+      const updatedUser = { ...user, streak, lastWorkoutDate, lastActivityDate: lastWorkoutDate };
+      this.users.set(id, updatedUser);
+      return updatedUser;
+    }
+    return undefined;
+  }
+
+  // Update user activity date for any activity (workout, meal, etc.)
+  async updateUserActivity(id: string, activityDate: Date): Promise<User | undefined> {
+    const user = this.users.get(id);
+    if (user) {
+      // Recalculate streak based on all activities
+      const newStreak = await this.calculateUserStreak(id);
+      const updatedUser = { ...user, lastActivityDate: activityDate, streak: newStreak };
       this.users.set(id, updatedUser);
       return updatedUser;
     }
@@ -600,14 +614,14 @@ export class MemStorage implements IStorage {
     
     if (userWorkouts.length === 0) return 0;
 
-    // Check if more than 24 hours have passed since last workout
-    if (user?.lastWorkoutDate) {
+    // Check if more than 24 hours have passed since last activity
+    if (user?.lastActivityDate) {
       const now = new Date();
-      const lastWorkout = new Date(user.lastWorkoutDate);
-      const hoursSinceLastWorkout = (now.getTime() - lastWorkout.getTime()) / (1000 * 60 * 60);
+      const lastActivity = new Date(user.lastActivityDate);
+      const hoursSinceLastActivity = (now.getTime() - lastActivity.getTime()) / (1000 * 60 * 60);
       
-      // If more than 24 hours have passed since last workout, reset streak
-      if (hoursSinceLastWorkout > 24) {
+      // If more than 24 hours have passed since last activity, reset streak
+      if (hoursSinceLastActivity > 24) {
         return 0;
       }
     }
@@ -661,18 +675,18 @@ export class MemStorage implements IStorage {
     return streak;
   }
 
-  // Reset streaks for users who haven't logged workouts in 24+ hours
+  // Reset streaks for users who haven't logged ANY activity in 24+ hours
   async resetInactiveUserStreaks(): Promise<void> {
     const now = new Date();
     const users = Array.from(this.users.values());
     
     for (const user of users) {
-      if (user.lastWorkoutDate && user.streak > 0) {
-        const lastWorkout = new Date(user.lastWorkoutDate);
-        const hoursSinceLastWorkout = (now.getTime() - lastWorkout.getTime()) / (1000 * 60 * 60);
+      if (user.lastActivityDate && user.streak > 0) {
+        const lastActivity = new Date(user.lastActivityDate);
+        const hoursSinceLastActivity = (now.getTime() - lastActivity.getTime()) / (1000 * 60 * 60);
         
-        // If more than 24 hours have passed since last workout, reset streak
-        if (hoursSinceLastWorkout > 24) {
+        // If more than 24 hours have passed since last activity, reset streak
+        if (hoursSinceLastActivity > 24) {
           await this.updateUserStreak(user.id, 0);
         }
       }
@@ -2231,6 +2245,10 @@ export class MemStorage implements IStorage {
     };
     
     this.userMealPlans.set(newUserPlan.id, newUserPlan);
+    
+    // Update user activity to maintain streak
+    await this.updateUserActivity(userMealPlan.userId, newUserPlan.createdAt);
+    
     return newUserPlan;
   }
 
@@ -3315,6 +3333,10 @@ export class MemStorage implements IStorage {
     };
     
     this.mealEntries.set(id, newEntry);
+    
+    // Update user activity to maintain streak
+    await this.updateUserActivity(entry.userId, newEntry.loggedAt);
+    
     return newEntry;
   }
 
@@ -3506,6 +3528,8 @@ export class DatabaseStorage implements IStorage {
   async getUserByUsername(username: string): Promise<User | undefined> { return this.memStorage.getUserByUsername(username); }
   async createUser(user: InsertUser): Promise<User> { return this.memStorage.createUser(user); }
   async updateUserStreak(id: string, streak: number): Promise<User | undefined> { return this.memStorage.updateUserStreak(id, streak); }
+  
+  async updateUserActivity(id: string, activityDate: Date): Promise<User | undefined> { return this.memStorage.updateUserActivity(id, activityDate); }
   
   async updateUser(id: string, updates: Partial<User>): Promise<User | undefined> {
     try {
