@@ -668,7 +668,7 @@ export default function MileTracker() {
             </Card>
 
             {/* GPS Map */}
-            {gpsEnabled && currentPosition && (
+            {gpsEnabled && (
               <Card className="bg-gradient-to-br from-gray-900 to-black border border-blue-500/50 shadow-xl shadow-blue-500/20">
                 <CardHeader>
                   <CardTitle className="flex items-center text-2xl font-bold text-blue-400">
@@ -677,41 +677,55 @@ export default function MileTracker() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="h-[400px] rounded-lg overflow-hidden border-2 border-blue-500/30">
-                    <MapContainer
-                      center={currentPosition}
-                      zoom={16}
-                      style={{ height: '100%', width: '100%' }}
-                      className="z-0"
-                    >
-                      <TileLayer
-                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                      />
-                      <MapUpdater center={currentPosition} />
-                      {gpsPath.length > 1 && (
-                        <Polyline
-                          positions={gpsPath}
-                          color="#ef4444"
-                          weight={4}
-                          opacity={0.8}
-                        />
+                  {currentPosition ? (
+                    <>
+                      <div className="h-[400px] rounded-lg overflow-hidden border-2 border-blue-500/30">
+                        <MapContainer
+                          center={currentPosition}
+                          zoom={16}
+                          style={{ height: '100%', width: '100%' }}
+                          className="z-0"
+                        >
+                          <TileLayer
+                            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                          />
+                          <MapUpdater center={currentPosition} />
+                          {gpsPath.length > 1 && (
+                            <Polyline
+                              positions={gpsPath}
+                              color="#ef4444"
+                              weight={4}
+                              opacity={0.8}
+                            />
+                          )}
+                          <Marker position={currentPosition} />
+                        </MapContainer>
+                      </div>
+                      <div className="mt-4 text-center">
+                        <p className="text-blue-300 font-semibold">
+                          🎯 Total Distance: <span className="text-blue-400 text-lg font-bold">{gpsDistance.toFixed(2)} miles</span>
+                        </p>
+                        {gpsPath.length > 0 && (
+                          <p className="text-sm text-blue-400/70 mt-1">
+                            📊 {gpsPath.length} GPS points tracked
+                          </p>
+                        )}
+                      </div>
+                    </>
+                  ) : (
+                    <div className="h-[400px] rounded-lg border-2 border-blue-500/30 bg-gray-800/50 flex flex-col items-center justify-center">
+                      <div className="animate-pulse text-6xl mb-4">🛰️</div>
+                      <p className="text-blue-400 text-xl font-bold mb-2">Acquiring GPS Signal...</p>
+                      <p className="text-blue-300 text-sm">Please wait while we locate you</p>
+                      {gpsAccuracy !== null && (
+                        <p className="text-yellow-400 text-xs mt-2">
+                          Signal accuracy: ±{gpsAccuracy.toFixed(0)}m
+                          {gpsAccuracy >= 100 && " (waiting for better signal)"}
+                        </p>
                       )}
-                      {currentPosition && (
-                        <Marker position={currentPosition} />
-                      )}
-                    </MapContainer>
-                  </div>
-                  <div className="mt-4 text-center">
-                    <p className="text-blue-300 font-semibold">
-                      🎯 Total Distance: <span className="text-blue-400 text-lg font-bold">{gpsDistance.toFixed(2)} miles</span>
-                    </p>
-                    {gpsPath.length > 0 && (
-                      <p className="text-sm text-blue-400/70 mt-1">
-                        📊 {gpsPath.length} GPS points tracked
-                      </p>
-                    )}
-                  </div>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             )}
