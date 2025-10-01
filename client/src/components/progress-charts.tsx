@@ -68,10 +68,16 @@ export default function ProgressCharts() {
           }).length;
         });
 
+        // Generate dynamic day labels based on actual dates
+        const dayLabels = last7Days.map(date => {
+          const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+          return days[date.getDay()];
+        });
+
         frequencyChartInstance.current = new window.Chart(ctx, {
           type: 'line',
           data: {
-            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            labels: dayLabels,
             datasets: [{
               label: 'Workouts',
               data: dailyWorkouts,
