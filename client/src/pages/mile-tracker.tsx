@@ -241,48 +241,48 @@ export default function MileTracker() {
     const speed = position.coords.speed; // in m/s
     
     setGpsAccuracy(accuracy);
-    setCurrentPosition([currentLat, currentLon]);
     
     // Convert speed from m/s to mph
     if (speed !== null && speed >= 0) {
       setCurrentSpeed(speed * 2.237); // m/s to mph conversion
     }
     
-    // Add to path if accuracy is good
+    // Only process GPS data if accuracy is good (< 100m)
     if (accuracy < 100) {
+      setCurrentPosition([currentLat, currentLon]);
       setGpsPath(prev => [...prev, [currentLat, currentLon]]);
-    }
-    
-    if (previousPositionRef.current) {
-      const distance = calculateDistance(
-        previousPositionRef.current.lat,
-        previousPositionRef.current.lon,
-        currentLat,
-        currentLon
-      );
       
-      // Only add distance if accuracy is reasonable and movement is significant
-      // Filter out GPS drift (movements less than ~16 feet)
-      if (accuracy < 100 && distance > 0.003) {
-        setGpsDistance(prev => {
-          const newDistance = prev + distance;
-          
-          // Auto-complete mile if we've traveled 1 mile since last mile marker
-          if (activeSession && isRunning && newDistance - lastMileDistanceRef.current >= 1.0) {
-            completeMile();
-            lastMileDistanceRef.current = newDistance;
-          }
-          
-          return newDistance;
-        });
+      if (previousPositionRef.current) {
+        const distance = calculateDistance(
+          previousPositionRef.current.lat,
+          previousPositionRef.current.lon,
+          currentLat,
+          currentLon
+        );
+        
+        // Only add distance if movement is significant (> ~16 feet to filter GPS drift)
+        if (distance > 0.003) {
+          setGpsDistance(prev => {
+            const newDistance = prev + distance;
+            
+            // Auto-complete mile if we've traveled 1 mile since last mile marker
+            if (activeSession && isRunning && newDistance - lastMileDistanceRef.current >= 1.0) {
+              completeMile();
+              lastMileDistanceRef.current = newDistance;
+            }
+            
+            return newDistance;
+          });
+        }
       }
+      
+      // Only update previous position if current accuracy is good
+      previousPositionRef.current = {
+        lat: currentLat,
+        lon: currentLon,
+        timestamp: position.timestamp
+      };
     }
-    
-    previousPositionRef.current = {
-      lat: currentLat,
-      lon: currentLon,
-      timestamp: position.timestamp
-    };
   };
 
   const handleGPSError = (error: GeolocationPositionError) => {
