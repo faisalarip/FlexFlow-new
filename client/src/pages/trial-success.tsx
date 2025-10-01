@@ -1,53 +1,9 @@
-import { useEffect } from "react";
 import { Activity, CheckCircle, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-
-// Declare the stripe-buy-button element for TypeScript
-declare global {
-  namespace JSX {
-    interface IntrinsicElements {
-      'stripe-buy-button': {
-        'buy-button-id': string;
-        'publishable-key': string;
-      };
-    }
-  }
-}
+import { Link } from "wouter";
 
 export default function TrialSuccess() {
-  useEffect(() => {
-    // Check if script is already loaded
-    const existingScript = document.querySelector('script[src="https://js.stripe.com/v3/buy-button.js"]');
-    
-    if (!existingScript) {
-      // Load Stripe buy button script
-      const script = document.createElement('script');
-      script.src = 'https://js.stripe.com/v3/buy-button.js';
-      script.async = true;
-      script.crossOrigin = 'anonymous';
-      
-      // Add error handling
-      script.onerror = (error) => {
-        console.error('Failed to load Stripe script:', error);
-      };
-      
-      script.onload = () => {
-        console.log('Stripe script loaded successfully');
-      };
-      
-      document.head.appendChild(script);
-    }
-
-    // Check if user came from successful subscription
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('success') === 'true') {
-      // Redirect to create account after successful trial activation
-      setTimeout(() => {
-        window.location.href = '/auth';
-      }, 2000);
-    }
-  }, []);
 
 
   return (
@@ -144,13 +100,11 @@ export default function TrialSuccess() {
               </div>
             </div>
 
-            <div className="w-full" data-testid="stripe-buy-button-container">
-              <stripe-buy-button
-                buy-button-id="buy_btn_1S0D64D5Ue5ytgHWvbMKX18b"
-                publishable-key="pk_live_51RydqBD5Ue5ytgHWpjOJg39P8VJu0EJMTBHZfdtZCSfRkf7EelPmERe5jat5DVUiIhfE1yDnyGVeBs9arKDQn8nZ00sMOvjEja"
-              >
-              </stripe-buy-button>
-            </div>
+            <Link href="/auth">
+              <Button className="w-full" size="lg">
+                Create Your Account <ArrowRight className="ml-2 w-4 h-4" />
+              </Button>
+            </Link>
           </CardContent>
         </Card>
 

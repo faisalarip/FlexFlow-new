@@ -1,72 +1,9 @@
-import { useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, Check } from "lucide-react";
 import { Link } from "wouter";
 
-// Extend JSX types to include Stripe buy button
-declare global {
-  namespace JSX {
-    interface IntrinsicElements {
-      'stripe-buy-button': {
-        'buy-button-id': string;
-        'publishable-key': string;
-      };
-    }
-  }
-}
-
-// Stripe Buy Button Script Loader
-const loadStripeScript = () => {
-  if (document.getElementById('stripe-buy-button-script')) {
-    return; // Script already loaded
-  }
-  
-  const script = document.createElement('script');
-  script.id = 'stripe-buy-button-script';
-  script.async = true;
-  script.src = 'https://js.stripe.com/v3/buy-button.js';
-  document.head.appendChild(script);
-};
-
-// Stripe Buy Button Component for Premium Monthly
-const StripeBuyButtonPremium = () => {
-  useEffect(() => {
-    loadStripeScript();
-  }, []);
-
-  return (
-    <div className="stripe-buy-button-container">
-      <stripe-buy-button
-        buy-button-id="buy_btn_1S0D80D5Ue5ytgHWLCHlU78G"
-        publishable-key="pk_live_51RydqBD5Ue5ytgHWpjOJg39P8VJu0EJMTBHZfdtZCSfRkf7EelPmERe5jat5DVUiIhfE1yDnyGVeBs9arKDQn8nZ00sMOvjEja"
-      >
-      </stripe-buy-button>
-    </div>
-  );
-};
-
-// Stripe Buy Button Component for Premium Annual
-const StripeBuyButtonAnnual = () => {
-  useEffect(() => {
-    loadStripeScript();
-  }, []);
-
-  return (
-    <div className="stripe-buy-button-container">
-      <stripe-buy-button
-        buy-button-id="buy_btn_1S0D64D5Ue5ytgHWvbMKX18b"
-        publishable-key="pk_live_51RydqBD5Ue5ytgHWpjOJg39P8VJu0EJMTBHZfdtZCSfRkf7EelPmERe5jat5DVUiIhfE1yDnyGVeBs9arKDQn8nZ00sMOvjEja"
-      >
-      </stripe-buy-button>
-    </div>
-  );
-};
-
 export default function Subscribe() {
-  useEffect(() => {
-    loadStripeScript();
-  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
@@ -82,30 +19,15 @@ export default function Subscribe() {
 
         <div className="space-y-8">
           {/* Subscription Plans */}
-          <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-            <Card className="relative">
-              <CardHeader>
-                <CardTitle>Monthly Premium</CardTitle>
-                <CardDescription>Best value for committed users</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex justify-center">
-                  <StripeBuyButtonPremium />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="relative">
-              <CardHeader>
-                <CardTitle>Monthly Premium</CardTitle>
-                <CardDescription>Perfect for getting started</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex justify-center">
-                  <StripeBuyButtonAnnual />
-                </div>
-              </CardContent>
-            </Card>
+          <div className="text-center p-8 bg-white rounded-lg shadow-md">
+            <p className="text-lg text-gray-600">
+              Premium subscription features are managed through your account settings.
+            </p>
+            <Link href="/user-subscription">
+              <Button className="mt-4">
+                View Subscription Options
+              </Button>
+            </Link>
           </div>
 
           {/* Features */}
@@ -125,10 +47,6 @@ export default function Subscribe() {
                   <li className="flex items-center text-sm">
                     <Check className="w-4 h-4 mr-3 text-green-600 flex-shrink-0" />
                     Advanced analytics & progress reports
-                  </li>
-                  <li className="flex items-center text-sm">
-                    <Check className="w-4 h-4 mr-3 text-green-600 flex-shrink-0" />
-                    Personal trainer booking & sessions
                   </li>
                   <li className="flex items-center text-sm">
                     <Check className="w-4 h-4 mr-3 text-green-600 flex-shrink-0" />
