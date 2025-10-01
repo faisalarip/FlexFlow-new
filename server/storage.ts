@@ -599,9 +599,19 @@ export class MemStorage implements IStorage {
   async updateUserActivity(id: string, activityDate: Date): Promise<User | undefined> {
     const user = this.users.get(id);
     if (user) {
+      const now = new Date();
+      // Security: Prevent future-dating activities to manipulate streaks
+      const effectiveDate = activityDate > now ? now : activityDate;
+      
+      // Security: Prevent backdating to rebuild streaks - only accept non-decreasing dates
+      if (user.lastActivityDate && effectiveDate < new Date(user.lastActivityDate)) {
+        // Backdated activity - don't update streak, just track the activity
+        return user;
+      }
+      
       // Recalculate streak based on all activities
       const newStreak = await this.calculateUserStreak(id);
-      const updatedUser = { ...user, lastActivityDate: activityDate, streak: newStreak };
+      const updatedUser = { ...user, lastActivityDate: effectiveDate, streak: newStreak };
       this.users.set(id, updatedUser);
       return updatedUser;
     }
