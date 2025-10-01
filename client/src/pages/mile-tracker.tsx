@@ -18,7 +18,17 @@ export default function MileTracker() {
   const [currentMile, setCurrentMile] = useState(0);
   const [showHistory, setShowHistory] = useState(false);
   
+  // GPS tracking state
+  const [gpsEnabled, setGpsEnabled] = useState(false);
+  const [gpsDistance, setGpsDistance] = useState(0); // in miles
+  const [gpsAccuracy, setGpsAccuracy] = useState<number | null>(null); // in meters
+  const [currentSpeed, setCurrentSpeed] = useState<number | null>(null); // in mph
+  
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const gpsWatchRef = useRef<number | null>(null);
+  const previousPositionRef = useRef<{ lat: number; lon: number; timestamp: number } | null>(null);
+  const lastMileDistanceRef = useRef(0); // Track distance at last mile completion
+  
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -194,8 +204,128 @@ export default function MileTracker() {
     }
   };
 
+  // GPS Functions - Haversine formula to calculate distance between two GPS points
+  const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+    const R = 3958.8; // Earth radius in miles
+    
+    const lat1Rad = lat1 * (Math.PI / 180);
+    const lat2Rad = lat2 * (Math.PI / 180);
+    const deltaLat = (lat2 - lat1) * (Math.PI / 180);
+    const deltaLon = (lon2 - lon1) * (Math.PI / 180);
+    
+    const a = Math.sin(deltaLat/2) * Math.sin(deltaLat/2) +
+              Math.cos(lat1Rad) * Math.cos(lat2Rad) *
+              Math.sin(deltaLon/2) * Math.sin(deltaLon/2);
+    
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+  };
+
+  const handleGPSPosition = (position: GeolocationPosition) => {
+    const currentLat = position.coords.latitude;
+    const currentLon = position.coords.longitude;
+    const accuracy = position.coords.accuracy;
+    const speed = position.coords.speed; // in m/s
+    
+    setGpsAccuracy(accuracy);
+    
+    // Convert speed from m/s to mph
+    if (speed !== null && speed >= 0) {
+      setCurrentSpeed(speed * 2.237); // m/s to mph conversion
+    }
+    
+    if (previousPositionRef.current) {
+      const distance = calculateDistance(
+        previousPositionRef.current.lat,
+        previousPositionRef.current.lon,
+        currentLat,
+        currentLon
+      );
+      
+      // Only add distance if accuracy is reasonable and movement is significant
+      // Filter out GPS drift (movements less than ~16 feet)
+      if (accuracy < 100 && distance > 0.003) {
+        setGpsDistance(prev => {
+          const newDistance = prev + distance;
+          
+          // Auto-complete mile if we've traveled 1 mile since last mile marker
+          if (activeSession && isRunning && newDistance - lastMileDistanceRef.current >= 1.0) {
+            completeMile();
+            lastMileDistanceRef.current = newDistance;
+          }
+          
+          return newDistance;
+        });
+      }
+    }
+    
+    previousPositionRef.current = {
+      lat: currentLat,
+      lon: currentLon,
+      timestamp: position.timestamp
+    };
+  };
+
+  const handleGPSError = (error: GeolocationPositionError) => {
+    let message = "GPS error occurred";
+    
+    switch(error.code) {
+      case error.PERMISSION_DENIED:
+        message = "Location access denied. Please enable location permissions.";
+        break;
+      case error.POSITION_UNAVAILABLE:
+        message = "Location unavailable. Make sure GPS is enabled.";
+        break;
+      case error.TIMEOUT:
+        message = "Location request timed out.";
+        break;
+    }
+    
+    toast({ title: "GPS Error", description: message, variant: "destructive" });
+    setGpsEnabled(false);
+  };
+
+  const startGPSTracking = () => {
+    if (!('geolocation' in navigator)) {
+      toast({ 
+        title: "GPS Not Available", 
+        description: "Your device doesn't support GPS tracking.", 
+        variant: "destructive" 
+      });
+      return;
+    }
+
+    const watchId = navigator.geolocation.watchPosition(
+      handleGPSPosition,
+      handleGPSError,
+      {
+        enableHighAccuracy: true,
+        timeout: 5000,
+        maximumAge: 0
+      }
+    );
+    
+    gpsWatchRef.current = watchId;
+    setGpsEnabled(true);
+    toast({ title: "GPS Enabled", description: "Tracking your location in real-time" });
+  };
+
+  const stopGPSTracking = () => {
+    if (gpsWatchRef.current !== null) {
+      navigator.geolocation.clearWatch(gpsWatchRef.current);
+      gpsWatchRef.current = null;
+    }
+    setGpsEnabled(false);
+    setGpsAccuracy(null);
+    setCurrentSpeed(null);
+  };
+
   const startSession = () => {
     startSessionMutation.mutate(selectedActivity);
+    // Reset GPS tracking data
+    setGpsDistance(0);
+    previousPositionRef.current = null;
+    lastMileDistanceRef.current = 0;
   };
 
   const pauseResume = () => {
@@ -221,7 +351,15 @@ export default function MileTracker() {
   const finishSession = () => {
     if (!activeSession) return;
     finishSessionMutation.mutate(activeSession.id);
+    stopGPSTracking(); // Stop GPS when session ends
   };
+
+  // Clean up GPS tracking on unmount
+  useEffect(() => {
+    return () => {
+      stopGPSTracking();
+    };
+  }, []);
 
   if (showHistory) {
     return (
@@ -409,9 +547,43 @@ export default function MileTracker() {
                     {formatTime(currentTime)}
                   </div>
                   
-                  <div className="text-2xl text-red-300 mb-8 font-bold">
+                  <div className="text-2xl text-red-300 mb-4 font-bold">
                     🏃‍♂️ MILE {currentMile} • ⚡ SPEED: {getCurrentPace()}/mile 💨
                   </div>
+
+                  {/* GPS Stats Display */}
+                  {gpsEnabled && (
+                    <div className="mb-6 p-4 bg-gradient-to-r from-blue-900/50 to-purple-900/50 rounded-xl border border-blue-500/30">
+                      <div className="flex items-center justify-center gap-6 flex-wrap text-sm">
+                        <div className="flex items-center gap-2">
+                          <MapPin className="text-blue-400" size={16} />
+                          <span className="text-blue-300 font-semibold">
+                            GPS: {gpsDistance.toFixed(2)} mi
+                          </span>
+                        </div>
+                        {currentSpeed !== null && (
+                          <div className="flex items-center gap-2">
+                            <Gauge className="text-green-400" size={16} />
+                            <span className="text-green-300 font-semibold">
+                              {currentSpeed.toFixed(1)} mph
+                            </span>
+                          </div>
+                        )}
+                        {gpsAccuracy !== null && (
+                          <div className="flex items-center gap-2">
+                            <Activity className="text-yellow-400" size={16} />
+                            <span className={`font-semibold ${
+                              gpsAccuracy < 20 ? 'text-green-300' : 
+                              gpsAccuracy < 50 ? 'text-yellow-300' : 
+                              'text-orange-300'
+                            }`}>
+                              ±{gpsAccuracy.toFixed(0)}m
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
 
                   <div className="flex justify-center space-x-4 flex-wrap gap-4">
                     <Button 
@@ -424,6 +596,19 @@ export default function MileTracker() {
                     >
                       {isRunning ? <Pause className="mr-2 animate-pulse" size={20} /> : <Play className="mr-2 animate-bounce" size={20} />}
                       {isRunning ? "⏸️ CHILL" : "▶️ UNLEASH!"}
+                    </Button>
+                    
+                    <Button 
+                      onClick={gpsEnabled ? stopGPSTracking : startGPSTracking}
+                      className={gpsEnabled ?
+                        "bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white border border-blue-500 shadow-lg shadow-blue-500/25" :
+                        "bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white border border-purple-500 shadow-lg shadow-purple-500/25"
+                      }
+                      size="lg"
+                      data-testid={gpsEnabled ? "button-gps-stop" : "button-gps-start"}
+                    >
+                      <MapPin className={gpsEnabled ? "mr-2 animate-pulse" : "mr-2"} size={20} />
+                      {gpsEnabled ? "📍 GPS ON" : "🛰️ START GPS"}
                     </Button>
                     
                     <Button 
