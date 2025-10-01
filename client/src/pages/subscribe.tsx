@@ -1,9 +1,32 @@
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, Check } from "lucide-react";
 import { Link } from "wouter";
 
+// Extend JSX types to include Stripe buy button
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      'stripe-buy-button': {
+        'buy-button-id': string;
+        'publishable-key': string;
+      };
+    }
+  }
+}
+
 export default function Subscribe() {
+  useEffect(() => {
+    // Load Stripe buy button script
+    if (!document.getElementById('stripe-buy-button-script')) {
+      const script = document.createElement('script');
+      script.id = 'stripe-buy-button-script';
+      script.async = true;
+      script.src = 'https://js.stripe.com/v3/buy-button.js';
+      document.head.appendChild(script);
+    }
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
@@ -19,16 +42,21 @@ export default function Subscribe() {
 
         <div className="space-y-8">
           {/* Subscription Plans */}
-          <div className="text-center p-8 bg-white rounded-lg shadow-md">
-            <p className="text-lg text-gray-600">
-              Premium subscription features are managed through your account settings.
-            </p>
-            <Link href="/user-subscription">
-              <Button className="mt-4">
-                View Subscription Options
-              </Button>
-            </Link>
-          </div>
+          <Card>
+            <CardHeader className="text-center">
+              <CardTitle>Premium Subscription</CardTitle>
+              <CardDescription>$15.99/month - Cancel anytime</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex justify-center">
+                <stripe-buy-button
+                  buy-button-id="buy_btn_1S0D64D5Ue5ytgHWvbMKX18b"
+                  publishable-key="pk_live_51RydqBD5Ue5ytgHWpjOJg39P8VJu0EJMTBHZfdtZCSfRkf7EelPmERe5jat5DVUiIhfE1yDnyGVeBs9arKDQn8nZ00sMOvjEja"
+                >
+                </stripe-buy-button>
+              </div>
+            </CardContent>
+          </Card>
 
           {/* Features */}
           <Card>
