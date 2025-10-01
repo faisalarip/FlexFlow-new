@@ -29,6 +29,7 @@ export const users = pgTable("users", {
   isEmailVerified: boolean("is_email_verified").default(false),
   streak: integer("streak").notNull().default(0),
   lastWorkoutDate: timestamp("last_workout_date"),
+  lastActivityDate: timestamp("last_activity_date"), // Tracks ANY activity (workout, meal, scan)
   subscriptionStatus: varchar("subscription_status").default("free_trial"), // free_trial, active, inactive, expired
   subscriptionStartDate: timestamp("subscription_start_date"),
   lastPaymentDate: timestamp("last_payment_date"),
