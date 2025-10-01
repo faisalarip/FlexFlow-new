@@ -268,10 +268,6 @@ export default function UserSubscription() {
               </div>
               <div className="flex items-center">
                 <CheckCircle size={16} className="text-green-600 mr-3 flex-shrink-0" />
-                <span className="text-gray-700 dark:text-gray-300">Personal trainer bookings</span>
-              </div>
-              <div className="flex items-center">
-                <CheckCircle size={16} className="text-green-600 mr-3 flex-shrink-0" />
                 <span className="text-gray-700 dark:text-gray-300">Custom meal plans</span>
               </div>
               <div className="flex items-center">
