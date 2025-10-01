@@ -10,6 +10,17 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import FeatureGate from "@/components/feature-gate";
 import type { MileTrackerSessionWithSplits } from "@shared/schema";
+import { MapContainer, TileLayer, Polyline, Marker, useMap } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
+
+// Fix for default marker icons in Leaflet
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
 
 export default function MileTracker() {
   const [selectedActivity, setSelectedActivity] = useState<"run" | "walk" | "bike">("run");
@@ -23,6 +34,8 @@ export default function MileTracker() {
   const [gpsDistance, setGpsDistance] = useState(0); // in miles
   const [gpsAccuracy, setGpsAccuracy] = useState<number | null>(null); // in meters
   const [currentSpeed, setCurrentSpeed] = useState<number | null>(null); // in mph
+  const [gpsPath, setGpsPath] = useState<[number, number][]>([]); // Array of [lat, lng] coordinates
+  const [currentPosition, setCurrentPosition] = useState<[number, number] | null>(null);
   
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const gpsWatchRef = useRef<number | null>(null);
@@ -228,10 +241,16 @@ export default function MileTracker() {
     const speed = position.coords.speed; // in m/s
     
     setGpsAccuracy(accuracy);
+    setCurrentPosition([currentLat, currentLon]);
     
     // Convert speed from m/s to mph
     if (speed !== null && speed >= 0) {
       setCurrentSpeed(speed * 2.237); // m/s to mph conversion
+    }
+    
+    // Add to path if accuracy is good
+    if (accuracy < 100) {
+      setGpsPath(prev => [...prev, [currentLat, currentLon]]);
     }
     
     if (previousPositionRef.current) {
@@ -324,6 +343,8 @@ export default function MileTracker() {
     startSessionMutation.mutate(selectedActivity);
     // Reset GPS tracking data
     setGpsDistance(0);
+    setGpsPath([]);
+    setCurrentPosition(null);
     previousPositionRef.current = null;
     lastMileDistanceRef.current = 0;
   };
@@ -360,6 +381,17 @@ export default function MileTracker() {
       stopGPSTracking();
     };
   }, []);
+
+  // Component to auto-center map on current position
+  function MapUpdater({ center }: { center: [number, number] | null }) {
+    const map = useMap();
+    useEffect(() => {
+      if (center) {
+        map.setView(center, 16);
+      }
+    }, [center, map]);
+    return null;
+  }
 
   if (showHistory) {
     return (
@@ -634,6 +666,55 @@ export default function MileTracker() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* GPS Map */}
+            {gpsEnabled && currentPosition && (
+              <Card className="bg-gradient-to-br from-gray-900 to-black border border-blue-500/50 shadow-xl shadow-blue-500/20">
+                <CardHeader>
+                  <CardTitle className="flex items-center text-2xl font-bold text-blue-400">
+                    <MapPin className="mr-3 text-blue-500 animate-pulse" size={28} />
+                    🗺️ LIVE GPS TRACKING 📍
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[400px] rounded-lg overflow-hidden border-2 border-blue-500/30">
+                    <MapContainer
+                      center={currentPosition}
+                      zoom={16}
+                      style={{ height: '100%', width: '100%' }}
+                      className="z-0"
+                    >
+                      <TileLayer
+                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                      />
+                      <MapUpdater center={currentPosition} />
+                      {gpsPath.length > 1 && (
+                        <Polyline
+                          positions={gpsPath}
+                          color="#ef4444"
+                          weight={4}
+                          opacity={0.8}
+                        />
+                      )}
+                      {currentPosition && (
+                        <Marker position={currentPosition} />
+                      )}
+                    </MapContainer>
+                  </div>
+                  <div className="mt-4 text-center">
+                    <p className="text-blue-300 font-semibold">
+                      🎯 Total Distance: <span className="text-blue-400 text-lg font-bold">{gpsDistance.toFixed(2)} miles</span>
+                    </p>
+                    {gpsPath.length > 0 && (
+                      <p className="text-sm text-blue-400/70 mt-1">
+                        📊 {gpsPath.length} GPS points tracked
+                      </p>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
             {/* Mile Splits */}
             {activeSession.splits.length > 0 && (
