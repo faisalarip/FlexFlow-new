@@ -211,6 +211,10 @@ export default function WorkoutLogger() {
     onSuccess: (workoutData) => {
       queryClient.invalidateQueries({ queryKey: ["/api/workouts"] });
       queryClient.invalidateQueries({ queryKey: ["/api/stats"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/progress/metrics"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/goals"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/progress/weight"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/performance-analytics"] });
       
       // Store completed workout data and show progress photo prompt
       setLastCompletedWorkout(workoutData);

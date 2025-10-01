@@ -985,19 +985,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ received: true });
   });
 
-  // Update goal
-  app.patch("/api/goals/:id", async (req, res) => {
-    try {
-      const goal = await storage.updateGoal(req.params.id, req.body);
-      if (!goal) {
-        return res.status(404).json({ message: "Goal not found" });
-      }
-      res.json(goal);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to update goal" });
-    }
-  });
-
   // Get workouts by date range (for calendar)
   app.get("/api/workouts/range/:start/:end", authenticateToken, async (req, res) => {
     try {
