@@ -52,14 +52,6 @@ export default function Home() {
       testId: "link-mile-tracker"
     },
     {
-      icon: Target,
-      title: "Set Goals",
-      description: "Create fitness goals and track your progress",
-      link: "/progress",
-      color: "red-light",
-      testId: "link-goals"
-    },
-    {
       icon: TrendingUp,
       title: "View Progress",
       description: "See charts and analytics of your fitness journey",
@@ -251,7 +243,7 @@ export default function Home() {
                   </li>
                   <li className="flex items-start" data-testid="text-tip-2">
                     <span className="text-red-500 font-bold mr-2">2.</span>
-                    <span>Visit <strong className="text-red-400">Set Goals</strong> to define your fitness targets</span>
+                    <span>Use <strong className="text-red-400">Mile Tracker</strong> to automatically count your running distance</span>
                   </li>
                   <li className="flex items-start" data-testid="text-tip-3">
                     <span className="text-red-500 font-bold mr-2">3.</span>
