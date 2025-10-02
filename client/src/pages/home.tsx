@@ -8,6 +8,12 @@ import ProfileEditor from "@/components/profile-editor";
 import { useNewAuth } from "@/hooks/useNewAuth";
 import { Card, CardContent } from "@/components/ui/card";
 import heroImage from "@assets/stock_images/men_and_women_workin_dbbf742b.jpg";
+import womanWeights1 from "@assets/stock_images/woman_strength_train_10dee1d1.jpg";
+import womanWeights2 from "@assets/stock_images/woman_strength_train_eff6079d.jpg";
+import manCardio1 from "@assets/stock_images/man_doing_cardio_run_26f92c48.jpg";
+import manCardio2 from "@assets/stock_images/man_doing_cardio_run_1b64af4d.jpg";
+import groupFitness1 from "@assets/stock_images/people_group_fitness_14845970.jpg";
+import groupFitness2 from "@assets/stock_images/people_group_fitness_0fe8a6fd.jpg";
 
 export default function Home() {
   const [showProfileEditor, setShowProfileEditor] = useState(false);
@@ -107,13 +113,57 @@ export default function Home() {
             Track workouts, monitor progress, compete on leaderboards, and use GPS to automatically count your miles. 
             Upgrade to Premium for AI-powered workout and meal recommendations.
           </p>
-          <div className="max-w-4xl mx-auto">
+          
+          {/* Image Gallery */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-6xl mx-auto">
             <img 
               src={heroImage} 
               alt="Men and women working out together" 
-              className="w-full h-64 md:h-96 object-cover rounded-2xl shadow-2xl shadow-red-900/50 border-2 border-red-500/30"
-              data-testid="img-hero"
+              className="w-full h-48 object-cover rounded-xl shadow-lg shadow-red-900/50 border border-red-500/30 hover:scale-105 transition-transform"
+              data-testid="img-hero-1"
             />
+            <img 
+              src={womanWeights1} 
+              alt="Woman strength training with weights" 
+              className="w-full h-48 object-cover rounded-xl shadow-lg shadow-red-900/50 border border-red-500/30 hover:scale-105 transition-transform"
+              data-testid="img-hero-2"
+            />
+            <img 
+              src={manCardio1} 
+              alt="Man doing cardio running" 
+              className="w-full h-48 object-cover rounded-xl shadow-lg shadow-red-900/50 border border-red-500/30 hover:scale-105 transition-transform"
+              data-testid="img-hero-3"
+            />
+            <img 
+              src={groupFitness1} 
+              alt="Group fitness class" 
+              className="w-full h-48 object-cover rounded-xl shadow-lg shadow-red-900/50 border border-red-500/30 hover:scale-105 transition-transform"
+              data-testid="img-hero-4"
+            />
+            <img 
+              src={womanWeights2} 
+              alt="Woman weightlifting in gym" 
+              className="w-full h-48 object-cover rounded-xl shadow-lg shadow-red-900/50 border border-red-500/30 hover:scale-105 transition-transform"
+              data-testid="img-hero-5"
+            />
+            <img 
+              src={manCardio2} 
+              alt="Man fitness exercise" 
+              className="w-full h-48 object-cover rounded-xl shadow-lg shadow-red-900/50 border border-red-500/30 hover:scale-105 transition-transform"
+              data-testid="img-hero-6"
+            />
+            <img 
+              src={groupFitness2} 
+              alt="People group workout" 
+              className="w-full h-48 object-cover rounded-xl shadow-lg shadow-red-900/50 border border-red-500/30 hover:scale-105 transition-transform"
+              data-testid="img-hero-7"
+            />
+            <div className="w-full h-48 bg-gradient-to-br from-red-500 to-red-700 rounded-xl shadow-lg shadow-red-900/50 border border-red-500/30 flex items-center justify-center hover:scale-105 transition-transform">
+              <div className="text-center text-white px-4">
+                <Dumbbell size={48} className="mx-auto mb-3" />
+                <p className="font-bold text-lg">Start Your Journey</p>
+              </div>
+            </div>
           </div>
         </div>
 
