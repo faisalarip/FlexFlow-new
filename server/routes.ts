@@ -2507,7 +2507,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   }
   
   // Lookup nutrition data by barcode
-  app.post("/api/meal-entries/barcode-lookup", authenticateToken, async (req, res) => {
+  app.post("/api/meal-entries/barcode-lookup", authenticateToken, requireFeatureAccess(PREMIUM_FEATURES.MEAL_TRACKER), async (req, res) => {
     try {
       const { barcode } = req.body;
       
@@ -2529,7 +2529,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get meal entries for a user (optionally filtered by date)
-  app.get("/api/meal-entries", authenticateToken, async (req, res) => {
+  app.get("/api/meal-entries", authenticateToken, requireFeatureAccess(PREMIUM_FEATURES.MEAL_TRACKER), async (req, res) => {
     try {
       const userId = getAuthUserId(req);
       if (!userId) {
