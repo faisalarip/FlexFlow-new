@@ -1800,7 +1800,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Meal Plan Routes
 
   // Get all meal plans (optionally filtered by goal)
-  app.get("/api/meal-plans", async (req, res) => {
+  app.get("/api/meal-plans", authenticateToken, requireFeatureAccess(PREMIUM_FEATURES.MEAL_PLANS), async (req, res) => {
     try {
       const { goal } = req.query;
       const mealPlans = await storage.getMealPlans(goal as string);
@@ -1812,7 +1812,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get specific meal plan by ID
-  app.get("/api/meal-plans/:id", async (req, res) => {
+  app.get("/api/meal-plans/:id", authenticateToken, requireFeatureAccess(PREMIUM_FEATURES.MEAL_PLANS), async (req, res) => {
     try {
       const mealPlan = await storage.getMealPlan(req.params.id);
       if (!mealPlan) {
@@ -1826,7 +1826,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create a new meal plan
-  app.post("/api/meal-plans", async (req, res) => {
+  app.post("/api/meal-plans", authenticateToken, requireFeatureAccess(PREMIUM_FEATURES.MEAL_PLANS), async (req, res) => {
     try {
       const data = insertMealPlanSchema.parse(req.body);
       const mealPlan = await storage.createMealPlan(data);
@@ -1841,7 +1841,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get current user's meal plan
-  app.get("/api/user-meal-plan", authenticateToken, async (req, res) => {
+  app.get("/api/user-meal-plan", authenticateToken, requireFeatureAccess(PREMIUM_FEATURES.MEAL_PLANS), async (req, res) => {
     try {
       const userId = getAuthUserId(req);
       if (!userId) {
@@ -1859,7 +1859,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Assign a meal plan to the current user
-  app.post("/api/user-meal-plan", authenticateToken, async (req, res) => {
+  app.post("/api/user-meal-plan", authenticateToken, requireFeatureAccess(PREMIUM_FEATURES.MEAL_PLANS), async (req, res) => {
     try {
       const userId = getAuthUserId(req);
       console.log("Assigning meal plan for user:", userId);
@@ -1896,7 +1896,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get user meal preferences
-  app.get("/api/user-meal-preferences", authenticateToken, async (req, res) => {
+  app.get("/api/user-meal-preferences", authenticateToken, requireFeatureAccess(PREMIUM_FEATURES.MEAL_PLANS), async (req, res) => {
     try {
       const userId = getAuthUserId(req);
       if (!userId) {
@@ -1911,7 +1911,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create or update user meal preferences
-  app.post("/api/user-meal-preferences", authenticateToken, async (req, res) => {
+  app.post("/api/user-meal-preferences", authenticateToken, requireFeatureAccess(PREMIUM_FEATURES.MEAL_PLANS), async (req, res) => {
     try {
       const userId = getAuthUserId(req);
       if (!userId) {
