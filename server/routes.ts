@@ -1364,7 +1364,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Mile Tracker Routes
 
   // Get all mile tracker sessions for user
-  app.get("/api/mile-tracker/sessions", authenticateToken, async (req, res) => {
+  app.get("/api/mile-tracker/sessions", authenticateToken, requireFeatureAccess(PREMIUM_FEATURES.MILE_TRACKER), async (req, res) => {
     try {
       const userId = getAuthUserId(req);
       if (!userId) {
@@ -1379,7 +1379,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get active mile tracker session
-  app.get("/api/mile-tracker/sessions/active", authenticateToken, async (req, res) => {
+  app.get("/api/mile-tracker/sessions/active", authenticateToken, requireFeatureAccess(PREMIUM_FEATURES.MILE_TRACKER), async (req, res) => {
     try {
       const userId = getAuthUserId(req);
       if (!userId) {
@@ -1411,7 +1411,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Start new mile tracker session
-  app.post("/api/mile-tracker/sessions", authenticateToken, async (req, res) => {
+  app.post("/api/mile-tracker/sessions", authenticateToken, requireFeatureAccess(PREMIUM_FEATURES.MILE_TRACKER), async (req, res) => {
     try {
       const userId = getAuthUserId(req);
       if (!userId) {
@@ -1441,7 +1441,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update mile tracker session (for completing, pausing, etc.)
-  app.patch("/api/mile-tracker/sessions/:id", async (req, res) => {
+  app.patch("/api/mile-tracker/sessions/:id", authenticateToken, requireFeatureAccess(PREMIUM_FEATURES.MILE_TRACKER), async (req, res) => {
     try {
       const session = await storage.updateMileTrackerSession(req.params.id, req.body);
       if (!session) {
@@ -1455,7 +1455,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Add mile split to session
-  app.post("/api/mile-tracker/sessions/:sessionId/splits", authenticateToken, async (req, res) => {
+  app.post("/api/mile-tracker/sessions/:sessionId/splits", authenticateToken, requireFeatureAccess(PREMIUM_FEATURES.MILE_TRACKER), async (req, res) => {
     try {
       const userId = getAuthUserId(req);
       if (!userId) {
