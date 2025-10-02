@@ -179,6 +179,7 @@ export default function Home() {
             {features.map((feature) => {
               const Icon = feature.icon;
               const isLogWorkouts = feature.title === "Log Workouts";
+              const isMileTracker = feature.title === "Mile Tracker";
               
               return (
                 <Link key={feature.title} href={feature.link}>
@@ -195,6 +196,18 @@ export default function Home() {
                             className="w-full h-full object-cover opacity-30 group-hover:opacity-40 transition-opacity"
                           />
                           <div className="absolute inset-0 bg-gradient-to-br from-red-900/80 to-black/90"></div>
+                        </div>
+                      </>
+                    )}
+                    {isMileTracker && (
+                      <>
+                        <div className="absolute inset-0">
+                          <img 
+                            src={manCardio1} 
+                            alt="Running background" 
+                            className="w-full h-full object-cover opacity-30 group-hover:opacity-40 transition-opacity"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-br from-red-600/80 to-red-900/90"></div>
                         </div>
                       </>
                     )}
