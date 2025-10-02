@@ -366,7 +366,7 @@ export class MemStorage implements IStorage {
       {
         name: "Hip Thrusts",
         category: "strength",
-        description: "PROPER FORM INSTRUCTIONS:\n\n1. SIT with your upper back against a bench, shoulder blades on the edge\n2. PLACE barbell or weight over your hips (use a pad for comfort)\n3. PLANT feet firmly on ground, shoulder-width apart, knees bent 90 degrees\n4. DRIVE through your heels to lift hips up, creating a straight line from knees to shoulders\n5. SQUEEZE glutes hard at the top position and hold for 1 second\n6. LOWER with control back to starting position\n\nKEY TIPS:\n• Focus on glute squeeze at the top\n• Keep your ribs down, don't overarch your back\n• Drive through your heels, not your toes\n• Keep your chin tucked, don't look up\n• Start with bodyweight before adding resistance",
+        description: "Glute and hamstring exercise using a bench for support",
         muscleGroups: ["glutes", "hamstrings", "core"],
         equipment: "bench"
       },
