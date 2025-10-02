@@ -7,6 +7,7 @@ import QuickStats from "@/components/quick-stats";
 import ProfileEditor from "@/components/profile-editor";
 import { useNewAuth } from "@/hooks/useNewAuth";
 import { Card, CardContent } from "@/components/ui/card";
+import heroImage from "@assets/stock_images/men_and_women_workin_dbbf742b.jpg";
 
 export default function Home() {
   const [showProfileEditor, setShowProfileEditor] = useState(false);
@@ -102,10 +103,18 @@ export default function Home() {
           <p className="text-xl md:text-2xl text-gray-300 mb-6" data-testid="text-tagline">
             Your complete fitness tracking companion
           </p>
-          <p className="text-lg text-gray-400 max-w-2xl mx-auto" data-testid="text-description">
+          <p className="text-lg text-gray-400 max-w-2xl mx-auto mb-8" data-testid="text-description">
             Track workouts, monitor progress, compete on leaderboards, and use GPS to automatically count your miles. 
             Upgrade to Premium for AI-powered workout and meal recommendations.
           </p>
+          <div className="max-w-4xl mx-auto">
+            <img 
+              src={heroImage} 
+              alt="Men and women working out together" 
+              className="w-full h-64 md:h-96 object-cover rounded-2xl shadow-2xl shadow-red-900/50 border-2 border-red-500/30"
+              data-testid="img-hero"
+            />
+          </div>
         </div>
 
         {/* Quick Stats Overview */}
