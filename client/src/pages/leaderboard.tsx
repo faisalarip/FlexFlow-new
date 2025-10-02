@@ -1,12 +1,30 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Trophy, Medal, Award, Users, Crown, Star, Sparkles } from "lucide-react";
+import { Trophy, Medal, Award, Users, Crown, Star, Sparkles, Flame, Zap, Target } from "lucide-react";
 import type { LeaderboardEntry } from "@shared/schema";
 
 export default function Leaderboard() {
   const { data: leaderboard, isLoading } = useQuery<LeaderboardEntry[]>({
     queryKey: ["/api/leaderboard"],
   });
+
+  const getRankTitle = (rank: number) => {
+    if (rank === 1) return "🏆 LEGEND";
+    if (rank === 2) return "🥈 ELITE MASTER";
+    if (rank === 3) return "🥉 CHAMPION";
+    if (rank <= 10) return "⚡ TOP 10 ELITE";
+    if (rank <= 50) return "🔥 TOP 50 WARRIOR";
+    return "💪 COMPETITOR";
+  };
+
+  const getRankBadge = (rank: number) => {
+    if (rank === 1) return { icon: Crown, color: "text-yellow-400", glow: "shadow-yellow-500/50" };
+    if (rank === 2) return { icon: Trophy, color: "text-gray-300", glow: "shadow-gray-400/50" };
+    if (rank === 3) return { icon: Medal, color: "text-orange-400", glow: "shadow-orange-500/50" };
+    if (rank <= 10) return { icon: Flame, color: "text-red-500", glow: "shadow-red-500/50" };
+    if (rank <= 50) return { icon: Zap, color: "text-purple-500", glow: "shadow-purple-500/50" };
+    return { icon: Target, color: "text-gray-400", glow: "shadow-gray-500/50" };
+  };
 
   const getRankIcon = (rank: number, size: number = 24) => {
     switch (rank) {
@@ -41,13 +59,15 @@ export default function Leaderboard() {
   const getRankBgColor = (rank: number) => {
     switch (rank) {
       case 1:
-        return "bg-gradient-to-br from-red-950 via-red-900 to-black border-red-500 shadow-red-500/30";
+        return "bg-gradient-to-br from-yellow-950 via-yellow-900 to-black border-yellow-500 shadow-yellow-500/30";
       case 2:
-        return "bg-gradient-to-br from-red-900 via-red-800 to-gray-900 border-red-400 shadow-red-400/20";
+        return "bg-gradient-to-br from-gray-800 via-gray-700 to-gray-900 border-gray-400 shadow-gray-400/30";
       case 3:
-        return "bg-gradient-to-br from-red-800 via-red-700 to-gray-800 border-red-300 shadow-red-300/20";
+        return "bg-gradient-to-br from-orange-950 via-orange-900 to-black border-orange-500 shadow-orange-500/30";
       default:
-        return "bg-gradient-to-br from-gray-900 via-gray-800 to-black border-red-900";
+        if (rank <= 10) return "bg-gradient-to-br from-red-950 via-red-900 to-black border-red-600 shadow-red-600/20";
+        if (rank <= 50) return "bg-gradient-to-br from-purple-950 via-purple-900 to-black border-purple-700 shadow-purple-700/20";
+        return "bg-gradient-to-br from-gray-900 via-gray-800 to-black border-gray-700";
     }
   };
 
@@ -153,17 +173,17 @@ export default function Leaderboard() {
 
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card className="bg-gradient-to-br from-red-950 to-black border-red-500 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
+          <Card className="bg-gradient-to-br from-yellow-950 to-black border-yellow-500 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
             <CardContent className="pt-6">
               <div className="text-center">
                 <div className="relative">
-                  <Trophy className="mx-auto mb-2 text-red-500 animate-bounce" size={40} />
-                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-400 rounded-full animate-ping"></div>
+                  <Crown className="mx-auto mb-2 text-yellow-500 animate-bounce" size={40} />
+                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-400 rounded-full animate-ping"></div>
                 </div>
-                <p className="text-3xl font-bold text-red-400">
+                <p className="text-3xl font-bold text-yellow-400">
                   {topThree[0]?.totalReps.toLocaleString() || 0}
                 </p>
-                <p className="text-sm font-semibold text-red-300">🏆 Champion Score</p>
+                <p className="text-sm font-semibold text-yellow-300">👑 Legend Score</p>
               </div>
             </CardContent>
           </Card>
@@ -226,8 +246,8 @@ export default function Leaderboard() {
                     >
                       {/* Winner Avatar & Crown */}
                       <div className="relative mb-4">
-                        <div className={`w-20 h-20 rounded-full border-4 ${entry.rank === 1 ? 'border-red-500 shadow-red-500/50' : entry.rank === 2 ? 'border-red-400 shadow-red-400/50' : 'border-red-300 shadow-red-300/50'} shadow-xl flex items-center justify-center bg-gradient-to-br ${entry.rank === 1 ? 'from-red-950 to-black' : entry.rank === 2 ? 'from-red-900 to-gray-900' : 'from-red-800 to-gray-800'}`}>
-                          <span className={`text-2xl font-bold ${entry.rank === 1 ? 'text-red-300' : entry.rank === 2 ? 'text-red-400' : 'text-red-500'}`}>
+                        <div className={`w-20 h-20 rounded-full border-4 ${entry.rank === 1 ? 'border-yellow-500 shadow-yellow-500/50' : entry.rank === 2 ? 'border-gray-400 shadow-gray-400/50' : 'border-orange-500 shadow-orange-500/50'} shadow-xl flex items-center justify-center bg-gradient-to-br ${entry.rank === 1 ? 'from-yellow-950 to-black' : entry.rank === 2 ? 'from-gray-800 to-gray-900' : 'from-orange-950 to-black'}`}>
+                          <span className={`text-2xl font-bold ${entry.rank === 1 ? 'text-yellow-300' : entry.rank === 2 ? 'text-gray-300' : 'text-orange-300'}`}>
                             {entry.firstName?.charAt(0) || entry.email?.charAt(0) || 'U'}
                           </span>
                         </div>
@@ -238,23 +258,34 @@ export default function Leaderboard() {
                         {/* Sparkle Effects */}
                         {entry.rank === 1 && (
                           <>
-                            <div className="absolute -top-2 -left-2 w-3 h-3 bg-red-400 rounded-full animate-ping"></div>
-                            <div className="absolute -bottom-1 -right-2 w-2 h-2 bg-red-500 rounded-full animate-bounce"></div>
+                            <div className="absolute -top-2 -left-2 w-3 h-3 bg-yellow-400 rounded-full animate-ping"></div>
+                            <div className="absolute -bottom-1 -right-2 w-2 h-2 bg-yellow-500 rounded-full animate-bounce"></div>
                           </>
+                        )}
+                        {entry.rank === 2 && (
+                          <div className="absolute -top-2 -right-2 w-2 h-2 bg-gray-400 rounded-full animate-pulse"></div>
+                        )}
+                        {entry.rank === 3 && (
+                          <div className="absolute -bottom-1 -left-2 w-2 h-2 bg-orange-400 rounded-full animate-pulse"></div>
                         )}
                       </div>
                       
                       {/* Winner Info */}
                       <div className="text-center mb-4 px-2">
-                        <h3 className={`font-bold text-lg ${entry.rank === 1 ? 'text-white' : entry.rank === 2 ? 'text-red-200' : 'text-red-300'} mb-1`}>
+                        <h3 className={`font-bold text-lg ${entry.rank === 1 ? 'text-white' : entry.rank === 2 ? 'text-gray-200' : 'text-orange-200'} mb-1`}>
                           {entry.firstName && entry.lastName ? `${entry.firstName} ${entry.lastName}` : entry.email?.split('@')[0] || 'User'}
                         </h3>
                         <p className="text-sm text-gray-400">@{entry.email?.split('@')[0] || 'user'}</p>
                         <div className="mt-2">
-                          <p className={`text-2xl font-bold ${entry.rank === 1 ? 'text-red-400' : entry.rank === 2 ? 'text-red-500' : 'text-red-600'}`}>
+                          <p className={`text-2xl font-bold ${entry.rank === 1 ? 'text-yellow-400' : entry.rank === 2 ? 'text-gray-400' : 'text-orange-400'}`}>
                             {entry.totalReps.toLocaleString()}
                           </p>
                           <p className="text-xs text-gray-500">total reps</p>
+                        </div>
+                        <div className="mt-1">
+                          <span className={`text-xs font-bold ${entry.rank === 1 ? 'text-yellow-500' : entry.rank === 2 ? 'text-gray-400' : 'text-orange-500'}`}>
+                            {getRankTitle(entry.rank)}
+                          </span>
                         </div>
                       </div>
                       
@@ -262,14 +293,14 @@ export default function Leaderboard() {
                       <div className={`w-24 ${getPodiumHeight(entry.rank)} ${getRankBgColor(entry.rank)} border-2 rounded-t-lg shadow-xl relative overflow-hidden`}>
                         {/* Podium Rank Number */}
                         <div className="absolute inset-0 flex items-center justify-center">
-                          <span className={`text-4xl font-black ${entry.rank === 1 ? 'text-red-600' : entry.rank === 2 ? 'text-red-700' : 'text-red-800'} opacity-40`}>
+                          <span className={`text-4xl font-black ${entry.rank === 1 ? 'text-yellow-600' : entry.rank === 2 ? 'text-gray-600' : 'text-orange-600'} opacity-40`}>
                             {entry.rank}
                           </span>
                         </div>
                         {/* Shimmer Effect */}
-                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-red-500/10 to-transparent animate-pulse"></div>
+                        <div className={`absolute inset-0 bg-gradient-to-r from-transparent ${entry.rank === 1 ? 'via-yellow-500/10' : entry.rank === 2 ? 'via-gray-500/10' : 'via-orange-500/10'} to-transparent animate-pulse`}></div>
                         {/* Base Platform */}
-                        <div className={`absolute bottom-0 w-full h-2 ${entry.rank === 1 ? 'bg-red-500' : entry.rank === 2 ? 'bg-red-400' : 'bg-red-300'}`}></div>
+                        <div className={`absolute bottom-0 w-full h-2 ${entry.rank === 1 ? 'bg-yellow-500' : entry.rank === 2 ? 'bg-gray-400' : 'bg-orange-500'}`}></div>
                       </div>
                     </div>
                   ))}
@@ -285,42 +316,176 @@ export default function Leaderboard() {
           </div>
         )}
 
-        {/* Full Leaderboard */}
-        <Card className="bg-gray-900 border-red-800">
-          <CardHeader>
-            <CardTitle className="text-white">Elite Rankings</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {leaderboard.map((entry) => (
-                <div
-                  key={entry.userId}
-                  className={`flex items-center justify-between p-4 rounded-lg border ${getRankBgColor(entry.rank)} transition-all hover:shadow-md`}
-                  data-testid={`leaderboard-entry-${entry.rank}`}
-                >
-                  <div className="flex items-center space-x-4">
-                    <div className="flex-shrink-0">
-                      {getRankIcon(entry.rank)}
+        {/* Top 10 Elite Section */}
+        {leaderboard.filter(e => e.rank <= 10 && e.rank > 3).length > 0 && (
+          <Card className="mb-8 bg-gradient-to-br from-red-950 via-red-900 to-black border-2 border-red-600 shadow-2xl">
+            <CardHeader className="text-center">
+              <CardTitle className="flex items-center justify-center text-2xl font-bold text-red-400">
+                <Flame className="mr-2 text-red-500 animate-pulse" size={28} />
+                ⚡ TOP 10 ELITE PERFORMERS ⚡
+                <Flame className="ml-2 text-red-500 animate-pulse" size={28} />
+              </CardTitle>
+              <p className="text-red-300 text-sm mt-2">The best of the best - unstoppable forces!</p>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {leaderboard.filter(e => e.rank <= 10 && e.rank > 3).map((entry) => {
+                  const badge = getRankBadge(entry.rank);
+                  const BadgeIcon = badge.icon;
+                  return (
+                    <div
+                      key={entry.userId}
+                      className={`relative flex items-center justify-between p-4 rounded-lg border ${getRankBgColor(entry.rank)} transition-all hover:shadow-xl hover:scale-[1.02] overflow-hidden`}
+                      data-testid={`leaderboard-entry-${entry.rank}`}
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-r from-red-600/10 via-transparent to-red-600/10 animate-pulse"></div>
+                      <div className="relative flex items-center space-x-4">
+                        <div className="flex-shrink-0">
+                          <div className="relative">
+                            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-red-600 to-red-900 flex items-center justify-center border-2 border-red-500 shadow-lg">
+                              <BadgeIcon className={badge.color} size={24} />
+                            </div>
+                            <div className="absolute -top-1 -right-1 w-6 h-6 bg-red-950 rounded-full border border-red-500 flex items-center justify-center">
+                              <span className="text-xs font-bold text-white">{entry.rank}</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <h4 className="font-bold text-white">
+                              {entry.firstName && entry.lastName ? `${entry.firstName} ${entry.lastName}` : entry.email?.split('@')[0] || 'User'}
+                            </h4>
+                            <span className="text-xs font-bold text-red-400 bg-red-950 px-2 py-1 rounded">
+                              {getRankTitle(entry.rank)}
+                            </span>
+                          </div>
+                          <p className="text-sm text-gray-400">@{entry.email?.split('@')[0] || 'user'}</p>
+                        </div>
+                      </div>
+                      
+                      <div className="relative text-right">
+                        <p className="text-2xl font-bold text-red-400">
+                          {entry.totalReps.toLocaleString()}
+                        </p>
+                        <p className="text-sm text-gray-500">reps</p>
+                      </div>
                     </div>
-                    <div>
-                      <h4 className="font-semibold text-white">
-                        {entry.firstName && entry.lastName ? `${entry.firstName} ${entry.lastName}` : entry.email?.split('@')[0] || 'User'}
-                      </h4>
-                      <p className="text-sm text-gray-400">@{entry.email?.split('@')[0] || 'user'}</p>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Top 50 Warriors Section */}
+        {leaderboard.filter(e => e.rank <= 50 && e.rank > 10).length > 0 && (
+          <Card className="mb-8 bg-gradient-to-br from-purple-950 via-purple-900 to-black border-2 border-purple-700 shadow-2xl">
+            <CardHeader className="text-center">
+              <CardTitle className="flex items-center justify-center text-2xl font-bold text-purple-400">
+                <Zap className="mr-2 text-purple-500 animate-pulse" size={28} />
+                🔥 TOP 50 WARRIORS 🔥
+                <Zap className="ml-2 text-purple-500 animate-pulse" size={28} />
+              </CardTitle>
+              <p className="text-purple-300 text-sm mt-2">Rising stars making their mark!</p>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {leaderboard.filter(e => e.rank <= 50 && e.rank > 10).map((entry) => {
+                  const badge = getRankBadge(entry.rank);
+                  const BadgeIcon = badge.icon;
+                  return (
+                    <div
+                      key={entry.userId}
+                      className={`relative flex items-center justify-between p-4 rounded-lg border ${getRankBgColor(entry.rank)} transition-all hover:shadow-xl hover:scale-[1.02]`}
+                      data-testid={`leaderboard-entry-${entry.rank}`}
+                    >
+                      <div className="flex items-center space-x-4">
+                        <div className="flex-shrink-0">
+                          <div className="relative">
+                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-purple-900 flex items-center justify-center border-2 border-purple-500">
+                              <BadgeIcon className={badge.color} size={20} />
+                            </div>
+                            <div className="absolute -top-1 -right-1 w-5 h-5 bg-purple-950 rounded-full border border-purple-500 flex items-center justify-center">
+                              <span className="text-xs font-bold text-white">{entry.rank}</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <h4 className="font-semibold text-white">
+                              {entry.firstName && entry.lastName ? `${entry.firstName} ${entry.lastName}` : entry.email?.split('@')[0] || 'User'}
+                            </h4>
+                            <span className="text-xs font-bold text-purple-400 bg-purple-950 px-2 py-1 rounded">
+                              {getRankTitle(entry.rank)}
+                            </span>
+                          </div>
+                          <p className="text-sm text-gray-400">@{entry.email?.split('@')[0] || 'user'}</p>
+                        </div>
+                      </div>
+                      
+                      <div className="text-right">
+                        <p className="text-xl font-bold text-purple-400">
+                          {entry.totalReps.toLocaleString()}
+                        </p>
+                        <p className="text-sm text-gray-500">reps</p>
+                      </div>
                     </div>
-                  </div>
-                  
-                  <div className="text-right">
-                    <p className="text-2xl font-bold text-red-400">
-                      {entry.totalReps.toLocaleString()}
-                    </p>
-                    <p className="text-sm text-gray-500">reps</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Rest of Leaderboard */}
+        {leaderboard.filter(e => e.rank > 50).length > 0 && (
+          <Card className="bg-gray-900 border-gray-700">
+            <CardHeader>
+              <CardTitle className="text-white">💪 All Competitors</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {leaderboard.filter(e => e.rank > 50).map((entry) => {
+                  const badge = getRankBadge(entry.rank);
+                  const BadgeIcon = badge.icon;
+                  return (
+                    <div
+                      key={entry.userId}
+                      className={`flex items-center justify-between p-4 rounded-lg border ${getRankBgColor(entry.rank)} transition-all hover:shadow-md`}
+                      data-testid={`leaderboard-entry-${entry.rank}`}
+                    >
+                      <div className="flex items-center space-x-4">
+                        <div className="flex-shrink-0">
+                          <div className="relative">
+                            <div className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center border border-gray-600">
+                              <BadgeIcon className={badge.color} size={20} />
+                            </div>
+                            <div className="absolute -top-1 -right-1 w-5 h-5 bg-gray-900 rounded-full border border-gray-600 flex items-center justify-center">
+                              <span className="text-xs font-bold text-white">{entry.rank}</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div>
+                          <h4 className="font-semibold text-white">
+                            {entry.firstName && entry.lastName ? `${entry.firstName} ${entry.lastName}` : entry.email?.split('@')[0] || 'User'}
+                          </h4>
+                          <p className="text-sm text-gray-400">@{entry.email?.split('@')[0] || 'user'}</p>
+                        </div>
+                      </div>
+                      
+                      <div className="text-right">
+                        <p className="text-xl font-bold text-gray-400">
+                          {entry.totalReps.toLocaleString()}
+                        </p>
+                        <p className="text-sm text-gray-500">reps</p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Tips */}
         <Card className="mt-8 bg-gray-900 border-red-800">
