@@ -106,8 +106,8 @@ export class SubscriptionService {
 export const requireFeatureAccess = (feature: PremiumFeature) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
-      // Get user ID from session - using the same method as other routes
-      const userId = (req as any).session?.userId || (req as any).userId;
+      // Get user ID from authenticated user (set by authenticateToken middleware)
+      const userId = (req as any).user?.id || (req as any).session?.userId || (req as any).userId;
       if (!userId) {
         return res.status(401).json({ 
           message: 'Authentication required',
@@ -150,7 +150,7 @@ export const checkFeatureAccessNonBlocking = async (req: Request, feature: Premi
   subscriptionStatus?: any;
 }> => {
   try {
-    const userId = (req as any).session?.userId || (req as any).userId;
+    const userId = (req as any).user?.id || (req as any).session?.userId || (req as any).userId;
     if (!userId) {
       return { hasAccess: false };
     }
