@@ -2395,7 +2395,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get user workout plan
-  app.get("/api/workout-plan", authenticateToken, async (req, res) => {
+  app.get("/api/workout-plan", authenticateToken, requireFeatureAccess(PREMIUM_FEATURES.WORKOUT_PLANNER), async (req, res) => {
     try {
       const userId = getAuthUserId(req);
       if (!userId) {
@@ -2411,7 +2411,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Generate new workout plan
-  app.post("/api/workout-plan/generate", authenticateToken, async (req, res) => {
+  app.post("/api/workout-plan/generate", authenticateToken, requireFeatureAccess(PREMIUM_FEATURES.WORKOUT_PLANNER), async (req, res) => {
     try {
       const userId = getAuthUserId(req);
       if (!userId) {
