@@ -6,16 +6,18 @@ import QuickStats from "@/components/quick-stats";
 
 export default function ProgressPage() {
   return (
-    <div className="font-inter bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 min-h-screen">      
+    <div className="font-inter bg-gradient-to-br from-black via-gray-900 to-black text-white min-h-screen">      
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Page Header */}
-        <div className="flex items-center gap-3 mb-8">
-          <TrendingUp className="w-8 h-8 text-primary" />
+        <div className="flex items-center gap-3 mb-8 border-b border-red-500/30 pb-6">
+          <div className="p-3 bg-gradient-to-br from-red-600 to-red-700 rounded-lg shadow-lg shadow-red-500/30">
+            <TrendingUp className="w-8 h-8 text-white" />
+          </div>
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white" data-testid="progress-title">
+            <h1 className="text-3xl font-bold text-white" data-testid="progress-title">
               Progress
             </h1>
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className="text-gray-400">
               Track your fitness achievements and analyze your performance
             </p>
           </div>
@@ -43,27 +45,27 @@ export default function ProgressPage() {
             <GoalsWidget />
             
             {/* Progress Insights */}
-            <section className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+            <section className="bg-gradient-to-br from-gray-900 to-black rounded-2xl shadow-2xl shadow-red-500/20 border-2 border-red-500/30 p-6">
               <div className="flex items-center gap-2 mb-4">
-                <Award className="w-5 h-5 text-primary" />
-                <h3 className="text-lg font-bold text-gray-800 dark:text-white">Progress Insights</h3>
+                <Award className="w-5 h-5 text-red-500" />
+                <h3 className="text-lg font-bold text-white">Progress Insights</h3>
               </div>
               <div className="space-y-4">
-                <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-                  <h4 className="font-medium text-blue-900 dark:text-blue-100 mb-1">Weekly Streak</h4>
-                  <p className="text-sm text-blue-800 dark:text-blue-200">
+                <div className="p-4 bg-gradient-to-r from-red-900/40 to-black/60 border border-red-500/30 rounded-lg hover:border-red-500/50 transition-colors">
+                  <h4 className="font-medium text-red-400 mb-1">Weekly Streak</h4>
+                  <p className="text-sm text-gray-300">
                     Keep up the great work! Consistent workouts lead to better results.
                   </p>
                 </div>
-                <div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
-                  <h4 className="font-medium text-green-900 dark:text-green-100 mb-1">Strength Progress</h4>
-                  <p className="text-sm text-green-800 dark:text-green-200">
+                <div className="p-4 bg-gradient-to-r from-red-900/30 to-black/60 border border-red-500/30 rounded-lg hover:border-red-500/50 transition-colors">
+                  <h4 className="font-medium text-red-400 mb-1">Strength Progress</h4>
+                  <p className="text-sm text-gray-300">
                     Your weight progress shows steady improvement in strength training.
                   </p>
                 </div>
-                <div className="p-4 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg">
-                  <h4 className="font-medium text-purple-900 dark:text-purple-100 mb-1">Goal Achievement</h4>
-                  <p className="text-sm text-purple-800 dark:text-purple-200">
+                <div className="p-4 bg-gradient-to-r from-red-900/40 to-black/60 border border-red-500/30 rounded-lg hover:border-red-500/50 transition-colors">
+                  <h4 className="font-medium text-red-400 mb-1">Goal Achievement</h4>
+                  <p className="text-sm text-gray-300">
                     You're making excellent progress toward your fitness goals!
                   </p>
                 </div>
