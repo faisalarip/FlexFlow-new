@@ -194,26 +194,26 @@ export default function MileTracker() {
   const getActivityIcon = (activity: string) => {
     switch (activity) {
       case "run":
-        return "🔥🏃‍♂️💨";
+        return <Activity size={20} className="text-red-400" />;
       case "walk":
-        return "⚡🚶‍♂️💪";
+        return <Target size={20} className="text-blue-400" />;
       case "bike":
-        return "🏁🚴‍♂️🔥";
+        return <Zap size={20} className="text-green-400" />;
       default:
-        return "🔥🏃‍♂️💨";
+        return <Activity size={20} className="text-red-400" />;
     }
   };
 
   const getActivityColor = (activity: string) => {
     switch (activity) {
       case "run":
-        return "bg-gradient-to-r from-red-600 to-red-800 text-white border-red-500 shadow-lg shadow-red-500/25";
+        return "bg-red-950/50 text-red-300 border-red-800";
       case "walk":
-        return "bg-gradient-to-r from-red-700 to-black text-white border-red-600 shadow-lg shadow-red-600/25";
+        return "bg-blue-950/50 text-blue-300 border-blue-800";
       case "bike":
-        return "bg-gradient-to-r from-black to-red-700 text-white border-red-500 shadow-lg shadow-red-500/25";
+        return "bg-green-950/50 text-green-300 border-green-800";
       default:
-        return "bg-gradient-to-r from-red-600 to-red-800 text-white border-red-500 shadow-lg shadow-red-500/25";
+        return "bg-red-950/50 text-red-300 border-red-800";
     }
   };
 
@@ -395,76 +395,71 @@ export default function MileTracker() {
 
   if (showHistory) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-red-950">
+      <div className="min-h-screen bg-black">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-red-500 to-red-300 bg-clip-text text-transparent mb-2 flex items-center">
-                <Trophy className="mr-3 text-red-500" size={40} />
-                🔥 SPEED HISTORY 🔥
+              <h1 className="text-3xl font-bold text-white mb-2 flex items-center">
+                <History className="mr-3 text-red-500" size={32} />
+                Session History
               </h1>
-              <p className="text-red-300 font-semibold">Your legendary racing sessions and conquests</p>
+              <p className="text-gray-400">Your completed training sessions</p>
             </div>
-            <Button onClick={() => setShowHistory(false)} className="bg-red-600 hover:bg-red-700 text-white border border-red-500">
-              <Zap className="mr-2" size={16} />
-              Back to Action
+            <Button onClick={() => setShowHistory(false)} className="bg-gray-800 hover:bg-gray-700 text-white border border-gray-700">
+              <MapPin className="mr-2" size={16} />
+              Back to Tracker
             </Button>
           </div>
 
           <div className="space-y-4">
             {sessions.map((session) => (
-              <Card key={session.id} className="bg-gradient-to-r from-gray-900 to-black border border-red-500/30 shadow-xl shadow-red-500/10">
+              <Card key={session.id} className="bg-gray-900 border border-gray-800 hover:border-gray-700 transition-colors">
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4">
-                      <div className="text-3xl animate-pulse">
+                      <div className="w-12 h-12 rounded-lg bg-gray-800 flex items-center justify-center border border-gray-700">
                         {getActivityIcon(session.activityType)}
                       </div>
                       <div>
                         <div className="flex items-center space-x-2">
-                          <h3 className="font-bold text-xl capitalize text-red-400 flex items-center">
-                            <Flame className="mr-1" size={18} />
-                            EPIC {session.activityType.toUpperCase()}
+                          <h3 className="font-semibold text-lg capitalize text-white">
+                            {session.activityType}
                           </h3>
                           <Badge className={getActivityColor(session.activityType)}>
-                            🏁 {session.splits.length} {session.splits.length === 1 ? 'MILE' : 'MILES'} 🏁
+                            {session.splits.length} {session.splits.length === 1 ? 'mile' : 'miles'}
                           </Badge>
                         </div>
-                        <p className="text-red-300 font-medium">
-                          ⚡ {new Date(session.startedAt).toLocaleDateString()} at{' '}
-                          {new Date(session.startedAt).toLocaleTimeString()}
+                        <p className="text-sm text-gray-400">
+                          {new Date(session.startedAt).toLocaleDateString()} • {new Date(session.startedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-3xl font-bold text-red-400 font-mono">
+                      <p className="text-2xl font-bold text-white font-mono">
                         {formatTime(session.totalTime)}
                       </p>
-                      <p className="text-sm text-red-300 font-semibold">
-                        💨 Avg Speed: {session.averagePace ? formatPace(session.averagePace) : '--:--'}/mile
+                      <p className="text-sm text-gray-400">
+                        Avg Pace: {session.averagePace ? formatPace(session.averagePace) : '--:--'}/mi
                       </p>
                     </div>
                   </div>
                   
                   {session.splits.length > 0 && (
-                    <div className="mt-4 pt-4 border-t border-red-500/30">
-                      <h4 className="font-bold text-red-400 mb-2 flex items-center">
-                        <Gauge className="mr-2" size={18} />
-                        🔥 SPEED SPLITS 🔥
+                    <div className="mt-4 pt-4 border-t border-gray-800">
+                      <h4 className="font-semibold text-gray-300 mb-3 flex items-center text-sm">
+                        <Gauge className="mr-2" size={16} />
+                        Mile Splits
                       </h4>
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                         {session.splits.map((split, index) => (
-                          <div key={split.id} className="bg-gradient-to-br from-red-900 to-black rounded-lg p-3 text-center border border-red-500/40 shadow-lg">
-                            <p className="text-sm font-bold text-red-300">🏃‍♂️ MILE {split.mileNumber}</p>
-                            <p className="text-xl font-bold text-red-400 font-mono">
+                          <div key={split.id} className="bg-gray-800/50 rounded-lg p-3 border border-gray-700">
+                            <p className="text-xs font-medium text-gray-400 mb-1">Mile {split.mileNumber}</p>
+                            <p className="text-lg font-bold text-white font-mono">
                               {formatTime(split.splitTime)}
                             </p>
-                            <p className="text-xs text-red-300 font-semibold">
-                              ⚡ {formatPace(split.pace)}/mile
+                            <p className="text-xs text-gray-500">
+                              {formatPace(split.pace)}/mi
                             </p>
-                            {index === 0 && session.splits.length > 1 && (
-                              <div className="text-xs text-yellow-400 font-bold">💫 FASTEST</div>
-                            )}
                           </div>
                         ))}
                       </div>
@@ -475,13 +470,13 @@ export default function MileTracker() {
             ))}
             
             {sessions.length === 0 && (
-              <Card className="bg-gradient-to-r from-gray-900 to-black border border-red-500/30 shadow-xl">
+              <Card className="bg-gray-900 border border-gray-800">
                 <CardContent className="pt-6">
-                  <div className="text-center py-8">
-                    <div className="text-6xl mb-4">🏁💨</div>
-                    <h3 className="text-2xl font-bold text-red-400 mb-2">🔥 NO LEGENDS YET 🔥</h3>
-                    <p className="text-red-300 font-semibold">
-                      Your racing legacy starts with the first mile. Ready to become a speed demon?
+                  <div className="text-center py-12">
+                    <History className="mx-auto mb-4 text-gray-600" size={48} />
+                    <h3 className="text-xl font-semibold text-white mb-2">No Sessions Yet</h3>
+                    <p className="text-gray-400">
+                      Start your first session to begin tracking your progress
                     </p>
                   </div>
                 </CardContent>
@@ -495,54 +490,51 @@ export default function MileTracker() {
 
   return (
     <FeatureGate feature="mile_tracker">
-      <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-red-950 relative overflow-hidden">
-      {/* Animated background effects */}
-      <div className="absolute inset-0 bg-gradient-to-r from-red-500/5 to-transparent animate-pulse"></div>
-      <div className="absolute top-10 left-10 text-red-500/20 text-9xl">🔥</div>
-      <div className="absolute bottom-10 right-10 text-red-500/20 text-9xl">⚡</div>
-      
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
+      <div className="min-h-screen bg-black">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-2">
-            <h1 className="text-3xl sm:text-5xl font-bold bg-gradient-to-r from-red-500 via-red-400 to-yellow-400 bg-clip-text text-transparent flex items-center animate-pulse">
-              <Flame className="mr-2 sm:mr-3 text-red-500" size={40} />
-              🏁 SPEED DEMON TRACKER 🔥
-            </h1>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+            <div>
+              <h1 className="text-3xl sm:text-4xl font-bold text-white flex items-center mb-2">
+                <MapPin className="mr-3 text-red-500" size={36} />
+                Mile Tracker
+              </h1>
+              <p className="text-gray-400">GPS-powered distance tracking with live performance metrics</p>
+            </div>
             <Button 
               variant="outline" 
               onClick={() => setShowHistory(true)}
-              className="bg-gradient-to-r from-red-600 to-red-800 text-white border border-red-500 hover:from-red-700 hover:to-red-900 shadow-lg shadow-red-500/25 w-full sm:w-auto"
+              className="bg-gray-800 hover:bg-gray-700 text-white border border-gray-700 w-full sm:w-auto"
             >
-              <Trophy className="mr-2" size={16} />
-              📜 Hall of Fame
+              <History className="mr-2" size={16} />
+              View History
             </Button>
           </div>
-          <p className="text-red-300 font-bold text-base sm:text-lg">⚡ Unleash your inner speed demon and dominate every mile! 💨</p>
         </div>
 
         {!activeSession ? (
           /* Start New Session */
           <div className="space-y-6">
-            <Card className="bg-gradient-to-br from-gray-900 to-black border border-red-500/50 shadow-2xl shadow-red-500/20">
+            <Card className="bg-gray-900 border border-gray-800">
               <CardHeader>
-                <CardTitle className="flex items-center text-2xl font-bold text-red-400">
-                  <Zap className="mr-3 text-red-500 animate-pulse" size={32} />
-                  🔥 IGNITE YOUR SPEED 🔥
+                <CardTitle className="flex items-center text-xl font-semibold text-white">
+                  <Play className="mr-3 text-red-500" size={24} />
+                  Start New Session
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div>
-                  <label className="block text-lg font-bold text-red-300 mb-3">
-                    ⚡ Choose Your Racing Mode ⚡
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Activity Type
                   </label>
                   <Select value={selectedActivity} onValueChange={(value: "run" | "walk" | "bike") => setSelectedActivity(value)}>
-                    <SelectTrigger className="w-full bg-gray-800 border-red-500/50 text-white text-lg font-semibold">
+                    <SelectTrigger className="w-full bg-gray-800 border-gray-700 text-white">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-gray-800 border-red-500/50">
-                      <SelectItem value="run" className="text-white font-bold text-lg">🔥🏃‍♂️💨 BLAZING RUN</SelectItem>
-                      <SelectItem value="walk" className="text-white font-bold text-lg">⚡🚶‍♂️💪 POWER WALK</SelectItem>
-                      <SelectItem value="bike" className="text-white font-bold text-lg">🏁🚴‍♂️🔥 SPEED CYCLING</SelectItem>
+                    <SelectContent className="bg-gray-800 border-gray-700">
+                      <SelectItem value="run" className="text-white">Running</SelectItem>
+                      <SelectItem value="walk" className="text-white">Walking</SelectItem>
+                      <SelectItem value="bike" className="text-white">Cycling</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -550,11 +542,11 @@ export default function MileTracker() {
                 <Button 
                   onClick={startSession}
                   disabled={startSessionMutation.isPending}
-                  className="w-full bg-gradient-to-r from-red-600 via-red-700 to-red-800 hover:from-red-700 hover:via-red-800 hover:to-red-900 text-white border border-red-500 shadow-lg shadow-red-500/50 text-xl font-bold py-6"
+                  className="w-full bg-red-600 hover:bg-red-700 text-white border-0 font-semibold"
                   size="lg"
                 >
-                  <Flame className="mr-3 animate-bounce" size={24} />
-                  {startSessionMutation.isPending ? "🔥 IGNITING..." : `🏁 START ${selectedActivity.toUpperCase()} DOMINATION! 💨`}
+                  <Play className="mr-2" size={20} />
+                  {startSessionMutation.isPending ? "Starting..." : `Start ${selectedActivity.charAt(0).toUpperCase() + selectedActivity.slice(1)}`}
                 </Button>
               </CardContent>
             </Card>
@@ -563,52 +555,57 @@ export default function MileTracker() {
           /* Active Session */
           <div className="space-y-6">
             {/* Main Timer Display */}
-            <Card className="bg-gradient-to-br from-red-950 via-black to-gray-900 border border-red-500/50 shadow-2xl shadow-red-500/30">
+            <Card className="bg-gray-900 border border-gray-800">
               <CardContent className="pt-6">
-                <div className="text-center relative">
-                  {/* Animated fire effects */}
-                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 text-6xl animate-bounce">🔥</div>
-                  
-                  <div className="flex items-center justify-center mb-6 mt-8">
-                    <Badge className={`${getActivityColor(activeSession.activityType)} text-xl px-4 py-2 animate-pulse`}>
-                      {getActivityIcon(activeSession.activityType)} BEAST MODE {activeSession.activityType.toUpperCase()}
+                <div className="text-center">
+                  <div className="flex items-center justify-center mb-6">
+                    <Badge className={`${getActivityColor(activeSession.activityType)} px-4 py-2 flex items-center gap-2`}>
+                      {getActivityIcon(activeSession.activityType)}
+                      <span className="capitalize">{activeSession.activityType}</span>
                     </Badge>
                   </div>
                   
-                  <div className="text-9xl font-bold bg-gradient-to-r from-red-400 via-red-500 to-yellow-400 bg-clip-text text-transparent mb-4 font-mono tracking-wider animate-pulse drop-shadow-lg">
+                  <div className="text-7xl font-bold text-white mb-4 font-mono">
                     {formatTime(currentTime)}
                   </div>
                   
-                  <div className="text-2xl text-red-300 mb-4 font-bold">
-                    🏃‍♂️ MILE {currentMile} • ⚡ SPEED: {getCurrentPace()}/mile 💨
+                  <div className="grid grid-cols-2 gap-4 max-w-md mx-auto mb-6">
+                    <div className="bg-gray-800 rounded-lg p-3">
+                      <p className="text-xs text-gray-400 mb-1">Current Mile</p>
+                      <p className="text-2xl font-bold text-white">{currentMile}</p>
+                    </div>
+                    <div className="bg-gray-800 rounded-lg p-3">
+                      <p className="text-xs text-gray-400 mb-1">Pace</p>
+                      <p className="text-2xl font-bold text-white">{getCurrentPace()}/mi</p>
+                    </div>
                   </div>
 
                   {/* GPS Stats Display */}
                   {gpsEnabled && (
-                    <div className="mb-6 p-4 bg-gradient-to-r from-blue-900/50 to-purple-900/50 rounded-xl border border-blue-500/30">
+                    <div className="mb-6 p-4 bg-gray-800 rounded-lg">
                       <div className="flex items-center justify-center gap-6 flex-wrap text-sm">
                         <div className="flex items-center gap-2">
                           <MapPin className="text-blue-400" size={16} />
-                          <span className="text-blue-300 font-semibold">
-                            GPS: {gpsDistance.toFixed(2)} mi
+                          <span className="text-gray-300">
+                            {gpsDistance.toFixed(2)} mi
                           </span>
                         </div>
                         {currentSpeed !== null && (
                           <div className="flex items-center gap-2">
                             <Gauge className="text-green-400" size={16} />
-                            <span className="text-green-300 font-semibold">
+                            <span className="text-gray-300">
                               {currentSpeed.toFixed(1)} mph
                             </span>
                           </div>
                         )}
                         {gpsAccuracy !== null && (
                           <div className="flex items-center gap-2">
-                            <Activity className="text-yellow-400" size={16} />
-                            <span className={`font-semibold ${
-                              gpsAccuracy < 20 ? 'text-green-300' : 
-                              gpsAccuracy < 50 ? 'text-yellow-300' : 
-                              'text-orange-300'
-                            }`}>
+                            <Activity className={
+                              gpsAccuracy < 20 ? 'text-green-400' : 
+                              gpsAccuracy < 50 ? 'text-yellow-400' : 
+                              'text-orange-400'
+                            } size={16} />
+                            <span className="text-gray-300">
                               ±{gpsAccuracy.toFixed(0)}m
                             </span>
                           </div>
@@ -617,50 +614,50 @@ export default function MileTracker() {
                     </div>
                   )}
 
-                  <div className="flex justify-center space-x-4 flex-wrap gap-4">
+                  <div className="flex justify-center space-x-3 flex-wrap gap-3">
                     <Button 
                       onClick={pauseResume}
                       className={isRunning ? 
-                        "bg-gradient-to-r from-yellow-600 to-yellow-700 hover:from-yellow-700 hover:to-yellow-800 text-white border border-yellow-500 shadow-lg shadow-yellow-500/25" :
-                        "bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white border border-green-500 shadow-lg shadow-green-500/25"
+                        "bg-yellow-600 hover:bg-yellow-700 text-white" :
+                        "bg-green-600 hover:bg-green-700 text-white"
                       }
                       size="lg"
                     >
-                      {isRunning ? <Pause className="mr-2 animate-pulse" size={20} /> : <Play className="mr-2 animate-bounce" size={20} />}
-                      {isRunning ? "⏸️ CHILL" : "▶️ UNLEASH!"}
+                      {isRunning ? <Pause className="mr-2" size={20} /> : <Play className="mr-2" size={20} />}
+                      {isRunning ? "Pause" : "Resume"}
                     </Button>
                     
                     <Button 
                       onClick={gpsEnabled ? stopGPSTracking : startGPSTracking}
                       className={gpsEnabled ?
-                        "bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white border border-blue-500 shadow-lg shadow-blue-500/25" :
-                        "bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white border border-purple-500 shadow-lg shadow-purple-500/25"
+                        "bg-blue-600 hover:bg-blue-700 text-white" :
+                        "bg-gray-700 hover:bg-gray-600 text-white"
                       }
                       size="lg"
                       data-testid={gpsEnabled ? "button-gps-stop" : "button-gps-start"}
                     >
-                      <MapPin className={gpsEnabled ? "mr-2 animate-pulse" : "mr-2"} size={20} />
-                      {gpsEnabled ? "📍 GPS ON" : "🛰️ START GPS"}
+                      <MapPin className="mr-2" size={20} />
+                      {gpsEnabled ? "Stop GPS" : "Start GPS"}
                     </Button>
                     
                     <Button 
                       onClick={completeMile}
-                      className="bg-gradient-to-r from-red-600 to-red-800 hover:from-red-700 hover:to-red-900 text-white border border-red-500 shadow-lg shadow-red-500/25"
+                      className="bg-red-600 hover:bg-red-700 text-white"
                       size="lg"
                       disabled={!isRunning || completeMileMutation.isPending}
                     >
-                      <Target className="mr-2 animate-spin" size={20} />
-                      {completeMileMutation.isPending ? "🔥 RECORDING..." : `🏁 CRUSH MILE ${currentMile}!`}
+                      <Target className="mr-2" size={20} />
+                      {completeMileMutation.isPending ? "Recording..." : `Complete Mile ${currentMile}`}
                     </Button>
                     
                     <Button 
                       onClick={finishSession}
-                      className="bg-gradient-to-r from-gray-700 to-black hover:from-gray-800 hover:to-gray-900 text-red-400 border border-red-500 shadow-lg shadow-red-500/25"
+                      className="bg-gray-700 hover:bg-gray-600 text-white"
                       size="lg"
                       disabled={finishSessionMutation.isPending}
                     >
                       <Square className="mr-2" size={20} />
-                      {finishSessionMutation.isPending ? "🔥 WRAPPING UP..." : "🏆 VICTORY LAP!"}
+                      {finishSessionMutation.isPending ? "Finishing..." : "Finish Session"}
                     </Button>
                   </div>
                 </div>
@@ -669,17 +666,17 @@ export default function MileTracker() {
 
             {/* GPS Map */}
             {gpsEnabled && (
-              <Card className="bg-gradient-to-br from-gray-900 to-black border border-blue-500/50 shadow-xl shadow-blue-500/20">
+              <Card className="bg-gray-900 border border-gray-800">
                 <CardHeader>
-                  <CardTitle className="flex items-center text-2xl font-bold text-blue-400">
-                    <MapPin className="mr-3 text-blue-500 animate-pulse" size={28} />
-                    🗺️ LIVE GPS TRACKING 📍
+                  <CardTitle className="flex items-center text-lg font-semibold text-white">
+                    <MapPin className="mr-3 text-blue-500" size={24} />
+                    Live GPS Tracking
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   {currentPosition ? (
                     <>
-                      <div className="h-[400px] rounded-lg overflow-hidden border-2 border-blue-500/30">
+                      <div className="h-[400px] rounded-lg overflow-hidden border border-gray-700">
                         <MapContainer
                           center={currentPosition}
                           zoom={16}
@@ -702,25 +699,25 @@ export default function MileTracker() {
                           <Marker position={currentPosition} />
                         </MapContainer>
                       </div>
-                      <div className="mt-4 text-center">
-                        <p className="text-blue-300 font-semibold">
-                          🎯 Total Distance: <span className="text-blue-400 text-lg font-bold">{gpsDistance.toFixed(2)} miles</span>
+                      <div className="mt-4 flex items-center justify-between text-sm">
+                        <p className="text-gray-300">
+                          Total Distance: <span className="text-white font-semibold">{gpsDistance.toFixed(2)} miles</span>
                         </p>
                         {gpsPath.length > 0 && (
-                          <p className="text-sm text-blue-400/70 mt-1">
-                            📊 {gpsPath.length} GPS points tracked
+                          <p className="text-gray-500">
+                            {gpsPath.length} points tracked
                           </p>
                         )}
                       </div>
                     </>
                   ) : (
-                    <div className="h-[400px] rounded-lg border-2 border-blue-500/30 bg-gray-800/50 flex flex-col items-center justify-center">
-                      <div className="animate-pulse text-6xl mb-4">🛰️</div>
-                      <p className="text-blue-400 text-xl font-bold mb-2">Acquiring GPS Signal...</p>
-                      <p className="text-blue-300 text-sm">Please wait while we locate you</p>
+                    <div className="h-[400px] rounded-lg border border-gray-700 bg-gray-800 flex flex-col items-center justify-center">
+                      <MapPin className="mb-4 text-gray-600 animate-pulse" size={48} />
+                      <p className="text-white text-lg font-semibold mb-2">Acquiring GPS Signal</p>
+                      <p className="text-gray-400 text-sm">Please wait while we locate you</p>
                       {gpsAccuracy !== null && (
-                        <p className="text-yellow-400 text-xs mt-2">
-                          Signal accuracy: ±{gpsAccuracy.toFixed(0)}m
+                        <p className="text-gray-500 text-xs mt-2">
+                          Accuracy: ±{gpsAccuracy.toFixed(0)}m
                           {gpsAccuracy >= 100 && " (waiting for better signal)"}
                         </p>
                       )}
@@ -732,11 +729,11 @@ export default function MileTracker() {
 
             {/* Mile Splits */}
             {activeSession.splits.length > 0 && (
-              <Card className="bg-gradient-to-br from-gray-900 to-black border border-red-500/50 shadow-xl shadow-red-500/20">
+              <Card className="bg-gray-900 border border-gray-800">
                 <CardHeader>
-                  <CardTitle className="flex items-center text-2xl font-bold text-red-400">
-                    <Gauge className="mr-3 text-red-500 animate-spin" size={28} />
-                    🔥 SPEED DEMON SPLITS 💨
+                  <CardTitle className="flex items-center text-lg font-semibold text-white">
+                    <Gauge className="mr-3 text-red-500" size={24} />
+                    Mile Splits
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -744,22 +741,22 @@ export default function MileTracker() {
                     {activeSession.splits.map((split, index) => (
                       <div
                         key={split.id}
-                        className="bg-gradient-to-br from-red-900 to-black rounded-lg p-4 text-center border border-red-500/40 shadow-lg hover:shadow-red-500/30 transition-all duration-300"
+                        className="bg-gray-800 rounded-lg p-4 border border-gray-700 hover:border-gray-600 transition-colors"
                       >
-                        <p className="text-lg font-bold text-red-300 mb-2">
-                          🏃‍♂️ MILE {split.mileNumber} 🔥
+                        <p className="text-sm font-medium text-gray-400 mb-2">
+                          Mile {split.mileNumber}
                         </p>
-                        <p className="text-3xl font-bold text-red-400 mb-2 font-mono">
+                        <p className="text-2xl font-bold text-white mb-2 font-mono">
                           {formatTime(split.splitTime)}
                         </p>
-                        <p className="text-sm text-red-300 font-semibold">
-                          ⚡ PACE: {formatPace(split.pace)}/mile
+                        <p className="text-sm text-gray-400">
+                          Pace: {formatPace(split.pace)}/mi
                         </p>
                         {index === activeSession.splits.indexOf(activeSession.splits.reduce((fastest, current) => 
                           current.pace < fastest.pace ? current : fastest
                         )) && activeSession.splits.length > 1 && (
-                          <div className="text-sm text-yellow-400 font-bold mt-2 animate-pulse">
-                            💫 FASTEST SPLIT! 💫
+                          <div className="text-xs text-green-400 font-medium mt-2">
+                            Fastest Split
                           </div>
                         )}
                       </div>
@@ -771,46 +768,46 @@ export default function MileTracker() {
 
             {/* Session Stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <Card className="bg-gradient-to-br from-red-900 to-black border border-red-500/40 shadow-lg">
+              <Card className="bg-gray-900 border border-gray-800">
                 <CardContent className="pt-6 text-center">
-                  <MapPin className="mx-auto mb-2 text-red-400 animate-pulse" size={28} />
-                  <p className="text-3xl font-bold text-red-400 font-mono">
+                  <MapPin className="mx-auto mb-2 text-gray-400" size={24} />
+                  <p className="text-2xl font-bold text-white font-mono">
                     {activeSession.splits.length}
                   </p>
-                  <p className="text-sm text-red-300 font-bold">🏁 MILES CRUSHED</p>
+                  <p className="text-xs text-gray-400 font-medium">Miles Completed</p>
                 </CardContent>
               </Card>
               
-              <Card className="bg-gradient-to-br from-red-900 to-black border border-red-500/40 shadow-lg">
+              <Card className="bg-gray-900 border border-gray-800">
                 <CardContent className="pt-6 text-center">
-                  <Gauge className="mx-auto mb-2 text-red-400 animate-spin" size={28} />
-                  <p className="text-3xl font-bold text-red-400 font-mono">
+                  <Gauge className="mx-auto mb-2 text-gray-400" size={24} />
+                  <p className="text-2xl font-bold text-white font-mono">
                     {getCurrentPace()}
                   </p>
-                  <p className="text-sm text-red-300 font-bold">⚡ CURRENT SPEED</p>
+                  <p className="text-xs text-gray-400 font-medium">Avg Pace</p>
                 </CardContent>
               </Card>
               
-              <Card className="bg-gradient-to-br from-red-900 to-black border border-red-500/40 shadow-lg">
+              <Card className="bg-gray-900 border border-gray-800">
                 <CardContent className="pt-6 text-center">
-                  <Trophy className="mx-auto mb-2 text-yellow-400 animate-bounce" size={28} />
-                  <p className="text-3xl font-bold text-yellow-400 font-mono">
+                  <Trophy className="mx-auto mb-2 text-gray-400" size={24} />
+                  <p className="text-2xl font-bold text-white font-mono">
                     {activeSession.splits.length > 0 
                       ? formatPace(Math.min(...activeSession.splits.map(s => s.pace)))
                       : "--:--"
                     }
                   </p>
-                  <p className="text-sm text-yellow-300 font-bold">💫 BEAST MILE</p>
+                  <p className="text-xs text-gray-400 font-medium">Best Pace</p>
                 </CardContent>
               </Card>
               
-              <Card className="bg-gradient-to-br from-red-900 to-black border border-red-500/40 shadow-lg">
+              <Card className="bg-gray-900 border border-gray-800">
                 <CardContent className="pt-6 text-center">
-                  <Flame className="mx-auto mb-2 text-red-500 animate-pulse" size={28} />
-                  <p className="text-3xl font-bold text-red-400 font-mono">
+                  <Target className="mx-auto mb-2 text-gray-400" size={24} />
+                  <p className="text-2xl font-bold text-white font-mono">
                     {currentMile}
                   </p>
-                  <p className="text-sm text-red-300 font-bold">🔥 NEXT TARGET</p>
+                  <p className="text-xs text-gray-400 font-medium">Next Mile</p>
                 </CardContent>
               </Card>
             </div>
