@@ -1318,9 +1318,9 @@ export default function WorkoutLogger() {
       {/* Content wrapper */}
       <div className="relative z-10">
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-2xl font-bold text-white drop-shadow-lg">Log Workout</h3>
+        <h3 className="text-3xl font-bold bg-gradient-to-r from-red-400 to-red-600 bg-clip-text text-transparent drop-shadow-lg">Log Workout</h3>
         <button 
-          className="text-primary hover:text-primary/80 transition-colors"
+          className="p-2 bg-red-600/20 hover:bg-red-600/30 text-red-400 hover:text-red-300 rounded-lg transition-all border border-red-500/30"
           onClick={() => setLocation('/workouts')}
           data-testid="expand-workouts-button"
           title="View all workouts"
@@ -1332,11 +1332,11 @@ export default function WorkoutLogger() {
       {/* Exercise Search */}
       <div className="mb-6">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted" size={16} />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-red-400" size={16} />
           <Input
             type="text"
             placeholder="Search exercises (e.g., push-ups, running, yoga)"
-            className="pl-10"
+            className="pl-10 bg-black/50 border-red-500/30 text-white placeholder:text-gray-400 focus:border-red-500 focus:ring-red-500/50"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -1345,7 +1345,7 @@ export default function WorkoutLogger() {
 
       {/* Workout Categories */}
       <div className="mb-6">
-        <p className="text-sm font-medium text-white mb-3">Popular Categories</p>
+        <p className="text-sm font-medium text-red-400 mb-3">Popular Categories</p>
         <div className="flex flex-wrap gap-3">
           {categories.map((category) => (
             <Button
@@ -1353,7 +1353,9 @@ export default function WorkoutLogger() {
               variant={selectedCategory === category.id ? "default" : "outline"}
               size="sm"
               onClick={() => setSelectedCategory(category.id)}
-              className="transition-colors"
+              className={selectedCategory === category.id 
+                ? "bg-gradient-to-r from-red-600 to-red-700 text-white border-0 shadow-lg shadow-red-500/50" 
+                : "border-red-500/30 text-gray-300 hover:bg-red-600/20 hover:text-red-400 hover:border-red-500/50"}
             >
               <category.icon className="mr-2" size={16} />
               {category.name}
@@ -1366,7 +1368,7 @@ export default function WorkoutLogger() {
       {/* Exercise Results */}
       {(searchQuery || filteredExercises.length > 6) ? (
         <div className="mb-4 flex items-center justify-between">
-          <p className="text-sm font-medium text-white">
+          <p className="text-sm font-medium text-gray-300">
             {searchQuery ? 
               (filteredExercises.length > 0 ? `Found ${filteredExercises.length} exercise${filteredExercises.length === 1 ? '' : 's'}` : 'No exercises found') :
               `Showing ${Math.min(filteredExercises.length, showAllExercises ? filteredExercises.length : 6)} of ${filteredExercises.length} exercises`
@@ -1375,7 +1377,7 @@ export default function WorkoutLogger() {
           {!searchQuery && filteredExercises.length > 6 && (
             <button
               onClick={() => setShowAllExercises(!showAllExercises)}
-              className="text-primary hover:text-primary/80 text-sm font-medium transition-colors"
+              className="text-red-400 hover:text-red-300 text-sm font-medium transition-colors"
               data-testid="view-all-exercises-button"
             >
               {showAllExercises ? 'Show Less' : 'View All'}
@@ -1392,19 +1394,19 @@ export default function WorkoutLogger() {
           return (
             <div
               key={exercise.name}
-              className={`bg-gradient-to-br from-${exercise.color}-50 to-${exercise.color}-100 border border-${exercise.color}-200 rounded-xl p-4 hover:from-${exercise.color}-100 hover:to-${exercise.color}-200 transition-all group ${createWorkoutMutation.isPending ? 'opacity-50 pointer-events-none' : 'cursor-pointer'}`}
+              className={`bg-gradient-to-br from-gray-900 to-black border border-red-500/30 rounded-xl p-4 hover:border-red-500/60 hover:shadow-lg hover:shadow-red-500/20 transition-all group ${createWorkoutMutation.isPending ? 'opacity-50 pointer-events-none' : 'cursor-pointer'}`}
               data-testid={`exercise-${exercise.name.toLowerCase().replace(/\s+/g, '-')}`}
             >
               <div className="flex items-center space-x-3 mb-2">
-                <IconComponent className={`text-${exercise.color}-600 text-lg group-hover:scale-110 transition-transform`} />
-                <span className="font-medium text-gray-800">{exercise.name}</span>
+                <IconComponent className="text-red-500 text-lg group-hover:scale-110 transition-transform" />
+                <span className="font-medium text-white">{exercise.name}</span>
               </div>
-              <p className="text-xs text-muted">{exercise.description}</p>
-              <div className="flex items-center justify-between mt-2 text-xs text-gray-500">
+              <p className="text-xs text-gray-400">{exercise.description}</p>
+              <div className="flex items-center justify-between mt-2 text-xs text-gray-400">
                 <button
                   onClick={() => handleExerciseClick(exercise)}
                   disabled={createWorkoutMutation.isPending}
-                  className="flex items-center hover:text-gray-700 transition-colors"
+                  className="flex items-center hover:text-red-400 transition-colors"
                   data-testid={`instructions-${exercise.name.toLowerCase().replace(/\s+/g, '-')}`}
                 >
                   <Play className="w-3 h-3 mr-1" />
@@ -1417,7 +1419,7 @@ export default function WorkoutLogger() {
                       handleToggleDemo(exercise);
                     }}
                     disabled={createWorkoutMutation.isPending}
-                    className="flex items-center text-blue-600 hover:text-blue-800 transition-colors"
+                    className="flex items-center text-red-400 hover:text-red-300 transition-colors"
                     data-testid={`demo-${exercise.name.toLowerCase().replace(/\s+/g, '-')}`}
                     aria-expanded={expandedDemo === exercise.name}
                     aria-controls={`demo-content-${exercise.name.toLowerCase().replace(/\s+/g, '-')}`}
@@ -1430,9 +1432,9 @@ export default function WorkoutLogger() {
               
               {/* Inline Exercise Demo */}
               {expandedDemo === exercise.name && (
-                <div className="mt-3 pt-3 border-t border-gray-200" id={`demo-content-${exercise.name.toLowerCase().replace(/\s+/g, '-')}`}>
-                  <div className="bg-gray-50 rounded-lg p-3">
-                    <h4 className="font-medium text-gray-800 mb-2 text-sm">Exercise Demonstration</h4>
+                <div className="mt-3 pt-3 border-t border-red-500/30" id={`demo-content-${exercise.name.toLowerCase().replace(/\s+/g, '-')}`}>
+                  <div className="bg-black/50 rounded-lg p-3 border border-red-500/20">
+                    <h4 className="font-medium text-red-400 mb-2 text-sm">Exercise Demonstration</h4>
                     <img 
                       src={getDemoImage(exercise.name)}
                       alt={`${exercise.name} demonstration`}
@@ -1440,9 +1442,9 @@ export default function WorkoutLogger() {
                       data-testid={`demo-image-${exercise.name.toLowerCase().replace(/\s+/g, '-')}`}
                     />
                     <div className="mt-2">
-                      <p className="text-xs text-gray-600 mb-1">{getExerciseAnimation(exercise.name).description}</p>
-                      <div className="text-xs text-gray-500">
-                        <strong>Key Points:</strong>
+                      <p className="text-xs text-gray-300 mb-1">{getExerciseAnimation(exercise.name).description}</p>
+                      <div className="text-xs text-gray-400">
+                        <strong className="text-red-400">Key Points:</strong>
                         <ul className="list-disc list-inside mt-1 space-y-0.5">
                           {getExerciseAnimation(exercise.name).keypoints.slice(0, 2).map((point, index) => (
                             <li key={index}>{point}</li>
@@ -1457,11 +1459,11 @@ export default function WorkoutLogger() {
           );
         }) : (
           <div className="col-span-full text-center py-8">
-            <Search className="mx-auto h-12 w-12 text-gray-300 mb-4" />
-            <p className="text-lg font-medium text-gray-500 mb-2">
+            <Search className="mx-auto h-12 w-12 text-red-500/50 mb-4" />
+            <p className="text-lg font-medium text-gray-400 mb-2">
               {searchQuery ? 'No exercises found' : 'Try searching for an exercise'}
             </p>
-            <p className="text-sm text-gray-400">
+            <p className="text-sm text-gray-500">
               {searchQuery ? `No exercises match "${searchQuery}"` : 'Search for exercises like "push-ups", "running", or "yoga"'}
             </p>
           </div>
@@ -1474,21 +1476,21 @@ export default function WorkoutLogger() {
 
       {/* Exercise Instructions Modal */}
       {selectedExercise && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50" onClick={() => setSelectedExercise(null)}>
-          <div className="bg-white rounded-2xl max-w-md w-full max-h-[70vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50" onClick={() => setSelectedExercise(null)}>
+          <div className="bg-gradient-to-br from-gray-900 to-black border-2 border-red-500/50 rounded-2xl max-w-md w-full max-h-[70vh] overflow-y-auto shadow-2xl shadow-red-500/20" onClick={(e) => e.stopPropagation()}>
             <div className="p-6">
               {/* Header */}
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center space-x-3">
-                  <selectedExercise.icon className={`text-${selectedExercise.color}-600 text-2xl`} />
+                  <selectedExercise.icon className="text-red-500 text-2xl" />
                   <div>
-                    <h2 className="text-2xl font-bold text-gray-800">{selectedExercise.name}</h2>
-                    <p className="text-muted capitalize">{selectedExercise.category} • {selectedExercise.description}</p>
+                    <h2 className="text-2xl font-bold text-white">{selectedExercise.name}</h2>
+                    <p className="text-gray-400 capitalize">{selectedExercise.category} • {selectedExercise.description}</p>
                   </div>
                 </div>
                 <button
                   onClick={() => setSelectedExercise(null)}
-                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                  className="text-gray-400 hover:text-red-400 transition-colors"
                   data-testid="close-exercise-modal"
                 >
                   <X className="w-6 h-6" />
@@ -1499,10 +1501,10 @@ export default function WorkoutLogger() {
               <div className="space-y-6">
                 {/* Target Muscles */}
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-800 mb-3">Target Muscles</h3>
+                  <h3 className="text-lg font-semibold text-red-400 mb-3">Target Muscles</h3>
                   <div className="flex flex-wrap gap-2">
                     {getExerciseInstructions(selectedExercise.name).muscles.map((muscle, index) => (
-                      <span key={index} className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+                      <span key={index} className="bg-red-600/20 text-red-400 border border-red-500/30 px-3 py-1 rounded-full text-sm font-medium">
                         {muscle}
                       </span>
                     ))}
@@ -1511,14 +1513,14 @@ export default function WorkoutLogger() {
 
                 {/* Step-by-Step Instructions */}
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-800 mb-3">How to Perform</h3>
+                  <h3 className="text-lg font-semibold text-red-400 mb-3">How to Perform</h3>
                   <ol className="space-y-3">
                     {getExerciseInstructions(selectedExercise.name).steps.map((step, index) => (
                       <li key={index} className="flex items-start space-x-3">
-                        <span className="bg-primary text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-medium flex-shrink-0 mt-0.5">
+                        <span className="bg-gradient-to-r from-red-600 to-red-700 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-medium flex-shrink-0 mt-0.5">
                           {index + 1}
                         </span>
-                        <p className="text-gray-700">{step}</p>
+                        <p className="text-gray-300">{step}</p>
                       </li>
                     ))}
                   </ol>
@@ -1526,12 +1528,12 @@ export default function WorkoutLogger() {
 
                 {/* Tips */}
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-800 mb-3">Pro Tips</h3>
+                  <h3 className="text-lg font-semibold text-red-400 mb-3">Pro Tips</h3>
                   <ul className="space-y-2">
                     {getExerciseInstructions(selectedExercise.name).tips.map((tip, index) => (
                       <li key={index} className="flex items-start space-x-2">
-                        <span className="text-yellow-500 mt-1">💡</span>
-                        <p className="text-gray-700">{tip}</p>
+                        <span className="text-red-500 mt-1">💡</span>
+                        <p className="text-gray-300">{tip}</p>
                       </li>
                     ))}
                   </ul>
@@ -1543,7 +1545,7 @@ export default function WorkoutLogger() {
                 <Button
                   onClick={() => handleStartWorkout(selectedExercise.name)}
                   disabled={createWorkoutMutation.isPending}
-                  className="flex-1"
+                  className="flex-1 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white border-0 shadow-lg shadow-red-500/50"
                   data-testid="start-workout-button"
                 >
                   {createWorkoutMutation.isPending ? 'Starting...' : 'Start Workout'}
@@ -1551,7 +1553,7 @@ export default function WorkoutLogger() {
                 <Button
                   variant="outline"
                   onClick={() => setSelectedExercise(null)}
-                  className="px-6"
+                  className="px-6 border-red-500/30 text-gray-300 hover:bg-red-600/20 hover:text-red-400 hover:border-red-500/50"
                   data-testid="close-modal-button"
                 >
                   Close
@@ -1564,21 +1566,21 @@ export default function WorkoutLogger() {
 
       {/* AI-Powered Workout Form with Difficulty Tracking */}
       {showWorkoutForm && selectedExercise && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
+          <div className="bg-gradient-to-br from-gray-900 to-black border-2 border-red-500/50 rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl shadow-red-500/20">
             <div className="p-8">
               {/* Header */}
               <div className="flex justify-between items-center mb-6">
                 <div>
-                  <h2 className="text-2xl font-bold text-gray-800">Log Your Workout</h2>
-                  <p className="text-gray-600 mt-1">AI-powered difficulty tracking for {selectedExercise.name}</p>
+                  <h2 className="text-2xl font-bold text-white">Log Your Workout</h2>
+                  <p className="text-gray-400 mt-1">AI-powered difficulty tracking for {selectedExercise.name}</p>
                 </div>
                 <button
                   onClick={() => {
                     setShowWorkoutForm(false);
                     setSelectedExercise(null);
                   }}
-                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                  className="text-gray-400 hover:text-red-400 transition-colors"
                   data-testid="close-workout-form"
                 >
                   <X className="w-6 h-6" />
@@ -1588,9 +1590,9 @@ export default function WorkoutLogger() {
               {/* Workout Form */}
               <div className="space-y-6">
                 {/* Exercise Details Section */}
-                <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-6">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                    <Dumbbell className="w-5 h-5 text-blue-600" />
+                <div className="bg-gradient-to-r from-red-900/30 to-black/50 border border-red-500/30 rounded-lg p-6">
+                  <h3 className="text-lg font-semibold text-red-400 mb-4 flex items-center gap-2">
+                    <Dumbbell className="w-5 h-5 text-red-500" />
                     Exercise Details for {selectedExercise.name}
                   </h3>
                   
@@ -1598,35 +1600,35 @@ export default function WorkoutLogger() {
                   <div className="grid grid-cols-2 gap-4 mb-4">
                     {/* Sets Input */}
                     <div>
-                      <Label className="text-sm font-semibold text-gray-700">Sets</Label>
+                      <Label className="text-sm font-semibold text-gray-300">Sets</Label>
                       <Input
                         type="number"
                         min="1"
                         max="10"
                         value={exerciseSets}
                         onChange={(e) => setExerciseSets(parseInt(e.target.value) || 1)}
-                        className="mt-1"
+                        className="mt-1 bg-black/50 border-red-500/30 text-white focus:border-red-500 focus:ring-red-500/50"
                         data-testid="input-sets"
                       />
                     </div>
 
                     {/* Reps Input */}
                     <div>
-                      <Label className="text-sm font-semibold text-gray-700">Reps per Set</Label>
+                      <Label className="text-sm font-semibold text-gray-300">Reps per Set</Label>
                       <Input
                         type="number"
                         min="1"
                         max="100"
                         value={exerciseReps}
                         onChange={(e) => setExerciseReps(parseInt(e.target.value) || 1)}
-                        className="mt-1"
+                        className="mt-1 bg-black/50 border-red-500/30 text-white focus:border-red-500 focus:ring-red-500/50"
                         data-testid="input-reps"
                       />
                     </div>
 
                     {/* Weight Input */}
                     <div>
-                      <Label className="text-sm font-semibold text-gray-700">Weight (lbs)</Label>
+                      <Label className="text-sm font-semibold text-gray-300">Weight (lbs)</Label>
                       <Input
                         type="number"
                         min="0"
@@ -1634,14 +1636,14 @@ export default function WorkoutLogger() {
                         value={exerciseWeight}
                         onChange={(e) => setExerciseWeight(parseInt(e.target.value) || 0)}
                         placeholder="0 for bodyweight"
-                        className="mt-1"
+                        className="mt-1 bg-black/50 border-red-500/30 text-white placeholder:text-gray-500 focus:border-red-500 focus:ring-red-500/50"
                         data-testid="input-weight"
                       />
                     </div>
 
                     {/* Exercise Duration Input */}
                     <div>
-                      <Label className="text-sm font-semibold text-gray-700">Duration (minutes)</Label>
+                      <Label className="text-sm font-semibold text-gray-300">Duration (minutes)</Label>
                       <Input
                         type="number"
                         min="0"
@@ -1649,7 +1651,7 @@ export default function WorkoutLogger() {
                         value={exerciseDuration}
                         onChange={(e) => setExerciseDuration(parseInt(e.target.value) || 0)}
                         placeholder="0 for rep-based"
-                        className="mt-1"
+                        className="mt-1 bg-black/50 border-red-500/30 text-white placeholder:text-gray-500 focus:border-red-500 focus:ring-red-500/50"
                         data-testid="input-exercise-duration"
                       />
                     </div>
@@ -1657,13 +1659,13 @@ export default function WorkoutLogger() {
 
                   {/* Exercise Notes */}
                   <div>
-                    <Label className="text-sm font-semibold text-gray-700">Exercise Notes (optional)</Label>
+                    <Label className="text-sm font-semibold text-gray-300">Exercise Notes (optional)</Label>
                     <Input
                       type="text"
                       value={exerciseNotes}
                       onChange={(e) => setExerciseNotes(e.target.value)}
                       placeholder="e.g., form notes, modifications, how it felt..."
-                      className="mt-1"
+                      className="mt-1 bg-black/50 border-red-500/30 text-white placeholder:text-gray-500 focus:border-red-500 focus:ring-red-500/50"
                       data-testid="input-exercise-notes"
                     />
                   </div>
@@ -1671,7 +1673,7 @@ export default function WorkoutLogger() {
 
                 {/* Overall Workout Duration Slider */}
                 <div>
-                  <Label className="text-base font-semibold text-gray-800 flex items-center gap-2">
+                  <Label className="text-base font-semibold text-red-400 flex items-center gap-2">
                     <Activity className="w-4 h-4" />
                     Total Workout Duration: {workoutDuration[0]} minutes
                   </Label>
@@ -1685,7 +1687,7 @@ export default function WorkoutLogger() {
                       className="w-full"
                       data-testid="duration-slider"
                     />
-                    <div className="flex justify-between text-xs text-gray-500 mt-1">
+                    <div className="flex justify-between text-xs text-gray-400 mt-1">
                       <span>5 min</span>
                       <span>60 min</span>
                       <span>120 min</span>
