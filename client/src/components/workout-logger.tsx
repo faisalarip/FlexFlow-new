@@ -323,15 +323,16 @@ export default function WorkoutLogger() {
 
   // Filter exercises based on search query
   const getFilteredExercises = () => {
-    // Merge API exercises with client-side display properties
-    const exercisesWithProps = (exercises || []).map(apiExercise => {
-      // Find matching quick exercise for display properties
-      const quickEx = quickExercises.find(qe => qe.name === apiExercise.name);
+    // Use quickExercises as the base and enrich with API data if available
+    const exercisesWithProps = quickExercises.map(quickEx => {
+      // Find matching API exercise for additional data
+      const apiExercise = (exercises || []).find(ex => ex.name === quickEx.name);
       return {
-        ...apiExercise,
-        icon: quickEx?.icon || Activity,
-        color: quickEx?.color || "gray",
-        description: apiExercise.description || quickEx?.description || ""
+        ...quickEx,
+        ...(apiExercise || {}), // Merge API data if available
+        icon: quickEx.icon,
+        color: quickEx.color,
+        description: apiExercise?.description || quickEx.description
       };
     });
     
