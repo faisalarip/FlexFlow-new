@@ -37,6 +37,7 @@ import deadBugImage from "@assets/generated_images/Man_performing_dead_bug_7bdcd
 import hangingLegRaisesImage from "@assets/generated_images/Woman_performing_hanging_leg_raises_ef4d5db2.png";
 import lateralRaisesImage from "@assets/generated_images/Man_and_woman_dumbbell_lateral_raises_a9e51d80.png";
 import frontRaisesImage from "@assets/generated_images/Man_and_woman_dumbbell_front_raises_f19c02ce.png";
+import workoutBgImage from "@assets/stock_images/men_and_women_workin_dbbf742b.jpg";
 
 export default function WorkoutLogger() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -1318,16 +1319,33 @@ export default function WorkoutLogger() {
       </div>
       {/* Content wrapper */}
       <div className="relative z-10">
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="text-3xl font-bold bg-gradient-to-r from-red-400 to-red-600 bg-clip-text text-transparent drop-shadow-lg">Log Workout</h3>
-        <button 
-          className="p-2 bg-red-600/20 hover:bg-red-600/30 text-red-400 hover:text-red-300 rounded-lg transition-all border border-red-500/30"
-          onClick={() => setLocation('/workouts')}
-          data-testid="expand-workouts-button"
-          title="View all workouts"
-        >
-          <Expand />
-        </button>
+      {/* Header with background image */}
+      <div className="relative mb-6 rounded-2xl overflow-hidden">
+        {/* Background image with overlay */}
+        <div className="absolute inset-0">
+          <img 
+            src={workoutBgImage} 
+            alt="Workout background" 
+            className="w-full h-full object-cover opacity-30"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent"></div>
+        </div>
+        
+        {/* Header content */}
+        <div className="relative flex items-center justify-between p-6">
+          <div>
+            <h3 className="text-3xl font-bold bg-gradient-to-r from-red-400 to-red-600 bg-clip-text text-transparent drop-shadow-lg">Log Workout</h3>
+            <p className="text-gray-300 text-sm mt-1">Track your exercises, sets, reps, and weight</p>
+          </div>
+          <button 
+            className="p-2 bg-red-600/20 hover:bg-red-600/30 text-red-400 hover:text-red-300 rounded-lg transition-all border border-red-500/30"
+            onClick={() => setLocation('/workouts')}
+            data-testid="expand-workouts-button"
+            title="View all workouts"
+          >
+            <Expand />
+          </button>
+        </div>
       </div>
 
       {/* Exercise Search */}
