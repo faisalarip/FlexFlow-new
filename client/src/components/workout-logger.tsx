@@ -1413,7 +1413,7 @@ export default function WorkoutLogger() {
                   <Play className="w-3 h-3 mr-1" />
                   <span>View instructions</span>
                 </button>
-                {["strength", "cardio", "yoga", "swimming", "dumbbells"].includes(exercise.category) && (
+                {["strength", "dumbbells"].includes(exercise.category) && (
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
@@ -1432,7 +1432,7 @@ export default function WorkoutLogger() {
               </div>
               
               {/* Inline Exercise Demo */}
-              {expandedDemo === exercise.name && (
+              {expandedDemo === exercise.name && ["strength", "dumbbells"].includes(exercise.category) && (
                 <div className="mt-3 pt-3 border-t border-red-500/30" id={`demo-content-${exercise.name.toLowerCase().replace(/\s+/g, '-')}`}>
                   <div className="bg-black/50 rounded-lg p-3 border border-red-500/20">
                     <h4 className="font-medium text-red-400 mb-2 text-sm">Exercise Demonstration</h4>
