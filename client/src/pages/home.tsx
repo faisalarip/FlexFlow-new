@@ -72,7 +72,7 @@ export default function Home() {
       icon: Sparkles,
       title: "AI Features",
       description: "Get personalized workout & meal recommendations",
-      link: "/premium",
+      link: "/subscription",
       color: "pink",
       badge: "Premium",
       testId: "link-premium"
