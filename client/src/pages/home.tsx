@@ -178,13 +178,27 @@ export default function Home() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {features.map((feature) => {
               const Icon = feature.icon;
+              const isLogWorkouts = feature.title === "Log Workouts";
+              
               return (
                 <Link key={feature.title} href={feature.link}>
                   <Card 
-                    className={`bg-gradient-to-br ${getColorClasses(feature.color)} border-0 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer group h-full`}
+                    className={`relative overflow-hidden bg-gradient-to-br ${getColorClasses(feature.color)} border-0 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer group h-full`}
                     data-testid={feature.testId}
                   >
-                    <CardContent className="p-6 text-white h-full flex flex-col">
+                    {isLogWorkouts && (
+                      <>
+                        <div className="absolute inset-0">
+                          <img 
+                            src={heroImage} 
+                            alt="Workout background" 
+                            className="w-full h-full object-cover opacity-30 group-hover:opacity-40 transition-opacity"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-br from-red-900/80 to-black/90"></div>
+                        </div>
+                      </>
+                    )}
+                    <CardContent className="relative p-6 text-white h-full flex flex-col">
                       <div className="flex items-start justify-between mb-4">
                         <div className="p-3 bg-white/20 rounded-lg group-hover:bg-white/30 transition-colors">
                           <Icon size={28} />
