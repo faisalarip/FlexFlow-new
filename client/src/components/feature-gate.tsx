@@ -93,96 +93,141 @@ export default function FeatureGate({ feature, children, fallback }: FeatureGate
     return <>{fallback}</>;
   }
 
-  // Default locked feature UI
+  // Default locked feature UI - Full screen lock page
   const featureInfo = FEATURE_INFO[feature];
   const isTrialUser = user?.subscriptionStatus === "free_trial";
+  const isExpired = user?.subscriptionStatus === "expired";
 
   return (
-    <div className="relative" data-testid={`feature-gate-${feature}`}>
-      {/* Backdrop blur effect for locked content */}
-      <div className="relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-gray-100/80 to-gray-200/90 backdrop-blur-sm z-10 rounded-lg" />
-        <div className="filter blur-sm opacity-50 pointer-events-none">
-          {children}
+    <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4" data-testid={`feature-gate-${feature}`}>
+      {/* Animated lock icon background */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 opacity-5">
+          <Lock className="w-full h-full text-red-500 animate-pulse" />
         </div>
       </div>
 
-      {/* Lock overlay */}
-      <div className="absolute inset-0 z-20 flex items-center justify-center">
-        <Card className="w-full max-w-md mx-4 bg-white/95 backdrop-blur-sm border-2 border-red-200 shadow-xl">
-          <CardHeader className="text-center">
-            <div className="mx-auto w-16 h-16 bg-gradient-to-r from-red-500 to-orange-500 rounded-full flex items-center justify-center mb-4">
-              <Lock className="w-8 h-8 text-white" />
+      {/* Lock Page Content */}
+      <div className="relative w-full max-w-2xl">
+        <Card className="bg-gradient-to-br from-gray-900 to-black border-2 border-red-500/30 shadow-2xl shadow-red-500/20">
+          <CardHeader className="text-center pb-6">
+            {/* Lock Icon */}
+            <div className="mx-auto w-24 h-24 bg-gradient-to-r from-red-500 to-red-700 rounded-full flex items-center justify-center mb-6 animate-bounce">
+              <Lock className="w-12 h-12 text-white" />
             </div>
-            <CardTitle className="flex items-center gap-2 justify-center text-xl">
+
+            {/* Feature Title */}
+            <CardTitle className="flex items-center gap-3 justify-center text-3xl text-white mb-3">
               {featureInfo.icon}
               {featureInfo.name}
             </CardTitle>
-            <CardDescription className="text-base">
+            
+            <CardDescription className="text-lg text-gray-300">
               {featureInfo.description}
             </CardDescription>
           </CardHeader>
           
-          <CardContent className="space-y-4">
-            {/* Trial status */}
+          <CardContent className="space-y-6">
+            {/* Subscription Status Message */}
+            {isExpired && (
+              <div className="text-center p-6 bg-gradient-to-r from-red-900/50 to-orange-900/50 rounded-xl border-2 border-red-500/50">
+                <Badge className="mb-3 bg-red-600 hover:bg-red-700 text-white px-4 py-2 text-base">
+                  <Lock className="w-4 h-4 mr-2" />
+                  Subscription Expired
+                </Badge>
+                <p className="text-xl font-bold text-white mb-2">
+                  Your Premium Access Has Ended
+                </p>
+                <p className="text-base text-gray-300">
+                  Renew your subscription to continue using {featureInfo.name} and all other premium features.
+                </p>
+              </div>
+            )}
+
             {isTrialUser && trialDaysRemaining > 0 && (
-              <div className="text-center p-3 bg-amber-50 rounded-lg border border-amber-200">
-                <Badge variant="secondary" className="mb-2 bg-amber-100 text-amber-800">
-                  <Calendar className="w-3 h-3 mr-1" />
-                  Trial: {trialDaysRemaining} days left
+              <div className="text-center p-6 bg-gradient-to-r from-amber-900/50 to-orange-900/50 rounded-xl border-2 border-amber-500/50">
+                <Badge className="mb-3 bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 text-base">
+                  <Calendar className="w-4 h-4 mr-2" />
+                  Trial Ending Soon
                 </Badge>
-                <p className="text-sm text-amber-700">
-                  Your free trial expires soon. Upgrade now to keep using premium features!
+                <p className="text-xl font-bold text-white mb-2">
+                  {trialDaysRemaining} {trialDaysRemaining === 1 ? 'Day' : 'Days'} Left in Your Trial
+                </p>
+                <p className="text-base text-gray-300">
+                  Upgrade now to keep using premium features after your trial expires!
                 </p>
               </div>
             )}
 
-            {/* Expired trial message */}
-            {(!isTrialUser || trialDaysRemaining === 0) && (
-              <div className="text-center p-3 bg-red-50 rounded-lg border border-red-200">
-                <Badge variant="destructive" className="mb-2">
-                  <Lock className="w-3 h-3 mr-1" />
-                  Premium Required
+            {isTrialUser && trialDaysRemaining === 0 && (
+              <div className="text-center p-6 bg-gradient-to-r from-red-900/50 to-orange-900/50 rounded-xl border-2 border-red-500/50">
+                <Badge className="mb-3 bg-red-600 hover:bg-red-700 text-white px-4 py-2 text-base">
+                  <Lock className="w-4 h-4 mr-2" />
+                  Trial Expired
                 </Badge>
-                <p className="text-sm text-red-700">
-                  {isTrialUser 
-                    ? "Your free trial has expired. Upgrade to continue using this feature."
-                    : "This feature requires a premium subscription."
-                  }
+                <p className="text-xl font-bold text-white mb-2">
+                  Your Free Trial Has Ended
+                </p>
+                <p className="text-base text-gray-300">
+                  Upgrade to premium to continue using {featureInfo.name} and all advanced features.
                 </p>
               </div>
             )}
 
-            {/* Upgrade buttons */}
-            <div className="flex flex-col gap-3">
+            {!isTrialUser && !isExpired && (
+              <div className="text-center p-6 bg-gradient-to-r from-purple-900/50 to-blue-900/50 rounded-xl border-2 border-purple-500/50">
+                <Badge className="mb-3 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 text-base">
+                  <Crown className="w-4 h-4 mr-2" />
+                  Premium Feature
+                </Badge>
+                <p className="text-xl font-bold text-white mb-2">
+                  This Feature Requires Premium Access
+                </p>
+                <p className="text-base text-gray-300">
+                  Upgrade to unlock {featureInfo.name} and all other premium features.
+                </p>
+              </div>
+            )}
+
+            {/* Upgrade Buttons */}
+            <div className="flex flex-col gap-4 pt-4">
               <Button
                 asChild
-                className="w-full bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white font-semibold py-3"
+                size="lg"
+                className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold py-6 text-lg shadow-lg shadow-red-500/50 border-2 border-red-500/50"
                 data-testid="upgrade-to-premium"
               >
                 <Link href="/subscription">
-                  <Crown className="w-4 h-4 mr-2" />
-                  Upgrade to Premium
+                  <Crown className="w-5 h-5 mr-3" />
+                  {isExpired ? "Renew Premium Subscription" : "Upgrade to Premium Now"}
                 </Link>
               </Button>
               
               <Button
                 asChild
                 variant="outline"
-                className="w-full"
+                size="lg"
+                className="w-full border-2 border-gray-600 text-white hover:bg-gray-800 hover:text-white py-6 text-lg"
                 data-testid="learn-more-premium"
               >
                 <Link href="/subscription">
-                  Learn More About Premium Features
+                  View Premium Features & Pricing
                 </Link>
               </Button>
             </div>
 
-            {/* Premium benefits */}
-            <div className="text-center pt-2">
-              <p className="text-xs text-gray-500">
-                Premium includes all features, unlimited access, and priority support
+            {/* Premium Benefits */}
+            <div className="text-center pt-4 border-t border-gray-700">
+              <p className="text-sm text-gray-400 mb-3">
+                Premium includes:
               </p>
+              <div className="flex flex-wrap gap-2 justify-center">
+                <Badge variant="secondary" className="bg-gray-800 text-gray-300">AI Workout Plans</Badge>
+                <Badge variant="secondary" className="bg-gray-800 text-gray-300">Mile Tracker</Badge>
+                <Badge variant="secondary" className="bg-gray-800 text-gray-300">Meal Planning</Badge>
+                <Badge variant="secondary" className="bg-gray-800 text-gray-300">Meal Tracking</Badge>
+                <Badge variant="secondary" className="bg-gray-800 text-gray-300">Priority Support</Badge>
+              </div>
             </div>
           </CardContent>
         </Card>
