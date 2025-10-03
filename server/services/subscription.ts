@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { PREMIUM_FEATURES, PremiumFeature, hasFeatureAccess, isTrialExpired, insertSubscriptionAuditSchema } from '../../shared/schema.js';
-import { IStorage } from '../storage.js';
+import { IStorage, storage } from '../storage.js';
 
 export class SubscriptionService {
   constructor(private storage: IStorage) {}
@@ -116,8 +116,7 @@ export const requireFeatureAccess = (feature: PremiumFeature) => {
         });
       }
 
-      const storage = (req as any).storage as IStorage;
-      const subscriptionService = new SubscriptionService(storage);
+      const subscriptionService = new SubscriptionService(storage as IStorage);
       
       const hasAccess = await subscriptionService.checkFeatureAccess(userId, feature);
       
@@ -155,7 +154,6 @@ export const checkFeatureAccessNonBlocking = async (req: Request, feature: Premi
       return { hasAccess: false };
     }
 
-    const storage = (req as any).storage as IStorage;
     const subscriptionService = new SubscriptionService(storage);
     
     const hasAccess = await subscriptionService.checkFeatureAccess(userId, feature);
