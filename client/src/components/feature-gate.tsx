@@ -48,6 +48,9 @@ function Camera({ className }: { className?: string }) {
   );
 }
 
+// Premium-only features that require active subscription (no trial access)
+const PREMIUM_ONLY_FEATURES = ['workout_planner', 'meal_plans', 'meal_tracker'];
+
 export default function FeatureGate({ feature, children, fallback }: FeatureGateProps) {
   const { user } = useNewAuth();
 
@@ -58,7 +61,10 @@ export default function FeatureGate({ feature, children, fallback }: FeatureGate
     // Active premium subscription has access to everything
     if (user.subscriptionStatus === "active") return true;
     
-    // Free trial users have access if trial hasn't expired
+    // Check if feature is premium-only (requires subscription, no trial access)
+    if (PREMIUM_ONLY_FEATURES.includes(feature)) return false;
+    
+    // For non-premium-only features, free trial users have access if trial hasn't expired
     if (user.subscriptionStatus === "free_trial") {
       if (!user.trialEndDate) return false;
       const trialEndDate = new Date(user.trialEndDate);
@@ -94,6 +100,7 @@ export default function FeatureGate({ feature, children, fallback }: FeatureGate
   const featureInfo = FEATURE_INFO[feature];
   const isTrialUser = user?.subscriptionStatus === "free_trial";
   const isExpired = user?.subscriptionStatus === "expired";
+  const isPremiumOnly = PREMIUM_ONLY_FEATURES.includes(feature);
 
   return (
     <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4" data-testid={`feature-gate-${feature}`}>
@@ -126,6 +133,21 @@ export default function FeatureGate({ feature, children, fallback }: FeatureGate
           
           <CardContent className="space-y-6">
             {/* Subscription Status Message */}
+            {isPremiumOnly && isTrialUser && (
+              <div className="text-center p-6 bg-gradient-to-r from-purple-900/50 to-red-900/50 rounded-xl border-2 border-purple-500/50">
+                <Badge className="mb-3 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 text-base">
+                  <Crown className="w-4 h-4 mr-2" />
+                  Premium Subscription Required
+                </Badge>
+                <p className="text-xl font-bold text-white mb-2">
+                  This Feature Requires an Active Subscription
+                </p>
+                <p className="text-base text-gray-300">
+                  {featureInfo.name} is a premium-only feature. Subscribe now to unlock this and other exclusive features.
+                </p>
+              </div>
+            )}
+
             {isExpired && (
               <div className="text-center p-6 bg-gradient-to-r from-red-900/50 to-orange-900/50 rounded-xl border-2 border-red-500/50">
                 <Badge className="mb-3 bg-red-600 hover:bg-red-700 text-white px-4 py-2 text-base">
@@ -141,7 +163,7 @@ export default function FeatureGate({ feature, children, fallback }: FeatureGate
               </div>
             )}
 
-            {isTrialUser && trialDaysRemaining > 0 && (
+            {!isPremiumOnly && isTrialUser && trialDaysRemaining > 0 && (
               <div className="text-center p-6 bg-gradient-to-r from-amber-900/50 to-orange-900/50 rounded-xl border-2 border-amber-500/50">
                 <Badge className="mb-3 bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 text-base">
                   <Calendar className="w-4 h-4 mr-2" />
@@ -156,7 +178,7 @@ export default function FeatureGate({ feature, children, fallback }: FeatureGate
               </div>
             )}
 
-            {isTrialUser && trialDaysRemaining === 0 && (
+            {!isPremiumOnly && isTrialUser && trialDaysRemaining === 0 && (
               <div className="text-center p-6 bg-gradient-to-r from-red-900/50 to-orange-900/50 rounded-xl border-2 border-red-500/50">
                 <Badge className="mb-3 bg-red-600 hover:bg-red-700 text-white px-4 py-2 text-base">
                   <Lock className="w-4 h-4 mr-2" />
@@ -171,7 +193,7 @@ export default function FeatureGate({ feature, children, fallback }: FeatureGate
               </div>
             )}
 
-            {!isTrialUser && !isExpired && (
+            {!isPremiumOnly && !isTrialUser && !isExpired && (
               <div className="text-center p-6 bg-gradient-to-r from-purple-900/50 to-blue-900/50 rounded-xl border-2 border-purple-500/50">
                 <Badge className="mb-3 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 text-base">
                   <Crown className="w-4 h-4 mr-2" />

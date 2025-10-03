@@ -825,9 +825,21 @@ export const PREMIUM_FEATURES = {
 
 export type PremiumFeature = typeof PREMIUM_FEATURES[keyof typeof PREMIUM_FEATURES];
 
+// Premium-only features (no trial access) - subscription required
+export const PREMIUM_ONLY_FEATURES: PremiumFeature[] = [
+  PREMIUM_FEATURES.WORKOUT_PLANNER,
+  PREMIUM_FEATURES.MEAL_PLANS,
+  PREMIUM_FEATURES.MEAL_TRACKER
+];
+
 // Feature access helper function
 export const isPremiumFeature = (feature: string): feature is PremiumFeature => {
   return Object.values(PREMIUM_FEATURES).includes(feature as PremiumFeature);
+};
+
+// Check if feature requires active subscription (no trial access)
+export const isPremiumOnlyFeature = (feature: PremiumFeature): boolean => {
+  return PREMIUM_ONLY_FEATURES.includes(feature);
 };
 
 // Trial expiration checker
@@ -838,8 +850,15 @@ export const isTrialExpired = (user: { trialEndDate: Date | null; subscriptionSt
 
 // Feature access checker
 export const hasFeatureAccess = (user: { subscriptionStatus: string; trialEndDate: Date | null }, feature: PremiumFeature): boolean => {
+  // Active subscription has access to everything
   if (user.subscriptionStatus === 'active') return true;
+  
+  // Check if feature is premium-only (requires subscription, no trial access)
+  if (isPremiumOnlyFeature(feature)) return false;
+  
+  // For non-premium-only features, trial users have access if trial hasn't expired
   if (user.subscriptionStatus === 'free_trial' && !isTrialExpired(user)) return true;
+  
   return false;
 };
 
