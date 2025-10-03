@@ -3,8 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "wouter";
-import { useQuery } from "@tanstack/react-query";
-import type { User } from "@shared/schema";
+import { useNewAuth } from "@/hooks/useNewAuth";
 
 interface FeatureGateProps {
   feature: 'workout_planner' | 'mile_tracker' | 'meal_plans' | 'meal_tracker' | 'progress_photos';
@@ -50,9 +49,7 @@ function Camera({ className }: { className?: string }) {
 }
 
 export default function FeatureGate({ feature, children, fallback }: FeatureGateProps) {
-  const { data: user } = useQuery<User>({
-    queryKey: ["/api/auth/user"],
-  });
+  const { user } = useNewAuth();
 
   // Check if user has access to the feature
   const hasAccess = (() => {
