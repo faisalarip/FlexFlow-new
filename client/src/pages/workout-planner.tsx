@@ -351,19 +351,19 @@ export default function WorkoutPlannerPage() {
               <CardContent className="space-y-4">
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
-                    <Label className="text-sm font-medium text-gray-700">Fitness Level</Label>
+                    <Label className="text-sm font-medium text-white">Fitness Level</Label>
                     <Badge variant="outline" className="mt-1 capitalize">{preferences.fitnessLevel}</Badge>
                   </div>
                   <div>
-                    <Label className="text-sm font-medium text-gray-700">Workout Days</Label>
+                    <Label className="text-sm font-medium text-white">Workout Days</Label>
                     <Badge variant="outline" className="mt-1">{preferences.workoutDaysPerWeek} days/week</Badge>
                   </div>
                   <div>
-                    <Label className="text-sm font-medium text-gray-700">Session Duration</Label>
+                    <Label className="text-sm font-medium text-white">Session Duration</Label>
                     <Badge variant="outline" className="mt-1">{preferences.sessionDuration} minutes</Badge>
                   </div>
                   <div>
-                    <Label className="text-sm font-medium text-gray-700">Primary Goals</Label>
+                    <Label className="text-sm font-medium text-white">Primary Goals</Label>
                     <div className="flex flex-wrap gap-1 mt-1">
                       {preferences.primaryGoals.map(goal => (
                         <Badge key={goal} variant="secondary" className="text-xs">
