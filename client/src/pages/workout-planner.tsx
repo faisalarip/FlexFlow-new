@@ -260,7 +260,7 @@ export default function WorkoutPlannerPage() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="w-2 h-2 rounded-full bg-primary" />
-                    <span className="font-medium">{day}</span>
+                    <span className="font-medium text-white">{day}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     {dayWorkout ? (
