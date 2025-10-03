@@ -455,18 +455,30 @@ export class MemStorage implements IStorage {
       
       // Create user first
       const now = new Date();
+      const trialEnd = new Date(now.getTime() + (7 * 24 * 60 * 60 * 1000)); // 7 days from now
       const isYogaTrainer = trainerInfo.specialties[0] === "yoga";
       const user: User = {
         id: trainerInfo.userId,
         email: isYogaTrainer ? "maya.singh.yoga@hotmail.com" : "marcus.williams.athlete@gmail.com",
+        username: null,
+        passwordHash: null,
         firstName: isYogaTrainer ? "Maya" : "Marcus",
         lastName: isYogaTrainer ? "Singh" : "Williams",
         profileImageUrl: null,
+        authProvider: "local",
+        isEmailVerified: false,
         streak: 0,
+        lastWorkoutDate: null,
+        lastActivityDate: null,
         subscriptionStatus: "free_trial",
         subscriptionStartDate: now,
         lastPaymentDate: null,
-        subscriptionExpiresAt: new Date(now.getTime() + (30 * 24 * 60 * 60 * 1000)),
+        subscriptionExpiresAt: null,
+        trialStartDate: now,
+        trialEndDate: trialEnd,
+        stripeCustomerId: null,
+        stripeSubscriptionId: null,
+        personalPlanData: null,
         createdAt: now,
         updatedAt: now,
       };
@@ -501,7 +513,25 @@ export class MemStorage implements IStorage {
 
   // Users (IMPORTANT) these user operations are mandatory for Replit Auth.
   async getUser(id: string): Promise<User | undefined> {
-    return this.users.get(id);
+    const user = this.users.get(id);
+    if (!user) return undefined;
+    
+    // Migrate users without trial dates (for existing users)
+    if (!user.trialStartDate || !user.trialEndDate) {
+      const now = new Date();
+      const trialEnd = new Date(now.getTime() + (7 * 24 * 60 * 60 * 1000)); // 7 days from now
+      const updatedUser = {
+        ...user,
+        trialStartDate: user.trialStartDate || user.createdAt || now,
+        trialEndDate: user.trialEndDate || trialEnd,
+        lastWorkoutDate: user.lastWorkoutDate || null,
+        lastActivityDate: user.lastActivityDate || null,
+      };
+      this.users.set(id, updatedUser);
+      return updatedUser;
+    }
+    
+    return user;
   }
 
   async upsertUser(userData: UpsertUser): Promise<User> {
@@ -530,10 +560,13 @@ export class MemStorage implements IStorage {
         isEmailVerified: false,
         streak: userData.streak || 0,
         lastWorkoutDate: userData.lastWorkoutDate || null,
+        lastActivityDate: null,
         subscriptionStatus: userData.subscriptionStatus || "free_trial",
         subscriptionStartDate: userData.subscriptionStartDate || now,
         lastPaymentDate: userData.lastPaymentDate || null,
-        subscriptionExpiresAt: userData.subscriptionExpiresAt || freeTrialExpiry,
+        subscriptionExpiresAt: userData.subscriptionExpiresAt || null,
+        trialStartDate: now,
+        trialEndDate: freeTrialExpiry,
         stripeCustomerId: null,
         stripeSubscriptionId: null,
         personalPlanData: null,
