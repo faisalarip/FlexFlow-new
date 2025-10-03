@@ -303,7 +303,7 @@ export default function WorkoutPlannerPage() {
       <FeatureGate feature="workout_planner">
         <div className="container mx-auto px-4 py-8 space-y-8">
         <div className="text-center space-y-4">
-          <h1 className="text-3xl font-bold text-gray-900 flex items-center justify-center gap-3">
+          <h1 className="text-3xl font-bold text-white flex items-center justify-center gap-3">
             <Target className="w-8 h-8 text-primary" />
             Your Personalized Workout Plan
           </h1>
