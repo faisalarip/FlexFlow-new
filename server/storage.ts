@@ -3580,6 +3580,10 @@ export class DatabaseStorage implements IStorage {
   
   async updateUserActivity(id: string, activityDate: Date): Promise<User | undefined> { return this.memStorage.updateUserActivity(id, activityDate); }
   
+  // Activity logging methods
+  async createUserActivity(activityData: InsertUserActivityLog): Promise<UserActivityLog> { return this.memStorage.createUserActivity(activityData); }
+  async getUserActivities(userId: string, limit?: number): Promise<UserActivityLog[]> { return this.memStorage.getUserActivities(userId, limit); }
+  
   async updateUser(id: string, updates: Partial<User>): Promise<User | undefined> {
     try {
       const [user] = await db
