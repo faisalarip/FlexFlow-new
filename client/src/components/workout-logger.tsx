@@ -48,7 +48,6 @@ export default function WorkoutLogger() {
   const [perceivedExertion, setPerceivedExertion] = useState([5]);
   const [workoutDuration, setWorkoutDuration] = useState([30]);
   const [showWorkoutForm, setShowWorkoutForm] = useState(false);
-  const [expandedDemo, setExpandedDemo] = useState<string | null>(null);
   const [showProgressPhotoPrompt, setShowProgressPhotoPrompt] = useState(false);
   const [lastCompletedWorkout, setLastCompletedWorkout] = useState<any>(null);
   
@@ -1083,10 +1082,6 @@ export default function WorkoutLogger() {
     setSelectedExercise(exercise);
   };
 
-  const handleToggleDemo = (exercise: any) => {
-    const exerciseKey = exercise.name;
-    setExpandedDemo(expandedDemo === exerciseKey ? null : exerciseKey);
-  };
 
   const handleStartWorkout = (exerciseName: string) => {
     setShowWorkoutForm(true);
@@ -1421,7 +1416,22 @@ export default function WorkoutLogger() {
                 <span className="font-medium text-white">{exercise.name}</span>
               </div>
               <p className="text-xs text-gray-400">{exercise.description}</p>
-              <div className="flex items-center justify-between mt-2 text-xs text-gray-400">
+              
+              {/* Always Show Exercise Demo for strength and dumbbell exercises */}
+              {["strength", "dumbbells"].includes(exercise.category) && (
+                <div className="mt-3 pt-3 border-t border-red-500/30" id={`demo-content-${exercise.name.toLowerCase().replace(/\s+/g, '-')}`}>
+                  <div className="bg-black/50 rounded-lg p-2">
+                    <img 
+                      src={getDemoImage(exercise.name)}
+                      alt={`${exercise.name} demonstration`}
+                      className="w-auto max-w-full h-auto max-h-32 object-contain rounded-md mx-auto"
+                      data-testid={`demo-image-${exercise.name.toLowerCase().replace(/\s+/g, '-')}`}
+                    />
+                  </div>
+                </div>
+              )}
+              
+              <div className="flex items-center justify-center mt-2 text-xs text-gray-400">
                 <button
                   onClick={() => handleExerciseClick(exercise)}
                   disabled={createWorkoutMutation.isPending}
@@ -1429,51 +1439,9 @@ export default function WorkoutLogger() {
                   data-testid={`instructions-${exercise.name.toLowerCase().replace(/\s+/g, '-')}`}
                 >
                   <Play className="w-3 h-3 mr-1" />
-                  <span>View instructions</span>
+                  <span>Start Workout</span>
                 </button>
-                {["strength", "dumbbells"].includes(exercise.category) && (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleToggleDemo(exercise);
-                    }}
-                    disabled={createWorkoutMutation.isPending}
-                    className="flex items-center text-red-400 hover:text-red-300 transition-colors"
-                    data-testid={`demo-${exercise.name.toLowerCase().replace(/\s+/g, '-')}`}
-                    aria-expanded={expandedDemo === exercise.name}
-                    aria-controls={`demo-content-${exercise.name.toLowerCase().replace(/\s+/g, '-')}`}
-                  >
-                    <Activity className="w-3 h-3 mr-1" />
-                    <span>{expandedDemo === exercise.name ? 'Hide' : 'Demo'}</span>
-                  </button>
-                )}
               </div>
-              
-              {/* Inline Exercise Demo */}
-              {expandedDemo === exercise.name && ["strength", "dumbbells"].includes(exercise.category) && (
-                <div className="mt-3 pt-3 border-t border-red-500/30" id={`demo-content-${exercise.name.toLowerCase().replace(/\s+/g, '-')}`}>
-                  <div className="bg-black/50 rounded-lg p-3 border border-red-500/20">
-                    <h4 className="font-medium text-red-400 mb-2 text-sm">Exercise Demonstration</h4>
-                    <img 
-                      src={getDemoImage(exercise.name)}
-                      alt={`${exercise.name} demonstration`}
-                      className="w-auto max-w-full h-auto max-h-40 object-contain rounded-md mx-auto"
-                      data-testid={`demo-image-${exercise.name.toLowerCase().replace(/\s+/g, '-')}`}
-                    />
-                    <div className="mt-2">
-                      <p className="text-xs text-gray-300 mb-1">{getExerciseAnimation(exercise.name).description}</p>
-                      <div className="text-xs text-gray-400">
-                        <strong className="text-red-400">Key Points:</strong>
-                        <ul className="list-disc list-inside mt-1 space-y-0.5">
-                          {getExerciseAnimation(exercise.name).keypoints.slice(0, 2).map((point, index) => (
-                            <li key={index}>{point}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
           );
         }) : (
@@ -1592,7 +1560,7 @@ export default function WorkoutLogger() {
               <div className="flex justify-between items-center mb-6">
                 <div>
                   <h2 className="text-2xl font-bold text-white">Log Your Workout</h2>
-                  <p className="text-gray-400 mt-1">AI-powered difficulty tracking for {selectedExercise.name}</p>
+                  <p className="text-gray-400 mt-1">{selectedExercise.name}</p>
                 </div>
                 <button
                   onClick={() => {
@@ -1690,13 +1658,10 @@ export default function WorkoutLogger() {
                   </div>
                 </div>
 
-                {/* Overall Workout Duration Slider */}
+                {/* Workout Duration */}
                 <div>
-                  <Label className="text-base font-semibold text-red-400 flex items-center gap-2">
-                    <Activity className="w-4 h-4" />
-                    Total Workout Duration: {workoutDuration[0]} minutes
-                  </Label>
-                  <div className="mt-3">
+                  <Label className="text-base font-semibold text-gray-300">Workout Duration: {workoutDuration[0]} minutes</Label>
+                  <div className="mt-2">
                     <Slider
                       value={workoutDuration}
                       onValueChange={setWorkoutDuration}
@@ -1706,115 +1671,20 @@ export default function WorkoutLogger() {
                       className="w-full"
                       data-testid="duration-slider"
                     />
-                    <div className="flex justify-between text-xs text-gray-400 mt-1">
-                      <span>5 min</span>
-                      <span>60 min</span>
-                      <span>120 min</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Difficulty Level Slider with AI Icon */}
-                <div>
-                  <Label className="text-base font-semibold text-gray-800 flex items-center gap-2">
-                    <TrendingUp className="w-4 h-4" />
-                    Difficulty Level: {getDifficultyLabel(difficultyLevel[0])} ({difficultyLevel[0]}/5)
-                  </Label>
-                  <div className="mt-3">
-                    <Slider
-                      value={difficultyLevel}
-                      onValueChange={setDifficultyLevel}
-                      min={1}
-                      max={5}
-                      step={1}
-                      className="w-full"
-                      data-testid="difficulty-slider"
-                    />
-                    <div className="flex justify-between text-xs text-gray-500 mt-1">
-                      <span>Very Easy</span>
-                      <span>Moderate</span>
-                      <span>Very Hard</span>
-                    </div>
-                  </div>
-                  <div className="mt-2 p-3 bg-blue-50 rounded-lg">
-                    <p className="text-sm text-blue-700">
-                      🤖 AI will analyze your performance and suggest difficulty adjustments for future workouts
-                    </p>
-                  </div>
-                </div>
-
-                {/* Perceived Exertion (RPE) Scale */}
-                <div>
-                  <Label className="text-base font-semibold text-gray-800 flex items-center gap-2">
-                    <Star className="w-4 h-4" />
-                    Perceived Exertion: {getExertionLabel(perceivedExertion[0])} ({perceivedExertion[0]}/10)
-                  </Label>
-                  <div className="mt-3">
-                    <Slider
-                      value={perceivedExertion}
-                      onValueChange={setPerceivedExertion}
-                      min={1}
-                      max={10}
-                      step={1}
-                      className="w-full"
-                      data-testid="exertion-slider"
-                    />
-                    <div className="flex justify-between text-xs text-gray-500 mt-1">
-                      <span>Very Light</span>
-                      <span>Moderate</span>
-                      <span>Maximum</span>
-                    </div>
-                  </div>
-                  <div className="mt-2 text-xs text-gray-600">
-                    Rate of Perceived Exertion (RPE) - How hard did this workout feel?
                   </div>
                 </div>
 
                 {/* Estimated Calories Display */}
-                <div className="p-4 bg-gradient-to-r from-red-50 to-orange-50 rounded-lg border border-red-200">
+                <div className="p-4 bg-gradient-to-r from-red-900/30 to-black/50 rounded-lg border border-red-500/30">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h3 className="font-semibold text-gray-800">Estimated Calories Burned</h3>
-                      <p className="text-sm text-gray-600">Based on sets, reps, weight, and intensity</p>
+                      <h3 className="font-semibold text-gray-300">Estimated Calories</h3>
+                      <p className="text-xs text-gray-400">Based on your workout</p>
                     </div>
-                    <div className="text-2xl font-bold text-red-600">
+                    <div className="text-2xl font-bold text-red-500">
                       {selectedExercise ? calculateExerciseCalories(selectedExercise, exerciseSets, exerciseReps, exerciseWeight, exerciseDuration, difficultyLevel[0]) : 0} kcal
                     </div>
                   </div>
-                  {/* Exercise Summary */}
-                  {selectedExercise && (
-                    <div className="mt-3 pt-3 border-t border-red-200">
-                      <div className="grid grid-cols-4 gap-2 text-xs text-gray-600">
-                        <div className="text-center">
-                          <div className="font-semibold text-gray-800">{exerciseSets}</div>
-                          <div>Sets</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="font-semibold text-gray-800">{exerciseReps}</div>
-                          <div>Reps</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="font-semibold text-gray-800">{exerciseWeight || 'BW'}</div>
-                          <div>Weight</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="font-semibold text-gray-800">{exerciseDuration || 'N/A'}</div>
-                          <div>Duration</div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* AI Features Preview */}
-                <div className="p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border border-purple-200">
-                  <h3 className="font-semibold text-purple-800 mb-2">🧠 AI Performance Analysis</h3>
-                  <ul className="text-sm text-purple-700 space-y-1">
-                    <li>• Track your performance trends over time</li>
-                    <li>• Get personalized difficulty recommendations</li>
-                    <li>• Receive adaptive training suggestions</li>
-                    <li>• Monitor progression and consistency</li>
-                  </ul>
                 </div>
               </div>
 
@@ -1826,7 +1696,7 @@ export default function WorkoutLogger() {
                   className="flex-1 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700"
                   data-testid="submit-workout-button"
                 >
-                  {createWorkoutMutation.isPending ? 'Logging Workout...' : 'Log Workout & Analyze'}
+                  {createWorkoutMutation.isPending ? 'Logging...' : 'Log Workout'}
                 </Button>
                 <Button
                   variant="outline"
