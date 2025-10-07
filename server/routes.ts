@@ -951,9 +951,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
         case 'invoice.payment_succeeded':
           const invoice = event.data.object as any;
+          console.log('📧 Invoice payment succeeded webhook received:', invoice.id);
+          
           if (invoice.subscription) {
             const subscription = await stripe.subscriptions.retrieve(invoice.subscription as string);
             const customer = await stripe.customers.retrieve(subscription.customer as string);
+            
+            console.log('🔍 Looking for user with Stripe customer ID:', customer.id);
             
             // Find user by Stripe customer ID and activate subscription
             const users = await storage.getUsers();
@@ -969,8 +973,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 subscriptionExpiresAt: nextExpiry
               });
               
-              console.log(`Subscription activated for user ${user.id}`);
+              console.log(`✅ Subscription activated for user ${user.id} (${user.email})`);
+            } else {
+              console.error(`❌ User not found with Stripe customer ID: ${customer.id}`);
+              console.log(`📋 Available Stripe customer IDs: ${users.map(u => u.stripeCustomerId).filter(Boolean).join(', ')}`);
             }
+          }
+          break;
+        
+        case 'customer.subscription.updated':
+          const updatedSubscription = event.data.object as any;
+          console.log('🔄 Subscription updated webhook received:', updatedSubscription.id);
+          
+          const subCustomer = await stripe.customers.retrieve(updatedSubscription.customer as string);
+          console.log('🔍 Looking for user with Stripe customer ID:', subCustomer.id);
+          
+          const allUsers = await storage.getUsers();
+          const subUser = allUsers.find(u => u.stripeCustomerId === subCustomer.id);
+          
+          if (subUser) {
+            // Check if subscription is now active (after trial ends and payment succeeds)
+            if (updatedSubscription.status === 'active' && subUser.subscriptionStatus !== 'active') {
+              const now = new Date();
+              const nextExpiry = new Date(updatedSubscription.current_period_end * 1000);
+              
+              await storage.updateUser(subUser.id, {
+                subscriptionStatus: "active",
+                lastPaymentDate: now,
+                subscriptionExpiresAt: nextExpiry
+              });
+              
+              console.log(`✅ Subscription activated via update for user ${subUser.id} (${subUser.email})`);
+            }
+          } else {
+            console.error(`❌ User not found with Stripe customer ID: ${subCustomer.id}`);
           }
           break;
 

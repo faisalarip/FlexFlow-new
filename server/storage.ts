@@ -4020,6 +4020,15 @@ export class DatabaseStorage implements IStorage {
     console.log("🔥 DatabaseStorage.seedLeaderboardData() called - delegating to MemStorage");
     return this.memStorage.seedLeaderboardData(); 
   }
+  
+  // Payment and Stripe methods
+  async createPayment(insertPayment: InsertPayment): Promise<Payment> { return this.memStorage.createPayment(insertPayment); }
+  async updatePayment(id: string, updates: Partial<Payment>): Promise<Payment | undefined> { return this.memStorage.updatePayment(id, updates); }
+  async getPayment(id: string): Promise<Payment | undefined> { return this.memStorage.getPayment(id); }
+  async getPaymentByStripeId(stripePaymentIntentId: string): Promise<Payment | undefined> { return this.memStorage.getPaymentByStripeId(stripePaymentIntentId); }
+  async getUserPayments(userId: string): Promise<Payment[]> { return this.memStorage.getUserPayments(userId); }
+  async updateStripeCustomerId(userId: string, stripeCustomerId: string): Promise<User | undefined> { return this.memStorage.updateStripeCustomerId(userId, stripeCustomerId); }
+  async updateUserStripeInfo(userId: string, stripeCustomerId: string, stripeSubscriptionId: string): Promise<User | undefined> { return this.memStorage.updateUserStripeInfo(userId, stripeCustomerId, stripeSubscriptionId); }
 }
 
 export const storage = new DatabaseStorage();
