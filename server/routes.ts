@@ -799,9 +799,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // If user already has a subscription
       if (user.stripeSubscriptionId) {
         const subscription = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
-        const latestInvoice = await stripe.invoices.retrieve(subscription.latest_invoice as string, {
+        const latestInvoiceResponse = await stripe.invoices.retrieve(subscription.latest_invoice as string, {
           expand: ['payment_intent'],
         });
+        const latestInvoice = (latestInvoiceResponse as any);
 
         res.json({
           subscriptionId: subscription.id,
@@ -828,20 +829,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
         user = await storage.getUser(userId); // Refresh user data
       }
 
+      // Create product and price
+      const product = await stripe.products.create({
+        name: 'FlexFlow Premium',
+        description: 'Complete fitness tracking and personal training platform'
+      });
+
+      const price = await stripe.prices.create({
+        unit_amount: 1599, // $15.99 per month
+        currency: 'usd',
+        recurring: {
+          interval: 'month'
+        },
+        product: product.id
+      });
+
       // Create subscription with 7-day trial
       const subscription = await stripe.subscriptions.create({
         customer: customer.id,
         items: [{
-          price_data: {
-            currency: 'usd',
-            unit_amount: 1599, // $15.99 per month
-            recurring: {
-              interval: 'month'
-            },
-            product_data: {
-              name: 'FlexFlow Premium',
-            }
-          }
+          price: price.id
         }],
         trial_period_days: 7, // 7-day free trial
         payment_behavior: 'default_incomplete',
@@ -1019,6 +1026,89 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
 
     res.json({ received: true });
+  });
+
+  // Admin endpoint to sync existing subscriptions from Stripe
+  app.post("/api/admin/sync-subscriptions", authenticateToken, async (req, res) => {
+    try {
+      const userId = getAuthUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+
+      console.log('🔄 Starting subscription sync for all users...');
+      const users = await storage.getUsers();
+      const updates: any[] = [];
+
+      for (const user of users) {
+        if (user.stripeSubscriptionId) {
+          try {
+            // Fetch the subscription from Stripe
+            const subscriptionResponse = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
+            const subscription = subscriptionResponse as any; // Handle Stripe.Response wrapper
+            
+            console.log(`Checking user ${user.id} (${user.email}): Stripe status = ${subscription.status}`);
+
+            // Update user if subscription is active in Stripe but not in our database
+            if (subscription.status === 'active' && user.subscriptionStatus !== 'active') {
+              const now = new Date();
+              const nextExpiry = new Date(subscription.current_period_end * 1000);
+              
+              await storage.updateUser(user.id, {
+                subscriptionStatus: "active",
+                lastPaymentDate: now,
+                subscriptionExpiresAt: nextExpiry,
+                stripeCustomerId: subscription.customer as string
+              });
+              
+              updates.push({
+                userId: user.id,
+                email: user.email,
+                status: 'activated',
+                expiresAt: nextExpiry
+              });
+              
+              console.log(`✅ Activated subscription for user ${user.id} (${user.email})`);
+            } else if (subscription.status === 'trialing' && user.subscriptionStatus !== 'trial') {
+              const trialEnd = subscription.trial_end ? new Date(subscription.trial_end * 1000) : null;
+              
+              await storage.updateUser(user.id, {
+                subscriptionStatus: "trial",
+                subscriptionExpiresAt: trialEnd,
+                stripeCustomerId: subscription.customer as string
+              });
+              
+              updates.push({
+                userId: user.id,
+                email: user.email,
+                status: 'trial_activated',
+                trialEnd
+              });
+              
+              console.log(`✅ Set trial status for user ${user.id} (${user.email})`);
+            }
+          } catch (error: any) {
+            console.error(`Error syncing subscription for user ${user.id}:`, error.message);
+            updates.push({
+              userId: user.id,
+              email: user.email,
+              status: 'error',
+              error: error.message
+            });
+          }
+        }
+      }
+
+      console.log(`✅ Subscription sync complete. Updated ${updates.length} users.`);
+      
+      res.json({
+        message: `Synced ${updates.length} subscriptions`,
+        updates
+      });
+    } catch (error: any) {
+      console.error('Subscription sync error:', error);
+      res.status(500).json({ message: "Failed to sync subscriptions: " + error.message });
+    }
   });
 
   // Get workouts by date range (for calendar)

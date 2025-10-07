@@ -70,6 +70,28 @@ export default function UserSubscription() {
     },
   });
 
+  const syncSubscriptionMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest("POST", "/api/admin/sync-subscriptions", {});
+      return response.json();
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user/subscription"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+      toast({
+        title: "Subscriptions Synced",
+        description: data.message || "Subscription status has been updated from Stripe.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Sync Failed",
+        description: error.message || "Failed to sync subscription status",
+        variant: "destructive",
+      });
+    },
+  });
+
   const getStatusColor = (status: string, isActive: boolean, isFreeTrialActive: boolean) => {
     if (isFreeTrialActive) {
       return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300";
@@ -359,6 +381,32 @@ export default function UserSubscription() {
                     disabled={cancelSubscriptionMutation.isPending}
                   >
                     {cancelSubscriptionMutation.isPending ? "Cancelling..." : "Cancel Subscription"}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Sync subscription status from Stripe */}
+          {subscriptionData.subscriptionStatus === "expired" && (
+            <Card className="border-purple-200 dark:border-purple-800">
+              <CardContent className="pt-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+                      Already Paid?
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-400">
+                      If you've already subscribed, click here to sync your subscription status from Stripe
+                    </p>
+                  </div>
+                  <Button 
+                    onClick={() => syncSubscriptionMutation.mutate()}
+                    disabled={syncSubscriptionMutation.isPending}
+                    className="bg-purple-600 hover:bg-purple-700"
+                    data-testid="button-sync-subscription"
+                  >
+                    {syncSubscriptionMutation.isPending ? "Syncing..." : "Sync from Stripe"}
                   </Button>
                 </div>
               </CardContent>
