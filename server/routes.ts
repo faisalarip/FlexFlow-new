@@ -1028,6 +1028,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ received: true });
   });
 
+  // Admin endpoint to list all users (for debugging)
+  app.get("/api/admin/users", authenticateToken, async (req, res) => {
+    try {
+      const users = await storage.getUsers();
+      res.json(users.map(u => ({
+        id: u.id,
+        email: u.email,
+        username: u.username,
+        subscriptionStatus: u.subscriptionStatus,
+        stripeCustomerId: u.stripeCustomerId,
+        stripeSubscriptionId: u.stripeSubscriptionId
+      })));
+    } catch (error: any) {
+      console.error('Error fetching users:', error);
+      res.status(500).json({ message: "Failed to fetch users: " + error.message });
+    }
+  });
+
   // Admin endpoint to sync existing subscriptions from Stripe
   app.post("/api/admin/sync-subscriptions", authenticateToken, async (req, res) => {
     try {
