@@ -1059,61 +1059,90 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const updates: any[] = [];
 
       for (const user of users) {
-        if (user.stripeSubscriptionId) {
-          try {
-            // Fetch the subscription from Stripe
+        try {
+          let subscription: any = null;
+          
+          // Try to get subscription by ID first
+          if (user.stripeSubscriptionId) {
             const subscriptionResponse = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
-            const subscription = subscriptionResponse as any; // Handle Stripe.Response wrapper
+            subscription = subscriptionResponse as any;
+            console.log(`Found subscription by ID for user ${user.id} (${user.email}): ${subscription.status}`);
+          } 
+          // If no subscription ID but has customer ID, search for active subscriptions
+          else if (user.stripeCustomerId) {
+            console.log(`No subscription ID for user ${user.id}, searching by customer ID: ${user.stripeCustomerId}`);
+            const subscriptionsList = await stripe.subscriptions.list({
+              customer: user.stripeCustomerId,
+              limit: 1,
+              status: 'all'
+            });
             
-            console.log(`Checking user ${user.id} (${user.email}): Stripe status = ${subscription.status}`);
-
-            // Update user if subscription is active in Stripe but not in our database
-            if (subscription.status === 'active' && user.subscriptionStatus !== 'active') {
-              const now = new Date();
-              const nextExpiry = new Date(subscription.current_period_end * 1000);
+            if (subscriptionsList.data && subscriptionsList.data.length > 0) {
+              subscription = subscriptionsList.data[0];
+              console.log(`Found subscription via customer ID for user ${user.id}: ${subscription.status}`);
               
+              // Save the subscription ID for future use
               await storage.updateUser(user.id, {
-                subscriptionStatus: "active",
-                lastPaymentDate: now,
-                subscriptionExpiresAt: nextExpiry,
-                stripeCustomerId: subscription.customer as string
+                stripeSubscriptionId: subscription.id
               });
-              
-              updates.push({
-                userId: user.id,
-                email: user.email,
-                status: 'activated',
-                expiresAt: nextExpiry
-              });
-              
-              console.log(`✅ Activated subscription for user ${user.id} (${user.email})`);
-            } else if (subscription.status === 'trialing' && user.subscriptionStatus !== 'trial') {
-              const trialEnd = subscription.trial_end ? new Date(subscription.trial_end * 1000) : null;
-              
-              await storage.updateUser(user.id, {
-                subscriptionStatus: "trial",
-                subscriptionExpiresAt: trialEnd,
-                stripeCustomerId: subscription.customer as string
-              });
-              
-              updates.push({
-                userId: user.id,
-                email: user.email,
-                status: 'trial_activated',
-                trialEnd
-              });
-              
-              console.log(`✅ Set trial status for user ${user.id} (${user.email})`);
+            } else {
+              console.log(`No subscriptions found for customer ${user.stripeCustomerId}`);
             }
-          } catch (error: any) {
-            console.error(`Error syncing subscription for user ${user.id}:`, error.message);
+          }
+          
+          if (!subscription) {
+            console.log(`Skipping user ${user.id} - no subscription found`);
+            continue;
+          }
+          
+          console.log(`Checking user ${user.id} (${user.email}): Stripe status = ${subscription.status}`);
+
+          // Update user if subscription is active in Stripe but not in our database
+          if (subscription.status === 'active' && user.subscriptionStatus !== 'active') {
+            const now = new Date();
+            const nextExpiry = new Date(subscription.current_period_end * 1000);
+            
+            await storage.updateUser(user.id, {
+              subscriptionStatus: "active",
+              lastPaymentDate: now,
+              subscriptionExpiresAt: nextExpiry,
+              stripeCustomerId: subscription.customer as string
+            });
+            
             updates.push({
               userId: user.id,
               email: user.email,
-              status: 'error',
-              error: error.message
+              status: 'activated',
+              expiresAt: nextExpiry
             });
+            
+            console.log(`✅ Activated subscription for user ${user.id} (${user.email})`);
+          } else if (subscription.status === 'trialing' && user.subscriptionStatus !== 'trial') {
+            const trialEnd = subscription.trial_end ? new Date(subscription.trial_end * 1000) : null;
+            
+            await storage.updateUser(user.id, {
+              subscriptionStatus: "trial",
+              subscriptionExpiresAt: trialEnd,
+              stripeCustomerId: subscription.customer as string
+            });
+            
+            updates.push({
+              userId: user.id,
+              email: user.email,
+              status: 'trial_activated',
+              trialEnd
+            });
+            
+            console.log(`✅ Set trial status for user ${user.id} (${user.email})`);
           }
+        } catch (error: any) {
+          console.error(`Error syncing subscription for user ${user.id}:`, error.message);
+          updates.push({
+            userId: user.id,
+            email: user.email,
+            status: 'error',
+            error: error.message
+          });
         }
       }
 
