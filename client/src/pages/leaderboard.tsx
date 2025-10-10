@@ -133,12 +133,37 @@ export default function Leaderboard() {
 
   return (
     <div className="min-h-screen bg-black relative overflow-hidden">
-      {/* Floating Background Elements - Red Theme */}
-      <div className="absolute top-10 left-10 w-20 h-20 bg-red-500/10 rounded-full animate-pulse"></div>
-      <div className="absolute top-32 right-16 w-12 h-12 bg-red-400/10 rounded-full animate-bounce"></div>
-      <div className="absolute bottom-20 left-1/4 w-16 h-16 bg-red-600/10 rounded-full animate-ping"></div>
-      <div className="absolute bottom-40 right-1/3 w-8 h-8 bg-red-500/20 rounded-full animate-pulse"></div>
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Animated Gradient Background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-red-950/20 via-black to-red-900/10 animate-pulse"></div>
+      
+      {/* Dynamic Diagonal Stripes */}
+      <div className="absolute inset-0 opacity-10">
+        <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-transparent via-red-500 to-transparent animate-pulse"></div>
+        <div className="absolute top-20 left-0 w-full h-1 bg-gradient-to-r from-red-600 via-transparent to-red-600" style={{animationDelay: '0.2s'}}></div>
+        <div className="absolute bottom-40 left-0 w-full h-2 bg-gradient-to-r from-transparent via-red-400 to-transparent animate-pulse" style={{animationDelay: '0.5s'}}></div>
+      </div>
+
+      {/* Floating Particles & Stars */}
+      <div className="absolute top-10 left-10 w-20 h-20 bg-red-500/20 rounded-full animate-pulse blur-xl"></div>
+      <div className="absolute top-32 right-16 w-32 h-32 bg-red-600/10 rounded-full animate-bounce blur-2xl"></div>
+      <div className="absolute bottom-20 left-1/4 w-24 h-24 bg-red-400/15 rounded-full animate-ping blur-xl"></div>
+      <div className="absolute bottom-40 right-1/3 w-16 h-16 bg-red-500/20 rounded-full animate-pulse blur-lg"></div>
+      
+      {/* Animated Stars */}
+      <div className="absolute top-24 left-1/3 text-red-500 opacity-30 animate-spin" style={{animationDuration: '3s'}}>⭐</div>
+      <div className="absolute top-48 right-1/4 text-red-400 opacity-40 animate-bounce" style={{animationDelay: '0.5s'}}>💪</div>
+      <div className="absolute bottom-32 left-1/5 text-red-600 opacity-30 animate-pulse" style={{animationDelay: '1s'}}>🏆</div>
+      <div className="absolute bottom-56 right-1/5 text-red-500 opacity-25 animate-spin" style={{animationDuration: '4s'}}>🔥</div>
+      
+      {/* Radial Glow Effects */}
+      <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-red-500/5 rounded-full blur-3xl animate-pulse"></div>
+      <div className="absolute bottom-1/3 right-1/3 w-80 h-80 bg-red-600/5 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
+      
+      {/* Moving Light Beams */}
+      <div className="absolute top-0 left-1/4 w-1 h-full bg-gradient-to-b from-transparent via-red-500/20 to-transparent animate-pulse"></div>
+      <div className="absolute top-0 right-1/3 w-1 h-full bg-gradient-to-b from-red-600/15 via-transparent to-red-600/15 animate-pulse" style={{animationDelay: '0.7s'}}></div>
+      
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
         <div className="mb-8 text-center">
           <h1 className="text-5xl font-black bg-gradient-to-r from-red-500 to-red-300 bg-clip-text text-transparent mb-4">
             🏆 ELITE LEADERBOARD 🏆
