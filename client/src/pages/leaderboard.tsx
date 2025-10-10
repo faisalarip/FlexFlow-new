@@ -132,36 +132,43 @@ export default function Leaderboard() {
   const others = leaderboard.slice(3);
 
   return (
-    <div className="min-h-screen bg-black relative overflow-hidden">
-      {/* Animated Gradient Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-red-950/20 via-black to-red-900/10 animate-pulse"></div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-red-950 to-black relative overflow-hidden">
+      {/* Animated Moving Gradient Background */}
+      <div className="absolute inset-0 bg-gradient-to-tr from-red-600/30 via-black to-red-900/40 animate-pulse"></div>
+      <div className="absolute inset-0 bg-gradient-to-bl from-red-500/20 via-transparent to-red-800/30" style={{animation: 'pulse 3s ease-in-out infinite alternate'}}></div>
       
-      {/* Dynamic Diagonal Stripes */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-transparent via-red-500 to-transparent animate-pulse"></div>
-        <div className="absolute top-20 left-0 w-full h-1 bg-gradient-to-r from-red-600 via-transparent to-red-600" style={{animationDelay: '0.2s'}}></div>
-        <div className="absolute bottom-40 left-0 w-full h-2 bg-gradient-to-r from-transparent via-red-400 to-transparent animate-pulse" style={{animationDelay: '0.5s'}}></div>
+      {/* Bold Diagonal Stripes */}
+      <div className="absolute inset-0 opacity-20">
+        <div className="absolute top-0 left-0 w-full h-4 bg-gradient-to-r from-red-600 via-red-400 to-red-600 animate-pulse"></div>
+        <div className="absolute top-20 left-0 w-full h-3 bg-gradient-to-r from-transparent via-red-500 to-transparent animate-pulse" style={{animationDelay: '0.2s'}}></div>
+        <div className="absolute top-40 left-0 w-full h-2 bg-gradient-to-r from-red-700 via-transparent to-red-700 animate-pulse" style={{animationDelay: '0.4s'}}></div>
+        <div className="absolute bottom-40 left-0 w-full h-3 bg-gradient-to-r from-transparent via-red-400 to-transparent animate-pulse" style={{animationDelay: '0.6s'}}></div>
+        <div className="absolute bottom-20 left-0 w-full h-4 bg-gradient-to-r from-red-500 via-red-600 to-red-500 animate-pulse" style={{animationDelay: '0.8s'}}></div>
       </div>
 
-      {/* Floating Particles & Stars */}
-      <div className="absolute top-10 left-10 w-20 h-20 bg-red-500/20 rounded-full animate-pulse blur-xl"></div>
-      <div className="absolute top-32 right-16 w-32 h-32 bg-red-600/10 rounded-full animate-bounce blur-2xl"></div>
-      <div className="absolute bottom-20 left-1/4 w-24 h-24 bg-red-400/15 rounded-full animate-ping blur-xl"></div>
-      <div className="absolute bottom-40 right-1/3 w-16 h-16 bg-red-500/20 rounded-full animate-pulse blur-lg"></div>
+      {/* Large Floating Orbs */}
+      <div className="absolute top-20 left-10 w-40 h-40 bg-red-500/40 rounded-full animate-pulse blur-3xl"></div>
+      <div className="absolute top-40 right-20 w-56 h-56 bg-red-600/30 rounded-full animate-bounce blur-3xl" style={{animationDuration: '3s'}}></div>
+      <div className="absolute bottom-32 left-1/4 w-48 h-48 bg-red-400/35 rounded-full animate-ping blur-3xl"></div>
+      <div className="absolute bottom-20 right-1/3 w-64 h-64 bg-red-500/30 rounded-full animate-pulse blur-3xl" style={{animationDelay: '1s'}}></div>
+      <div className="absolute top-1/2 left-1/2 w-72 h-72 bg-red-700/25 rounded-full animate-pulse blur-3xl transform -translate-x-1/2 -translate-y-1/2"></div>
       
-      {/* Animated Stars */}
-      <div className="absolute top-24 left-1/3 text-red-500 opacity-30 animate-spin" style={{animationDuration: '3s'}}>⭐</div>
-      <div className="absolute top-48 right-1/4 text-red-400 opacity-40 animate-bounce" style={{animationDelay: '0.5s'}}>💪</div>
-      <div className="absolute bottom-32 left-1/5 text-red-600 opacity-30 animate-pulse" style={{animationDelay: '1s'}}>🏆</div>
-      <div className="absolute bottom-56 right-1/5 text-red-500 opacity-25 animate-spin" style={{animationDuration: '4s'}}>🔥</div>
+      {/* Extra Large Animated Emojis */}
+      <div className="absolute top-16 left-1/4 text-6xl opacity-40 animate-spin" style={{animationDuration: '4s'}}>⭐</div>
+      <div className="absolute top-32 right-1/5 text-7xl opacity-50 animate-bounce" style={{animationDelay: '0.5s'}}>💪</div>
+      <div className="absolute bottom-24 left-1/6 text-6xl opacity-40 animate-pulse" style={{animationDelay: '1s'}}>🏆</div>
+      <div className="absolute bottom-48 right-1/4 text-7xl opacity-45 animate-spin" style={{animationDuration: '5s'}}>🔥</div>
+      <div className="absolute top-2/3 left-1/3 text-5xl opacity-35 animate-bounce" style={{animationDelay: '0.3s'}}>⚡</div>
+      <div className="absolute top-1/3 right-1/3 text-6xl opacity-40 animate-pulse" style={{animationDelay: '0.7s'}}>💯</div>
       
-      {/* Radial Glow Effects */}
-      <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-red-500/5 rounded-full blur-3xl animate-pulse"></div>
-      <div className="absolute bottom-1/3 right-1/3 w-80 h-80 bg-red-600/5 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
+      {/* Massive Radial Glow Effects */}
+      <div className="absolute top-0 left-0 w-96 h-96 bg-red-500/20 rounded-full blur-3xl animate-pulse"></div>
+      <div className="absolute bottom-0 right-0 w-96 h-96 bg-red-600/20 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1.5s'}}></div>
       
-      {/* Moving Light Beams */}
-      <div className="absolute top-0 left-1/4 w-1 h-full bg-gradient-to-b from-transparent via-red-500/20 to-transparent animate-pulse"></div>
-      <div className="absolute top-0 right-1/3 w-1 h-full bg-gradient-to-b from-red-600/15 via-transparent to-red-600/15 animate-pulse" style={{animationDelay: '0.7s'}}></div>
+      {/* Pulsing Light Beams */}
+      <div className="absolute top-0 left-1/4 w-2 h-full bg-gradient-to-b from-red-500/40 via-transparent to-red-500/40 animate-pulse"></div>
+      <div className="absolute top-0 left-1/2 w-3 h-full bg-gradient-to-b from-transparent via-red-600/30 to-transparent animate-pulse" style={{animationDelay: '0.5s'}}></div>
+      <div className="absolute top-0 right-1/4 w-2 h-full bg-gradient-to-b from-red-400/40 via-transparent to-red-400/40 animate-pulse" style={{animationDelay: '1s'}}></div>
       
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
         <div className="mb-8 text-center">
