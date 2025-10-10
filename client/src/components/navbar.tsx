@@ -126,6 +126,35 @@ export default function Navbar() {
                   const Icon = item.icon;
                   const isActive = location === item.path;
                   
+                  // Special styling for Leaderboard
+                  if (item.label === "Leaderboard") {
+                    return (
+                      <DropdownMenuItem key={item.path} asChild>
+                        <Link 
+                          href={item.path}
+                          className={`relative flex items-center space-x-3 px-2 py-2 w-full cursor-pointer overflow-hidden group ${
+                            isActive ? "bg-gradient-to-r from-red-600 to-red-500 text-white" : "bg-gradient-to-r from-red-950/50 to-black hover:from-red-900/60 hover:to-red-950/50"
+                          }`}
+                        >
+                          {/* Animated background effects */}
+                          <div className="absolute inset-0 bg-gradient-to-r from-red-500/20 via-transparent to-red-500/20 animate-pulse opacity-50"></div>
+                          <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-red-400 to-transparent"></div>
+                          <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-red-400 to-transparent"></div>
+                          
+                          {/* Trophy animation on hover */}
+                          <div className="absolute right-2 opacity-0 group-hover:opacity-30 transition-opacity">
+                            <span className="text-xl animate-bounce">🏆</span>
+                          </div>
+                          
+                          <Icon size={16} className={`relative z-10 ${isActive ? "text-white" : "text-red-400"}`} />
+                          <span className={`relative z-10 font-semibold ${isActive ? "text-white" : "text-red-300"}`}>
+                            {item.label} ⭐
+                          </span>
+                        </Link>
+                      </DropdownMenuItem>
+                    );
+                  }
+                  
                   return (
                     <DropdownMenuItem key={item.path} asChild>
                       <Link 
