@@ -4027,8 +4027,12 @@ export class DatabaseStorage implements IStorage {
   async getPayment(id: string): Promise<Payment | undefined> { return this.memStorage.getPayment(id); }
   async getPaymentByStripeId(stripePaymentIntentId: string): Promise<Payment | undefined> { return this.memStorage.getPaymentByStripeId(stripePaymentIntentId); }
   async getUserPayments(userId: string): Promise<Payment[]> { return this.memStorage.getUserPayments(userId); }
-  async updateStripeCustomerId(userId: string, stripeCustomerId: string): Promise<User | undefined> { return this.memStorage.updateStripeCustomerId(userId, stripeCustomerId); }
-  async updateUserStripeInfo(userId: string, stripeCustomerId: string, stripeSubscriptionId: string): Promise<User | undefined> { return this.memStorage.updateUserStripeInfo(userId, stripeCustomerId, stripeSubscriptionId); }
+  async updateStripeCustomerId(userId: string, stripeCustomerId: string): Promise<User | undefined> { 
+    return this.updateUser(userId, { stripeCustomerId }); 
+  }
+  async updateUserStripeInfo(userId: string, stripeCustomerId: string, stripeSubscriptionId: string): Promise<User | undefined> { 
+    return this.updateUser(userId, { stripeCustomerId, stripeSubscriptionId }); 
+  }
 }
 
 export const storage = new DatabaseStorage();

@@ -379,6 +379,7 @@ export default function UserSubscription() {
                     variant="destructive"
                     onClick={() => cancelSubscriptionMutation.mutate()}
                     disabled={cancelSubscriptionMutation.isPending}
+                    data-testid="button-cancel-subscription"
                   >
                     {cancelSubscriptionMutation.isPending ? "Cancelling..." : "Cancel Subscription"}
                   </Button>

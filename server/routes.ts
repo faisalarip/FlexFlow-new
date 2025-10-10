@@ -2336,15 +2336,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
       }
-      const updatedUser = await storage.updateUser(userId, {
-        subscriptionStatus: "inactive"
-      });
 
-      if (!updatedUser) {
+      const user = await storage.getUser(userId);
+      if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
 
-      res.json({ message: "Subscription cancelled successfully" });
+      // If user has a Stripe subscription, cancel it in Stripe
+      if (user.stripeSubscriptionId) {
+        try {
+          // Cancel at period end so user can use until current billing cycle ends
+          const subscriptionResponse = await stripe.subscriptions.update(
+            user.stripeSubscriptionId,
+            { cancel_at_period_end: true }
+          );
+          const subscription = subscriptionResponse as any;
+
+          // Update local status - keep as active until period ends
+          await storage.updateUser(userId, {
+            subscriptionStatus: "active" // Keep active until period ends
+          });
+
+          res.json({ 
+            message: "Subscription cancelled successfully. You can continue using premium features until the end of your billing period.",
+            cancelAtPeriodEnd: true,
+            currentPeriodEnd: subscription.current_period_end ? new Date(subscription.current_period_end * 1000) : null
+          });
+        } catch (stripeError: any) {
+          console.error("Stripe cancellation error:", stripeError);
+          // Return error so frontend shows failure
+          return res.status(500).json({ 
+            message: "Failed to cancel subscription in Stripe. Please contact support.",
+            error: stripeError.message || "Unknown error"
+          });
+        }
+      } else {
+        // No Stripe subscription ID - just update local status
+        await storage.updateUser(userId, {
+          subscriptionStatus: "inactive"
+        });
+        res.json({ message: "Subscription cancelled successfully" });
+      }
     } catch (error) {
       console.error("Error cancelling user subscription:", error);
       res.status(500).json({ message: "Failed to cancel subscription" });
