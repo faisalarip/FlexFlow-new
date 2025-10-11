@@ -11,6 +11,14 @@ interface AuthUser {
   profileImageUrl: string | null;
   authProvider: string | null;
   isEmailVerified: boolean | null;
+  subscriptionStatus?: string;
+  trialStartDate?: Date | null;
+  trialEndDate?: Date | null;
+  subscriptionStartDate?: Date | null;
+  subscriptionExpiresAt?: Date | null;
+  lastPaymentDate?: Date | null;
+  stripeCustomerId?: string | null;
+  stripeSubscriptionId?: string | null;
 }
 
 export function useNewAuth() {
