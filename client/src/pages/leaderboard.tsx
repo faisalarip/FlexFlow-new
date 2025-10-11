@@ -132,98 +132,103 @@ export default function Leaderboard() {
   const others = leaderboard.slice(3);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-red-950 to-black relative overflow-hidden">
-      {/* Animated Moving Gradient Background */}
-      <div className="absolute inset-0 bg-gradient-to-tr from-red-600/30 via-black to-red-900/40 animate-pulse"></div>
-      <div className="absolute inset-0 bg-gradient-to-bl from-red-500/20 via-transparent to-red-800/30" style={{animation: 'pulse 3s ease-in-out infinite alternate'}}></div>
+    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-950 relative overflow-hidden">
+      {/* Animated Gradient Overlays */}
+      <div className="absolute inset-0 bg-gradient-to-tr from-purple-600/40 via-blue-500/30 to-cyan-500/40 animate-pulse"></div>
+      <div className="absolute inset-0 bg-gradient-to-bl from-pink-500/20 via-transparent to-blue-600/30" style={{animation: 'pulse 4s ease-in-out infinite alternate'}}></div>
       
-      {/* Bold Diagonal Stripes */}
-      <div className="absolute inset-0 opacity-20">
-        <div className="absolute top-0 left-0 w-full h-4 bg-gradient-to-r from-red-600 via-red-400 to-red-600 animate-pulse"></div>
-        <div className="absolute top-20 left-0 w-full h-3 bg-gradient-to-r from-transparent via-red-500 to-transparent animate-pulse" style={{animationDelay: '0.2s'}}></div>
-        <div className="absolute top-40 left-0 w-full h-2 bg-gradient-to-r from-red-700 via-transparent to-red-700 animate-pulse" style={{animationDelay: '0.4s'}}></div>
-        <div className="absolute bottom-40 left-0 w-full h-3 bg-gradient-to-r from-transparent via-red-400 to-transparent animate-pulse" style={{animationDelay: '0.6s'}}></div>
-        <div className="absolute bottom-20 left-0 w-full h-4 bg-gradient-to-r from-red-500 via-red-600 to-red-500 animate-pulse" style={{animationDelay: '0.8s'}}></div>
+      {/* Animated Wave Lines */}
+      <div className="absolute inset-0 opacity-30">
+        <div className="absolute top-0 left-0 w-full h-8 bg-gradient-to-r from-purple-500 via-pink-400 to-blue-500 animate-pulse"></div>
+        <div className="absolute top-24 left-0 w-full h-6 bg-gradient-to-r from-blue-400 via-cyan-500 to-purple-400 animate-pulse" style={{animationDelay: '0.3s'}}></div>
+        <div className="absolute top-48 left-0 w-full h-4 bg-gradient-to-r from-pink-500 via-purple-400 to-blue-500 animate-pulse" style={{animationDelay: '0.6s'}}></div>
+        <div className="absolute bottom-48 left-0 w-full h-5 bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 animate-pulse" style={{animationDelay: '0.9s'}}></div>
+        <div className="absolute bottom-24 left-0 w-full h-7 bg-gradient-to-r from-blue-500 via-purple-400 to-pink-500 animate-pulse" style={{animationDelay: '1.2s'}}></div>
       </div>
 
-      {/* Large Floating Orbs */}
-      <div className="absolute top-20 left-10 w-40 h-40 bg-red-500/40 rounded-full animate-pulse blur-3xl"></div>
-      <div className="absolute top-40 right-20 w-56 h-56 bg-red-600/30 rounded-full animate-bounce blur-3xl" style={{animationDuration: '3s'}}></div>
-      <div className="absolute bottom-32 left-1/4 w-48 h-48 bg-red-400/35 rounded-full animate-ping blur-3xl"></div>
-      <div className="absolute bottom-20 right-1/3 w-64 h-64 bg-red-500/30 rounded-full animate-pulse blur-3xl" style={{animationDelay: '1s'}}></div>
-      <div className="absolute top-1/2 left-1/2 w-72 h-72 bg-red-700/25 rounded-full animate-pulse blur-3xl transform -translate-x-1/2 -translate-y-1/2"></div>
+      {/* Giant Glowing Orbs */}
+      <div className="absolute top-10 left-20 w-64 h-64 bg-purple-500/50 rounded-full animate-pulse blur-3xl"></div>
+      <div className="absolute top-48 right-10 w-80 h-80 bg-blue-500/40 rounded-full animate-bounce blur-3xl" style={{animationDuration: '4s'}}></div>
+      <div className="absolute bottom-24 left-1/4 w-72 h-72 bg-cyan-400/45 rounded-full animate-ping blur-3xl"></div>
+      <div className="absolute bottom-32 right-1/4 w-96 h-96 bg-pink-500/35 rounded-full animate-pulse blur-3xl" style={{animationDelay: '1.5s'}}></div>
+      <div className="absolute top-1/2 left-1/2 w-[500px] h-[500px] bg-indigo-600/30 rounded-full animate-pulse blur-3xl transform -translate-x-1/2 -translate-y-1/2"></div>
       
-      {/* Extra Large Animated Emojis */}
-      <div className="absolute top-16 left-1/4 text-6xl opacity-40 animate-spin" style={{animationDuration: '4s'}}>⭐</div>
-      <div className="absolute top-32 right-1/5 text-7xl opacity-50 animate-bounce" style={{animationDelay: '0.5s'}}>💪</div>
-      <div className="absolute bottom-24 left-1/6 text-6xl opacity-40 animate-pulse" style={{animationDelay: '1s'}}>🏆</div>
-      <div className="absolute bottom-48 right-1/4 text-7xl opacity-45 animate-spin" style={{animationDuration: '5s'}}>🔥</div>
-      <div className="absolute top-2/3 left-1/3 text-5xl opacity-35 animate-bounce" style={{animationDelay: '0.3s'}}>⚡</div>
-      <div className="absolute top-1/3 right-1/3 text-6xl opacity-40 animate-pulse" style={{animationDelay: '0.7s'}}>💯</div>
+      {/* Massive Animated Emojis */}
+      <div className="absolute top-20 left-1/4 text-8xl opacity-50 animate-spin" style={{animationDuration: '5s'}}>⭐</div>
+      <div className="absolute top-40 right-1/5 text-9xl opacity-60 animate-bounce" style={{animationDelay: '0.5s'}}>💪</div>
+      <div className="absolute bottom-28 left-1/6 text-8xl opacity-50 animate-pulse" style={{animationDelay: '1s'}}>🏆</div>
+      <div className="absolute bottom-56 right-1/4 text-9xl opacity-55 animate-spin" style={{animationDuration: '6s'}}>🔥</div>
+      <div className="absolute top-2/3 left-1/3 text-7xl opacity-45 animate-bounce" style={{animationDelay: '0.3s'}}>⚡</div>
+      <div className="absolute top-1/3 right-1/3 text-8xl opacity-50 animate-pulse" style={{animationDelay: '0.7s'}}>💯</div>
+      <div className="absolute top-1/4 left-1/2 text-7xl opacity-40 animate-spin" style={{animationDuration: '7s'}}>🌟</div>
       
-      {/* Massive Radial Glow Effects */}
-      <div className="absolute top-0 left-0 w-96 h-96 bg-red-500/20 rounded-full blur-3xl animate-pulse"></div>
-      <div className="absolute bottom-0 right-0 w-96 h-96 bg-red-600/20 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1.5s'}}></div>
+      {/* Corner Glow Effects */}
+      <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-purple-600/30 rounded-full blur-3xl animate-pulse"></div>
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-500/30 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
+      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-cyan-500/30 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
+      <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-pink-500/30 rounded-full blur-3xl animate-pulse" style={{animationDelay: '0.5s'}}></div>
       
-      {/* Pulsing Light Beams */}
-      <div className="absolute top-0 left-1/4 w-2 h-full bg-gradient-to-b from-red-500/40 via-transparent to-red-500/40 animate-pulse"></div>
-      <div className="absolute top-0 left-1/2 w-3 h-full bg-gradient-to-b from-transparent via-red-600/30 to-transparent animate-pulse" style={{animationDelay: '0.5s'}}></div>
-      <div className="absolute top-0 right-1/4 w-2 h-full bg-gradient-to-b from-red-400/40 via-transparent to-red-400/40 animate-pulse" style={{animationDelay: '1s'}}></div>
+      {/* Vertical Light Beams */}
+      <div className="absolute top-0 left-1/5 w-4 h-full bg-gradient-to-b from-purple-500/50 via-transparent to-purple-500/50 animate-pulse"></div>
+      <div className="absolute top-0 left-2/5 w-3 h-full bg-gradient-to-b from-blue-400/40 via-transparent to-blue-400/40 animate-pulse" style={{animationDelay: '0.4s'}}></div>
+      <div className="absolute top-0 left-3/5 w-4 h-full bg-gradient-to-b from-cyan-500/50 via-transparent to-cyan-500/50 animate-pulse" style={{animationDelay: '0.8s'}}></div>
+      <div className="absolute top-0 right-1/5 w-3 h-full bg-gradient-to-b from-pink-400/40 via-transparent to-pink-400/40 animate-pulse" style={{animationDelay: '1.2s'}}></div>
       
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
         <div className="mb-8 text-center">
-          <h1 className="text-5xl font-black bg-gradient-to-r from-red-500 to-red-300 bg-clip-text text-transparent mb-4">
+          <h1 className="text-6xl font-black bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent mb-4 animate-pulse">
             🏆 ELITE LEADERBOARD 🏆
           </h1>
-          <p className="text-lg text-red-400 font-medium">Champions ranked by total reps • Elite performance tracker</p>
+          <p className="text-lg text-cyan-300 font-medium">Champions ranked by total reps • Elite performance tracker</p>
           <div className="mt-4 flex justify-center space-x-2">
-            <div className="w-3 h-3 bg-red-500 rounded-full animate-bounce"></div>
-            <div className="w-3 h-3 bg-red-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-            <div className="w-3 h-3 bg-red-300 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+            <div className="w-3 h-3 bg-purple-500 rounded-full animate-bounce"></div>
+            <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+            <div className="w-3 h-3 bg-cyan-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+            <div className="w-3 h-3 bg-pink-400 rounded-full animate-bounce" style={{animationDelay: '0.3s'}}></div>
           </div>
         </div>
 
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card className="bg-gradient-to-br from-red-950 to-black border-red-500 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
+          <Card className="bg-gradient-to-br from-purple-950 to-indigo-950 border-purple-500 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
             <CardContent className="pt-6">
               <div className="text-center">
                 <div className="relative">
-                  <Trophy className="mx-auto mb-2 text-red-500 animate-bounce" size={40} />
-                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-400 rounded-full animate-ping"></div>
+                  <Trophy className="mx-auto mb-2 text-purple-400 animate-bounce" size={40} />
+                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-pink-400 rounded-full animate-ping"></div>
                 </div>
-                <p className="text-3xl font-bold text-red-400">
+                <p className="text-3xl font-bold text-purple-300">
                   {topThree[0]?.totalReps.toLocaleString() || 0}
                 </p>
-                <p className="text-sm font-semibold text-red-300">🏆 Champion Score</p>
+                <p className="text-sm font-semibold text-purple-200">🏆 Champion Score</p>
               </div>
             </CardContent>
           </Card>
           
-          <Card className="bg-gradient-to-br from-gray-900 to-black border-red-800 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
+          <Card className="bg-gradient-to-br from-blue-950 to-indigo-950 border-blue-500 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
             <CardContent className="pt-6">
               <div className="text-center">
                 <div className="relative">
-                  <Users className="mx-auto mb-2 text-red-400 animate-pulse" size={40} />
-                  <Sparkles className="absolute -top-1 -right-1 w-4 h-4 text-red-300 animate-spin" />
+                  <Users className="mx-auto mb-2 text-blue-400 animate-pulse" size={40} />
+                  <Sparkles className="absolute -top-1 -right-1 w-4 h-4 text-cyan-300 animate-spin" />
                 </div>
                 <p className="text-3xl font-bold text-white">{leaderboard.length}</p>
-                <p className="text-sm font-semibold text-red-300">💪 Elite Athletes</p>
+                <p className="text-sm font-semibold text-cyan-300">💪 Elite Athletes</p>
               </div>
             </CardContent>
           </Card>
           
-          <Card className="bg-gradient-to-br from-red-900 to-black border-red-700 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
+          <Card className="bg-gradient-to-br from-cyan-950 to-blue-950 border-cyan-500 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
             <CardContent className="pt-6">
               <div className="text-center">
                 <div className="relative">
-                  <Award className="mx-auto mb-2 text-red-400 animate-pulse" size={40} />
-                  <Star className="absolute -top-1 -right-1 w-4 h-4 text-red-300 animate-bounce" />
+                  <Award className="mx-auto mb-2 text-cyan-400 animate-pulse" size={40} />
+                  <Star className="absolute -top-1 -right-1 w-4 h-4 text-pink-300 animate-bounce" />
                 </div>
-                <p className="text-3xl font-bold text-red-300">
+                <p className="text-3xl font-bold text-cyan-200">
                   {Math.round(leaderboard.reduce((sum, entry) => sum + entry.totalReps, 0) / leaderboard.length).toLocaleString()}
                 </p>
-                <p className="text-sm font-semibold text-red-400">⚖️ Average Reps</p>
+                <p className="text-sm font-semibold text-cyan-300">⚖️ Average Reps</p>
               </div>
             </CardContent>
           </Card>
