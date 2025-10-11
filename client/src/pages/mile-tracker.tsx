@@ -350,6 +350,12 @@ export default function MileTracker() {
   };
 
   const pauseResume = () => {
+    if (!isRunning) {
+      // Starting the session - automatically enable GPS
+      if (!gpsEnabled) {
+        startGPSTracking();
+      }
+    }
     setIsRunning(!isRunning);
   };
 
@@ -625,22 +631,10 @@ export default function MileTracker() {
                         "bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white border border-green-500 shadow-lg shadow-green-500/25"
                       }
                       size="lg"
+                      data-testid={isRunning ? "button-pause" : "button-unleash"}
                     >
                       {isRunning ? <Pause className="mr-2 animate-pulse" size={20} /> : <Play className="mr-2 animate-bounce" size={20} />}
                       {isRunning ? "⏸️ CHILL" : "▶️ UNLEASH!"}
-                    </Button>
-                    
-                    <Button 
-                      onClick={gpsEnabled ? stopGPSTracking : startGPSTracking}
-                      className={gpsEnabled ?
-                        "bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white border border-blue-500 shadow-lg shadow-blue-500/25" :
-                        "bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white border border-purple-500 shadow-lg shadow-purple-500/25"
-                      }
-                      size="lg"
-                      data-testid={gpsEnabled ? "button-gps-stop" : "button-gps-start"}
-                    >
-                      <MapPin className={gpsEnabled ? "mr-2 animate-pulse" : "mr-2"} size={20} />
-                      {gpsEnabled ? "📍 GPS ON" : "🛰️ START GPS"}
                     </Button>
                     
                     <Button 
@@ -648,6 +642,7 @@ export default function MileTracker() {
                       className="bg-gradient-to-r from-red-600 to-red-800 hover:from-red-700 hover:to-red-900 text-white border border-red-500 shadow-lg shadow-red-500/25"
                       size="lg"
                       disabled={!isRunning || completeMileMutation.isPending}
+                      data-testid="button-complete-mile"
                     >
                       <Target className="mr-2 animate-spin" size={20} />
                       {completeMileMutation.isPending ? "🔥 RECORDING..." : `🏁 CRUSH MILE ${currentMile}!`}
@@ -658,6 +653,7 @@ export default function MileTracker() {
                       className="bg-gradient-to-r from-gray-700 to-black hover:from-gray-800 hover:to-gray-900 text-red-400 border border-red-500 shadow-lg shadow-red-500/25"
                       size="lg"
                       disabled={finishSessionMutation.isPending}
+                      data-testid="button-finish-session"
                     >
                       <Square className="mr-2" size={20} />
                       {finishSessionMutation.isPending ? "🔥 WRAPPING UP..." : "🏆 VICTORY LAP!"}
