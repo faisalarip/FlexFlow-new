@@ -17,6 +17,14 @@ export interface AuthResult {
     profileImageUrl: string | null;
     authProvider: string | null;
     isEmailVerified: boolean | null;
+    subscriptionStatus?: string | null;
+    trialStartDate?: Date | null;
+    trialEndDate?: Date | null;
+    subscriptionStartDate?: Date | null;
+    subscriptionExpiresAt?: Date | null;
+    lastPaymentDate?: Date | null;
+    stripeCustomerId?: string | null;
+    stripeSubscriptionId?: string | null;
   };
   token: string;
 }
@@ -58,6 +66,14 @@ export class AuthService {
           profileImageUrl: user.profileImageUrl,
           authProvider: user.authProvider,
           isEmailVerified: user.isEmailVerified,
+          subscriptionStatus: user.subscriptionStatus,
+          trialStartDate: user.trialStartDate,
+          trialEndDate: user.trialEndDate,
+          subscriptionStartDate: user.subscriptionStartDate,
+          subscriptionExpiresAt: user.subscriptionExpiresAt,
+          lastPaymentDate: user.lastPaymentDate,
+          stripeCustomerId: user.stripeCustomerId,
+          stripeSubscriptionId: user.stripeSubscriptionId,
         },
         token
       };
@@ -118,6 +134,14 @@ export class AuthService {
         profileImageUrl: user.profileImageUrl,
         authProvider: user.authProvider,
         isEmailVerified: user.isEmailVerified,
+        subscriptionStatus: user.subscriptionStatus,
+        trialStartDate: user.trialStartDate,
+        trialEndDate: user.trialEndDate,
+        subscriptionStartDate: user.subscriptionStartDate,
+        subscriptionExpiresAt: user.subscriptionExpiresAt,
+        lastPaymentDate: user.lastPaymentDate,
+        stripeCustomerId: user.stripeCustomerId,
+        stripeSubscriptionId: user.stripeSubscriptionId,
       },
       token
     };
@@ -162,6 +186,14 @@ export class AuthService {
         profileImageUrl: user.profileImageUrl,
         authProvider: user.authProvider,
         isEmailVerified: user.isEmailVerified,
+        subscriptionStatus: user.subscriptionStatus,
+        trialStartDate: user.trialStartDate,
+        trialEndDate: user.trialEndDate,
+        subscriptionStartDate: user.subscriptionStartDate,
+        subscriptionExpiresAt: user.subscriptionExpiresAt,
+        lastPaymentDate: user.lastPaymentDate,
+        stripeCustomerId: user.stripeCustomerId,
+        stripeSubscriptionId: user.stripeSubscriptionId,
       };
     } catch (error) {
       return null;
