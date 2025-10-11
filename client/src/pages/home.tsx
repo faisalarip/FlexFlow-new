@@ -60,14 +60,6 @@ export default function Home() {
       testId: "link-progress"
     },
     {
-      icon: Users,
-      title: "Leaderboard",
-      description: "Compete with others and climb the rankings",
-      link: "/leaderboard",
-      color: "red",
-      testId: "link-leaderboard"
-    },
-    {
       icon: Sparkles,
       title: "AI Features",
       description: "Get personalized workout & meal recommendations",
@@ -102,7 +94,7 @@ export default function Home() {
             Your complete fitness tracking companion
           </p>
           <p className="text-lg text-gray-400 max-w-2xl mx-auto mb-8" data-testid="text-description">
-            Track workouts, monitor progress, compete on leaderboards, and use GPS to automatically count your miles. 
+            Track workouts, monitor progress, and use GPS to automatically count your miles. 
             Upgrade to Premium for AI-powered workout and meal recommendations.
           </p>
           
@@ -257,10 +249,6 @@ export default function Home() {
                   <li className="flex items-start" data-testid="text-feature-1">
                     <span className="text-red-400 mr-2">📍</span>
                     <span><strong className="text-red-400">Mile Tracker</strong> uses GPS to auto-count miles while running</span>
-                  </li>
-                  <li className="flex items-start" data-testid="text-feature-2">
-                    <span className="text-red-400 mr-2">🏆</span>
-                    <span><strong className="text-red-400">Leaderboard</strong> shows real user rankings - compete to be #1!</span>
                   </li>
                   <li className="flex items-start" data-testid="text-feature-3">
                     <span className="text-red-400 mr-2">✨</span>

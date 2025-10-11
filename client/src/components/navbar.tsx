@@ -33,11 +33,6 @@ export default function Navbar() {
       icon: Target 
     },
     { 
-      path: "/leaderboard", 
-      label: "Leaderboard", 
-      icon: Award 
-    },
-    { 
       path: "/mile-tracker", 
       label: "Mile Tracker", 
       icon: MapPin 

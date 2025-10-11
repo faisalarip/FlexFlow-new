@@ -7,7 +7,6 @@ import { ThemeProvider } from "@/hooks/useTheme";
 import Dashboard from "@/pages/dashboard";
 import Home from "@/pages/home";
 import UserSubscription from "@/pages/user-subscription";
-import Leaderboard from "@/pages/leaderboard";
 import MileTracker from "@/pages/mile-tracker";
 import Community from "@/pages/community";
 import MealPlans from "@/pages/meal-plans";
@@ -72,7 +71,6 @@ function Router() {
             <Route path="/home" component={Home} />
             <Route path="/dashboard" component={Dashboard} />
             <Route path="/subscription" component={UserSubscription} />
-            <Route path="/leaderboard" component={Leaderboard} />
             <Route path="/mile-tracker" component={MileTracker} />
             <Route path="/community" component={Community} />
             <Route path="/meal-plans" component={MealPlans} />
