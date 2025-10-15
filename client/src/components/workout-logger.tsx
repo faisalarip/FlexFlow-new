@@ -39,7 +39,6 @@ import lateralRaisesImage from "@assets/generated_images/Man_and_woman_dumbbell_
 import frontRaisesImage from "@assets/generated_images/Man_and_woman_dumbbell_front_raises_f19c02ce.png";
 import dumbbellShrugsImage from "@assets/generated_images/Woman_performing_dumbbell_shrugs_ac5db82c.png";
 import dumbbellStepUpsImage from "@assets/generated_images/Man_performing_dumbbell_step-ups_da98f98d.png";
-import dumbbellRenegadeRowsImage from "@assets/generated_images/Man_performing_dumbbell_renegade_rows_195725be.png";
 import dumbbellThrustersImage from "@assets/generated_images/Woman_performing_dumbbell_thrusters_e6b4460d.png";
 import workoutBgImage from "@assets/stock_images/men_and_women_workin_dbbf742b.jpg";
 
@@ -197,9 +196,6 @@ export default function WorkoutLogger() {
     if (exerciseNameLower.includes('dumbbell') && (exerciseNameLower.includes('step-up') || exerciseNameLower.includes('step up') || exerciseNameLower.includes('stepup'))) {
       return dumbbellStepUpsImage;
     }
-    if (exerciseNameLower.includes('renegade') && (exerciseNameLower.includes('row') || exerciseNameLower.includes('rows'))) {
-      return dumbbellRenegadeRowsImage;
-    }
     if (exerciseNameLower.includes('dumbbell') && (exerciseNameLower.includes('thruster') || exerciseNameLower.includes('thrusters'))) {
       return dumbbellThrustersImage;
     }
@@ -332,7 +328,6 @@ export default function WorkoutLogger() {
     { name: "Dumbbell Thrusters", category: "dumbbells", icon: Weight, color: "red", description: "Full body exercise" },
     { name: "Dumbbell Russian Twists", category: "dumbbells", icon: Weight, color: "purple", description: "Weighted core work" },
     { name: "Dumbbell Walking Lunges", category: "dumbbells", icon: Weight, color: "purple", description: "Dynamic leg exercise" },
-    { name: "Dumbbell Renegade Rows", category: "dumbbells", icon: Weight, color: "red", description: "Core and back combo" },
     { name: "Dumbbell Goblet Squats", category: "dumbbells", icon: Weight, color: "purple", description: "Front-loaded squats" },
     { name: "Dumbbell Bulgarian Split Squats", category: "dumbbells", icon: Weight, color: "purple", description: "Single leg focus" },
   ];
@@ -1048,16 +1043,6 @@ export default function WorkoutLogger() {
       ],
       tips: ["Take larger steps for better glute activation", "Keep torso upright throughout", "Ensure adequate space to walk"],
       muscles: ["Quadriceps", "Glutes", "Hamstrings", "Core"]
-    },
-    "Dumbbell Renegade Rows": {
-      steps: [
-        "Start in plank position with hands on dumbbells",
-        "Row one dumbbell to your ribcage while balancing on other arm",
-        "Keep hips square and core tight",
-        "Lower weight and repeat on opposite side"
-      ],
-      tips: ["Use hexagonal dumbbells for stability", "Don't let hips rotate", "This combines core and back training"],
-      muscles: ["Lats", "Core", "Shoulders", "Triceps"]
     },
     "Dumbbell Goblet Squats": {
       steps: [
