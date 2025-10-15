@@ -37,6 +37,7 @@ import deadBugImage from "@assets/generated_images/Man_performing_dead_bug_7bdcd
 import hangingLegRaisesImage from "@assets/generated_images/Woman_performing_hanging_leg_raises_ef4d5db2.png";
 import lateralRaisesImage from "@assets/generated_images/Man_and_woman_dumbbell_lateral_raises_a9e51d80.png";
 import frontRaisesImage from "@assets/generated_images/Man_and_woman_dumbbell_front_raises_f19c02ce.png";
+import dumbbellShrugsImage from "@assets/generated_images/Woman_performing_dumbbell_shrugs_ac5db82c.png";
 import workoutBgImage from "@assets/stock_images/men_and_women_workin_dbbf742b.jpg";
 
 export default function WorkoutLogger() {
@@ -186,6 +187,9 @@ export default function WorkoutLogger() {
     }
     if (exerciseNameLower.includes('hanging leg raise') || exerciseNameLower.includes('hanging leg raises')) {
       return hangingLegRaisesImage;
+    }
+    if (exerciseNameLower.includes('dumbbell') && (exerciseNameLower.includes('shrug') || exerciseNameLower.includes('shrugs'))) {
+      return dumbbellShrugsImage;
     }
     // Default to dumbbell exercises image for other exercises
     return dumbbellExercisesImage;
