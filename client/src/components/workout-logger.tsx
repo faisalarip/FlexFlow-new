@@ -39,7 +39,7 @@ import lateralRaisesImage from "@assets/generated_images/Man_and_woman_dumbbell_
 import frontRaisesImage from "@assets/generated_images/Man_and_woman_dumbbell_front_raises_f19c02ce.png";
 import dumbbellShrugsImage from "@assets/generated_images/Woman_performing_dumbbell_shrugs_ac5db82c.png";
 import dumbbellStepUpsImage from "@assets/generated_images/Man_performing_dumbbell_step-ups_da98f98d.png";
-import dumbbellRenegadeRowsImage from "@assets/generated_images/Woman_performing_dumbbell_renegade_rows_42580429.png";
+import dumbbellRenegadeRowsImage from "@assets/generated_images/Man_performing_dumbbell_renegade_rows_195725be.png";
 import dumbbellThrustersImage from "@assets/generated_images/Woman_performing_dumbbell_thrusters_e6b4460d.png";
 import workoutBgImage from "@assets/stock_images/men_and_women_workin_dbbf742b.jpg";
 
