@@ -8,7 +8,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Camera, Plus, Calendar, Trash2, Edit3, X, Check, Grid3X3, Eye, ArrowLeft, ArrowRight, RotateCcw } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Camera, Plus, Calendar, Trash2, Edit3, X, Check, Grid3X3, Eye, ArrowLeft, ArrowRight, RotateCcw, ChevronDown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import FeatureGate from "@/components/feature-gate";
@@ -670,37 +671,55 @@ export default function ProgressPhotos() {
           </div>
         
           <div className="flex items-center gap-4">
-          {/* View Mode Toggle */}
-          <div className="flex bg-black/60 border border-red-600/30 rounded-lg p-1 backdrop-blur-sm">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setViewMode("grid")}
-              className={`${
-                viewMode === "grid" 
-                  ? "bg-gradient-to-r from-red-600 to-red-700 text-white shadow-lg shadow-red-500/25" 
-                  : "text-gray-300 hover:bg-red-600/20 hover:text-white"
-              }`}
-              data-testid="button-grid-view"
-            >
-              <Grid3X3 className="mr-2 h-4 w-4" />
-              Grid
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setViewMode("comparison")}
-              className={`${
-                viewMode === "comparison" 
-                  ? "bg-gradient-to-r from-red-600 to-red-700 text-white shadow-lg shadow-red-500/25" 
-                  : "text-gray-300 hover:bg-red-600/20 hover:text-white"
-              }`}
-              data-testid="button-comparison-view"
-            >
-              <Eye className="mr-2 h-4 w-4" />
-              Compare
-            </Button>
-          </div>
+          {/* View Mode Dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                className="bg-black/60 border-red-600/30 text-gray-300 hover:bg-red-600/20 hover:text-white backdrop-blur-sm"
+                data-testid="button-view-mode"
+              >
+                {viewMode === "grid" ? (
+                  <>
+                    <Grid3X3 className="mr-2 h-4 w-4" />
+                    Grid
+                  </>
+                ) : (
+                  <>
+                    <Eye className="mr-2 h-4 w-4" />
+                    Compare
+                  </>
+                )}
+                <ChevronDown className="ml-2 h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="bg-black/95 border-red-600/30 backdrop-blur-sm">
+              <DropdownMenuItem
+                onClick={() => setViewMode("grid")}
+                className={`${
+                  viewMode === "grid"
+                    ? "bg-red-600/20 text-white"
+                    : "text-gray-300 hover:bg-red-600/20 hover:text-white"
+                } cursor-pointer`}
+                data-testid="menu-item-grid"
+              >
+                <Grid3X3 className="mr-2 h-4 w-4" />
+                Grid View
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => setViewMode("comparison")}
+                className={`${
+                  viewMode === "comparison"
+                    ? "bg-red-600/20 text-white"
+                    : "text-gray-300 hover:bg-red-600/20 hover:text-white"
+                } cursor-pointer`}
+                data-testid="menu-item-compare"
+              >
+                <Eye className="mr-2 h-4 w-4" />
+                Compare
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
