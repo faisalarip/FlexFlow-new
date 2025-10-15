@@ -1656,6 +1656,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         userId: userId
       });
       
+      // Moderate post content for inappropriate language
+      const { moderateText } = await import("./services/content-moderation");
+      const contentToModerate = `${data.content || ''} ${data.title || ''}`;
+      const moderationResult = await moderateText(contentToModerate);
+      
+      if (!moderationResult.isAppropriate) {
+        return res.status(400).json({ 
+          message: "Your post contains inappropriate content and cannot be published.",
+          reason: moderationResult.reason,
+          categories: moderationResult.categories
+        });
+      }
+      
       const post = await storage.createCommunityPost(data);
       res.status(201).json(post);
     } catch (error) {
@@ -1753,6 +1766,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
 
     try {
+      // Moderate image for inappropriate content
+      const { moderateImage } = await import("./services/content-moderation");
+      const moderationResult = await moderateImage(req.body.imageURL);
+      
+      if (!moderationResult.isAppropriate) {
+        return res.status(400).json({ 
+          error: "This image contains inappropriate content and cannot be uploaded.",
+          reason: moderationResult.reason,
+          categories: moderationResult.categories
+        });
+      }
+
       const objectStorageService = new ObjectStorageService();
       const objectPath = await objectStorageService.trySetObjectEntityAclPolicy(
         req.body.imageURL,
