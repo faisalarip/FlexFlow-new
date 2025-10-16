@@ -102,6 +102,10 @@ export default function WorkoutPlannerPage() {
   const generatePlanMutation = useMutation({
     mutationFn: async () => {
       const response = await apiRequest("POST", "/api/workout-plan/generate", {});
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to generate workout plan");
+      }
       return response.json();
     },
     onSuccess: () => {
@@ -110,6 +114,13 @@ export default function WorkoutPlannerPage() {
       toast({
         title: "Workout Plan Generated! 🏋️‍♂️",
         description: "Your personalized workout plan is ready!",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Generation Failed",
+        description: error.message || "Failed to generate workout plan. Please try again.",
+        variant: "destructive",
       });
     },
   });
