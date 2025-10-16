@@ -759,46 +759,20 @@ export default function ProgressPhotos() {
                 <div className="space-y-4">
                   <Label>Photo Capture</Label>
                   
-                  {!capturedImage && !isCameraActive && (
-                    <div className="flex gap-4">
-                      <Button
-                        type="button"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          startCamera();
-                        }}
-                        variant="outline"
-                        className="flex-1"
-                        disabled={isLoadingCamera}
-                        data-testid="button-start-camera"
-                      >
-                        {isLoadingCamera ? (
-                          <>
-                            <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600" />
-                            Starting Camera...
-                          </>
-                        ) : (
-                          <>
-                            <Camera className="mr-2 h-4 w-4" />
-                            Take Photo
-                          </>
-                        )}
-                      </Button>
-                      <Button
-                        type="button"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          fileInputRef.current?.click();
-                        }}
-                        variant="outline"
-                        className="flex-1"
-                        data-testid="button-upload-photo"
-                      >
-                        <Plus className="mr-2 h-4 w-4" />
-                        Upload Photo
-                      </Button>
-                    </div>
+                  {!capturedImage && (
+                    <Button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        fileInputRef.current?.click();
+                      }}
+                      variant="outline"
+                      className="w-full"
+                      data-testid="button-upload-photo"
+                    >
+                      <Camera className="mr-2 h-4 w-4" />
+                      Take/Upload Photo
+                    </Button>
                   )}
                   
                   <input
@@ -809,41 +783,6 @@ export default function ProgressPhotos() {
                     onChange={handleFileUpload}
                     className="hidden"
                   />
-                  
-                  {isCameraActive && (
-                    <div className="space-y-4">
-                      <div className="relative">
-                        <video
-                          ref={videoRef}
-                          autoPlay
-                          playsInline
-                          className="w-full rounded-lg"
-                          style={{ maxHeight: '400px' }}
-                        />
-                      </div>
-                      <div className="flex gap-4">
-                        <Button
-                          type="button"
-                          onClick={capturePhoto}
-                          className="flex-1 bg-red-600 hover:bg-red-700"
-                          data-testid="button-capture-photo"
-                        >
-                          <Camera className="mr-2 h-4 w-4" />
-                          Capture
-                        </Button>
-                        <Button
-                          type="button"
-                          onClick={stopCamera}
-                          variant="outline"
-                          className="flex-1"
-                          data-testid="button-cancel-camera"
-                        >
-                          <X className="mr-2 h-4 w-4" />
-                          Cancel
-                        </Button>
-                      </div>
-                    </div>
-                  )}
                   
                   {capturedImage && (
                     <div className="space-y-4">
