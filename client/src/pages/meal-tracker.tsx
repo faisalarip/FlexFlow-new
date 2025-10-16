@@ -57,6 +57,31 @@ export default function MealTrackerPage() {
     }
   });
 
+  // Get weekly meal entries (last 7 days)
+  const getWeekDates = () => {
+    const dates = [];
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date();
+      date.setDate(date.getDate() - i);
+      dates.push(date.toISOString().split('T')[0]);
+    }
+    return dates;
+  };
+
+  const weekDates = getWeekDates();
+  const { data: weeklyEntries = [] } = useQuery<MealEntry[]>({
+    queryKey: ["/api/meal-entries", "weekly", weekDates[0]],
+    queryFn: async () => {
+      const allEntries: MealEntry[] = [];
+      for (const date of weekDates) {
+        const response = await apiRequest("GET", `/api/meal-entries?date=${date}`);
+        const entries = await response.json();
+        allEntries.push(...entries);
+      }
+      return allEntries;
+    }
+  });
+
 
   // Barcode lookup mutation
   const barcodeLookupMutation = useMutation({
@@ -226,14 +251,18 @@ export default function MealTrackerPage() {
         </div>
 
         <Tabs defaultValue="scan" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 bg-black/50 border border-red-800/30">
+          <TabsList className="grid w-full grid-cols-3 bg-black/50 border border-red-800/30">
             <TabsTrigger value="scan" className="data-[state=active]:bg-red-600 data-[state=active]:text-white text-gray-300 hover:text-white transition-colors">
               <ScanLine className="w-4 h-4 mr-2" />
               Scan Barcode
             </TabsTrigger>
             <TabsTrigger value="history" className="data-[state=active]:bg-red-600 data-[state=active]:text-white text-gray-300 hover:text-white transition-colors">
               <Calendar className="w-4 h-4 mr-2" />
-              Daily History
+              Daily View
+            </TabsTrigger>
+            <TabsTrigger value="weekly" className="data-[state=active]:bg-red-600 data-[state=active]:text-white text-gray-300 hover:text-white transition-colors">
+              <TrendingUp className="w-4 h-4 mr-2" />
+              Weekly View
             </TabsTrigger>
           </TabsList>
 
@@ -551,6 +580,136 @@ export default function MealTrackerPage() {
                 );
               })}
             </div>
+        </TabsContent>
+
+          <TabsContent value="weekly" className="space-y-6">
+            {/* Weekly Summary */}
+            {weeklyEntries.length > 0 && (
+              <Card data-testid="card-weekly-summary" className="bg-black/90 border-red-600/50 shadow-2xl">
+                <CardHeader className="border-b border-red-800/30">
+                  <CardTitle className="flex items-center gap-2 text-white">
+                    <div className="p-1 bg-red-600 rounded">
+                      <TrendingUp className="w-5 h-5 text-white" />
+                    </div>
+                    Weekly Nutrition Summary (Last 7 Days)
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-6">
+                  <div className="grid gap-6 md:grid-cols-4">
+                    {(() => {
+                      const weeklyTotals = weeklyEntries.reduce((totals, entry) => ({
+                        calories: totals.calories + entry.totalCalories,
+                        protein: totals.protein + parseFloat(entry.protein),
+                        carbs: totals.carbs + parseFloat(entry.carbs),
+                        fat: totals.fat + parseFloat(entry.fat)
+                      }), { calories: 0, protein: 0, carbs: 0, fat: 0 });
+                      
+                      const avgCalories = Math.round(weeklyTotals.calories / 7);
+                      
+                      return (
+                        <>
+                          <div className="text-center bg-gray-900/50 p-4 rounded-lg border border-red-800/20">
+                            <p className="text-3xl font-bold text-red-400 mb-1">{weeklyTotals.calories}</p>
+                            <p className="text-sm text-gray-300 font-medium">Total Calories</p>
+                            <p className="text-xs text-gray-500 mt-1">~{avgCalories}/day avg</p>
+                          </div>
+                          <div className="text-center bg-gray-900/50 p-4 rounded-lg border border-red-800/20">
+                            <p className="text-3xl font-bold text-blue-400 mb-1">{Math.round(weeklyTotals.protein)}g</p>
+                            <p className="text-sm text-gray-300 font-medium">Total Protein</p>
+                            <p className="text-xs text-gray-500 mt-1">~{Math.round(weeklyTotals.protein / 7)}g/day avg</p>
+                          </div>
+                          <div className="text-center bg-gray-900/50 p-4 rounded-lg border border-red-800/20">
+                            <p className="text-3xl font-bold text-green-400 mb-1">{Math.round(weeklyTotals.carbs)}g</p>
+                            <p className="text-sm text-gray-300 font-medium">Total Carbs</p>
+                            <p className="text-xs text-gray-500 mt-1">~{Math.round(weeklyTotals.carbs / 7)}g/day avg</p>
+                          </div>
+                          <div className="text-center bg-gray-900/50 p-4 rounded-lg border border-red-800/20">
+                            <p className="text-3xl font-bold text-orange-400 mb-1">{Math.round(weeklyTotals.fat)}g</p>
+                            <p className="text-sm text-gray-300 font-medium">Total Fat</p>
+                            <p className="text-xs text-gray-500 mt-1">~{Math.round(weeklyTotals.fat / 7)}g/day avg</p>
+                          </div>
+                        </>
+                      );
+                    })()}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* All Weekly Entries */}
+            <Card className="bg-black/80 border-red-800/30 shadow-xl">
+              <CardHeader className="border-b border-red-800/20">
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Calendar className="w-5 h-5" />
+                  <span className="font-semibold">All Scanned Items This Week</span>
+                  <Badge variant="outline" className="ml-auto">{weeklyEntries.length} items</Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-6">
+                {weeklyEntries.length > 0 ? (
+                  <div className="space-y-4">
+                    {weekDates.map((date) => {
+                      const dayEntries = weeklyEntries.filter(entry => 
+                        new Date(entry.loggedAt).toISOString().split('T')[0] === date
+                      );
+                      
+                      if (dayEntries.length === 0) return null;
+                      
+                      const dayTotal = dayEntries.reduce((sum, entry) => sum + entry.totalCalories, 0);
+                      const dayOfWeek = new Date(date).toLocaleDateString('en-US', { weekday: 'short' });
+                      const formattedDate = new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                      
+                      return (
+                        <div key={date} className="border border-red-800/20 rounded-lg p-4 bg-gray-900/30">
+                          <div className="flex justify-between items-center mb-3">
+                            <h4 className="font-semibold text-white">
+                              {dayOfWeek}, {formattedDate}
+                            </h4>
+                            <Badge className="bg-red-600 text-white">{dayTotal} cal</Badge>
+                          </div>
+                          <div className="space-y-2">
+                            {dayEntries.map((entry) => (
+                              <div key={entry.id} className="flex justify-between items-start p-3 bg-black/40 border border-red-800/10 rounded-lg">
+                                <div className="flex-1">
+                                  <h5 className="font-medium text-white text-sm">{entry.mealName}</h5>
+                                  <p className="text-xs text-gray-400 capitalize">{entry.mealType}</p>
+                                </div>
+                                <div className="text-right flex items-start gap-3">
+                                  <div>
+                                    <p className="font-semibold text-red-400 text-sm">{entry.totalCalories} cal</p>
+                                    <p className="text-xs text-gray-400">
+                                      P: {entry.protein}g | C: {entry.carbs}g | F: {entry.fat}g
+                                    </p>
+                                  </div>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => deleteMutation.mutate(entry.id)}
+                                    disabled={deleteMutation.isPending}
+                                    className="text-red-400 hover:text-red-300 hover:bg-red-900/20 h-8 w-8"
+                                    data-testid={`button-delete-weekly-meal-${entry.id}`}
+                                  >
+                                    <Trash2 className="h-3 w-3" />
+                                  </Button>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    }).filter(Boolean)}
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <ScanLine className="w-8 h-8 text-gray-600" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-white mb-2">No Items Scanned This Week</h3>
+                    <p className="text-gray-400">Start scanning barcodes to track your nutrition throughout the week</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
         </TabsContent>
         </Tabs>
         

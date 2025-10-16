@@ -325,7 +325,7 @@ export default function WorkoutPlannerPage() {
                       <p className="text-sm text-gray-400">{dayWorkout.description}</p>
                     </div>
                     
-                    {dayWorkout.exercises && Array.isArray(dayWorkout.exercises) && dayWorkout.exercises.length > 0 && (
+                    {dayWorkout.exercises && Array.isArray(dayWorkout.exercises) && dayWorkout.exercises.length > 0 ? (
                       <div className="space-y-2 mt-4 pt-3 border-t border-gray-700">
                         <h5 className="text-sm font-medium text-white flex items-center gap-2">
                           <Activity className="w-4 h-4 text-primary" />
@@ -350,7 +350,7 @@ export default function WorkoutPlannerPage() {
                           ))}
                         </div>
                       </div>
-                    )}
+                    ) : null}
                   </div>
                 )}
               </Card>
