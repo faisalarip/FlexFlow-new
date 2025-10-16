@@ -23,7 +23,8 @@ import {
   RotateCcw,
   TrendingUp,
   Users,
-  Award
+  Award,
+  Loader2
 } from "lucide-react";
 import { WorkoutPreferences, WorkoutPlan, PlannedWorkout } from "@shared/schema";
 
@@ -238,7 +239,39 @@ export default function WorkoutPlannerPage() {
   };
 
   const renderWeeklySchedule = () => {
-    if (!workoutPlan?.plannedWorkouts) return null;
+    if (!workoutPlan?.plannedWorkouts) {
+      return (
+        <Card className="bg-black/80 border-red-800/30">
+          <CardContent className="p-12 text-center space-y-4">
+            <div className="w-16 h-16 bg-red-600/20 rounded-full flex items-center justify-center mx-auto">
+              <Dumbbell className="w-8 h-8 text-red-500" />
+            </div>
+            <h3 className="text-xl font-semibold text-white">No Workout Plan Generated Yet</h3>
+            <p className="text-gray-400 max-w-md mx-auto">
+              Click the "Generate New Plan" button below to create your personalized AI-powered workout plan.
+            </p>
+            <Button 
+              onClick={() => generatePlanMutation.mutate()} 
+              disabled={generatePlanMutation.isPending}
+              className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800"
+              data-testid="button-generate-initial-plan"
+            >
+              {generatePlanMutation.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Generating Your Plan...
+                </>
+              ) : (
+                <>
+                  <Play className="mr-2 h-4 w-4" />
+                  Generate My Workout Plan
+                </>
+              )}
+            </Button>
+          </CardContent>
+        </Card>
+      );
+    }
 
     const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     const currentWeek = 1; // For now, show first week
