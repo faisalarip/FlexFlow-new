@@ -39,6 +39,7 @@ export default function MealPlans() {
   const [showFoodPreferences, setShowFoodPreferences] = useState(false);
   const [expandedIngredients, setExpandedIngredients] = useState<Set<string>>(new Set());
   const [activeTab, setActiveTab] = useState<string>("plans");
+  const [selectedPlanId, setSelectedPlanId] = useState<string>("");
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -457,61 +458,87 @@ export default function MealPlans() {
           </Card>
         )}
 
-        {/* Meal Plans Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredPlans.map((plan) => (
-            <Card key={plan.id} className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg">{plan.name}</CardTitle>
-                  {getGoalIcon(plan.goal)}
-                </div>
-                <Badge className={getGoalColor(plan.goal)} variant="secondary">
-                  {formatGoalName(plan.goal)}
-                </Badge>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {plan.description}
-                </p>
-                
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600 dark:text-gray-400">Daily Calories:</span>
-                    <span className="font-semibold">{plan.dailyCalories}</span>
-                  </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600 dark:text-gray-400">Protein:</span>
-                    <span className="font-semibold">{plan.dailyProtein}g</span>
-                  </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600 dark:text-gray-400">Duration:</span>
-                    <span className="font-semibold">{plan.duration} days</span>
-                  </div>
-                </div>
-
-                <div className="flex space-x-2">
-                  <Button
-                    onClick={() => setSelectedPlan(plan)}
-                    variant="outline"
-                    size="sm"
-                    className="flex-1"
-                  >
-                    View Details
-                  </Button>
-                  <Button
-                    onClick={() => handleAssignPlan(plan.id)}
-                    disabled={assignMealPlanMutation.isPending || userMealPlan?.mealPlanId === plan.id}
-                    size="sm"
-                    className="flex-1"
-                  >
-                    {userMealPlan?.mealPlanId === plan.id ? "Active" : "Start Plan"}
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+        {/* Meal Plan Selector */}
+        <div className="max-w-2xl mx-auto mb-8">
+          <Select value={selectedPlanId} onValueChange={(value) => {
+            setSelectedPlanId(value);
+            const plan = filteredPlans.find(p => p.id === value);
+            if (plan) {
+              setSelectedPlan(plan);
+            }
+          }}>
+            <SelectTrigger className="w-full" data-testid="select-meal-plan">
+              <SelectValue placeholder="Select a meal plan" />
+            </SelectTrigger>
+            <SelectContent>
+              {filteredPlans.map((plan) => (
+                <SelectItem key={plan.id} value={plan.id}>
+                  {plan.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
+
+        {/* Selected Plan Details */}
+        {selectedPlanId && filteredPlans.find(p => p.id === selectedPlanId) && (
+          <Card className="max-w-4xl mx-auto">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  {getGoalIcon(filteredPlans.find(p => p.id === selectedPlanId)!.goal)}
+                  <CardTitle className="ml-2">{filteredPlans.find(p => p.id === selectedPlanId)!.name}</CardTitle>
+                </div>
+                <Badge className={getGoalColor(filteredPlans.find(p => p.id === selectedPlanId)!.goal)} variant="secondary">
+                  {formatGoalName(filteredPlans.find(p => p.id === selectedPlanId)!.goal)}
+                </Badge>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <p className="text-gray-600 dark:text-gray-400">
+                {filteredPlans.find(p => p.id === selectedPlanId)!.description}
+              </p>
+              
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="text-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                  <div className="text-2xl font-bold text-primary">{filteredPlans.find(p => p.id === selectedPlanId)!.dailyCalories}</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">Calories/day</div>
+                </div>
+                <div className="text-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                  <div className="text-2xl font-bold text-green-600">{filteredPlans.find(p => p.id === selectedPlanId)!.dailyProtein}g</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">Protein/day</div>
+                </div>
+                <div className="text-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                  <div className="text-2xl font-bold text-blue-600">{filteredPlans.find(p => p.id === selectedPlanId)!.dailyCarbs}g</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">Carbs/day</div>
+                </div>
+                <div className="text-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                  <div className="text-2xl font-bold text-orange-600">{filteredPlans.find(p => p.id === selectedPlanId)!.dailyFat}g</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">Fat/day</div>
+                </div>
+              </div>
+
+              <div className="flex space-x-3">
+                <Button
+                  onClick={() => setSelectedPlan(filteredPlans.find(p => p.id === selectedPlanId)!)}
+                  variant="outline"
+                  className="flex-1"
+                  data-testid="button-view-details"
+                >
+                  View Full Details
+                </Button>
+                <Button
+                  onClick={() => handleAssignPlan(selectedPlanId)}
+                  disabled={assignMealPlanMutation.isPending || userMealPlan?.mealPlanId === selectedPlanId}
+                  className="flex-1"
+                  data-testid="button-start-plan"
+                >
+                  {userMealPlan?.mealPlanId === selectedPlanId ? "Active Plan" : "Start This Plan"}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Meal Plan Details Dialog */}
         <Dialog open={!!selectedPlan} onOpenChange={() => setSelectedPlan(null)}>
