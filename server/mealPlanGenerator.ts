@@ -400,6 +400,9 @@ interface PersonalizedMealPlanParams {
   likedFoods: string[];
   dislikedFoods: string[];
   userId: string;
+  dietaryRestrictions?: string[];
+  allergies?: string[];
+  preferences?: string[];
 }
 
 export async function generatePersonalizedMealPlan(params: PersonalizedMealPlanParams | MealPlanGenerationOptions): Promise<GeneratedMealPlan> {
@@ -568,14 +571,27 @@ export async function generateWeeklyMealPlan(
 }
 
 async function generatePersonalizedMealPlanWithFoodPreferences(params: PersonalizedMealPlanParams): Promise<GeneratedMealPlan> {
-  const { goal, dailyCalories, duration, likedFoods, dislikedFoods, userId } = params;
+  const { 
+    goal, 
+    dailyCalories, 
+    duration, 
+    likedFoods, 
+    dislikedFoods, 
+    userId,
+    dietaryRestrictions = [],
+    allergies = [],
+    preferences = []
+  } = params;
 
   console.log(`Generating personalized meal plan for user ${userId}:`, {
     goal,
     dailyCalories,
     duration,
     likedFoodsCount: likedFoods.length,
-    dislikedFoodsCount: dislikedFoods.length
+    dislikedFoodsCount: dislikedFoods.length,
+    dietaryRestrictions,
+    allergies,
+    preferences
   });
 
   if (!process.env.OPENAI_API_KEY) {
@@ -642,6 +658,9 @@ ${goalGuidance}
 FOOD PREFERENCES:
 Preferred foods (use these heavily): ${likedFoods.length > 0 ? likedFoods.join(", ") : "No specific preferences"}
 Foods to avoid: ${dislikedFoods.length > 0 ? dislikedFoods.join(", ") : "None"}
+${dietaryRestrictions.length > 0 ? `Dietary restrictions: ${dietaryRestrictions.join(", ")}` : ""}
+${allergies.length > 0 ? `Allergies (MUST avoid): ${allergies.join(", ")}` : ""}
+${preferences.length > 0 ? `General preferences: ${preferences.join(", ")}` : ""}
 
 IMPORTANT CONSTRAINTS:
 - MUST create distinctly different meals based on the goal (weight loss vs weight gain meals should be VERY different)
@@ -703,7 +722,12 @@ Respond with JSON in this exact format:
       max_tokens: 4000
     });
 
-    const generatedPlan = JSON.parse(response.choices[0].message.content);
+    const content = response.choices[0].message.content;
+    if (!content) {
+      throw new Error("No content received from AI");
+    }
+    
+    const generatedPlan = JSON.parse(content);
     
     // Validate the response structure
     if (!generatedPlan.name || !generatedPlan.days || !Array.isArray(generatedPlan.days)) {

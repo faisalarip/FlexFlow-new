@@ -2127,15 +2127,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Goal and daily calories are required" });
       }
 
-      // Generate the meal plan using AI
-      const generatedPlan = await generatePersonalizedMealPlan({
-        goal,
-        dailyCalories,
-        dietaryRestrictions: dietaryRestrictions || [],
-        preferences: preferences || [],
-        allergies: allergies || [],
-        duration
-      });
+      // Fetch user's food preferences to incorporate into meal plan
+      const userPreferences = await storage.getUserFoodPreferences(userId);
+      const likedFoods = userPreferences
+        .filter(pref => pref.preference === "like" || pref.preference === "love")
+        .map(pref => pref.foodItemId);
+      
+      const dislikedFoods = userPreferences
+        .filter(pref => pref.preference === "dislike" || pref.preference === "never")
+        .map(pref => pref.foodItemId);
+
+      // Get the actual food items
+      const allFoodItems = await storage.getFoodItems();
+      const likedFoodItems = allFoodItems.filter(item => likedFoods.includes(item.id));
+      const dislikedFoodItems = allFoodItems.filter(item => dislikedFoods.includes(item.id));
+
+      // Generate the meal plan using AI with food preferences if available
+      let generatedPlan;
+      if (likedFoodItems.length > 0 || dislikedFoodItems.length > 0) {
+        // Use personalized meal plan with food preferences
+        generatedPlan = await generatePersonalizedMealPlan({
+          goal,
+          dailyCalories,
+          duration,
+          likedFoods: likedFoodItems.map(item => item.name),
+          dislikedFoods: dislikedFoodItems.map(item => item.name),
+          userId,
+          dietaryRestrictions: dietaryRestrictions || [],
+          allergies: allergies || [],
+          preferences: preferences || []
+        });
+      } else {
+        // Fall back to general preferences if no food preferences set
+        generatedPlan = await generatePersonalizedMealPlan({
+          goal,
+          dailyCalories,
+          dietaryRestrictions: dietaryRestrictions || [],
+          preferences: preferences || [],
+          allergies: allergies || [],
+          duration
+        });
+      }
 
       // Save the generated meal plan to storage
       const mealPlan = await storage.createAIMealPlan(

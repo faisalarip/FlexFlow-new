@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Clock, Users, Target, TrendingUp, TrendingDown, Calendar, ChefHat, Sparkles, Settings, ChevronDown, ChevronUp, Heart } from "lucide-react";
 import { FoodPreferences } from "@/components/food-preferences";
@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -60,18 +61,38 @@ export default function MealPlans() {
     retry: false,
   });
 
+  // Fetch user food preferences to check if they exist
+  const { data: userFoodPreferences = [] } = useQuery<any[]>({
+    queryKey: ["/api/user-food-preferences"],
+    retry: false,
+  });
+
   // AI Meal Plan Generation Form
   const form = useForm<MealPlanGenerationForm>({
     resolver: zodResolver(mealPlanGenerationSchema),
     defaultValues: {
-      goal: userPreferences?.goal as "weight_loss" | "weight_gain" | "maintenance" || "maintenance",
-      dailyCalories: userPreferences?.dailyCalories || 2000,
-      dietaryRestrictions: userPreferences?.dietaryRestrictions || [],
-      allergies: userPreferences?.allergies || [],
-      preferences: userPreferences?.preferences || [],
+      goal: "maintenance",
+      dailyCalories: 2000,
+      dietaryRestrictions: [],
+      allergies: [],
+      preferences: [],
       duration: 7,
     },
   });
+
+  // Update form when userPreferences loads
+  useEffect(() => {
+    if (userPreferences) {
+      form.reset({
+        goal: userPreferences.goal as "weight_loss" | "weight_gain" | "maintenance",
+        dailyCalories: userPreferences.dailyCalories,
+        dietaryRestrictions: userPreferences.dietaryRestrictions || [],
+        allergies: userPreferences.allergies || [],
+        preferences: userPreferences.preferences || [],
+        duration: 7,
+      });
+    }
+  }, [userPreferences, form]);
 
   const assignMealPlanMutation = useMutation({
     mutationFn: async (planId: string) => {
@@ -260,6 +281,14 @@ export default function MealPlans() {
               </DialogHeader>
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmitAIMealPlan)} className="space-y-6">
+                  {userFoodPreferences.length > 0 && (
+                    <Alert className="bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800">
+                      <Heart className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                      <AlertDescription className="text-blue-800 dark:text-blue-200">
+                        Your saved food preferences will be automatically incorporated into this meal plan.
+                      </AlertDescription>
+                    </Alert>
+                  )}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
