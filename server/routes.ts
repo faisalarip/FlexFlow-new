@@ -2626,13 +2626,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Please complete the workout questionnaire first" });
       }
       
-      // Generate personalized workout plan based on user preferences
-      const plannedWorkouts = generateWeeklySchedule(preferences);
+      // Generate AI-powered personalized workout plan with specific exercises
+      const { aiWorkoutGenerator } = await import("./services/ai-workout-generator");
+      const plannedWorkouts = await aiWorkoutGenerator.generatePersonalizedPlan({
+        fitnessLevel: preferences.fitnessLevel,
+        primaryGoals: preferences.primaryGoals,
+        workoutDaysPerWeek: preferences.workoutDaysPerWeek,
+        sessionDuration: preferences.sessionDuration,
+        availableEquipment: preferences.availableEquipment,
+        preferredWorkoutTypes: preferences.preferredWorkoutTypes,
+        injuriesOrLimitations: preferences.injuriesOrLimitations || []
+      });
       
       const workoutPlan = {
         userId,
-        name: "Personalized Workout Plan",
-        description: `A customized ${preferences.workoutDaysPerWeek}-day workout plan based on your ${preferences.fitnessLevel} fitness level`,
+        name: "AI-Powered Workout Plan",
+        description: `A personalized ${preferences.workoutDaysPerWeek}-day workout plan tailored to your ${preferences.fitnessLevel} fitness level and goals`,
         durationWeeks: 4,
         isActive: true,
         startDate: new Date(),
