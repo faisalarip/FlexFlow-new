@@ -13,14 +13,16 @@ FlexFlow is a comprehensive fitness and wellness application built with React an
 - **Equipment Consideration**: Workouts tailored to available equipment (bodyweight, dumbbells, full gym, etc.)
 - **Injury Accommodation**: Avoids exercises that could aggravate user-specified limitations
 
-### AI Meal Plan Generator
-- **Goal-Specific Meals**: Distinctly different meals for weight loss vs weight gain
-  - **Weight Loss**: High-volume, low-calorie foods with lean proteins and vegetables (salads, grilled proteins, egg whites)
-  - **Weight Gain**: Calorie-dense, nutrient-rich foods with healthy fats (pasta dishes, nut butters, smoothies, larger portions)
-  - **Maintenance**: Balanced meals with moderate portions
-- **Maximum Variety**: No repeated meals across 7-day plans
-- **Personalized Preferences**: Incorporates user food likes/dislikes
+### AI Meal Plan Generator (Enhanced October 2025)
+- **Goal-Specific Meals**: AI generates distinctly different meals tailored to each goal
+  - **Weight Loss**: High-volume, low-calorie foods with lean proteins and vegetables (grilled chicken salads, vegetable stir-fries, egg white omelets)
+  - **Weight Gain**: Calorie-dense, nutrient-rich foods with healthy fats (pasta dishes, nut butters, smoothies, rice bowls, protein pancakes)
+  - **Maintenance**: Balanced meals with moderate portions and variety (mix of lean proteins, whole grains, healthy fats)
+- **Enhanced AI Prompts**: Explicit goal-specific guidelines with concrete food examples ensure proper differentiation
+- **Maximum Variety Constraint**: AI generates unique meals across full plan duration with no repetition
+- **Personalized Preferences**: Incorporates user food likes/dislikes when provided
 - **Macro-Optimized**: Different macro ratios per goal (higher protein for weight loss, higher carbs for weight gain)
+- **Goal-Specific Ingredient Lists**: Separate food databases for each goal (weight loss fats, weight gain fats, maintenance fats)
 
 ### Content Moderation
 - **AI-Powered Filtering**: OpenAI moderation API prevents inappropriate text content in community posts
