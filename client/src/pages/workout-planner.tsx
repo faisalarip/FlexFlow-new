@@ -247,20 +247,20 @@ export default function WorkoutPlannerPage() {
     
     return (
       <div className="grid gap-4">
-        <h3 className="text-lg font-semibold flex items-center gap-2">
+        <h3 className="text-lg font-semibold flex items-center gap-2 text-white">
           <Calendar className="w-5 h-5" />
-          Weekly Schedule
+          Weekly Schedule - Week {currentWeek}
         </h3>
         <div className="grid gap-3">
           {daysOfWeek.map((day, index) => {
             const dayWorkout = weekWorkouts.find(w => w.dayOfWeek === index);
             
             return (
-              <Card key={day} className={`p-4 ${dayWorkout?.isRestDay ? 'bg-gray-50' : 'bg-white'}`}>
+              <Card key={day} className={`p-4 ${dayWorkout?.isRestDay ? 'bg-gray-900/50' : 'bg-gray-900/70'}`} data-testid={`workout-card-${day.toLowerCase()}`}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="w-2 h-2 rounded-full bg-primary" />
-                    <span className="font-medium text-black">{day}</span>
+                    <span className="font-medium text-white">{day}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     {dayWorkout ? (
@@ -275,7 +275,7 @@ export default function WorkoutPlannerPage() {
                             <Dumbbell className="w-3 h-3" />
                             {dayWorkout.workoutType}
                           </Badge>
-                          <span className="text-sm text-gray-500">
+                          <span className="text-sm text-gray-400">
                             {dayWorkout.estimatedDuration}min
                           </span>
                         </div>
@@ -286,8 +286,38 @@ export default function WorkoutPlannerPage() {
                   </div>
                 </div>
                 {dayWorkout && !dayWorkout.isRestDay && (
-                  <div className="mt-2 text-sm text-gray-600">
-                    {dayWorkout.description}
+                  <div className="mt-3 space-y-3">
+                    <div className="space-y-1">
+                      <h4 className="font-semibold text-white">{dayWorkout.name}</h4>
+                      <p className="text-sm text-gray-400">{dayWorkout.description}</p>
+                    </div>
+                    
+                    {dayWorkout.exercises && dayWorkout.exercises.length > 0 && (
+                      <div className="space-y-2 mt-4 pt-3 border-t border-gray-700">
+                        <h5 className="text-sm font-medium text-white flex items-center gap-2">
+                          <Activity className="w-4 h-4 text-primary" />
+                          Exercises ({dayWorkout.exercises.length})
+                        </h5>
+                        <div className="space-y-3">
+                          {dayWorkout.exercises.map((exercise: any, idx: number) => (
+                            <div key={idx} className="bg-gray-800/50 rounded-lg p-3 space-y-1" data-testid={`exercise-${idx}`}>
+                              <div className="flex items-start justify-between">
+                                <span className="font-medium text-white text-sm">{exercise.name}</span>
+                                <Badge variant="outline" className="text-xs">
+                                  {exercise.sets} × {exercise.reps}
+                                </Badge>
+                              </div>
+                              <div className="flex items-center gap-3 text-xs text-gray-400">
+                                <span>Rest: {exercise.restSeconds}s</span>
+                              </div>
+                              {exercise.notes && (
+                                <p className="text-xs text-gray-500 mt-1 italic">{exercise.notes}</p>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </Card>

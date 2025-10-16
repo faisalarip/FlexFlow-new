@@ -127,7 +127,7 @@ export const plannedWorkouts = pgTable("planned_workouts", {
   description: text("description"),
   estimatedDuration: integer("estimated_duration").notNull(), // in minutes
   targetCalories: integer("target_calories"),
-  exercises: text("exercises").array().default(sql`ARRAY[]::text[]`), // exercise IDs
+  exercises: jsonb("exercises").default(sql`'[]'::jsonb`), // array of exercise objects with name, sets, reps, notes
   isRestDay: boolean("is_rest_day").default(false),
   completed: boolean("completed").default(false),
   completedAt: timestamp("completed_at"),
