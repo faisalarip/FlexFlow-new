@@ -38,6 +38,7 @@ export default function MealPlans() {
   const [showAIDialog, setShowAIDialog] = useState(false);
   const [showFoodPreferences, setShowFoodPreferences] = useState(false);
   const [expandedIngredients, setExpandedIngredients] = useState<Set<string>>(new Set());
+  const [activeTab, setActiveTab] = useState<string>("plans");
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -233,7 +234,7 @@ export default function MealPlans() {
         </div>
 
         {/* Main Tabs */}
-        <Tabs defaultValue="plans" className="space-y-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid w-full grid-cols-3 max-w-2xl mx-auto">
             <TabsTrigger value="plans">Available Plans</TabsTrigger>
             <TabsTrigger value="current">My Current Plan</TabsTrigger>
@@ -712,10 +713,10 @@ export default function MealPlans() {
                     You don't have an active meal plan yet. Browse our meal plans or create a personalized one based on your food preferences.
                   </p>
                   <div className="space-x-3">
-                    <Button onClick={() => setShowAIDialog(true)}>
+                    <Button onClick={() => setShowAIDialog(true)} data-testid="button-generate-ai-plan">
                       Generate AI Plan
                     </Button>
-                    <Button variant="outline" onClick={() => document.querySelector('[value="preferences"]')?.click()}>
+                    <Button variant="outline" onClick={() => setActiveTab("preferences")} data-testid="button-set-food-preferences">
                       Set Food Preferences
                     </Button>
                   </div>
