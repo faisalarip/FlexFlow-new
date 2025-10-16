@@ -33,7 +33,6 @@ const mealPlanGenerationSchema = z.object({
 type MealPlanGenerationForm = z.infer<typeof mealPlanGenerationSchema>;
 
 export default function MealPlans() {
-  const [selectedGoal, setSelectedGoal] = useState<string>("all");
   const [selectedPlan, setSelectedPlan] = useState<MealPlanWithDetails | null>(null);
   const [selectedDay, setSelectedDay] = useState(1);
   const [showAIDialog, setShowAIDialog] = useState(false);
@@ -171,9 +170,7 @@ export default function MealPlans() {
     }
   });
 
-  const filteredPlans = selectedGoal === "all" 
-    ? mealPlans 
-    : mealPlans.filter(plan => plan.goal === selectedGoal);
+  const filteredPlans = mealPlans;
 
   const getGoalIcon = (goal: string) => {
     switch (goal) {
@@ -459,17 +456,6 @@ export default function MealPlans() {
             </CardContent>
           </Card>
         )}
-
-        {/* Goal Filter */}
-        <div className="mb-6">
-          <Tabs value={selectedGoal} onValueChange={setSelectedGoal}>
-            <TabsList className="grid w-full grid-cols-3 max-w-md">
-              <TabsTrigger value="all">All Plans</TabsTrigger>
-              <TabsTrigger value="weight_loss">Weight Loss</TabsTrigger>
-              <TabsTrigger value="weight_gain">Weight Gain</TabsTrigger>
-            </TabsList>
-          </Tabs>
-        </div>
 
         {/* Meal Plans Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
