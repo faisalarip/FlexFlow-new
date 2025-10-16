@@ -35,12 +35,12 @@ export default function ProgressPhotos() {
   const queryClient = useQueryClient();
 
   // Fetch progress photos
-  const { data: photos = [], isLoading: photosLoading } = useQuery({
+  const { data: photos = [], isLoading: photosLoading } = useQuery<ProgressPhotoWithWorkout[]>({
     queryKey: ["/api/progress-photos"],
   });
 
   // Fetch workouts for selection
-  const { data: workouts = [] } = useQuery({
+  const { data: workouts = [] } = useQuery<Workout[]>({
     queryKey: ["/api/workouts"],
   });
 
