@@ -27,6 +27,7 @@ export default function ProgressPhotos() {
   const [viewMode, setViewMode] = useState<"grid" | "comparison">("grid");
   const [currentComparisonIndex, setCurrentComparisonIndex] = useState(0);
   const [isLoadingCamera, setIsLoadingCamera] = useState(false);
+  const [selectedPhotoForView, setSelectedPhotoForView] = useState<ProgressPhotoWithWorkout | null>(null);
   
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -341,7 +342,7 @@ export default function ProgressPhotos() {
   }
 
   const renderGridView = () => (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
       {photos.length === 0 ? (
         <div className="col-span-full text-center py-12">
           <Camera className="mx-auto h-12 w-12 text-gray-400 mb-4" />
@@ -360,15 +361,21 @@ export default function ProgressPhotos() {
         </div>
       ) : (
         photos.map((photo: ProgressPhotoWithWorkout) => (
-          <Card key={photo.id} className="overflow-hidden bg-gradient-to-br from-gray-900 to-black border border-red-600/30 shadow-xl shadow-red-500/10" data-testid={`card-photo-${photo.id}`}>
+          <Card key={photo.id} className="overflow-hidden bg-gradient-to-br from-gray-900 to-black border border-red-600/30 shadow-xl shadow-red-500/10 cursor-pointer hover:border-red-500/50 transition-all" data-testid={`card-photo-${photo.id}`}>
             {photo.imageUrl && (
-              <div className="aspect-square overflow-hidden">
+              <div 
+                className="aspect-square overflow-hidden relative group"
+                onClick={() => setSelectedPhotoForView(photo)}
+              >
                 <img
                   src={photo.imageUrl}
                   alt={photo.notes || 'Progress photo'}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover transition-transform group-hover:scale-105"
                   data-testid={`img-photo-${photo.id}`}
                 />
+                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <Eye className="w-8 h-8 text-white" />
+                </div>
               </div>
             )}
             
@@ -883,6 +890,81 @@ export default function ProgressPhotos() {
         {/* Main Content */}
         {viewMode === "grid" ? renderGridView() : renderComparisonView()}
       </div>
+
+      {/* Full-size Photo Viewer Dialog */}
+      <Dialog open={!!selectedPhotoForView} onOpenChange={(open) => !open && setSelectedPhotoForView(null)}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-black/95 border-red-600/30">
+          {selectedPhotoForView && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2 text-white">
+                  <Badge
+                    variant={selectedPhotoForView.photoType === 'before' ? 'secondary' : 'default'}
+                    className={selectedPhotoForView.photoType === 'before' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'}
+                  >
+                    {selectedPhotoForView.photoType === 'before' ? 'Before' : 'After'}
+                  </Badge>
+                  {format(new Date(selectedPhotoForView.createdAt), 'MMMM d, yyyy')}
+                </DialogTitle>
+              </DialogHeader>
+              
+              <div className="space-y-4">
+                {/* Full-size image */}
+                {selectedPhotoForView.imageUrl && (
+                  <div className="w-full rounded-lg overflow-hidden border border-red-600/30">
+                    <img
+                      src={selectedPhotoForView.imageUrl}
+                      alt={selectedPhotoForView.notes || 'Progress photo'}
+                      className="w-full h-auto object-contain max-h-[60vh]"
+                    />
+                  </div>
+                )}
+                
+                {/* Photo details */}
+                <div className="space-y-2 text-gray-300">
+                  <div>
+                    <Label className="text-gray-400">Notes</Label>
+                    <p className="text-white mt-1">{selectedPhotoForView.notes || 'No notes'}</p>
+                  </div>
+                  
+                  {selectedPhotoForView.workout && (
+                    <div>
+                      <Label className="text-gray-400">Linked Workout</Label>
+                      <p className="text-white mt-1">{selectedPhotoForView.workout.name}</p>
+                    </div>
+                  )}
+                </div>
+                
+                {/* Action buttons */}
+                <div className="flex gap-2 pt-4">
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      handleEditPhoto(selectedPhotoForView);
+                      setSelectedPhotoForView(null);
+                    }}
+                    className="flex-1"
+                  >
+                    <Edit3 className="mr-2 h-4 w-4" />
+                    Edit
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      handleDeletePhoto(selectedPhotoForView.id);
+                      setSelectedPhotoForView(null);
+                    }}
+                    className="flex-1 text-red-500 hover:text-red-600 hover:bg-red-600/10"
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Delete
+                  </Button>
+                </div>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
     </FeatureGate>
   );
