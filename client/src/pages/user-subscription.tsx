@@ -237,7 +237,7 @@ export default function UserSubscription() {
               <div>
                 <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Monthly Price</h3>
                 <p className="text-2xl font-bold text-green-600">
-                  {subscriptionData.isFreeTrialActive ? "$0.00" : "$15.00"}
+                  {subscriptionData.isFreeTrialActive ? "$0.00" : "$15.99"}
                 </p>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
                   {subscriptionData.isFreeTrialActive ? "Free trial period" : "Per month"}
@@ -259,7 +259,7 @@ export default function UserSubscription() {
                   <p className="text-lg font-semibold text-gray-900 dark:text-white">
                     {format(new Date(subscriptionData.lastPaymentDate), "MMM d, yyyy")}
                   </p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">$15.00</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">$15.99</p>
                 </div>
               )}
             </div>

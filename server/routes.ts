@@ -2310,7 +2310,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         daysRemaining: user.subscriptionExpiresAt 
           ? Math.max(0, Math.ceil((user.subscriptionExpiresAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)))
           : 0,
-        monthlyFee: 15 // $15 per month for users
+        monthlyFee: 15.99 // $15.99 per month for users
       };
 
       res.json(subscriptionInfo);
@@ -2350,7 +2350,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         subscriptionStatus: "active",
         lastPaymentDate: now,
         subscriptionExpiresAt: nextExpiry,
-        monthlyFee: 15
+        monthlyFee: 15.99
       });
     } catch (error) {
       console.error("Error activating user subscription:", error);
@@ -2422,12 +2422,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         user.subscriptionExpiresAt > new Date()
       );
       
-      const totalMonthlyRevenue = activeUsers.length * 15; // $15 per user
+      const totalMonthlyRevenue = activeUsers.length * 15.99; // $15.99 per user
 
       res.json({
         totalMonthlyRevenue: totalMonthlyRevenue,
         activeUsers: activeUsers.length,
-        monthlyFeePerUser: 15, // $15 per user per month
+        monthlyFeePerUser: 15.99, // $15.99 per user per month
         usersInFreeTrial: users.filter(user => user.subscriptionStatus === "free_trial").length
       });
     } catch (error) {
