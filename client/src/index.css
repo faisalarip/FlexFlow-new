@@ -140,3 +140,19 @@
 .font-inter {
   font-family: 'Inter', sans-serif;
 }
+
+/* Fix Uppy Dashboard Modal scrolling */
+.uppy-Dashboard-inner {
+  max-height: 90vh !important;
+  overflow-y: auto !important;
+}
+
+.uppy-Dashboard-AddFiles {
+  max-height: calc(90vh - 120px) !important;
+  overflow-y: auto !important;
+}
+
+.uppy-Dashboard-files {
+  max-height: calc(90vh - 200px) !important;
+  overflow-y: auto !important;
+}
