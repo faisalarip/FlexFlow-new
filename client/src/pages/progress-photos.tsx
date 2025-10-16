@@ -180,37 +180,27 @@ export default function ProgressPhotos() {
   });
 
   const startCamera = useCallback(async () => {
-    console.log("🎥 startCamera function called");
     setIsLoadingCamera(true);
-    console.log("✅ isLoadingCamera set to true");
     
     try {
       // Check if mediaDevices is available
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        console.error("❌ Camera not supported - mediaDevices not available");
         throw new Error("Camera not supported on this device");
       }
 
-      console.log("📸 Requesting camera access...");
       const stream = await navigator.mediaDevices.getUserMedia({ 
         video: { facingMode: 'user', width: 640, height: 480 } 
       });
       
-      console.log("✅ Camera stream obtained", stream);
-      
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         setIsCameraActive(true);
-        console.log("✅ Camera activated and videoRef set");
         toast({
           title: "Camera Ready",
           description: "Camera activated successfully!",
         });
-      } else {
-        console.error("❌ videoRef.current is null");
       }
     } catch (error: any) {
-      console.error("❌ Error accessing camera:", error);
       let errorMessage = "Unable to access camera.";
       
       if (error.name === "NotAllowedError" || error.name === "PermissionDeniedError") {
@@ -229,7 +219,6 @@ export default function ProgressPhotos() {
         variant: "destructive",
       });
     } finally {
-      console.log("🔄 Finally block - setting isLoadingCamera to false");
       setIsLoadingCamera(false);
     }
   }, [toast]);
@@ -773,8 +762,10 @@ export default function ProgressPhotos() {
                   {!capturedImage && !isCameraActive && (
                     <div className="flex gap-4">
                       <Button
-                        onClick={() => {
-                          console.log("🖱️ Take Photo button clicked");
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
                           startCamera();
                         }}
                         variant="outline"
@@ -795,7 +786,11 @@ export default function ProgressPhotos() {
                         )}
                       </Button>
                       <Button
-                        onClick={() => fileInputRef.current?.click()}
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          fileInputRef.current?.click();
+                        }}
                         variant="outline"
                         className="flex-1"
                         data-testid="button-upload-photo"
@@ -827,6 +822,7 @@ export default function ProgressPhotos() {
                       </div>
                       <div className="flex gap-4">
                         <Button
+                          type="button"
                           onClick={capturePhoto}
                           className="flex-1 bg-red-600 hover:bg-red-700"
                           data-testid="button-capture-photo"
@@ -835,6 +831,7 @@ export default function ProgressPhotos() {
                           Capture
                         </Button>
                         <Button
+                          type="button"
                           onClick={stopCamera}
                           variant="outline"
                           className="flex-1"
@@ -859,6 +856,7 @@ export default function ProgressPhotos() {
                         />
                       </div>
                       <Button
+                        type="button"
                         onClick={() => setCapturedImage(null)}
                         variant="outline"
                         className="w-full"
@@ -920,6 +918,7 @@ export default function ProgressPhotos() {
               
               <DialogFooter>
                 <Button
+                  type="button"
                   onClick={() => setIsDialogOpen(false)}
                   variant="outline"
                   data-testid="button-cancel-photo"
@@ -927,6 +926,7 @@ export default function ProgressPhotos() {
                   Cancel
                 </Button>
                 <Button
+                  type="button"
                   onClick={handleSavePhoto}
                   disabled={createPhotoMutation.isPending}
                   className="bg-red-600 hover:bg-red-700"
