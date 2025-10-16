@@ -26,6 +26,7 @@ export default function ProgressPhotos() {
   const [editingPhoto, setEditingPhoto] = useState<ProgressPhotoWithWorkout | null>(null);
   const [viewMode, setViewMode] = useState<"grid" | "comparison">("grid");
   const [currentComparisonIndex, setCurrentComparisonIndex] = useState(0);
+  const [isLoadingCamera, setIsLoadingCamera] = useState(false);
   
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -179,21 +180,46 @@ export default function ProgressPhotos() {
   });
 
   const startCamera = useCallback(async () => {
+    setIsLoadingCamera(true);
     try {
+      // Check if mediaDevices is available
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error("Camera not supported on this device");
+      }
+
       const stream = await navigator.mediaDevices.getUserMedia({ 
         video: { facingMode: 'user', width: 640, height: 480 } 
       });
+      
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         setIsCameraActive(true);
+        toast({
+          title: "Camera Ready",
+          description: "Camera activated successfully!",
+        });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error accessing camera:", error);
+      let errorMessage = "Unable to access camera.";
+      
+      if (error.name === "NotAllowedError" || error.name === "PermissionDeniedError") {
+        errorMessage = "Camera access denied. Please allow camera permissions in your browser settings.";
+      } else if (error.name === "NotFoundError") {
+        errorMessage = "No camera found on this device.";
+      } else if (error.name === "NotReadableError") {
+        errorMessage = "Camera is already in use by another application.";
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
       toast({
         title: "Camera Error",
-        description: "Unable to access camera. Please check permissions.",
+        description: errorMessage,
         variant: "destructive",
       });
+    } finally {
+      setIsLoadingCamera(false);
     }
   }, [toast]);
 
@@ -720,7 +746,7 @@ export default function ProgressPhotos() {
                 Add Photo
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-2xl">
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Add Progress Photo</DialogTitle>
                 <DialogDescription>
@@ -739,10 +765,20 @@ export default function ProgressPhotos() {
                         onClick={startCamera}
                         variant="outline"
                         className="flex-1"
+                        disabled={isLoadingCamera}
                         data-testid="button-start-camera"
                       >
-                        <Camera className="mr-2 h-4 w-4" />
-                        Take Photo
+                        {isLoadingCamera ? (
+                          <>
+                            <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600" />
+                            Starting Camera...
+                          </>
+                        ) : (
+                          <>
+                            <Camera className="mr-2 h-4 w-4" />
+                            Take Photo
+                          </>
+                        )}
                       </Button>
                       <Button
                         onClick={() => fileInputRef.current?.click()}
