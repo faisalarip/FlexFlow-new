@@ -49,7 +49,7 @@ export default function Navbar() {
     },
     { 
       path: "/meal-tracker", 
-      label: "Meal Tracker", 
+      label: "Professional Barcode Scanner", 
       icon: Apple 
     },
     { 

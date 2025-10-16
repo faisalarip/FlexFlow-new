@@ -28,7 +28,7 @@ const FEATURE_INFO = {
     icon: <Crown className="w-5 h-5" />
   },
   meal_tracker: {
-    name: "Meal Tracker",
+    name: "Professional Barcode Scanner",
     description: "Log and analyze your meals with AI-powered nutrition tracking",
     icon: <Crown className="w-5 h-5" />
   },
