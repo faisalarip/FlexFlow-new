@@ -20,7 +20,7 @@ export default function ProgressPhotos() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isCameraActive, setIsCameraActive] = useState(false);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
-  const [photoDescription, setPhotoDescription] = useState("");
+  const [photoNotes, setPhotoNotes] = useState("");
   const [selectedWorkoutId, setSelectedWorkoutId] = useState<string | undefined>();
   const [photoType, setPhotoType] = useState<"before" | "after">("before");
   const [editingPhoto, setEditingPhoto] = useState<ProgressPhotoWithWorkout | null>(null);
@@ -114,11 +114,8 @@ export default function ProgressPhotos() {
 
   // Create progress photo mutation
   const createPhotoMutation = useMutation({
-    mutationFn: async (data: { description: string; workoutId?: string; photoType: string; imageUrl?: string }) => {
-      return apiRequest("/api/progress-photos", {
-        method: "POST",
-        body: data,
-      });
+    mutationFn: async (data: { notes: string; workoutId?: string; photoType: string; imageUrl?: string }) => {
+      await apiRequest("POST", "/api/progress-photos", data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/progress-photos"] });
@@ -141,10 +138,7 @@ export default function ProgressPhotos() {
   // Update progress photo mutation
   const updatePhotoMutation = useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: any }) => {
-      return apiRequest(`/api/progress-photos/${id}`, {
-        method: "PUT",
-        body: updates,
-      });
+      await apiRequest("PUT", `/api/progress-photos/${id}`, updates);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/progress-photos"] });
@@ -166,9 +160,7 @@ export default function ProgressPhotos() {
   // Delete progress photo mutation
   const deletePhotoMutation = useMutation({
     mutationFn: async (id: string) => {
-      return apiRequest(`/api/progress-photos/${id}`, {
-        method: "DELETE",
-      });
+      await apiRequest("DELETE", `/api/progress-photos/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/progress-photos"] });
@@ -245,7 +237,7 @@ export default function ProgressPhotos() {
 
   const resetForm = () => {
     setCapturedImage(null);
-    setPhotoDescription("");
+    setPhotoNotes("");
     setSelectedWorkoutId(undefined);
     setPhotoType("before");
     stopCamera();
@@ -264,10 +256,10 @@ export default function ProgressPhotos() {
       return;
     }
 
-    if (!photoDescription.trim()) {
+    if (!photoNotes.trim()) {
       toast({
         title: "Error",
-        description: "Please add a description for your progress photo.",
+        description: "Please add notes for your progress photo.",
         variant: "destructive",
       });
       return;
@@ -277,7 +269,7 @@ export default function ProgressPhotos() {
       // For now, we'll save without uploading to object storage
       // In a real implementation, you'd upload the image first
       createPhotoMutation.mutate({
-        description: photoDescription,
+        notes: photoNotes,
         workoutId: selectedWorkoutId,
         photoType,
         imageUrl: capturedImage, // This would be the uploaded URL in production
@@ -297,7 +289,7 @@ export default function ProgressPhotos() {
     updatePhotoMutation.mutate({
       id: editingPhoto.id,
       updates: {
-        description: editingPhoto.description,
+        notes: editingPhoto.notes,
         photoType: editingPhoto.photoType,
       },
     });
@@ -347,7 +339,7 @@ export default function ProgressPhotos() {
               <div className="aspect-square overflow-hidden">
                 <img
                   src={photo.imageUrl}
-                  alt={photo.description}
+                  alt={photo.notes || 'Progress photo'}
                   className="w-full h-full object-cover"
                   data-testid={`img-photo-${photo.id}`}
                 />
@@ -391,10 +383,10 @@ export default function ProgressPhotos() {
               {editingPhoto?.id === photo.id ? (
                 <div className="space-y-3">
                   <Textarea
-                    value={editingPhoto.description}
-                    onChange={(e) => setEditingPhoto({ ...editingPhoto, description: e.target.value })}
+                    value={editingPhoto.notes || ''}
+                    onChange={(e) => setEditingPhoto({ ...editingPhoto, notes: e.target.value })}
                     className="text-sm"
-                    data-testid={`input-edit-description-${photo.id}`}
+                    data-testid={`input-edit-notes-${photo.id}`}
                   />
                   <Select
                     value={editingPhoto.photoType}
@@ -435,8 +427,8 @@ export default function ProgressPhotos() {
                 </div>
               ) : (
                 <div>
-                  <p className="text-sm text-gray-200 mb-2" data-testid={`text-description-${photo.id}`}>
-                    {photo.description}
+                  <p className="text-sm text-gray-200 mb-2" data-testid={`text-notes-${photo.id}`}>
+                    {photo.notes}
                   </p>
                   {photo.workout && (
                     <p className="text-xs text-gray-400 mb-1" data-testid={`text-workout-${photo.id}`}>
@@ -536,15 +528,15 @@ export default function ProgressPhotos() {
                         <div className="aspect-square overflow-hidden rounded-lg border-2 border-blue-200">
                           <img
                             src={comparisonPairs[currentComparisonIndex].before!.imageUrl}
-                            alt={comparisonPairs[currentComparisonIndex].before!.description}
+                            alt={comparisonPairs[currentComparisonIndex].before!.notes || 'Before photo'}
                             className="w-full h-full object-cover"
                             data-testid="img-before-comparison"
                           />
                         </div>
                       )}
                       <div className="text-center space-y-2">
-                        <p className="text-sm text-gray-200" data-testid="text-before-description">
-                          {comparisonPairs[currentComparisonIndex].before!.description}
+                        <p className="text-sm text-gray-200" data-testid="text-before-notes">
+                          {comparisonPairs[currentComparisonIndex].before!.notes}
                         </p>
                         <p className="text-xs text-gray-400" data-testid="text-before-date">
                           {format(new Date(comparisonPairs[currentComparisonIndex].before!.createdAt), 'MMM d, yyyy')}
@@ -574,15 +566,15 @@ export default function ProgressPhotos() {
                         <div className="aspect-square overflow-hidden rounded-lg border-2 border-green-200">
                           <img
                             src={comparisonPairs[currentComparisonIndex].after!.imageUrl}
-                            alt={comparisonPairs[currentComparisonIndex].after!.description}
+                            alt={comparisonPairs[currentComparisonIndex].after!.notes || 'After photo'}
                             className="w-full h-full object-cover"
                             data-testid="img-after-comparison"
                           />
                         </div>
                       )}
                       <div className="text-center space-y-2">
-                        <p className="text-sm text-gray-200" data-testid="text-after-description">
-                          {comparisonPairs[currentComparisonIndex].after!.description}
+                        <p className="text-sm text-gray-200" data-testid="text-after-notes">
+                          {comparisonPairs[currentComparisonIndex].after!.notes}
                         </p>
                         <p className="text-xs text-gray-400" data-testid="text-after-date">
                           {format(new Date(comparisonPairs[currentComparisonIndex].after!.createdAt), 'MMM d, yyyy')}
@@ -834,14 +826,14 @@ export default function ProgressPhotos() {
                 {/* Form Fields */}
                 <div className="space-y-4">
                   <div>
-                    <Label htmlFor="photo-description">Description</Label>
+                    <Label htmlFor="photo-notes">Notes</Label>
                     <Textarea
-                      id="photo-description"
-                      placeholder="Describe your progress, goals, or what this photo represents..."
-                      value={photoDescription}
-                      onChange={(e) => setPhotoDescription(e.target.value)}
+                      id="photo-notes"
+                      placeholder="Add notes about your progress, goals, or what this photo represents..."
+                      value={photoNotes}
+                      onChange={(e) => setPhotoNotes(e.target.value)}
                       className="mt-1"
-                      data-testid="input-photo-description"
+                      data-testid="input-photo-notes"
                     />
                   </div>
                   
