@@ -85,12 +85,25 @@ function generateMockMealPlan(options: MealPlanGenerationOptions): GeneratedMeal
     maintenance: "A well-balanced meal plan to maintain your current weight while supporting overall health and wellness."
   };
 
-  // Create diverse meal database with various options
-  const proteinFoods = ["Chicken breast", "Salmon", "Eggs", "Greek yogurt", "Tofu", "Lentils", "Chickpeas", "Turkey", "Cottage cheese", "Quinoa"];
-  const carbFoods = ["Brown rice", "Quinoa", "Oats", "Sweet potato", "Whole grain bread", "Pasta", "Barley", "Buckwheat"];
-  const vegetables = ["Broccoli", "Spinach", "Bell peppers", "Carrots", "Tomatoes", "Cucumber", "Kale", "Zucchini", "Brussels sprouts"];
-  const fruits = ["Berries", "Apple", "Banana", "Orange", "Avocado", "Grapes", "Mango", "Pineapple"];
-  const fats = ["Olive oil", "Almonds", "Walnuts", "Seeds", "Avocado oil", "Coconut oil"];
+  // Create diverse meal database with goal-specific options
+  const weightLossProteins = ["Chicken breast", "White fish", "Egg whites", "Non-fat Greek yogurt", "Tofu", "Shrimp", "Turkey breast", "Cottage cheese"];
+  const weightGainProteins = ["Salmon", "Whole eggs", "Full-fat Greek yogurt", "Beef", "Pork", "Chicken thighs", "Cheese", "Whole milk"];
+  const maintenanceProteins = ["Chicken breast", "Salmon", "Eggs", "Greek yogurt", "Tofu", "Lentils", "Chickpeas", "Turkey"];
+  
+  const weightLossCarbsFoods = ["Cauliflower rice", "Zucchini noodles", "Lettuce wraps", "Quinoa (small portions)", "Berries", "Vegetables"];
+  const weightGainCarbsFoods = ["Brown rice", "Pasta", "Oats", "Sweet potato", "Whole grain bread", "Bagels", "Granola", "Dried fruits"];
+  const maintenanceCarbsFoods = ["Brown rice", "Quinoa", "Oats", "Sweet potato", "Whole grain bread", "Pasta", "Barley"];
+  
+  const vegetables = ["Broccoli", "Spinach", "Bell peppers", "Carrots", "Tomatoes", "Cucumber", "Kale", "Zucchini", "Brussels sprouts", "Asparagus", "Green beans", "Mushrooms"];
+  const fruits = ["Berries", "Apple", "Banana", "Orange", "Avocado", "Grapes", "Mango", "Pineapple", "Peach", "Kiwi"];
+  const weightGainFats = ["Peanut butter", "Almond butter", "Avocado", "Nuts", "Seeds", "Olive oil", "Coconut oil", "Full-fat dairy"];
+  const weightLossFats = ["Light olive oil spray", "Small portions of nuts", "Avocado (limited)", "Seeds (limited)"];
+  const maintenanceFats = ["Olive oil", "Avocado", "Nuts", "Seeds", "Nut butters (moderate)"];
+  
+  // Select appropriate food lists based on goal
+  const proteinFoods = goal === 'weight_loss' ? weightLossProteins : goal === 'weight_gain' ? weightGainProteins : maintenanceProteins;
+  const carbFoods = goal === 'weight_loss' ? weightLossCarbsFoods : goal === 'weight_gain' ? weightGainCarbsFoods : maintenanceCarbsFoods;
+  const fats = goal === 'weight_loss' ? weightLossFats : goal === 'weight_gain' ? weightGainFats : maintenanceFats;
 
   // Filter foods based on preferences
   const likedFoods = preferences.map(p => p.toLowerCase());
@@ -143,58 +156,195 @@ function generateMockMealPlan(options: MealPlanGenerationOptions): GeneratedMeal
     const veggie = availableVeggies[veggieIndex] || "Mixed vegetables";
     const fruit = availableFruits[fruitIndex] || "Berries";
 
-    const mealTemplates = {
-      breakfast: [
-        {
-          name: `${protein} and ${fruit} Bowl`,
-          description: `Nutritious breakfast with ${protein.toLowerCase()} and fresh ${fruit.toLowerCase()}`,
-          ingredients: [protein, fruit, carb === "Oats" ? "Oats" : "Whole grain toast", "Almond milk", "Honey"],
-          instructions: ["Prepare base ingredients", "Add toppings", "Serve fresh"]
-        },
-        {
-          name: `${fruit} ${carb} Parfait`,
-          description: `Layered breakfast with ${fruit.toLowerCase()} and ${carb.toLowerCase()}`,
-          ingredients: [fruit, carb, protein, "Nuts", "Greek yogurt alternative"],
-          instructions: ["Layer ingredients", "Add nuts on top", "Enjoy immediately"]
+    // Goal-specific meal templates with maximum variety
+    const mealTemplates = goal === 'weight_loss' 
+      ? {
+          breakfast: [
+            {
+              name: `${protein} Egg White Scramble`,
+              description: `High-protein, low-calorie breakfast with ${protein.toLowerCase()} and vegetables`,
+              ingredients: [protein, veggie, "Spinach", "Mushrooms", "Herbs"],
+              instructions: ["Cook protein", "Add vegetables", "Season lightly", "Serve hot"]
+            },
+            {
+              name: `Greek Yogurt Berry Bowl`,
+              description: `Protein-rich breakfast with fresh berries and minimal added sugar`,
+              ingredients: ["Non-fat Greek yogurt", fruit, "Chia seeds", "Cinnamon"],
+              instructions: ["Layer yogurt", "Top with berries", "Add seeds", "Enjoy fresh"]
+            },
+            {
+              name: `Veggie Omelet with ${protein}`,
+              description: `Fluffy egg white omelet loaded with colorful vegetables`,
+              ingredients: ["Egg whites", veggie, "Tomatoes", "Onions", "Bell peppers", "Herbs"],
+              instructions: ["Whisk egg whites", "Add vegetables", "Cook until fluffy", "Serve immediately"]
+            },
+            {
+              name: `Cottage Cheese ${fruit} Parfait`,
+              description: `Light and refreshing breakfast parfait`,
+              ingredients: ["Low-fat cottage cheese", fruit, "Stevia", "Vanilla extract", "Berries"],
+              instructions: ["Layer cottage cheese", "Add fruits", "Top with berries", "Enjoy cold"]
+            },
+            {
+              name: `Green Smoothie Bowl`,
+              description: `Nutrient-packed smoothie bowl with leafy greens`,
+              ingredients: ["Spinach", "Kale", fruit, "Protein powder", "Almond milk", "Ice"],
+              instructions: ["Blend all ingredients", "Pour into bowl", "Top with seeds", "Serve fresh"]
+            },
+            {
+              name: `Zucchini Egg Muffins`,
+              description: `Portable, low-calorie breakfast muffins`,
+              ingredients: ["Egg whites", "Zucchini", veggie, "Garlic", "Herbs"],
+              instructions: ["Mix ingredients", "Pour into muffin tin", "Bake until set", "Enjoy warm"]
+            },
+            {
+              name: `${fruit} Chia Pudding`,
+              description: `Overnight chia pudding with fresh fruits`,
+              ingredients: ["Chia seeds", "Unsweetened almond milk", fruit, "Vanilla", "Stevia"],
+              instructions: ["Mix chia and milk", "Refrigerate overnight", "Top with fruit", "Serve cold"]
+            }
+          ],
+          lunch: [
+            {
+              name: `Grilled ${protein} Salad Bowl`,
+              description: `Large volume salad with lean ${protein.toLowerCase()} and colorful vegetables`,
+              ingredients: [protein, veggie, "Mixed greens", "Tomatoes", "Cucumber", "Balsamic vinegar"],
+              instructions: ["Grill protein", "Toss salad", "Top with protein", "Light dressing"]
+            },
+            {
+              name: `Vegetable-Packed ${protein} Wrap`,
+              description: `Lettuce wrap loaded with ${protein.toLowerCase()} and vegetables`,
+              ingredients: [protein, veggie, "Lettuce leaves", "Bell peppers", "Mustard"],
+              instructions: ["Prepare protein", "Fill lettuce leaves", "Add veggies", "Roll and serve"]
+            }
+          ],
+          dinner: [
+            {
+              name: `Baked ${protein} with Roasted Vegetables`,
+              description: `Simple, lean dinner with ${protein.toLowerCase()} and nutrient-dense vegetables`,
+              ingredients: [protein, veggie, "Broccoli", "Cauliflower", "Herbs", "Lemon"],
+              instructions: ["Bake protein", "Roast vegetables", "Season with herbs", "Serve immediately"]
+            },
+            {
+              name: `Vegetable Stir-Fry with ${protein}`,
+              description: `Low-calorie stir-fry packed with vegetables and lean ${protein.toLowerCase()}`,
+              ingredients: [protein, veggie, "Snap peas", "Water chestnuts", "Soy sauce (low sodium)"],
+              instructions: ["Stir-fry vegetables", "Add protein", "Light sauce", "Serve hot"]
+            }
+          ],
+          snack: [
+            {
+              name: `${fruit} with Cottage Cheese`,
+              description: `High-protein, low-calorie snack`,
+              ingredients: [fruit, "Low-fat cottage cheese", "Cinnamon"],
+              instructions: ["Combine ingredients", "Enjoy fresh"]
+            }
+          ]
         }
-      ],
-      lunch: [
-        {
-          name: `${protein} and ${veggie} ${carb} Bowl`,
-          description: `Power lunch bowl with ${protein.toLowerCase()}, ${veggie.toLowerCase()}, and ${carb.toLowerCase()}`,
-          ingredients: [protein, veggie, carb, "Olive oil", "Lemon", "Herbs"],
-          instructions: ["Cook protein and grain", "Prepare vegetables", "Combine with dressing"]
-        },
-        {
-          name: `Mediterranean ${protein} Salad`,
-          description: `Fresh Mediterranean salad featuring ${protein.toLowerCase()}`,
-          ingredients: [protein, veggie, "Mixed greens", "Cucumber", "Olive oil", "Lemon"],
-          instructions: ["Prepare protein", "Mix salad ingredients", "Dress and serve"]
+      : goal === 'weight_gain'
+      ? {
+          breakfast: [
+            {
+              name: `Protein Pancakes with ${fruit}`,
+              description: `Calorie-dense breakfast with protein pancakes, ${fruit.toLowerCase()}, and nut butter`,
+              ingredients: ["Whole eggs", carb, fruit, "Peanut butter", "Honey", "Granola"],
+              instructions: ["Make protein pancakes", "Top with nut butter", "Add fruit and granola", "Drizzle honey"]
+            },
+            {
+              name: `Overnight Oats Power Bowl`,
+              description: `Energy-dense oats with nuts, seeds, and dried fruits`,
+              ingredients: ["Oats", "Whole milk", fruit, "Almonds", "Chia seeds", "Honey", "Dried fruits"],
+              instructions: ["Mix oats and milk", "Add nuts and seeds", "Top with fruits", "Refrigerate overnight"]
+            }
+          ],
+          lunch: [
+            {
+              name: `${protein} Rice Bowl with Avocado`,
+              description: `Calorie-rich bowl with ${protein.toLowerCase()}, rice, and healthy fats`,
+              ingredients: [protein, carb, "Avocado", "Cheese", "Olive oil", veggie],
+              instructions: ["Cook rice", "Prepare protein", "Add avocado and cheese", "Drizzle with oil"]
+            },
+            {
+              name: `Loaded ${protein} Sandwich`,
+              description: `High-calorie sandwich with ${protein.toLowerCase()}, cheese, and spreads`,
+              ingredients: [protein, "Whole grain bread", "Cheese", "Avocado", "Mayo", veggie],
+              instructions: ["Toast bread", "Layer protein and cheese", "Add spreads", "Pack with veggies"]
+            }
+          ],
+          dinner: [
+            {
+              name: `${protein} Pasta with Creamy Sauce`,
+              description: `Energy-dense pasta dish with ${protein.toLowerCase()} and rich sauce`,
+              ingredients: [protein, "Pasta", "Heavy cream", "Parmesan cheese", veggie, "Olive oil"],
+              instructions: ["Cook pasta", "Prepare protein", "Make creamy sauce", "Combine and serve"]
+            },
+            {
+              name: `${protein} and Sweet Potato Bowl`,
+              description: `Hearty bowl with ${protein.toLowerCase()}, roasted sweet potatoes, and tahini`,
+              ingredients: [protein, "Sweet potato", "Chickpeas", "Tahini", "Olive oil", veggie],
+              instructions: ["Roast sweet potato", "Cook protein", "Drizzle tahini", "Serve with veggies"]
+            }
+          ],
+          snack: [
+            {
+              name: `Trail Mix with ${fruit}`,
+              description: `Calorie-dense snack with nuts, seeds, and dried fruits`,
+              ingredients: ["Mixed nuts", "Dried fruits", fruit, "Dark chocolate chips", "Granola"],
+              instructions: ["Mix all ingredients", "Store in container", "Enjoy anytime"]
+            }
+          ]
         }
-      ],
-      dinner: [
-        {
-          name: `Herb-Crusted ${protein} with ${carb}`,
-          description: `Flavorful dinner featuring ${protein.toLowerCase()} with ${carb.toLowerCase()}`,
-          ingredients: [protein, carb, veggie, "Herbs", "Garlic", "Olive oil"],
-          instructions: ["Season and cook protein", "Prepare grain", "Steam vegetables", "Combine and serve"]
-        },
-        {
-          name: `${veggie} and ${protein} Stir-Fry`,
-          description: `Quick and healthy stir-fry with ${veggie.toLowerCase()} and ${protein.toLowerCase()}`,
-          ingredients: [protein, veggie, carb, "Soy sauce", "Ginger", "Garlic"],
-          instructions: ["Heat pan", "Stir-fry ingredients", "Season to taste", "Serve hot"]
-        }
-      ],
-      snack: [
-        {
-          name: `${fruit} with Protein`,
-          description: `Simple and nutritious snack`,
-          ingredients: [fruit, protein === "Greek yogurt" ? "Greek yogurt" : "Nuts", "Honey"],
-          instructions: ["Combine ingredients", "Enjoy fresh"]
-        }
-      ]
-    };
+      : {
+          breakfast: [
+            {
+              name: `${protein} and ${fruit} Bowl`,
+              description: `Balanced breakfast with ${protein.toLowerCase()} and fresh ${fruit.toLowerCase()}`,
+              ingredients: [protein, fruit, carb, "Almond milk", "Honey"],
+              instructions: ["Prepare base ingredients", "Add toppings", "Serve fresh"]
+            },
+            {
+              name: `${fruit} ${carb} Parfait`,
+              description: `Layered breakfast with ${fruit.toLowerCase()} and ${carb.toLowerCase()}`,
+              ingredients: [fruit, carb, protein, "Nuts", "Greek yogurt"],
+              instructions: ["Layer ingredients", "Add nuts on top", "Enjoy immediately"]
+            }
+          ],
+          lunch: [
+            {
+              name: `${protein} and ${veggie} ${carb} Bowl`,
+              description: `Balanced lunch bowl with ${protein.toLowerCase()}, ${veggie.toLowerCase()}, and ${carb.toLowerCase()}`,
+              ingredients: [protein, veggie, carb, "Olive oil", "Lemon", "Herbs"],
+              instructions: ["Cook protein and grain", "Prepare vegetables", "Combine with dressing"]
+            },
+            {
+              name: `Mediterranean ${protein} Salad`,
+              description: `Fresh Mediterranean salad featuring ${protein.toLowerCase()}`,
+              ingredients: [protein, veggie, "Mixed greens", "Cucumber", "Olive oil", "Lemon"],
+              instructions: ["Prepare protein", "Mix salad ingredients", "Dress and serve"]
+            }
+          ],
+          dinner: [
+            {
+              name: `Herb-Crusted ${protein} with ${carb}`,
+              description: `Flavorful dinner featuring ${protein.toLowerCase()} with ${carb.toLowerCase()}`,
+              ingredients: [protein, carb, veggie, "Herbs", "Garlic", "Olive oil"],
+              instructions: ["Season and cook protein", "Prepare grain", "Steam vegetables", "Combine and serve"]
+            },
+            {
+              name: `${veggie} and ${protein} Stir-Fry`,
+              description: `Quick and healthy stir-fry with ${veggie.toLowerCase()} and ${protein.toLowerCase()}`,
+              ingredients: [protein, veggie, carb, "Soy sauce", "Ginger", "Garlic"],
+              instructions: ["Heat pan", "Stir-fry ingredients", "Season to taste", "Serve hot"]
+            }
+          ],
+          snack: [
+            {
+              name: `${fruit} with Protein`,
+              description: `Simple and nutritious snack`,
+              ingredients: [fruit, protein === "Greek yogurt" ? "Greek yogurt" : "Nuts", "Honey"],
+              instructions: ["Combine ingredients", "Enjoy fresh"]
+            }
+          ]
+        };
 
     const templates = mealTemplates[mealType as keyof typeof mealTemplates];
     const template = templates[dayIndex % templates.length];
@@ -335,10 +485,32 @@ ${dietaryRestrictions.length > 0 ? `Dietary Restrictions: ${dietaryRestrictions.
 ${allergies.length > 0 ? `Allergies: ${allergies.join(', ')}` : ''}
 ${preferences.length > 0 ? `Preferences: ${preferences.join(', ')}` : ''}
 
-Guidelines based on goal:
-${goal === 'weight_loss' ? '- Focus on high protein, moderate carbs, healthy fats\n- Include plenty of vegetables and lean proteins\n- Emphasize satiety and nutrient density' : ''}
-${goal === 'weight_gain' ? '- Include calorie-dense, nutritious foods\n- Focus on healthy weight gain with adequate protein\n- Include healthy fats and complex carbohydrates' : ''}
-${goal === 'maintenance' ? '- Create balanced meals for sustained energy\n- Focus on variety and nutritional completeness\n- Include all food groups in appropriate portions' : ''}
+GOAL-SPECIFIC GUIDELINES:
+${goal === 'weight_loss' ? `WEIGHT LOSS:
+- Focus on high-volume, low-calorie foods (vegetables, lean proteins)
+- Emphasize foods that promote satiety (high protein, high fiber)
+- Include plenty of leafy greens and non-starchy vegetables
+- Use lean cooking methods (grilling, baking, steaming)
+- Smaller portion sizes with nutrient-dense foods
+- Examples: Grilled chicken salads, vegetable stir-fries, egg white omelets` : ''}
+${goal === 'weight_gain' ? `WEIGHT GAIN:
+- Focus on calorie-dense, nutrient-rich foods
+- Include healthy fats (nuts, avocado, olive oil, nut butters)
+- Emphasize complex carbs and starches (rice, pasta, potatoes, oats)
+- Larger portion sizes with added healthy calories
+- Include smoothies, shakes, and energy-dense snacks
+- Examples: Peanut butter toast, pasta dishes, rice bowls, protein pancakes` : ''}
+${goal === 'maintenance' ? `MAINTENANCE:
+- Balance between all food groups
+- Moderate portions with variety
+- Include a mix of lean proteins, whole grains, healthy fats
+- Focus on sustainable, enjoyable meals` : ''}
+
+IMPORTANT CONSTRAINTS:
+- MUST create distinctly different meals based on the goal (weight loss vs weight gain meals should be VERY different)
+- Include MAXIMUM variety - no repeated meals across the ${duration} days
+- Every day should feature different meals and different ingredients
+- Focus on whole, minimally processed foods
 
 Please ensure each day's meals total approximately ${dailyCalories} calories and provide a good balance of macronutrients. Make the meals practical for someone with basic cooking skills.`
         }
@@ -432,6 +604,30 @@ async function generatePersonalizedMealPlanWithFoodPreferences(params: Personali
     "healthy weight gain with calorie surplus" : 
     "weight maintenance and overall health";
 
+  // Goal-specific meal guidance
+  const goalGuidance = goal === "weight_loss" 
+    ? `WEIGHT LOSS SPECIFIC GUIDELINES:
+- Focus on high-volume, low-calorie foods (vegetables, lean proteins)
+- Emphasize foods that promote satiety (high protein, high fiber)
+- Include plenty of leafy greens and non-starchy vegetables
+- Use lean cooking methods (grilling, baking, steaming)
+- Smaller portion sizes with nutrient-dense foods
+- Examples: Grilled chicken salads, vegetable stir-fries, egg white omelets, Greek yogurt bowls`
+    : goal === "weight_gain"
+    ? `WEIGHT GAIN SPECIFIC GUIDELINES:
+- Focus on calorie-dense, nutrient-rich foods
+- Include healthy fats (nuts, avocado, olive oil, nut butters)
+- Emphasize complex carbs and starches (rice, pasta, potatoes, oats)
+- Larger portion sizes with added healthy calories
+- Include smoothies, shakes, and energy-dense snacks
+- Examples: Peanut butter toast, pasta dishes, rice bowls, protein pancakes, trail mix, smoothie bowls`
+    : `MAINTENANCE SPECIFIC GUIDELINES:
+- Balance between all food groups
+- Moderate portions with variety
+- Include a mix of lean proteins, whole grains, healthy fats
+- Focus on sustainable, enjoyable meals
+- Examples: Balanced grain bowls, mixed protein sources, variety of vegetables`;
+
   const prompt = `Create a ${duration}-day personalized meal plan for ${goalDescription}.
 
 REQUIREMENTS:
@@ -441,16 +637,20 @@ REQUIREMENTS:
 - Daily fat: ${dailyFat}g
 - 4 meals per day: breakfast, lunch, dinner, snack
 
+${goalGuidance}
+
 FOOD PREFERENCES:
 Preferred foods (use these heavily): ${likedFoods.length > 0 ? likedFoods.join(", ") : "No specific preferences"}
 Foods to avoid: ${dislikedFoods.length > 0 ? dislikedFoods.join(", ") : "None"}
 
-CONSTRAINTS:
+IMPORTANT CONSTRAINTS:
+- MUST create distinctly different meals based on the goal (weight loss vs weight gain meals should be VERY different)
 - Focus on whole, minimally processed foods
-- Include variety across all food groups
+- Include MAXIMUM variety - no repeated meals across the ${duration} days
 - Ensure adequate micronutrient coverage
 - Make meals practical and realistic
 - Each meal should have clear portions and instructions
+- Every day should feature different meals and different ingredients
 
 Respond with JSON in this exact format:
 {

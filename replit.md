@@ -2,7 +2,30 @@
 
 ## Overview
 
-FlexFlow is a comprehensive fitness and wellness application built with React and Express. It combines workout tracking, trainer marketplace, and AI-powered food scanning into a unified platform. Users can log workouts, track progress, set goals, book personal trainers, and monitor nutrition through an intuitive dashboard.
+FlexFlow is a comprehensive fitness and wellness application built with React and Express. It combines workout tracking, trainer marketplace, AI-powered workout planning, and personalized meal planning into a unified platform. Users can log workouts, track progress, set goals, book personal trainers, and monitor nutrition through an intuitive dashboard.
+
+## Recent Enhancements (October 2025)
+
+### AI Workout Planner
+- **Personalized Exercise Plans**: AI generates specific exercises with sets, reps, rest periods, and form cues based on user goals
+- **Goal-Based Programming**: Different workout structures for weight loss, muscle gain, and general fitness
+- **Progressive 4-Week Plans**: Automatically increases difficulty over time
+- **Equipment Consideration**: Workouts tailored to available equipment (bodyweight, dumbbells, full gym, etc.)
+- **Injury Accommodation**: Avoids exercises that could aggravate user-specified limitations
+
+### AI Meal Plan Generator
+- **Goal-Specific Meals**: Distinctly different meals for weight loss vs weight gain
+  - **Weight Loss**: High-volume, low-calorie foods with lean proteins and vegetables (salads, grilled proteins, egg whites)
+  - **Weight Gain**: Calorie-dense, nutrient-rich foods with healthy fats (pasta dishes, nut butters, smoothies, larger portions)
+  - **Maintenance**: Balanced meals with moderate portions
+- **Maximum Variety**: No repeated meals across 7-day plans
+- **Personalized Preferences**: Incorporates user food likes/dislikes
+- **Macro-Optimized**: Different macro ratios per goal (higher protein for weight loss, higher carbs for weight gain)
+
+### Content Moderation
+- **AI-Powered Filtering**: OpenAI moderation API prevents inappropriate text content in community posts
+- **Image Moderation**: Vision API scans uploaded images for inappropriate visual content
+- **Real-Time Protection**: Content is filtered before posting to maintain community standards
 
 ## User Preferences
 
