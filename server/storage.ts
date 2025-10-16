@@ -3428,7 +3428,7 @@ export class MemStorage implements IStorage {
     if (!plan) return undefined;
     
     const plannedWorkouts = Array.from(this.plannedWorkouts.values())
-      .filter(pw => pw.workoutPlanId === plan.id);
+      .filter(pw => pw.planId === plan.id);
     
     return {
       ...plan,
