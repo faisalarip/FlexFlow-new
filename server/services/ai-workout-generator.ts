@@ -50,8 +50,7 @@ export class AIWorkoutGenerator {
             content: prompt
           }
         ],
-        response_format: { type: "json_object" },
-        max_completion_tokens: 4000
+        response_format: { type: "json_object" }
       });
 
       const aiPlan = JSON.parse(response.choices[0].message.content || '{}');

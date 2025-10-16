@@ -292,14 +292,14 @@ export default function WorkoutPlannerPage() {
                       <p className="text-sm text-gray-400">{dayWorkout.description}</p>
                     </div>
                     
-                    {dayWorkout.exercises && dayWorkout.exercises.length > 0 && (
+                    {dayWorkout.exercises && Array.isArray(dayWorkout.exercises) && dayWorkout.exercises.length > 0 && (
                       <div className="space-y-2 mt-4 pt-3 border-t border-gray-700">
                         <h5 className="text-sm font-medium text-white flex items-center gap-2">
                           <Activity className="w-4 h-4 text-primary" />
                           Exercises ({dayWorkout.exercises.length})
                         </h5>
                         <div className="space-y-3">
-                          {dayWorkout.exercises.map((exercise: any, idx: number) => (
+                          {(dayWorkout.exercises as any[]).map((exercise: any, idx: number) => (
                             <div key={idx} className="bg-gray-800/50 rounded-lg p-3 space-y-1" data-testid={`exercise-${idx}`}>
                               <div className="flex items-start justify-between">
                                 <span className="font-medium text-white text-sm">{exercise.name}</span>

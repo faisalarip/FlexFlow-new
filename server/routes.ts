@@ -1658,7 +1658,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Moderate post content for inappropriate language
       const { moderateText } = await import("./services/content-moderation");
-      const contentToModerate = `${data.content || ''} ${data.title || ''}`;
+      const contentToModerate = data.content || '';
       const moderationResult = await moderateText(contentToModerate);
       
       if (!moderationResult.isAppropriate) {
@@ -2652,7 +2652,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const savedPlan = await storage.createWorkoutPlan(workoutPlan);
       await storage.createPlannedWorkouts(plannedWorkouts.map(workout => ({
         ...workout,
-        workoutPlanId: savedPlan.id
+        planId: savedPlan.id
       })));
       
       // Return the complete plan with workouts
