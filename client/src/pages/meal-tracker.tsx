@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { Loader2, Apple, Calendar, TrendingUp, ScanLine } from "lucide-react";
+import { Loader2, Apple, Calendar, TrendingUp, ScanLine, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import FeatureGate from "@/components/feature-gate";
@@ -122,6 +122,28 @@ export default function MealTrackerPage() {
       toast({
         title: "Meal Saved! ✅",
         description: "Your meal has been added to your diary.",
+      });
+    }
+  });
+
+  // Delete meal entry mutation
+  const deleteMutation = useMutation({
+    mutationFn: async (mealId: string) => {
+      const response = await apiRequest("DELETE", `/api/meal-entries/${mealId}`);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/meal-entries"] });
+      toast({
+        title: "Meal Deleted! 🗑️",
+        description: "The meal entry has been removed from your diary.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to delete meal entry. Please try again.",
+        variant: "destructive",
       });
     }
   });
@@ -484,17 +506,29 @@ export default function MealTrackerPage() {
                         <div className="space-y-4">
                           {meals.map((meal) => (
                             <div key={meal.id} className="flex justify-between items-start p-4 bg-gray-900/50 border border-red-800/20 rounded-lg hover:border-red-600/40 transition-colors">
-                              <div>
+                              <div className="flex-1">
                                 <h4 className="font-medium text-white">{meal.mealName}</h4>
                                 {meal.description && (
                                   <p className="text-sm text-gray-400 mt-1">{meal.description}</p>
                                 )}
                               </div>
-                              <div className="text-right">
-                                <p className="font-semibold text-red-400">{meal.totalCalories} cal</p>
-                                <p className="text-xs text-gray-400">
-                                  P: {meal.protein}g | C: {meal.carbs}g | F: {meal.fat}g
-                                </p>
+                              <div className="text-right flex items-start gap-3">
+                                <div>
+                                  <p className="font-semibold text-red-400">{meal.totalCalories} cal</p>
+                                  <p className="text-xs text-gray-400">
+                                    P: {meal.protein}g | C: {meal.carbs}g | F: {meal.fat}g
+                                  </p>
+                                </div>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => deleteMutation.mutate(meal.id)}
+                                  disabled={deleteMutation.isPending}
+                                  className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
+                                  data-testid={`button-delete-meal-${meal.id}`}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
                               </div>
                             </div>
                           ))}
