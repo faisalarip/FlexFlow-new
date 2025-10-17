@@ -20,6 +20,8 @@ import { z } from "zod";
 import { apiRequest } from "@/lib/queryClient";
 import FeatureGate from "@/components/feature-gate";
 import type { MealPlanWithDetails, UserMealPlanWithDetails, UserMealPreferences } from "@shared/schema";
+import { PageMedicalDisclaimer, AIGeneratedDisclaimer } from "@/components/medical-disclaimer";
+import { HealthSources } from "@/components/health-sources";
 
 const mealPlanGenerationSchema = z.object({
   goal: z.enum(["weight_loss", "weight_gain", "maintenance"]),
@@ -252,6 +254,8 @@ export default function MealPlans() {
           <p className="text-gray-600 dark:text-gray-400">Choose a meal plan to support your fitness goals</p>
         </div>
 
+        <PageMedicalDisclaimer type="nutrition" />
+
         {/* Main Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid w-full grid-cols-3 max-w-2xl mx-auto">
@@ -277,6 +281,7 @@ export default function MealPlans() {
               <DialogHeader>
                 <DialogTitle>Generate Personalized Meal Plan</DialogTitle>
               </DialogHeader>
+              <AIGeneratedDisclaimer />
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmitAIMealPlan)} className="space-y-6">
                   {userFoodPreferences.length > 0 && (
@@ -715,6 +720,8 @@ export default function MealPlans() {
             )}
           </DialogContent>
         </Dialog>
+        
+        <HealthSources />
           </TabsContent>
 
           {/* Current Plan Tab */}
@@ -765,6 +772,8 @@ export default function MealPlans() {
                 </CardContent>
               </Card>
             )}
+            
+            <HealthSources />
           </TabsContent>
 
           {/* Food Preferences Tab */}

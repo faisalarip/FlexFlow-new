@@ -32,6 +32,7 @@ import Tutorial from "@/pages/tutorial";
 import TermsOfService from "@/pages/terms-of-service";
 import PrivacyPolicy from "@/pages/privacy-policy";
 import { useNewAuth } from "@/hooks/useNewAuth";
+import { AppFooter } from "@/components/app-footer";
 
 function Router() {
   const { isAuthenticated, isLoading } = useNewAuth();
@@ -45,10 +46,11 @@ function Router() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-black">
+    <div className="min-h-screen bg-gray-50 dark:bg-black flex flex-col">
       {isAuthenticated && <Navbar />}
       
-      <Switch>
+      <div className="flex-1">
+        <Switch>
         {/* Legal pages - accessible to all users */}
         <Route path="/terms-of-service" component={TermsOfService} />
         <Route path="/privacy-policy" component={PrivacyPolicy} />
@@ -87,6 +89,9 @@ function Router() {
         )}
         <Route component={NotFound} />
       </Switch>
+      </div>
+      
+      {isAuthenticated && <AppFooter />}
     </div>
   );
 }
