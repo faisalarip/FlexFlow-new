@@ -14,6 +14,8 @@ import { apiRequest } from "@/lib/queryClient";
 import FeatureGate from "@/components/feature-gate";
 import type { MealEntry, InsertMealEntry } from "@shared/schema";
 import BarcodeScanner from "@/components/barcode-scanner";
+import { PageMedicalDisclaimer, AIGeneratedDisclaimer } from "@/components/medical-disclaimer";
+import { HealthSources } from "@/components/health-sources";
 
 interface NutritionalAnalysis {
   mealName: string;
@@ -249,6 +251,9 @@ export default function MealTrackerPage() {
             Advanced barcode scanning technology for precise nutritional tracking and professional meal management.
           </p>
         </div>
+
+        <PageMedicalDisclaimer type="nutrition" />
+        <AIGeneratedDisclaimer />
 
         <Tabs defaultValue="scan" className="w-full">
           <TabsList className="grid w-full grid-cols-3 bg-black/50 border border-red-800/30">
@@ -712,6 +717,8 @@ export default function MealTrackerPage() {
             </Card>
         </TabsContent>
         </Tabs>
+        
+        <HealthSources />
         
         {/* Barcode Scanner Modal */}
         <BarcodeScanner

@@ -12,6 +12,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import FeatureGate from "@/components/feature-gate";
+import { PageMedicalDisclaimer, AIGeneratedDisclaimer } from "@/components/medical-disclaimer";
+import { HealthSources } from "@/components/health-sources";
 import { 
   Target, 
   Clock, 
@@ -386,6 +388,9 @@ export default function WorkoutPlannerPage() {
           </p>
         </div>
 
+        <PageMedicalDisclaimer type="exercise" />
+        <AIGeneratedDisclaimer />
+
         <Tabs defaultValue="schedule" className="w-full">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="schedule">Weekly Schedule</TabsTrigger>
@@ -472,6 +477,8 @@ export default function WorkoutPlannerPage() {
             </Card>
           </TabsContent>
         </Tabs>
+        
+        <HealthSources />
       </div>
       </FeatureGate>
     );
@@ -500,6 +507,9 @@ export default function WorkoutPlannerPage() {
           <Progress value={progress} className="w-full" />
         </div>
       </div>
+
+      <PageMedicalDisclaimer type="exercise" />
+      <AIGeneratedDisclaimer />
 
       <Card className="mb-6">
         <CardHeader>
@@ -575,6 +585,8 @@ export default function WorkoutPlannerPage() {
           )}
         </Button>
       </div>
+      
+      <HealthSources />
     </div>
     </FeatureGate>
   );
