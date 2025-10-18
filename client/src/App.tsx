@@ -13,8 +13,6 @@ import MealPlans from "@/pages/meal-plans";
 import WorkoutPlanner from "@/pages/workout-planner";
 import MealTracker from "@/pages/meal-tracker";
 import Landing from "@/pages/landing";
-import Checkout from "@/pages/checkout";
-import Subscribe from "@/pages/subscribe";
 import Settings from "@/pages/settings";
 import Workouts from "@/pages/workouts";
 import Progress from "@/pages/progress";
@@ -24,7 +22,6 @@ import NotFound from "@/pages/not-found";
 import Navbar from "@/components/navbar";
 import Onboarding from "@/pages/onboarding";
 import OnboardingPlan from "@/pages/onboarding-plan";
-import OnboardingPayment from "@/pages/onboarding-payment";
 import TrialSuccess from "@/pages/trial-success";
 import ProfileCompletionGuard from "@/components/profile-completion-guard";
 import AuthSelection from "@/pages/auth-selection";
@@ -64,7 +61,6 @@ function Router() {
             <Route path="/auth-selection" component={AuthSelection} />
             <Route path="/onboarding" component={Onboarding} />
             <Route path="/onboarding/plan" component={OnboardingPlan} />
-            <Route path="/onboarding/payment" component={OnboardingPayment} />
             <Route path="/trial-success" component={TrialSuccess} />
           </>
         ) : (
@@ -83,8 +79,6 @@ function Router() {
             <Route path="/progress" component={Progress} />
             <Route path="/progress-photos" component={ProgressPhotos} />
             <Route path="/calendar" component={Calendar} />
-            <Route path="/checkout" component={Checkout} />
-            <Route path="/subscribe" component={Subscribe} />
           </ProfileCompletionGuard>
         )}
         <Route component={NotFound} />
