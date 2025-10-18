@@ -1981,6 +1981,124 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Delete user account and all associated data
+  app.delete("/api/user/account", authenticateToken, async (req, res) => {
+    try {
+      const userId = getAuthUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Delete all user-related data
+      // This includes: workouts, workout_exercises, goals, payments, trainers, bookings, 
+      // trainer_reviews, user_activity_log, workout_preferences, workout_plans, planned_workouts,
+      // food_entries, mile_tracker_sessions, mile_tracker_splits, community_posts,
+      // meal_plans (through user_meal_plans), user_meal_plans, user_food_preferences,
+      // calendar_notes, user_meal_preferences, ai_difficulty_adjustments, meal_entries, progress_photos
+
+      await db.transaction(async (tx) => {
+        // Delete progress photos
+        await tx.delete(progressPhotos).where(eq(progressPhotos.userId, userId));
+        
+        // Delete meal entries
+        await tx.delete(mealEntries).where(eq(mealEntries.userId, userId));
+        
+        // Delete AI difficulty adjustments
+        await tx.delete(aiDifficultyAdjustments).where(eq(aiDifficultyAdjustments.userId, userId));
+        
+        // Delete user meal preferences
+        await tx.delete(userMealPreferences).where(eq(userMealPreferences.userId, userId));
+        
+        // Delete calendar notes
+        await tx.delete(calendarNotes).where(eq(calendarNotes.userId, userId));
+        
+        // Delete user food preferences
+        await tx.delete(userFoodPreferences).where(eq(userFoodPreferences.userId, userId));
+        
+        // Delete user meal plans
+        await tx.delete(userMealPlans).where(eq(userMealPlans.userId, userId));
+        
+        // Delete community posts
+        await tx.delete(communityPosts).where(eq(communityPosts.userId, userId));
+        
+        // Delete mile tracker splits (through sessions)
+        const sessions = await tx.select().from(mileTrackerSessions).where(eq(mileTrackerSessions.userId, userId));
+        for (const session of sessions) {
+          await tx.delete(mileTrackerSplits).where(eq(mileTrackerSplits.sessionId, session.id));
+        }
+        
+        // Delete mile tracker sessions
+        await tx.delete(mileTrackerSessions).where(eq(mileTrackerSessions.userId, userId));
+        
+        // Delete food entries
+        await tx.delete(foodEntries).where(eq(foodEntries.userId, userId));
+        
+        // Delete planned workouts (through workout plans)
+        const plans = await tx.select().from(workoutPlans).where(eq(workoutPlans.userId, userId));
+        for (const plan of plans) {
+          await tx.delete(plannedWorkouts).where(eq(plannedWorkouts.planId, plan.id));
+        }
+        
+        // Delete workout plans
+        await tx.delete(workoutPlans).where(eq(workoutPlans.userId, userId));
+        
+        // Delete workout preferences
+        await tx.delete(workoutPreferences).where(eq(workoutPreferences.userId, userId));
+        
+        // Delete user activity log
+        await tx.delete(userActivityLog).where(eq(userActivityLog.userId, userId));
+        
+        // Delete trainer reviews
+        await tx.delete(trainerReviews).where(eq(trainerReviews.userId, userId));
+        
+        // Delete bookings
+        await tx.delete(bookings).where(eq(bookings.userId, userId));
+        
+        // Delete trainer services and trainer profile if user is a trainer
+        const trainer = await tx.select().from(trainers).where(eq(trainers.userId, userId)).limit(1);
+        if (trainer.length > 0) {
+          await tx.delete(trainerServices).where(eq(trainerServices.trainerId, trainer[0].id));
+          await tx.delete(trainers).where(eq(trainers.userId, userId));
+        }
+        
+        // Delete payments
+        await tx.delete(payments).where(eq(payments.userId, userId));
+        
+        // Delete workout exercises (through workouts)
+        const userWorkouts = await tx.select().from(workouts).where(eq(workouts.userId, userId));
+        for (const workout of userWorkouts) {
+          await tx.delete(workoutExercises).where(eq(workoutExercises.workoutId, workout.id));
+        }
+        
+        // Delete workouts
+        await tx.delete(workouts).where(eq(workouts.userId, userId));
+        
+        // Delete goals
+        await tx.delete(goals).where(eq(goals.userId, userId));
+        
+        // Finally, delete the user
+        await tx.delete(users).where(eq(users.id, userId));
+      });
+
+      // Log out the user by destroying the session
+      req.session.destroy((err) => {
+        if (err) {
+          console.error("Error destroying session:", err);
+        }
+      });
+
+      res.json({ message: "Account deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting user account:", error);
+      res.status(500).json({ message: "Failed to delete account" });
+    }
+  });
+
   // Get user subscription revenue (admin endpoint)
   app.get("/api/admin/user-subscription-revenue", async (req, res) => {
     try {

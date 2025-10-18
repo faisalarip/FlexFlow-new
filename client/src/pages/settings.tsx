@@ -1,5 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
-import { Settings, CreditCard, Calendar, Crown, Check, X } from "lucide-react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Settings, CreditCard, Calendar, Crown, Check, X, Trash2, AlertTriangle } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -7,9 +7,50 @@ import { Separator } from "@/components/ui/separator";
 import { useNewAuth } from "@/hooks/useNewAuth";
 import ProfileEditor from "@/components/profile-editor";
 import type { User } from "@shared/schema";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
+import { useState } from "react";
 
 export default function SettingsPage() {
   const { user } = useNewAuth() as { user: User | null };
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
+  const deleteAccountMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest("DELETE", "/api/user/account", {});
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Account Deleted",
+        description: "Your account and all associated data have been permanently deleted.",
+      });
+      // Redirect to landing page after a brief delay
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 2000);
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to delete account. Please try again or contact support.",
+        variant: "destructive",
+      });
+    },
+  });
 
   const formatDate = (date: string | Date | null | undefined) => {
     if (!date) return "N/A";
@@ -281,6 +322,84 @@ export default function SettingsPage() {
                 <span className="text-sm">Priority customer support</span>
               </div>
             </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Account Deletion Section */}
+      <Card className="border-red-200" data-testid="account-deletion-card">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-red-600">
+            <Trash2 className="w-5 h-5" />
+            Delete Account
+          </CardTitle>
+          <CardDescription>
+            Permanently delete your account and all associated data
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" />
+                <div>
+                  <h4 className="font-medium text-red-900">Warning: This action cannot be undone</h4>
+                  <p className="text-sm text-red-800 mt-1">
+                    Deleting your account will permanently remove:
+                  </p>
+                  <ul className="text-sm text-red-800 mt-2 space-y-1 ml-4 list-disc">
+                    <li>All your workout history and progress photos</li>
+                    <li>All your goals, meal plans, and food tracking data</li>
+                    <li>Your community posts and trainer reviews</li>
+                    <li>Your subscription and payment information</li>
+                    <li>Your personal profile and preferences</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+              <AlertDialogTrigger asChild>
+                <Button 
+                  variant="destructive" 
+                  data-testid="delete-account-button"
+                  className="w-full sm:w-auto"
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Delete My Account
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action cannot be undone. This will permanently delete your account
+                    and remove all of your data from our servers, including:
+                    <ul className="mt-2 space-y-1 ml-4 list-disc">
+                      <li>All workout history and exercise logs</li>
+                      <li>Progress photos and measurements</li>
+                      <li>Meal plans and nutrition tracking data</li>
+                      <li>Goals and achievements</li>
+                      <li>Community posts and interactions</li>
+                      <li>Subscription and billing information</li>
+                    </ul>
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel data-testid="cancel-delete-button">
+                    Cancel
+                  </AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={() => deleteAccountMutation.mutate()}
+                    disabled={deleteAccountMutation.isPending}
+                    className="bg-red-600 hover:bg-red-700"
+                    data-testid="confirm-delete-button"
+                  >
+                    {deleteAccountMutation.isPending ? "Deleting..." : "Yes, delete my account"}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
         </CardContent>
       </Card>
