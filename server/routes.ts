@@ -2208,6 +2208,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Goal and daily calories are required" });
       }
 
+      // Ensure dailyCalories is a number
+      const calories = typeof dailyCalories === 'number' ? dailyCalories : Number(dailyCalories);
+      if (isNaN(calories)) {
+        return res.status(400).json({ message: "Daily calories must be a valid number" });
+      }
+
       // Get user food preferences
       const userPreferences = await storage.getUserFoodPreferences(userId);
       const likedFoods = userPreferences
@@ -2226,7 +2232,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Generate personalized meal plan using OpenAI
       const generatedPlan = await generatePersonalizedMealPlan({
         goal,
-        dailyCalories: parseInt(dailyCalories),
+        dailyCalories: calories,
         duration,
         likedFoods: likedFoodItems.map(item => item.name),
         dislikedFoods: dislikedFoodItems.map(item => item.name),
