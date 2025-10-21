@@ -52,9 +52,17 @@ export class BadgeService {
    * Check and award badges to a user based on their current streak
    * Returns array of newly earned badges
    */
-  static async checkAndAwardBadges(userId: string, currentStreak: number): Promise<BadgeAward[]> {
+  static async checkAndAwardBadges(userId: string): Promise<BadgeAward[]> {
     try {
       const awardedBadges: BadgeAward[] = [];
+      
+      // Get user's current streak
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return [];
+      }
+      
+      const currentStreak = user.streak || 0;
       
       // Get all consistency badges
       const allBadges = await storage.getAllBadges();
@@ -116,3 +124,6 @@ export class BadgeService {
     }
   }
 }
+
+// Export singleton instance
+export const badgeService = BadgeService;

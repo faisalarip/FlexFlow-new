@@ -1,5 +1,6 @@
 import { storage } from "./storage";
 import type { InsertUserActivityLog } from "@shared/schema";
+import { badgeService } from "./badge-service";
 
 export class ActivityLogger {
   static async logActivity({
@@ -64,7 +65,7 @@ export class ActivityLogger {
   }
 
   static async logWorkout(userId: string, workoutData: any): Promise<void> {
-    return this.logActivity({
+    await this.logActivity({
       userId,
       actionType: 'workout_logged',
       actionDetails: {
@@ -74,6 +75,18 @@ export class ActivityLogger {
         exerciseCount: workoutData.exercises?.length || 0
       }
     });
+    
+    // Check for new badge achievements after workout
+    await this.checkForBadges(userId);
+  }
+
+  static async checkForBadges(userId: string): Promise<void> {
+    try {
+      await badgeService.checkAndAwardBadges(userId);
+    } catch (error) {
+      console.error('Failed to check for badge achievements:', error);
+      // Don't throw - badge checking should not break the main functionality
+    }
   }
 
   static async logGoalSet(userId: string, goalData: any): Promise<void> {
