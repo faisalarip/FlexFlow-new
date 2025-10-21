@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Settings, CreditCard, Calendar, Crown, Check, X, Trash2, AlertTriangle, Bell } from "lucide-react";
+import { Settings, CreditCard, Calendar, Crown, Check, X, Trash2, AlertTriangle, Bell, Award, Trophy, Flame, Zap } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -38,6 +38,22 @@ interface NotificationPreferences {
   updatedAt: Date;
 }
 
+interface UserBadgeWithDetails {
+  id: string;
+  userId: string;
+  badgeId: string;
+  earnedAt: Date;
+  badge: {
+    id: string;
+    name: string;
+    description: string;
+    iconName: string;
+    category: string;
+    requiredDays: number | null;
+    createdAt: Date;
+  };
+}
+
 export default function SettingsPage() {
   const { user } = useNewAuth() as { user: User | null };
   const { toast } = useToast();
@@ -47,6 +63,12 @@ export default function SettingsPage() {
   // Fetch notification preferences
   const { data: notificationPreferences, isLoading: isLoadingPreferences } = useQuery<NotificationPreferences>({
     queryKey: ["/api/notification-preferences"],
+    enabled: !!user,
+  });
+
+  // Fetch user badges
+  const { data: userBadges, isLoading: isLoadingBadges } = useQuery<UserBadgeWithDetails[]>({
+    queryKey: ["/api/user/badges"],
     enabled: !!user,
   });
 
@@ -132,6 +154,22 @@ export default function SettingsPage() {
         return "Your subscription is currently inactive. Reactivate to access premium features.";
       default:
         return "Manage your subscription to access premium features.";
+    }
+  };
+
+  const getBadgeIcon = (iconName: string) => {
+    const iconProps = { className: "w-12 h-12" };
+    switch (iconName.toLowerCase()) {
+      case "flame":
+        return <Flame {...iconProps} className="w-12 h-12 text-orange-500" />;
+      case "zap":
+        return <Zap {...iconProps} className="w-12 h-12 text-yellow-500" />;
+      case "trophy":
+        return <Trophy {...iconProps} className="w-12 h-12 text-amber-500" />;
+      case "award":
+        return <Award {...iconProps} className="w-12 h-12 text-blue-500" />;
+      default:
+        return <Award {...iconProps} className="w-12 h-12 text-purple-500" />;
     }
   };
 
@@ -324,6 +362,94 @@ export default function SettingsPage() {
                 </div>
               </div>
             </>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Badges Section */}
+      <Card data-testid="badges-card">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Award className="w-5 h-5 text-primary" />
+            Achievements & Badges
+          </CardTitle>
+          <CardDescription>
+            Earn badges for consistency and dedication to your fitness journey
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {isLoadingBadges ? (
+            <p className="text-sm text-gray-500">Loading your achievements...</p>
+          ) : (
+            <div className="space-y-6">
+              {userBadges && userBadges.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {userBadges.map((userBadge) => (
+                    <div
+                      key={userBadge.id}
+                      className="flex items-start gap-4 p-4 border rounded-lg bg-gradient-to-br from-amber-50 to-orange-50 border-amber-200"
+                      data-testid={`badge-${userBadge.badge.name.toLowerCase().replace(/\s+/g, '-')}`}
+                    >
+                      <div className="flex-shrink-0">
+                        {getBadgeIcon(userBadge.badge.iconName)}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-lg text-gray-900">
+                          {userBadge.badge.name}
+                        </h3>
+                        <p className="text-sm text-gray-600 mt-1">
+                          {userBadge.badge.description}
+                        </p>
+                        <p className="text-xs text-gray-500 mt-2">
+                          Earned on {new Date(userBadge.earnedAt).toLocaleDateString("en-US", {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          })}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 text-center">
+                  <Award className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                  <h4 className="font-medium text-gray-900 mb-2">No badges earned yet</h4>
+                  <p className="text-sm text-gray-600 mb-4">
+                    Keep logging your workouts daily to earn consistency badges!
+                  </p>
+                  <div className="space-y-2 text-sm text-gray-700">
+                    <p className="flex items-center justify-center gap-2">
+                      <Flame className="w-4 h-4 text-orange-500" />
+                      <span>Week Warrior - 7 days streak</span>
+                    </p>
+                    <p className="flex items-center justify-center gap-2">
+                      <Zap className="w-4 h-4 text-yellow-500" />
+                      <span>Fortnight Champion - 14 days streak</span>
+                    </p>
+                    <p className="flex items-center justify-center gap-2">
+                      <Trophy className="w-4 h-4 text-amber-500" />
+                      <span>Monthly Master - 30 days streak</span>
+                    </p>
+                  </div>
+                </div>
+              )}
+              
+              {/* Current Streak Info */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <Flame className="w-5 h-5 text-blue-600 mt-0.5" />
+                  <div>
+                    <h4 className="font-medium text-blue-900">Current Streak: {user?.streak || 0} days</h4>
+                    <p className="text-sm text-blue-800 mt-1">
+                      {user?.streak && user.streak >= 7
+                        ? "Great job! Keep up the consistent work to maintain your badges."
+                        : `Keep logging workouts daily! ${7 - (user?.streak || 0)} more days until your first badge.`}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
           )}
         </CardContent>
       </Card>
