@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import type { Exercise } from "@shared/schema";
+import VoiceSearchButton from "@/components/voice-search-button";
 import dumbbellExercisesImage from "@assets/IMG_6694_1758675702051.jpeg";
 import pushUpExerciseImage from "@assets/generated_images/Man_performing_push-up_exercise_19b36844.png";
 import benchPressImage from "@assets/generated_images/Man_performing_bench_press_60a51258.png";
@@ -1351,10 +1352,17 @@ export default function WorkoutLogger() {
           <Input
             type="text"
             placeholder="Search exercises (e.g., push-ups, running, yoga)"
-            className="pl-10 bg-black/50 border-red-500/30 text-white placeholder:text-gray-400 focus:border-red-500 focus:ring-red-500/50"
+            className="pl-10 pr-12 bg-black/50 border-red-500/30 text-white placeholder:text-gray-400 focus:border-red-500 focus:ring-red-500/50"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
+            data-testid="input-search-exercises"
           />
+          <div className="absolute right-1 top-1/2 transform -translate-y-1/2">
+            <VoiceSearchButton
+              onTranscript={(text) => setSearchQuery(text)}
+              className="h-8 w-8"
+            />
+          </div>
         </div>
       </div>
 
