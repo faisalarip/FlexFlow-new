@@ -84,7 +84,7 @@ export default function Home() {
       <NavigationHeader />
       <MobileNavigation />
       
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-20 md:pb-8">
+      <main className="max-w-6xl mx-auto px-3 sm:px-4 py-4 pb-20 md:pb-8">
         {/* Welcome Hero */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-red-500 to-red-700 bg-clip-text text-transparent" data-testid="text-welcome">
