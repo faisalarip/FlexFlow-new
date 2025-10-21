@@ -36,15 +36,7 @@ import { requireFeatureAccess } from "./services/subscription.js";
 import { PREMIUM_FEATURES } from "@shared/schema";
 import { signUpSchema, signInSchema } from "@shared/schema";
 import { ActivityLogger } from "./activity-logger";
-import Stripe from "stripe";
 
-// Initialize Stripe
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
-}
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2025-09-30.clover",
-});
 
 export async function registerRoutes(app: Express): Promise<Server> {
 
@@ -1976,100 +1968,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Trainer subscription management routes - DISABLED
   // Trainer payment/subscription features have been removed per user request
-
-  // Stripe Payment Routes
-
-  // Create payment intent for subscription upgrade
-  app.post("/api/create-payment-intent", authenticateToken, async (req, res) => {
-    try {
-      const userId = getAuthUserId(req);
-      if (!userId) {
-        return res.status(401).json({ message: "User not authenticated" });
-      }
-
-      const user = await storage.getUser(userId);
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
-
-      // Premium subscription price: $15.99/month
-      const amount = 1599; // in cents
-
-      const paymentIntent = await stripe.paymentIntents.create({
-        amount,
-        currency: "usd",
-        automatic_payment_methods: {
-          enabled: true, // This enables Apple Pay, Google Pay, and other payment methods
-        },
-        metadata: {
-          userId: user.id,
-          email: user.email || '',
-          purpose: 'premium_subscription',
-        },
-        description: "FlexFlow Premium Subscription - $15.99/month",
-      });
-
-      res.json({ 
-        clientSecret: paymentIntent.client_secret,
-        amount: amount
-      });
-    } catch (error: any) {
-      console.error("Error creating payment intent:", error);
-      res.status(500).json({ 
-        message: "Error creating payment intent: " + error.message 
-      });
-    }
-  });
-
-  // Webhook to handle successful payments
-  app.post("/api/stripe-webhook", async (req, res) => {
-    const sig = req.headers['stripe-signature'];
-    
-    if (!sig) {
-      return res.status(400).send('Missing stripe signature');
-    }
-
-    let event;
-
-    try {
-      // In production, you'd use a webhook secret
-      event = req.body;
-      
-      // Handle the event
-      switch (event.type) {
-        case 'payment_intent.succeeded':
-          const paymentIntent = event.data.object;
-          const userId = paymentIntent.metadata.userId;
-          
-          if (userId) {
-            // Upgrade user to premium
-            await storage.updateUser(userId, {
-              subscriptionStatus: 'active',
-              subscriptionStartDate: new Date(),
-              lastPaymentDate: new Date(),
-            });
-
-            // Record payment
-            await storage.createPayment({
-              userId,
-              stripePaymentIntentId: paymentIntent.id,
-              amount: paymentIntent.amount,
-              currency: paymentIntent.currency,
-              status: 'succeeded',
-              description: 'Premium subscription upgrade',
-            });
-          }
-          break;
-        default:
-          console.log(`Unhandled event type ${event.type}`);
-      }
-
-      res.json({ received: true });
-    } catch (err: any) {
-      console.error("Webhook error:", err);
-      res.status(400).send(`Webhook Error: ${err.message}`);
-    }
-  });
 
   // User Subscription Routes
 
