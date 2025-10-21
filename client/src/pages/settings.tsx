@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Settings, CreditCard, Calendar, Crown, Check, X, Trash2, AlertTriangle } from "lucide-react";
+import { Settings, CreditCard, Calendar, Crown, Check, X, Trash2, AlertTriangle, Bell } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -21,12 +21,56 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { useState } from "react";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+
+interface NotificationPreferences {
+  id: string;
+  userId: string;
+  workoutRemindersEnabled: boolean;
+  mealNotificationsEnabled: boolean;
+  breakfastTime: string;
+  lunchTime: string;
+  dinnerTime: string;
+  notificationPermissionGranted: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 export default function SettingsPage() {
   const { user } = useNewAuth() as { user: User | null };
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
+  // Fetch notification preferences
+  const { data: notificationPreferences, isLoading: isLoadingPreferences } = useQuery<NotificationPreferences>({
+    queryKey: ["/api/notification-preferences"],
+    enabled: !!user,
+  });
+
+  // Update notification preferences mutation
+  const updateNotificationPreferences = useMutation({
+    mutationFn: async (updates: Partial<NotificationPreferences>) => {
+      const response = await apiRequest("PUT", "/api/notification-preferences", updates);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/notification-preferences"] });
+      toast({
+        title: "Preferences Updated",
+        description: "Your notification preferences have been saved.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to update notification preferences.",
+        variant: "destructive",
+      });
+    },
+  });
 
   const deleteAccountMutation = useMutation({
     mutationFn: async () => {
@@ -129,6 +173,158 @@ export default function SettingsPage() {
               </Button>
             } />
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Notification Preferences Section */}
+      <Card data-testid="notification-settings-card">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Bell className="w-5 h-5" />
+            Notification Preferences
+          </CardTitle>
+          <CardDescription>
+            Manage workout reminders and meal time notifications
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {isLoadingPreferences ? (
+            <p className="text-sm text-gray-500">Loading preferences...</p>
+          ) : (
+            <>
+              {/* Workout Reminders */}
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label htmlFor="workout-reminders" className="text-base">
+                    Workout Reminders
+                  </Label>
+                  <p className="text-sm text-gray-500">
+                    Get notified if you haven't logged a workout in 24 hours
+                  </p>
+                </div>
+                <Switch
+                  id="workout-reminders"
+                  checked={notificationPreferences?.workoutRemindersEnabled ?? true}
+                  onCheckedChange={(checked) => {
+                    updateNotificationPreferences.mutate({ workoutRemindersEnabled: checked });
+                  }}
+                  data-testid="switch-workout-reminders"
+                />
+              </div>
+
+              <Separator />
+
+              {/* Meal Notifications */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label htmlFor="meal-notifications" className="text-base">
+                      Meal Time Notifications
+                    </Label>
+                    <p className="text-sm text-gray-500">
+                      Receive reminders for breakfast, lunch, and dinner times
+                    </p>
+                  </div>
+                  <Switch
+                    id="meal-notifications"
+                    checked={notificationPreferences?.mealNotificationsEnabled ?? true}
+                    onCheckedChange={(checked) => {
+                      updateNotificationPreferences.mutate({ mealNotificationsEnabled: checked });
+                    }}
+                    data-testid="switch-meal-notifications"
+                  />
+                </div>
+
+                {notificationPreferences?.mealNotificationsEnabled && (
+                  <div className="ml-4 space-y-4 pl-4 border-l-2 border-gray-200">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="breakfast-time">Breakfast Time</Label>
+                        <Input
+                          id="breakfast-time"
+                          type="time"
+                          value={notificationPreferences?.breakfastTime || "08:00"}
+                          onChange={(e) => {
+                            updateNotificationPreferences.mutate({ breakfastTime: e.target.value });
+                          }}
+                          data-testid="input-breakfast-time"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="lunch-time">Lunch Time</Label>
+                        <Input
+                          id="lunch-time"
+                          type="time"
+                          value={notificationPreferences?.lunchTime || "12:00"}
+                          onChange={(e) => {
+                            updateNotificationPreferences.mutate({ lunchTime: e.target.value });
+                          }}
+                          data-testid="input-lunch-time"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="dinner-time">Dinner Time</Label>
+                        <Input
+                          id="dinner-time"
+                          type="time"
+                          value={notificationPreferences?.dinnerTime || "18:00"}
+                          onChange={(e) => {
+                            updateNotificationPreferences.mutate({ dinnerTime: e.target.value });
+                          }}
+                          data-testid="input-dinner-time"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <Separator />
+
+              {/* Browser Notification Permission */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <Bell className="w-5 h-5 text-blue-600 mt-0.5" />
+                  <div className="flex-1">
+                    <h4 className="font-medium text-blue-900">Browser Notifications</h4>
+                    <p className="text-sm text-blue-800 mt-1">
+                      {notificationPreferences?.notificationPermissionGranted
+                        ? "Browser notifications are enabled. You'll receive reminders even when the app is closed."
+                        : "Enable browser notifications to receive reminders even when the app is not open."}
+                    </p>
+                    {!notificationPreferences?.notificationPermissionGranted && (
+                      <Button
+                        className="mt-3"
+                        size="sm"
+                        variant="outline"
+                        onClick={async () => {
+                          if ('Notification' in window) {
+                            const permission = await Notification.requestPermission();
+                            if (permission === 'granted') {
+                              updateNotificationPreferences.mutate({ notificationPermissionGranted: true });
+                              toast({
+                                title: "Notifications Enabled",
+                                description: "You'll now receive browser notifications for reminders.",
+                              });
+                            }
+                          } else {
+                            toast({
+                              title: "Not Supported",
+                              description: "Your browser doesn't support notifications.",
+                              variant: "destructive",
+                            });
+                          }
+                        }}
+                        data-testid="button-enable-notifications"
+                      >
+                        Enable Browser Notifications
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
         </CardContent>
       </Card>
 
