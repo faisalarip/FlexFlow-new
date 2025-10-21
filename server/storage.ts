@@ -73,12 +73,14 @@ import {
   type InsertProgressPhoto,
   type ProgressPhotoWithWorkout,
   type SubscriptionAudit,
-  type InsertSubscriptionAudit
+  type InsertSubscriptionAudit,
+  type NotificationPreferences,
+  type InsertNotificationPreferences
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 import * as bcrypt from "bcrypt";
 import { db } from "./db";
-import { users, communityPosts, workouts, progressPhotos, subscriptionAudit } from "@shared/schema";
+import { users, communityPosts, workouts, progressPhotos, subscriptionAudit, notificationPreferences } from "@shared/schema";
 import { eq, or, desc, sql, and } from "drizzle-orm";
 
 export interface IStorage {
@@ -208,6 +210,12 @@ export interface IStorage {
 
   // Subscription Audit
   createSubscriptionAudit(audit: InsertSubscriptionAudit): Promise<SubscriptionAudit>;
+
+  // Notification Preferences
+  getNotificationPreferences(userId: string): Promise<NotificationPreferences | undefined>;
+  createNotificationPreferences(preferences: InsertNotificationPreferences): Promise<NotificationPreferences>;
+  updateNotificationPreferences(userId: string, updates: Partial<NotificationPreferences>): Promise<NotificationPreferences | undefined>;
+  checkWorkoutReminderNeeded(userId: string): Promise<boolean>;
 
   // Meal Plans
   getMealPlans(goal?: string): Promise<MealPlanWithDetails[]>;
@@ -3985,6 +3993,91 @@ export class DatabaseStorage implements IStorage {
     } catch (error) {
       console.error("Error creating subscription audit in database:", error);
       throw error;
+    }
+  }
+
+  // Notification Preferences
+  async getNotificationPreferences(userId: string): Promise<NotificationPreferences | undefined> {
+    try {
+      const [preferences] = await db
+        .select()
+        .from(notificationPreferences)
+        .where(eq(notificationPreferences.userId, userId));
+      
+      return preferences;
+    } catch (error) {
+      console.error("Error getting notification preferences from database:", error);
+      throw error;
+    }
+  }
+
+  async createNotificationPreferences(preferences: InsertNotificationPreferences): Promise<NotificationPreferences> {
+    try {
+      const [newPreferences] = await db
+        .insert(notificationPreferences)
+        .values(preferences)
+        .returning();
+      
+      console.log(`Created notification preferences with ID: ${newPreferences.id}`);
+      return newPreferences;
+    } catch (error) {
+      console.error("Error creating notification preferences in database:", error);
+      throw error;
+    }
+  }
+
+  async updateNotificationPreferences(userId: string, updates: Partial<NotificationPreferences>): Promise<NotificationPreferences | undefined> {
+    try {
+      const [updated] = await db
+        .update(notificationPreferences)
+        .set({ ...updates, updatedAt: new Date() })
+        .where(eq(notificationPreferences.userId, userId))
+        .returning();
+      
+      console.log(`Updated notification preferences for user: ${userId}`);
+      return updated;
+    } catch (error) {
+      console.error("Error updating notification preferences in database:", error);
+      throw error;
+    }
+  }
+
+  async checkWorkoutReminderNeeded(userId: string): Promise<boolean> {
+    try {
+      // Get user's last workout
+      const [user] = await db
+        .select()
+        .from(users)
+        .where(eq(users.id, userId));
+      
+      if (!user || !user.lastWorkoutDate) {
+        return true; // No workout logged yet, reminder needed
+      }
+
+      // Get notification preferences
+      const prefs = await this.getNotificationPreferences(userId);
+      if (!prefs || !prefs.workoutRemindersEnabled) {
+        return false; // Reminders disabled
+      }
+
+      // Check if 24 hours have passed since last workout
+      const now = new Date();
+      const lastWorkout = new Date(user.lastWorkoutDate);
+      const hoursSinceLastWorkout = (now.getTime() - lastWorkout.getTime()) / (1000 * 60 * 60);
+
+      // Check if we've already sent a reminder recently (within last 6 hours)
+      if (prefs.lastWorkoutReminderSent) {
+        const lastReminder = new Date(prefs.lastWorkoutReminderSent);
+        const hoursSinceLastReminder = (now.getTime() - lastReminder.getTime()) / (1000 * 60 * 60);
+        if (hoursSinceLastReminder < 6) {
+          return false; // Already sent reminder recently
+        }
+      }
+
+      return hoursSinceLastWorkout >= 24;
+    } catch (error) {
+      console.error("Error checking workout reminder needed:", error);
+      return false;
     }
   }
 

@@ -1565,6 +1565,99 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Notification Preferences Routes
+
+  // Get notification preferences for user
+  app.get("/api/notification-preferences", authenticateToken, async (req, res) => {
+    try {
+      const userId = getAuthUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+
+      let preferences = await storage.getNotificationPreferences(userId);
+      
+      // Create default preferences if they don't exist
+      if (!preferences) {
+        preferences = await storage.createNotificationPreferences({
+          userId,
+          workoutRemindersEnabled: true,
+          mealNotificationsEnabled: true,
+          breakfastTime: "08:00",
+          lunchTime: "12:00",
+          dinnerTime: "18:00",
+          notificationPermissionGranted: false,
+        });
+      }
+
+      res.json(preferences);
+    } catch (error) {
+      console.error("Error fetching notification preferences:", error);
+      res.status(500).json({ message: "Failed to fetch notification preferences" });
+    }
+  });
+
+  // Update notification preferences
+  app.put("/api/notification-preferences", authenticateToken, async (req, res) => {
+    try {
+      const userId = getAuthUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+
+      const updates = req.body;
+      let updatedPreferences = await storage.updateNotificationPreferences(userId, updates);
+
+      // If preferences don't exist, create them first
+      if (!updatedPreferences) {
+        updatedPreferences = await storage.createNotificationPreferences({
+          userId,
+          ...updates,
+        });
+      }
+
+      res.json(updatedPreferences);
+    } catch (error) {
+      console.error("Error updating notification preferences:", error);
+      res.status(500).json({ message: "Failed to update notification preferences" });
+    }
+  });
+
+  // Check if workout reminder is needed
+  app.get("/api/notification-preferences/workout-reminder-needed", authenticateToken, async (req, res) => {
+    try {
+      const userId = getAuthUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+
+      const reminderNeeded = await storage.checkWorkoutReminderNeeded(userId);
+      res.json({ reminderNeeded });
+    } catch (error) {
+      console.error("Error checking workout reminder:", error);
+      res.status(500).json({ message: "Failed to check workout reminder" });
+    }
+  });
+
+  // Mark workout reminder as sent
+  app.post("/api/notification-preferences/workout-reminder-sent", authenticateToken, async (req, res) => {
+    try {
+      const userId = getAuthUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+
+      await storage.updateNotificationPreferences(userId, {
+        lastWorkoutReminderSent: new Date(),
+      });
+
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error marking workout reminder sent:", error);
+      res.status(500).json({ message: "Failed to mark workout reminder sent" });
+    }
+  });
+
   // Meal Plan Routes
 
   // Get all meal plans (optionally filtered by goal)
