@@ -793,6 +793,21 @@ export type ProgressPhotoWithWorkout = ProgressPhoto & {
   };
 };
 
+// Notification Preferences for workout reminders and meal times
+export const notificationPreferences = pgTable("notification_preferences", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id).notNull().unique(),
+  workoutRemindersEnabled: boolean("workout_reminders_enabled").default(true).notNull(),
+  mealNotificationsEnabled: boolean("meal_notifications_enabled").default(true).notNull(),
+  breakfastTime: varchar("breakfast_time").default("08:00"), // HH:MM format
+  lunchTime: varchar("lunch_time").default("12:00"), // HH:MM format
+  dinnerTime: varchar("dinner_time").default("18:00"), // HH:MM format
+  lastWorkoutReminderSent: timestamp("last_workout_reminder_sent"),
+  notificationPermissionGranted: boolean("notification_permission_granted").default(false),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 // Subscription Audit Table for tracking subscription state changes
 export const subscriptionAudit = pgTable("subscription_audit", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -803,6 +818,17 @@ export const subscriptionAudit = pgTable("subscription_audit", {
   timestamp: timestamp("timestamp").defaultNow().notNull(),
   metadata: jsonb("metadata"), // Additional data like Stripe event ID, error details, etc.
 });
+
+// Notification Preferences insert schema
+export const insertNotificationPreferencesSchema = createInsertSchema(notificationPreferences).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+// Notification Preferences types
+export type InsertNotificationPreferences = z.infer<typeof insertNotificationPreferencesSchema>;
+export type NotificationPreferences = typeof notificationPreferences.$inferSelect;
 
 // Subscription Audit insert schema
 export const insertSubscriptionAuditSchema = createInsertSchema(subscriptionAudit).omit({
