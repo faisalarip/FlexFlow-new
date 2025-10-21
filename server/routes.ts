@@ -22,7 +22,8 @@ import {
   insertPaymentSchema,
   insertUserMealPreferencesSchema,
   insertFoodItemSchema,
-  insertUserFoodPreferenceSchema
+  insertUserFoodPreferenceSchema,
+  insertBadgeSchema
 } from "@shared/schema";
 import { z } from "zod";
 import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
@@ -36,6 +37,7 @@ import { requireFeatureAccess } from "./services/subscription.js";
 import { PREMIUM_FEATURES } from "@shared/schema";
 import { signUpSchema, signInSchema } from "@shared/schema";
 import { ActivityLogger } from "./activity-logger";
+import { badgeService } from "./badge-service";
 
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -229,7 +231,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Badge routes
+  
+  // Get all available badges
+  app.get('/api/badges', async (req, res) => {
+    try {
+      const badges = await storage.getAllBadges();
+      res.json(badges);
+    } catch (error) {
+      console.error("Error fetching badges:", error);
+      res.status(500).json({ message: "Failed to fetch badges" });
+    }
+  });
 
+  // Get user's earned badges
+  app.get('/api/user/badges', authenticateToken, async (req, res) => {
+    try {
+      const userId = getAuthUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      
+      const userBadges = await storage.getUserBadges(userId);
+      res.json(userBadges);
+    } catch (error) {
+      console.error("Error fetching user badges:", error);
+      res.status(500).json({ message: "Failed to fetch user badges" });
+    }
+  });
+
+  // Check and award new badges based on current streak
+  app.post('/api/user/badges/check', authenticateToken, async (req, res) => {
+    try {
+      const userId = getAuthUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      
+      const newBadges = await badgeService.checkAndAwardBadges(userId);
+      res.json({ 
+        message: newBadges.length > 0 ? "New badges earned!" : "No new badges",
+        badges: newBadges 
+      });
+    } catch (error) {
+      console.error("Error checking badges:", error);
+      res.status(500).json({ message: "Failed to check badges" });
+    }
+  });
 
   // Get exercises
   app.get("/api/exercises", async (req, res) => {
