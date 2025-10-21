@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Play, Pause, Square, Timer, Activity, Target, History, MapPin, Zap, Flame, Trophy, Gauge, Music, Volume2, VolumeX, Upload } from "lucide-react";
+import { Play, Pause, Square, Timer, Activity, Target, History, MapPin, Zap, Flame, Trophy, Gauge } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -42,14 +42,6 @@ export default function MileTracker() {
   const gpsWatchRef = useRef<number | null>(null);
   const previousPositionRef = useRef<{ lat: number; lon: number; timestamp: number } | null>(null);
   const lastMileDistanceRef = useRef(0); // Track distance at last mile completion
-  
-  // Music player state
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [audioFile, setAudioFile] = useState<string | null>(null);
-  const [audioFileName, setAudioFileName] = useState<string>("");
-  const [isAudioPlaying, setIsAudioPlaying] = useState(false);
-  const [audioVolume, setAudioVolume] = useState(0.7);
-  const [isMuted, setIsMuted] = useState(false);
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -181,96 +173,6 @@ export default function MileTracker() {
     }
     return `${minutes}:${secs.toString().padStart(2, '0')}`;
   };
-
-  // Audio player functions
-  const handleAudioUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      if (!file.type.startsWith('audio/')) {
-        toast({
-          title: "Invalid File",
-          description: "Please upload an audio file (MP3, WAV, etc.)",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Revoke previous object URL to prevent memory leak
-      if (audioFile) {
-        URL.revokeObjectURL(audioFile);
-      }
-
-      const url = URL.createObjectURL(file);
-      setAudioFile(url);
-      setAudioFileName(file.name);
-      
-      if (audioRef.current) {
-        audioRef.current.src = url;
-        audioRef.current.volume = audioVolume; // Set initial volume
-        audioRef.current.load();
-      }
-
-      toast({
-        title: "Music Loaded",
-        description: `${file.name} ready to play!`,
-      });
-    }
-  };
-
-  const toggleAudioPlayback = () => {
-    if (!audioRef.current || !audioFile) return;
-
-    if (isAudioPlaying) {
-      audioRef.current.pause();
-      setIsAudioPlaying(false);
-    } else {
-      audioRef.current.play();
-      setIsAudioPlaying(true);
-    }
-  };
-
-  const toggleMute = () => {
-    if (!audioRef.current) return;
-    
-    if (isMuted) {
-      audioRef.current.volume = audioVolume;
-      setIsMuted(false);
-    } else {
-      audioRef.current.volume = 0;
-      setIsMuted(true);
-    }
-  };
-
-  const handleVolumeChange = (newVolume: number) => {
-    setAudioVolume(newVolume);
-    if (audioRef.current && !isMuted) {
-      audioRef.current.volume = newVolume;
-    }
-  };
-
-  // Audio ended event handler
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    const handleAudioEnd = () => {
-      setIsAudioPlaying(false);
-      audio.currentTime = 0; // Reset to beginning
-    };
-
-    const handleAudioPlay = () => setIsAudioPlaying(true);
-    const handleAudioPause = () => setIsAudioPlaying(false);
-
-    audio.addEventListener('ended', handleAudioEnd);
-    audio.addEventListener('play', handleAudioPlay);
-    audio.addEventListener('pause', handleAudioPause);
-
-    return () => {
-      audio.removeEventListener('ended', handleAudioEnd);
-      audio.removeEventListener('play', handleAudioPlay);
-      audio.removeEventListener('pause', handleAudioPause);
-    };
-  }, []);
 
   const formatPace = (seconds: number): string => {
     const minutes = Math.floor(seconds / 60);
@@ -486,15 +388,6 @@ export default function MileTracker() {
       stopGPSTracking();
     };
   }, []);
-
-  // Clean up audio object URL on unmount
-  useEffect(() => {
-    return () => {
-      if (audioFile) {
-        URL.revokeObjectURL(audioFile);
-      }
-    };
-  }, [audioFile]);
 
   // Component to auto-center map on current position
   function MapUpdater({ center }: { center: [number, number] | null }) {
@@ -768,122 +661,6 @@ export default function MileTracker() {
                     </Button>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-
-            {/* Music Player */}
-            <Card className="bg-gradient-to-br from-purple-950 via-black to-gray-900 border border-purple-500/50 shadow-xl shadow-purple-500/20">
-              <CardHeader>
-                <CardTitle className="flex items-center text-2xl font-bold text-purple-400">
-                  <Music className="mr-3 text-purple-500 animate-pulse" size={28} />
-                  🎵 WORKOUT BEATS 🎧
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {/* Hidden audio element */}
-                <audio ref={audioRef} loop />
-
-                {!audioFile ? (
-                  <div className="text-center py-6">
-                    <div className="text-5xl mb-4">🎵</div>
-                    <p className="text-purple-300 font-semibold mb-4">
-                      Upload your favorite music to keep you pumped!
-                    </p>
-                    <label htmlFor="audio-upload">
-                      <Button 
-                        className="bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900 text-white border border-purple-500"
-                        onClick={() => document.getElementById('audio-upload')?.click()}
-                        data-testid="upload-music-button"
-                      >
-                        <Upload className="mr-2" size={20} />
-                        Upload Music
-                      </Button>
-                    </label>
-                    <input
-                      id="audio-upload"
-                      type="file"
-                      accept="audio/*"
-                      onChange={handleAudioUpload}
-                      className="hidden"
-                      data-testid="audio-file-input"
-                    />
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between bg-purple-900/30 rounded-lg p-3 border border-purple-500/30">
-                      <div className="flex items-center space-x-3">
-                        <Music className="text-purple-400" size={20} />
-                        <div>
-                          <p className="text-purple-300 font-semibold text-sm truncate max-w-[200px]">
-                            {audioFileName}
-                          </p>
-                          <p className="text-purple-400/70 text-xs">Now Playing</p>
-                        </div>
-                      </div>
-                      <label htmlFor="audio-upload-change">
-                        <Button 
-                          size="sm"
-                          variant="outline"
-                          className="border-purple-500/50 text-purple-300"
-                          onClick={() => document.getElementById('audio-upload-change')?.click()}
-                        >
-                          Change
-                        </Button>
-                      </label>
-                      <input
-                        id="audio-upload-change"
-                        type="file"
-                        accept="audio/*"
-                        onChange={handleAudioUpload}
-                        className="hidden"
-                      />
-                    </div>
-
-                    <div className="flex items-center justify-center space-x-4">
-                      <Button
-                        onClick={toggleAudioPlayback}
-                        className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white border border-purple-500"
-                        size="lg"
-                        data-testid="toggle-audio-playback"
-                      >
-                        {isAudioPlaying ? (
-                          <>
-                            <Pause className="mr-2" size={20} />
-                            Pause Music
-                          </>
-                        ) : (
-                          <>
-                            <Play className="mr-2" size={20} />
-                            Play Music
-                          </>
-                        )}
-                      </Button>
-                    </div>
-
-                    <div className="flex items-center space-x-3 bg-purple-900/20 rounded-lg p-3 border border-purple-500/20">
-                      <Button
-                        onClick={toggleMute}
-                        variant="ghost"
-                        size="sm"
-                        className="text-purple-300"
-                        data-testid="toggle-mute"
-                      >
-                        {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
-                      </Button>
-                      <Slider
-                        value={[isMuted ? 0 : audioVolume * 100]}
-                        onValueChange={([value]) => handleVolumeChange(value / 100)}
-                        max={100}
-                        step={1}
-                        className="flex-1"
-                        data-testid="volume-slider"
-                      />
-                      <span className="text-purple-300 text-sm font-mono w-12 text-right">
-                        {Math.round((isMuted ? 0 : audioVolume) * 100)}%
-                      </span>
-                    </div>
-                  </div>
-                )}
               </CardContent>
             </Card>
 
