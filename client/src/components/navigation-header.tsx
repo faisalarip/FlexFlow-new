@@ -4,7 +4,6 @@ import { Link, useLocation } from "wouter";
 import { useNewAuth } from "@/hooks/useNewAuth";
 import PremiumBadge from "@/components/premium-badge";
 import ProfileEditor from "@/components/profile-editor";
-import DifficultyNotifications from "@/components/difficulty-notifications";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -89,7 +88,6 @@ export default function NavigationHeader() {
             >
               {isMobileMenuOpen ? <X className="text-xl" /> : <Menu className="text-xl" />}
             </button>
-            <DifficultyNotifications />
             <PremiumBadge />
             <div className="hidden md:flex items-center space-x-3">
               <DropdownMenu>
