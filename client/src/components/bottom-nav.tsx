@@ -44,7 +44,7 @@ export default function BottomNav() {
     <>
       {/* Bottom Navigation - Mobile Only */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 z-50 safe-area-inset-bottom">
-        <nav className="grid grid-cols-5 h-16">
+        <nav className="grid grid-cols-5 h-16" aria-label="Main navigation">
           {mainNavItems.map((item) => {
             const Icon = item.icon;
             const active = isActive(item.path);
@@ -54,6 +54,9 @@ export default function BottomNav() {
                 key={item.path}
                 href={item.path}
                 className="flex flex-col items-center justify-center space-y-1"
+                data-testid={`bottom-nav-${item.label.toLowerCase()}`}
+                aria-label={`Navigate to ${item.label}`}
+                aria-current={active ? "page" : undefined}
               >
                 <Icon 
                   size={22} 
@@ -63,6 +66,7 @@ export default function BottomNav() {
                       : "text-gray-500 dark:text-gray-400"
                   }`}
                   strokeWidth={active ? 2.5 : 2}
+                  aria-hidden="true"
                 />
                 <span 
                   className={`text-xs font-medium ${
@@ -80,7 +84,11 @@ export default function BottomNav() {
           {/* More Sheet Trigger */}
           <Sheet open={moreSheetOpen} onOpenChange={setMoreSheetOpen}>
             <SheetTrigger asChild>
-              <button className="flex flex-col items-center justify-center space-y-1">
+              <button 
+                className="flex flex-col items-center justify-center space-y-1"
+                data-testid="bottom-nav-more"
+                aria-label="Open more options menu"
+              >
                 <MoreHorizontal 
                   size={22} 
                   className={`transition-colors ${
@@ -89,6 +97,7 @@ export default function BottomNav() {
                       : "text-gray-500 dark:text-gray-400"
                   }`}
                   strokeWidth={isMoreActive ? 2.5 : 2}
+                  aria-hidden="true"
                 />
                 <span 
                   className={`text-xs font-medium ${
@@ -115,6 +124,8 @@ export default function BottomNav() {
                       key={item.path}
                       href={item.path}
                       onClick={() => setMoreSheetOpen(false)}
+                      data-testid={`more-menu-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
+                      aria-label={`Navigate to ${item.label}`}
                     >
                       <div 
                         className={`flex flex-col items-center justify-center p-4 rounded-2xl transition-all ${
@@ -123,7 +134,7 @@ export default function BottomNav() {
                             : "bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                         }`}
                       >
-                        <Icon size={28} className="mb-2" />
+                        <Icon size={28} className="mb-2" aria-hidden="true" />
                         <span className="text-xs font-medium text-center leading-tight">
                           {item.label}
                         </span>
@@ -141,6 +152,8 @@ export default function BottomNav() {
                     setMoreSheetOpen(false);
                     signOut();
                   }}
+                  data-testid="more-menu-signout"
+                  aria-label="Sign out of your account"
                 >
                   Sign Out
                 </Button>
