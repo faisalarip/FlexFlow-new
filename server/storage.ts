@@ -75,12 +75,17 @@ import {
   type SubscriptionAudit,
   type InsertSubscriptionAudit,
   type NotificationPreferences,
-  type InsertNotificationPreferences
+  type InsertNotificationPreferences,
+  type Badge,
+  type InsertBadge,
+  type UserBadge,
+  type InsertUserBadge,
+  type UserBadgeWithDetails
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 import * as bcrypt from "bcrypt";
 import { db } from "./db";
-import { users, communityPosts, workouts, progressPhotos, subscriptionAudit, notificationPreferences } from "@shared/schema";
+import { users, communityPosts, workouts, progressPhotos, subscriptionAudit, notificationPreferences, badges, userBadges } from "@shared/schema";
 import { eq, or, desc, sql, and } from "drizzle-orm";
 
 export interface IStorage {
@@ -217,6 +222,13 @@ export interface IStorage {
   updateNotificationPreferences(userId: string, updates: Partial<NotificationPreferences>): Promise<NotificationPreferences | undefined>;
   checkWorkoutReminderNeeded(userId: string): Promise<boolean>;
 
+  // Badges
+  getAllBadges(): Promise<Badge[]>;
+  getBadge(id: string): Promise<Badge | undefined>;
+  createBadgeIfNotExists(badge: InsertBadge): Promise<Badge>;
+  getUserBadges(userId: string): Promise<UserBadgeWithDetails[]>;
+  awardBadge(userId: string, badgeId: string): Promise<UserBadge>;
+
   // Meal Plans
   getMealPlans(goal?: string): Promise<MealPlanWithDetails[]>;
   getMealPlan(id: string): Promise<MealPlanWithDetails | undefined>;
@@ -317,6 +329,10 @@ export class MemStorage implements IStorage {
   private workoutPreferences: Map<string, WorkoutPreferences> = new Map();
   private workoutPlans: Map<string, WorkoutPlan> = new Map();
   private plannedWorkouts: Map<string, PlannedWorkout> = new Map();
+  private badges: Map<string, Badge> = new Map();
+  private userBadges: Map<string, UserBadge> = new Map();
+  private userActivityLogs: Map<string, UserActivityLog> = new Map();
+  private notificationPrefs: Map<string, NotificationPreferences> = new Map();
 
   constructor() {
     this.seedExercises();
@@ -1010,6 +1026,81 @@ export class MemStorage implements IStorage {
   async getUserActivities(userId: string, limit: number = 100): Promise<UserActivityLog[]> {
     const userActivityList = this.userActivities.get(userId) || [];
     return userActivityList.slice(0, limit);
+  }
+
+  // Badge methods
+  async getAllBadges(): Promise<Badge[]> {
+    return Array.from(this.badges.values());
+  }
+
+  async getBadge(id: string): Promise<Badge | undefined> {
+    return this.badges.get(id);
+  }
+
+  async createBadgeIfNotExists(badge: InsertBadge): Promise<Badge> {
+    // Check if badge with same name already exists
+    const existingBadge = Array.from(this.badges.values()).find(
+      b => b.name === badge.name
+    );
+    
+    if (existingBadge) {
+      return existingBadge;
+    }
+
+    const id = randomUUID();
+    const newBadge: Badge = {
+      id,
+      ...badge,
+      createdAt: new Date(),
+    };
+    
+    this.badges.set(id, newBadge);
+    return newBadge;
+  }
+
+  async getUserBadges(userId: string): Promise<UserBadgeWithDetails[]> {
+    const userBadgesList = Array.from(this.userBadges.values()).filter(
+      ub => ub.userId === userId
+    );
+    
+    const userBadgesWithDetails: UserBadgeWithDetails[] = [];
+    
+    for (const userBadge of userBadgesList) {
+      const badge = this.badges.get(userBadge.badgeId);
+      if (badge) {
+        userBadgesWithDetails.push({
+          ...userBadge,
+          badge,
+        });
+      }
+    }
+    
+    // Sort by earned date (newest first)
+    return userBadgesWithDetails.sort((a, b) => 
+      b.earnedAt.getTime() - a.earnedAt.getTime()
+    );
+  }
+
+  async awardBadge(userId: string, badgeId: string): Promise<UserBadge> {
+    // Check if user already has this badge
+    const existingUserBadge = Array.from(this.userBadges.values()).find(
+      ub => ub.userId === userId && ub.badgeId === badgeId
+    );
+    
+    if (existingUserBadge) {
+      return existingUserBadge;
+    }
+
+    const id = randomUUID();
+    const userBadge: UserBadge = {
+      id,
+      userId,
+      badgeId,
+      earnedAt: new Date(),
+    };
+    
+    this.userBadges.set(id, userBadge);
+    return userBadge;
   }
 
   // Authentication methods
