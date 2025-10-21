@@ -223,6 +223,25 @@ export const userActivityLog = pgTable("user_activity_log", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+// Badges for user achievements
+export const badges = pgTable("badges", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  description: text("description").notNull(),
+  iconName: text("icon_name").notNull(), // Icon identifier for rendering
+  category: text("category").notNull(), // consistency, milestone, achievement
+  requiredDays: integer("required_days"), // For consistency badges (7, 14, 30)
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// User badges tracking - which badges each user has earned
+export const userBadges = pgTable("user_badges", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  badgeId: varchar("badge_id").references(() => badges.id).notNull(),
+  earnedAt: timestamp("earned_at").defaultNow().notNull(),
+});
+
 export type UpsertUser = typeof users.$inferInsert;
 
 // Insert schemas
@@ -287,6 +306,16 @@ export const insertUserActivityLogSchema = createInsertSchema(userActivityLog).o
   createdAt: true,
 });
 
+export const insertBadgeSchema = createInsertSchema(badges).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertUserBadgeSchema = createInsertSchema(userBadges).omit({
+  id: true,
+  earnedAt: true,
+});
+
 export const insertPaymentSchema = createInsertSchema(payments).omit({
   id: true,
   createdAt: true,
@@ -346,6 +375,12 @@ export type PlannedWorkout = typeof plannedWorkouts.$inferSelect;
 export type InsertUserActivityLog = z.infer<typeof insertUserActivityLogSchema>;
 export type UserActivityLog = typeof userActivityLog.$inferSelect;
 
+export type InsertBadge = z.infer<typeof insertBadgeSchema>;
+export type Badge = typeof badges.$inferSelect;
+
+export type InsertUserBadge = z.infer<typeof insertUserBadgeSchema>;
+export type UserBadge = typeof userBadges.$inferSelect;
+
 export type InsertPayment = z.infer<typeof insertPaymentSchema>;
 export type Payment = typeof payments.$inferSelect;
 
@@ -379,6 +414,10 @@ export type BookingWithDetails = Booking & {
 
 export type TrainerReviewWithUser = TrainerReview & {
   user: Pick<User, "firstName" | "lastName" | "email">;
+};
+
+export type UserBadgeWithDetails = UserBadge & {
+  badge: Badge;
 };
 
 // Food entries for nutrition tracking
