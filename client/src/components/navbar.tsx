@@ -1,193 +1,62 @@
 import { Link, useLocation } from "wouter";
-import { Home, Users, Calendar, Trophy, Activity, Camera, Award, MapPin, MessageSquare, ChefHat, CreditCard, Star, ChevronDown, Menu, LogOut, Settings, Target, Apple } from "lucide-react";
+import { Activity, LogOut, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { useNewAuth } from "@/hooks/useNewAuth";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useState } from "react";
 
 export default function Navbar() {
   const [location] = useLocation();
   const { signOut } = useNewAuth();
-
-  const mainNavItems = [
-    { 
-      path: "/", 
-      label: "Home", 
-      icon: Home 
-    }
-  ];
-
-  const dropdownItems = [
-    { 
-      path: "/subscription", 
-      label: "Premium", 
-      icon: Star 
-    },
-    { 
-      path: "/workout-planner", 
-      label: "Workout Planner", 
-      icon: Target 
-    },
-    { 
-      path: "/mile-tracker", 
-      label: "Mile Tracker", 
-      icon: MapPin 
-    },
-    { 
-      path: "/community", 
-      label: "Community", 
-      icon: MessageSquare 
-    },
-    { 
-      path: "/meal-plans", 
-      label: "Meal Plans", 
-      icon: ChefHat 
-    },
-    { 
-      path: "/meal-tracker", 
-      label: "Professional Barcode Scanner", 
-      icon: Apple 
-    },
-    { 
-      path: "/progress-photos", 
-      label: "Progress Photos", 
-      icon: Camera 
-    },
-    { 
-      path: "/settings", 
-      label: "Settings", 
-      icon: Settings 
-    }
-  ];
-
-  const isDropdownActive = dropdownItems.some(item => location === item.path);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <nav className="bg-white dark:bg-gray-900 shadow-sm border-b border-gray-200 dark:border-gray-800 relative z-[80]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          <div className="flex items-center">
-            <div className="flex items-center space-x-2">
-              <Activity className="text-primary" size={32} />
-              <h1 className="text-xl font-bold text-gray-900 dark:text-white">FlexFlow</h1>
-            </div>
-          </div>
+    <nav className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-50">
+      <div className="px-4 sm:px-6">
+        <div className="flex justify-between items-center h-14">
+          {/* Logo - Centered on Mobile, Left on Desktop */}
+          <Link href="/" className="flex items-center space-x-2">
+            <Activity className="text-primary" size={28} />
+            <h1 className="text-lg font-bold text-gray-900 dark:text-white">FlexFlow</h1>
+          </Link>
 
-          <div className="flex items-center space-x-8">
-            {/* Main navigation items */}
-            {mainNavItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = location === item.path || 
-                (item.path === "/trainers" && location.startsWith("/trainers"));
-              
-              return (
-                <Link 
-                  key={item.path}
-                  href={item.path}
-                  className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    isActive
-                      ? "text-primary bg-primary/10"
-                      : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800"
-                  }`}
-                >
-                  <Icon size={18} />
-                  <span>{item.label}</span>
-                </Link>
-              );
-            })}
-
-            {/* Trainers dropdown menu */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button 
-                  variant="ghost" 
-                  className={`flex items-center space-x-2 px-3 py-2 text-sm font-medium transition-colors ${
-                    location === "/trainers" || location.startsWith("/trainers") || isDropdownActive
-                      ? "text-primary bg-primary/10"
-                      : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800"
-                  }`}
-                >
-                  <Users size={18} />
-                  <span>More</span>
-                  <ChevronDown size={14} />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56 z-[100]">
-                {dropdownItems.map((item) => {
-                  const Icon = item.icon;
-                  const isActive = location === item.path;
-                  
-                  // Special styling for Leaderboard
-                  if (item.label === "Leaderboard") {
-                    return (
-                      <DropdownMenuItem key={item.path} asChild>
-                        <Link 
-                          href={item.path}
-                          className={`relative flex items-center space-x-3 px-2 py-2 w-full cursor-pointer overflow-hidden group ${
-                            isActive ? "bg-gradient-to-r from-red-600 to-red-500 text-white" : "bg-gradient-to-r from-red-950/50 to-black hover:from-red-900/60 hover:to-red-950/50"
-                          }`}
-                        >
-                          {/* Animated background effects */}
-                          <div className="absolute inset-0 bg-gradient-to-r from-red-500/20 via-transparent to-red-500/20 animate-pulse opacity-50"></div>
-                          <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-red-400 to-transparent"></div>
-                          <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-red-400 to-transparent"></div>
-                          
-                          {/* Trophy animation on hover */}
-                          <div className="absolute right-2 opacity-0 group-hover:opacity-30 transition-opacity">
-                            <span className="text-xl animate-bounce">🏆</span>
-                          </div>
-                          
-                          <Icon size={16} className={`relative z-10 ${isActive ? "text-white" : "text-red-400"}`} />
-                          <span className={`relative z-10 font-semibold ${isActive ? "text-white" : "text-red-300"}`}>
-                            {item.label} ⭐
-                          </span>
-                        </Link>
-                      </DropdownMenuItem>
-                    );
-                  }
-                  
-                  return (
-                    <DropdownMenuItem key={item.path} asChild>
-                      <Link 
-                        href={item.path}
-                        className={`flex items-center space-x-3 px-2 py-2 w-full cursor-pointer ${
-                          isActive ? "bg-primary/10 text-primary" : ""
-                        }`}
-                      >
-                        <Icon size={16} />
-                        <span className={item.label === "Workout Planner" ? "text-white" : ""}>{item.label}</span>
-                      </Link>
-                    </DropdownMenuItem>
-                  );
-                })}
-                <hr className="my-2" />
-                <DropdownMenuItem>
-                  <button 
-                    onClick={signOut}
-                    className="flex items-center space-x-3 px-2 py-2 w-full cursor-pointer text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 bg-transparent border-none"
-                  >
-                    <LogOut size={16} />
-                    <span>Sign Out</span>
-                  </button>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-
-          <div className="flex items-center space-x-2">
-            
+          {/* Desktop Sign Out */}
+          <div className="hidden md:block">
             <Button
               variant="ghost"
               size="sm"
               onClick={signOut}
-              className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
+              className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
             >
-              <LogOut size={20} />
+              <LogOut size={18} className="mr-2" />
+              Sign Out
             </Button>
+          </div>
+
+          {/* Mobile Menu */}
+          <div className="md:hidden">
+            <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="sm" className="p-2">
+                  <Menu size={24} />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-64">
+                <div className="flex flex-col space-y-4 mt-8">
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start text-red-600 border-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+                    onClick={() => {
+                      setMenuOpen(false);
+                      signOut();
+                    }}
+                  >
+                    <LogOut size={18} className="mr-2" />
+                    Sign Out
+                  </Button>
+                </div>
+              </SheetContent>
+            </Sheet>
           </div>
         </div>
       </div>

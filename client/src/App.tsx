@@ -20,6 +20,7 @@ import ProgressPhotos from "@/pages/progress-photos";
 import Calendar from "@/pages/calendar";
 import NotFound from "@/pages/not-found";
 import Navbar from "@/components/navbar";
+import BottomNav from "@/components/bottom-nav";
 import Onboarding from "@/pages/onboarding";
 import OnboardingPlan from "@/pages/onboarding-plan";
 import TrialSuccess from "@/pages/trial-success";
@@ -29,7 +30,6 @@ import Tutorial from "@/pages/tutorial";
 import TermsOfService from "@/pages/terms-of-service";
 import PrivacyPolicy from "@/pages/privacy-policy";
 import { useNewAuth } from "@/hooks/useNewAuth";
-import { AppFooter } from "@/components/app-footer";
 
 function Router() {
   const { isAuthenticated, isLoading } = useNewAuth();
@@ -43,10 +43,10 @@ function Router() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-black flex flex-col">
+    <div className="min-h-screen bg-gray-50 dark:bg-black">
       {isAuthenticated && <Navbar />}
       
-      <div className="flex-1">
+      <main className="pb-safe">
         <Switch>
         {/* Legal pages - accessible to all users */}
         <Route path="/terms-of-service" component={TermsOfService} />
@@ -83,9 +83,9 @@ function Router() {
         )}
         <Route component={NotFound} />
       </Switch>
-      </div>
+      </main>
       
-      {isAuthenticated && <AppFooter />}
+      {isAuthenticated && <BottomNav />}
     </div>
   );
 }
