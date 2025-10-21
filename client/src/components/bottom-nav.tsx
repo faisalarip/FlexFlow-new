@@ -110,7 +110,7 @@ export default function BottomNav() {
                 </span>
               </button>
             </SheetTrigger>
-            <SheetContent side="bottom" className="h-[80vh] rounded-t-3xl">
+            <SheetContent side="bottom" className="h-[80vh] rounded-t-3xl z-[80]">
               <SheetHeader className="mb-6">
                 <SheetTitle className="text-center text-xl">More Options</SheetTitle>
               </SheetHeader>
