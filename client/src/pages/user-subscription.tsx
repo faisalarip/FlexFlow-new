@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Calendar, CheckCircle, XCircle, AlertCircle, Gift, Mail, MessageCircle } from "lucide-react";
+import { Calendar, CheckCircle, XCircle, AlertCircle, Gift, CreditCard } from "lucide-react";
 import { format } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -7,6 +7,16 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import StripeCheckout from "@/components/stripe-checkout";
+import { useState } from "react";
 
 interface UserSubscriptionStatus {
   subscriptionStatus: string;
@@ -22,6 +32,7 @@ interface UserSubscriptionStatus {
 export default function UserSubscription() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [showCheckout, setShowCheckout] = useState(false);
 
   const { data: subscriptionData, isLoading } = useQuery<UserSubscriptionStatus>({
     queryKey: ["/api/user/subscription"],
@@ -192,26 +203,32 @@ export default function UserSubscription() {
                 </AlertDescription>
               </Alert>
 
-              <div className="space-y-3">
-                <p className="text-sm font-medium text-gray-900 dark:text-white">Contact us to upgrade:</p>
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <Button asChild className="flex-1">
-                    <a href="mailto:support@flexflow.app">
-                      <Mail className="w-4 h-4 mr-2" />
-                      Email Us
-                    </a>
+              <Dialog open={showCheckout} onOpenChange={setShowCheckout}>
+                <DialogTrigger asChild>
+                  <Button className="w-full" size="lg" data-testid="button-upgrade-premium">
+                    <CreditCard className="w-4 h-4 mr-2" />
+                    Upgrade to Premium - $15.99/month
                   </Button>
-                  <Button asChild variant="outline" className="flex-1">
-                    <a href="sms:+1234567890">
-                      <MessageCircle className="w-4 h-4 mr-2" />
-                      Text Us
-                    </a>
-                  </Button>
-                </div>
-                <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
-                  We'll manually upgrade your account after receiving payment via Venmo, Cash App, or Zelle
-                </p>
-              </div>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Upgrade to Premium</DialogTitle>
+                    <DialogDescription>
+                      Complete your payment to unlock all premium features. Apple Pay, Google Pay, and credit cards accepted.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <StripeCheckout
+                    onSuccess={() => {
+                      setShowCheckout(false);
+                      queryClient.invalidateQueries({ queryKey: ["/api/user/subscription"] });
+                    }}
+                    onCancel={() => setShowCheckout(false)}
+                  />
+                </DialogContent>
+              </Dialog>
+              <p className="text-xs text-gray-500 dark:text-gray-400 text-center mt-3">
+                Secure payment powered by Stripe. Cancel anytime.
+              </p>
             </CardContent>
           </Card>
         )}
