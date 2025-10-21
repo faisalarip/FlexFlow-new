@@ -30,6 +30,7 @@ import Tutorial from "@/pages/tutorial";
 import TermsOfService from "@/pages/terms-of-service";
 import PrivacyPolicy from "@/pages/privacy-policy";
 import { useNewAuth } from "@/hooks/useNewAuth";
+import NotificationManager from "@/components/notification-manager";
 
 function Router() {
   const { isAuthenticated, isLoading } = useNewAuth();
@@ -44,7 +45,12 @@ function Router() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-black">
-      {isAuthenticated && <Navbar />}
+      {isAuthenticated && (
+        <>
+          <Navbar />
+          <NotificationManager />
+        </>
+      )}
       
       <main className="pb-safe">
         <Switch>
