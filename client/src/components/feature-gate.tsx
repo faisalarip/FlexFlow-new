@@ -49,7 +49,7 @@ function Camera({ className }: { className?: string }) {
 }
 
 // Premium-only features that require active subscription (no trial access)
-const PREMIUM_ONLY_FEATURES = ['workout_planner', 'meal_plans', 'meal_tracker'];
+const PREMIUM_ONLY_FEATURES = ['workout_planner', 'meal_tracker'];
 
 export default function FeatureGate({ feature, children, fallback }: FeatureGateProps) {
   const { user } = useNewAuth();
