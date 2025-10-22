@@ -42,8 +42,8 @@ export default function BottomNav() {
 
   return (
     <>
-      {/* Bottom Navigation - Mobile Only */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 z-50 safe-area-inset-bottom">
+      {/* Bottom Navigation - Mobile and Tablet */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 z-50 safe-area-inset-bottom">
         <nav className="grid grid-cols-5 h-16" aria-label="Main navigation">
           {mainNavItems.map((item) => {
             const Icon = item.icon;
@@ -163,8 +163,8 @@ export default function BottomNav() {
         </nav>
       </div>
 
-      {/* Spacer for bottom nav on mobile */}
-      <div className="md:hidden h-16" />
+      {/* Spacer for bottom nav on mobile and tablet */}
+      <div className="lg:hidden h-16" />
     </>
   );
 }

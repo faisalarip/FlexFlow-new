@@ -31,7 +31,7 @@ export default function NavigationHeader() {
             </div>
           </div>
 
-          <nav className="hidden md:flex space-x-8">
+          <nav className="hidden lg:flex space-x-8">
             <Link
               href="/"
               className={`transition-colors py-4 ${
@@ -80,7 +80,7 @@ export default function NavigationHeader() {
 
           <div className="flex items-center space-x-4">
             <PremiumBadge />
-            <div className="hidden md:flex items-center space-x-3">
+            <div className="hidden lg:flex items-center space-x-3">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="flex items-center space-x-2 hover:bg-gray-50" data-testid="user-menu-trigger">
