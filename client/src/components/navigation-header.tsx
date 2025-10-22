@@ -1,5 +1,4 @@
-import { Dumbbell, Menu, User, ChevronDown, X } from "lucide-react";
-import { useState } from "react";
+import { Dumbbell, User, ChevronDown } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useNewAuth } from "@/hooks/useNewAuth";
 import PremiumBadge from "@/components/premium-badge";
@@ -18,7 +17,6 @@ import type { User as UserType } from "@shared/schema";
 export default function NavigationHeader() {
   const { user } = useNewAuth() as { user: UserType | null };
   const [location] = useLocation();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const fullName = user ? `${user.firstName || ""} ${user.lastName || ""}`.trim() : "";
   const displayName = fullName || user?.email || "User";
 
@@ -81,13 +79,6 @@ export default function NavigationHeader() {
           </nav>
 
           <div className="flex items-center space-x-4">
-            <button 
-              className="md:hidden text-muted hover:text-primary transition-colors"
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              data-testid="mobile-menu-toggle"
-            >
-              {isMobileMenuOpen ? <X className="text-xl" /> : <Menu className="text-xl" />}
-            </button>
             <PremiumBadge />
             <div className="hidden md:flex items-center space-x-3">
               <DropdownMenu>
@@ -135,62 +126,6 @@ export default function NavigationHeader() {
           </div>
         </div>
       </div>
-      
-      {/* Mobile Menu */}
-      {isMobileMenuOpen && (
-        <div className="md:hidden bg-white border-b border-gray-200 shadow-lg relative z-[60]">
-          <nav className="px-4 py-2 space-y-1">
-            <Link
-              href="/"
-              className={`block px-3 py-2 rounded-md transition-colors ${
-                isActive("/")
-                  ? "text-primary bg-primary/10 font-medium"
-                  : "text-gray-600 hover:text-primary hover:bg-gray-50"
-              }`}
-              onClick={() => setIsMobileMenuOpen(false)}
-              data-testid="mobile-nav-home"
-            >
-              Home
-            </Link>
-            <Link
-              href="/workouts"
-              className={`block px-3 py-2 rounded-md transition-colors ${
-                isActive("/workouts")
-                  ? "text-primary bg-primary/10 font-medium"
-                  : "text-gray-600 hover:text-primary hover:bg-gray-50"
-              }`}
-              onClick={() => setIsMobileMenuOpen(false)}
-              data-testid="mobile-nav-workouts"
-            >
-              Workouts
-            </Link>
-            <Link
-              href="/progress"
-              className={`block px-3 py-2 rounded-md transition-colors ${
-                isActive("/progress")
-                  ? "text-primary bg-primary/10 font-medium"
-                  : "text-gray-600 hover:text-primary hover:bg-gray-50"
-              }`}
-              onClick={() => setIsMobileMenuOpen(false)}
-              data-testid="mobile-nav-progress"
-            >
-              Progress
-            </Link>
-            <Link
-              href="/calendar"
-              className={`block px-3 py-2 rounded-md transition-colors ${
-                isActive("/calendar")
-                  ? "text-primary bg-primary/10 font-medium"
-                  : "text-gray-600 hover:text-primary hover:bg-gray-50"
-              }`}
-              onClick={() => setIsMobileMenuOpen(false)}
-              data-testid="mobile-nav-calendar"
-            >
-              Calendar
-            </Link>
-          </nav>
-        </div>
-      )}
     </header>
   );
 }
