@@ -1,4 +1,5 @@
 import OpenAI from "openai";
+import { getMealImageUrl, getIngredientImageUrl } from "./imageService";
 
 // the newest OpenAI model is "gpt-5" which was released August 7, 2025. do not change this unless explicitly requested by the user
 const openai = new OpenAI({
@@ -46,31 +47,9 @@ export interface GeneratedMealPlan {
   }[];
 }
 
-// Helper function to get ingredient image URL
-function getIngredientImageUrl(ingredientName: string): string {
-  // Clean up the ingredient name for the URL
-  const cleanName = ingredientName
-    .toLowerCase()
-    .replace(/[()]/g, '')
-    .replace(/,.*/, '') // Remove anything after comma
-    .trim();
-  
-  // Use Picsum Photos for ingredient images (random with seed for consistency)
-  const seed = cleanName.replace(/\s+/g, '-');
-  return `https://picsum.photos/seed/${seed}-ingredient/200/200`;
-}
-
-// Helper function to get a meal image URL based on meal type and name
-function getMealImageUrl(mealType: string, mealName: string): string {
-  // Use Picsum Photos with seed for consistent images based on meal name
-  const seed = mealName.toLowerCase().replace(/\s+/g, '-') + '-' + mealType;
-  
-  // Return a placeholder food image based on meal type
-  return `https://picsum.photos/seed/${seed}/400/300`;
-}
 
 // Enhanced meal plan generator with user food preferences
-function generateMockMealPlan(options: MealPlanGenerationOptions): GeneratedMealPlan {
+async function generateMockMealPlan(options: MealPlanGenerationOptions): Promise<GeneratedMealPlan> {
   const {
     goal,
     dailyCalories,
@@ -375,12 +354,7 @@ function generateMockMealPlan(options: MealPlanGenerationOptions): GeneratedMeal
     const templates = mealTemplates[mealType as keyof typeof mealTemplates];
     const template = templates[dayIndex % templates.length];
 
-    // Generate ingredient image URLs
-    const ingredientImages: Record<string, string> = {};
-    template.ingredients.forEach(ingredient => {
-      ingredientImages[ingredient] = getIngredientImageUrl(ingredient);
-    });
-
+      // Note: Image URLs will be added later in batch
     return {
       mealType: mealType as "breakfast" | "lunch" | "dinner" | "snack",
       name: template.name,
@@ -393,8 +367,8 @@ function generateMockMealPlan(options: MealPlanGenerationOptions): GeneratedMeal
       instructions: template.instructions,
       prepTime: mealType === "breakfast" ? 10 : mealType === "snack" ? 5 : mealType === "lunch" ? 20 : 30,
       servings: 1,
-      imageUrl: getMealImageUrl(mealType, template.name),
-      ingredientImages
+      imageUrl: '',
+      ingredientImages: {}
     };
   };
 
@@ -411,6 +385,21 @@ function generateMockMealPlan(options: MealPlanGenerationOptions): GeneratedMeal
         generateMealVariations("snack", i - 1)
       ]
     });
+  }
+
+  // Fetch images for all meals
+  for (const day of days) {
+    for (const meal of day.meals) {
+      // Fetch meal image
+      meal.imageUrl = await getMealImageUrl(meal.mealType, meal.name);
+      
+      // Fetch ingredient images
+      const ingredientImages: Record<string, string> = {};
+      for (const ingredient of meal.ingredients) {
+        ingredientImages[ingredient] = await getIngredientImageUrl(ingredient);
+      }
+      meal.ingredientImages = ingredientImages;
+    }
   }
 
   return {
@@ -575,17 +564,17 @@ Please ensure each day's meals total approximately ${dailyCalories} calories and
       }
       
       // Add image URLs to each meal
-      day.meals.forEach((meal: any) => {
-        meal.imageUrl = getMealImageUrl(meal.mealType, meal.name);
+      for (const meal of day.meals) {
+        meal.imageUrl = await getMealImageUrl(meal.mealType, meal.name);
         
         // Add ingredient images
         if (meal.ingredients && Array.isArray(meal.ingredients)) {
           meal.ingredientImages = {};
-          meal.ingredients.forEach((ingredient: string) => {
-            meal.ingredientImages[ingredient] = getIngredientImageUrl(ingredient);
-          });
+          for (const ingredient of meal.ingredients) {
+            meal.ingredientImages[ingredient] = await getIngredientImageUrl(ingredient);
+          }
         }
-      });
+      }
     }
 
     return result as GeneratedMealPlan;
@@ -782,7 +771,9 @@ Respond with JSON in this exact format:
     }
 
     // Ensure each day has the required meal types and add image URLs
-    generatedPlan.days.forEach((day: any, dayIndex: number) => {
+    for (let dayIndex = 0; dayIndex < generatedPlan.days.length; dayIndex++) {
+      const day = generatedPlan.days[dayIndex];
+      
       if (!day.meals || !Array.isArray(day.meals)) {
         throw new Error(`Day ${dayIndex + 1} is missing meals array`);
       }
@@ -797,18 +788,18 @@ Respond with JSON in this exact format:
       });
       
       // Add image URLs to each meal
-      day.meals.forEach((meal: any) => {
-        meal.imageUrl = getMealImageUrl(meal.mealType, meal.name);
+      for (const meal of day.meals) {
+        meal.imageUrl = await getMealImageUrl(meal.mealType, meal.name);
         
         // Add ingredient images
         if (meal.ingredients && Array.isArray(meal.ingredients)) {
           meal.ingredientImages = {};
-          meal.ingredients.forEach((ingredient: string) => {
-            meal.ingredientImages[ingredient] = getIngredientImageUrl(ingredient);
-          });
+          for (const ingredient of meal.ingredients) {
+            meal.ingredientImages[ingredient] = await getIngredientImageUrl(ingredient);
+          }
         }
-      });
-    });
+      }
+    }
 
     console.log(`Successfully generated ${duration}-day meal plan: "${generatedPlan.name}"`);
     return generatedPlan as GeneratedMealPlan;
