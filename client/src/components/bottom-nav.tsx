@@ -42,8 +42,8 @@ export default function BottomNav() {
 
   return (
     <>
-      {/* Bottom Navigation - Mobile and Tablet */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 z-50 safe-area-inset-bottom">
+      {/* Bottom Navigation - Mobile and Tablet with bounce animation */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 z-50 safe-area-inset-bottom mobile-slide-up">
         <nav className="grid grid-cols-5 h-16" aria-label="Main navigation">
           {mainNavItems.map((item) => {
             const Icon = item.icon;
@@ -53,23 +53,23 @@ export default function BottomNav() {
               <Link 
                 key={item.path}
                 href={item.path}
-                className="flex flex-col items-center justify-center space-y-1"
+                className="flex flex-col items-center justify-center space-y-1 active:mobile-pop"
                 data-testid={`bottom-nav-${item.label.toLowerCase()}`}
                 aria-label={`Navigate to ${item.label}`}
                 aria-current={active ? "page" : undefined}
               >
                 <Icon 
                   size={22} 
-                  className={`transition-colors ${
+                  className={`transition-all duration-300 ${
                     active 
-                      ? "text-primary" 
+                      ? "text-primary mobile-pulse" 
                       : "text-gray-500 dark:text-gray-400"
                   }`}
                   strokeWidth={active ? 2.5 : 2}
                   aria-hidden="true"
                 />
                 <span 
-                  className={`text-xs font-medium ${
+                  className={`text-xs font-medium transition-colors ${
                     active 
                       ? "text-primary" 
                       : "text-gray-500 dark:text-gray-400"

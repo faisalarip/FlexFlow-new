@@ -103,46 +103,53 @@ export default function Home() {
             <img 
               src={heroImage} 
               alt="Men and women working out together" 
-              className="w-full h-48 object-cover rounded-xl shadow-lg shadow-red-900/50 border border-red-500/30 hover:scale-105 transition-transform"
+              className="w-full h-48 object-cover rounded-xl shadow-lg shadow-red-900/50 border border-red-500/30 hover:scale-105 transition-transform lg:desktop-fade-in mobile-slide-up"
+              style={{ animationDelay: '0s' }}
               data-testid="img-hero-1"
             />
             <img 
               src={womanWeights1} 
               alt="Woman strength training with weights" 
-              className="w-full h-48 object-cover rounded-xl shadow-lg shadow-red-900/50 border border-red-500/30 hover:scale-105 transition-transform"
+              className="w-full h-48 object-cover rounded-xl shadow-lg shadow-red-900/50 border border-red-500/30 hover:scale-105 transition-transform lg:desktop-fade-in mobile-slide-up"
+              style={{ animationDelay: '0.1s' }}
               data-testid="img-hero-2"
             />
             <img 
               src={manCardio1} 
               alt="Man doing cardio running" 
-              className="w-full h-48 object-cover rounded-xl shadow-lg shadow-red-900/50 border border-red-500/30 hover:scale-105 transition-transform"
+              className="w-full h-48 object-cover rounded-xl shadow-lg shadow-red-900/50 border border-red-500/30 hover:scale-105 transition-transform lg:desktop-fade-in mobile-slide-up"
+              style={{ animationDelay: '0.2s' }}
               data-testid="img-hero-3"
             />
             <img 
               src={groupFitness1} 
               alt="Group fitness class" 
-              className="w-full h-48 object-cover rounded-xl shadow-lg shadow-red-900/50 border border-red-500/30 hover:scale-105 transition-transform"
+              className="w-full h-48 object-cover rounded-xl shadow-lg shadow-red-900/50 border border-red-500/30 hover:scale-105 transition-transform lg:desktop-fade-in mobile-slide-up"
+              style={{ animationDelay: '0.3s' }}
               data-testid="img-hero-4"
             />
             <img 
               src={womanWeights2} 
               alt="Woman weightlifting in gym" 
-              className="w-full h-48 object-cover rounded-xl shadow-lg shadow-red-900/50 border border-red-500/30 hover:scale-105 transition-transform"
+              className="w-full h-48 object-cover rounded-xl shadow-lg shadow-red-900/50 border border-red-500/30 hover:scale-105 transition-transform lg:desktop-fade-in mobile-slide-up"
+              style={{ animationDelay: '0.4s' }}
               data-testid="img-hero-5"
             />
             <img 
               src={manCardio2} 
               alt="Man fitness exercise" 
-              className="w-full h-48 object-cover rounded-xl shadow-lg shadow-red-900/50 border border-red-500/30 hover:scale-105 transition-transform"
+              className="w-full h-48 object-cover rounded-xl shadow-lg shadow-red-900/50 border border-red-500/30 hover:scale-105 transition-transform lg:desktop-fade-in mobile-slide-up"
+              style={{ animationDelay: '0.5s' }}
               data-testid="img-hero-6"
             />
             <img 
               src={groupFitness2} 
               alt="People group workout" 
-              className="w-full h-48 object-cover rounded-xl shadow-lg shadow-red-900/50 border border-red-500/30 hover:scale-105 transition-transform"
+              className="w-full h-48 object-cover rounded-xl shadow-lg shadow-red-900/50 border border-red-500/30 hover:scale-105 transition-transform lg:desktop-fade-in mobile-slide-up"
+              style={{ animationDelay: '0.6s' }}
               data-testid="img-hero-7"
             />
-            <div className="w-full h-48 bg-gradient-to-br from-red-500 to-red-700 rounded-xl shadow-lg shadow-red-900/50 border border-red-500/30 flex items-center justify-center hover:scale-105 transition-transform">
+            <div className="w-full h-48 bg-gradient-to-br from-red-500 to-red-700 rounded-xl shadow-lg shadow-red-900/50 border border-red-500/30 flex items-center justify-center hover:scale-105 transition-transform lg:desktop-fade-in mobile-slide-up" style={{ animationDelay: '0.7s' }}>
               <div className="text-center text-white px-4">
                 <Dumbbell size={48} className="mx-auto mb-3" />
                 <p className="font-bold text-lg">Start Your Journey</p>
@@ -160,7 +167,7 @@ export default function Home() {
             What You Can Do
           </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {features.map((feature) => {
+            {features.map((feature, index) => {
               const Icon = feature.icon;
               const isLogWorkouts = feature.title === "Log Workouts";
               const isMileTracker = feature.title === "Mile Tracker";
@@ -168,7 +175,8 @@ export default function Home() {
               return (
                 <Link key={feature.title} href={feature.link}>
                   <Card 
-                    className={`relative overflow-hidden bg-gradient-to-br ${getColorClasses(feature.color)} border-0 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer group h-full`}
+                    className={`relative overflow-hidden bg-gradient-to-br ${getColorClasses(feature.color)} border-0 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer group h-full lg:desktop-scale-in mobile-bounce-in`}
+                    style={{ animationDelay: `${index * 0.1}s` }}
                     data-testid={feature.testId}
                   >
                     {isLogWorkouts && (

@@ -79,10 +79,10 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Desktop Horizontal Tabs - Only visible on large screens */}
+        {/* Desktop Horizontal Tabs - Only visible on large screens with desktop animations */}
         <div className="hidden lg:block border-t border-gray-200 dark:border-gray-800">
           <div className="flex items-center space-x-1 overflow-x-auto py-2">
-            {allNavItems.map((item) => {
+            {allNavItems.map((item, index) => {
               const Icon = item.icon;
               const active = isActive(item.path);
               
@@ -93,11 +93,12 @@ export default function Navbar() {
                   data-testid={`desktop-nav-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
                 >
                   <button
-                    className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
+                    className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 whitespace-nowrap desktop-slide-from-left ${
                       active 
-                        ? "bg-primary text-white shadow-sm" 
-                        : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                        ? "bg-primary text-white shadow-sm scale-105" 
+                        : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:scale-105"
                     }`}
+                    style={{ animationDelay: `${index * 0.03}s` }}
                   >
                     <Icon size={16} aria-hidden="true" />
                     <span>{item.label}</span>

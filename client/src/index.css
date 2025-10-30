@@ -30,6 +30,124 @@
     66% { transform: translateY(5px) rotate(-1deg); }
   }
 
+  /* Mobile-specific animations (playful, energetic) */
+  @keyframes mobile-slide-up {
+    0% { 
+      opacity: 0; 
+      transform: translateY(30px); 
+    }
+    100% { 
+      opacity: 1; 
+      transform: translateY(0); 
+    }
+  }
+
+  @keyframes mobile-bounce-in {
+    0% { 
+      opacity: 0; 
+      transform: scale(0.8) translateY(20px); 
+    }
+    50% { 
+      transform: scale(1.05) translateY(-5px); 
+    }
+    100% { 
+      opacity: 1; 
+      transform: scale(1) translateY(0); 
+    }
+  }
+
+  @keyframes mobile-pop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+    100% { transform: scale(1); }
+  }
+
+  @keyframes mobile-pulse {
+    0%, 100% { 
+      transform: scale(1);
+      opacity: 1;
+    }
+    50% { 
+      transform: scale(1.05);
+      opacity: 0.9;
+    }
+  }
+
+  /* Desktop-specific animations (smooth, professional) */
+  @keyframes desktop-fade-in {
+    0% { 
+      opacity: 0; 
+    }
+    100% { 
+      opacity: 1; 
+    }
+  }
+
+  @keyframes desktop-scale-in {
+    0% { 
+      opacity: 0; 
+      transform: scale(0.95); 
+    }
+    100% { 
+      opacity: 1; 
+      transform: scale(1); 
+    }
+  }
+
+  @keyframes desktop-slide-from-left {
+    0% { 
+      opacity: 0; 
+      transform: translateX(-20px); 
+    }
+    100% { 
+      opacity: 1; 
+      transform: translateX(0); 
+    }
+  }
+
+  @keyframes desktop-glow {
+    0%, 100% { 
+      box-shadow: 0 0 5px rgba(220, 38, 38, 0.3);
+    }
+    50% { 
+      box-shadow: 0 0 20px rgba(220, 38, 38, 0.5);
+    }
+  }
+
+  /* Mobile animation classes */
+  .mobile-slide-up {
+    animation: mobile-slide-up 0.4s ease-out forwards;
+  }
+
+  .mobile-bounce-in {
+    animation: mobile-bounce-in 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+  }
+
+  .mobile-pop {
+    animation: mobile-pop 0.3s ease-in-out;
+  }
+
+  .mobile-pulse {
+    animation: mobile-pulse 2s ease-in-out infinite;
+  }
+
+  /* Desktop animation classes */
+  .desktop-fade-in {
+    animation: desktop-fade-in 0.3s ease-out forwards;
+  }
+
+  .desktop-scale-in {
+    animation: desktop-scale-in 0.4s ease-out forwards;
+  }
+
+  .desktop-slide-from-left {
+    animation: desktop-slide-from-left 0.3s ease-out forwards;
+  }
+
+  .desktop-glow {
+    animation: desktop-glow 2s ease-in-out infinite;
+  }
+
   /* Mobile app utilities */
   .pb-safe {
     padding-bottom: env(safe-area-inset-bottom, 0px);
