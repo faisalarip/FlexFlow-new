@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Activity, LogOut, Menu } from "lucide-react";
+import { Activity, LogOut, Menu, Home, Dumbbell, TrendingUp, Users, ChefHat, Target, Apple, MapPin, Camera, Star, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNewAuth } from "@/hooks/useNewAuth";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -9,6 +9,25 @@ export default function Navbar() {
   const [location] = useLocation();
   const { signOut } = useNewAuth();
   const [menuOpen, setMenuOpen] = useState(false);
+
+  const allNavItems = [
+    { path: "/", label: "Home", icon: Home },
+    { path: "/workouts", label: "Workouts", icon: Dumbbell },
+    { path: "/progress", label: "Progress", icon: TrendingUp },
+    { path: "/community", label: "Community", icon: Users },
+    { path: "/subscription", label: "Premium", icon: Star },
+    { path: "/meal-plans", label: "Meal Plans", icon: ChefHat },
+    { path: "/workout-planner", label: "Workout Planner", icon: Target },
+    { path: "/meal-tracker", label: "Barcode Scanner", icon: Apple },
+    { path: "/mile-tracker", label: "Mile Tracker", icon: MapPin },
+    { path: "/progress-photos", label: "Progress Photos", icon: Camera },
+    { path: "/settings", label: "Settings", icon: Settings },
+  ];
+
+  const isActive = (path: string) => {
+    if (path === "/") return location === "/" || location === "/home";
+    return location.startsWith(path);
+  };
 
   return (
     <nav className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-50">
@@ -57,6 +76,35 @@ export default function Navbar() {
                 </div>
               </SheetContent>
             </Sheet>
+          </div>
+        </div>
+
+        {/* Desktop Horizontal Tabs - Only visible on large screens */}
+        <div className="hidden lg:block border-t border-gray-200 dark:border-gray-800">
+          <div className="flex items-center space-x-1 overflow-x-auto py-2">
+            {allNavItems.map((item) => {
+              const Icon = item.icon;
+              const active = isActive(item.path);
+              
+              return (
+                <Link 
+                  key={item.path}
+                  href={item.path}
+                  data-testid={`desktop-nav-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
+                >
+                  <button
+                    className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
+                      active 
+                        ? "bg-primary text-white shadow-sm" 
+                        : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                    }`}
+                  >
+                    <Icon size={16} aria-hidden="true" />
+                    <span>{item.label}</span>
+                  </button>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </div>
