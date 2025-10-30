@@ -40,8 +40,45 @@ export interface GeneratedMealPlan {
       instructions: string[];
       prepTime: number;
       servings: number;
+      imageUrl?: string;
+      ingredientImages?: Record<string, string>;
     }[];
   }[];
+}
+
+// Helper function to convert ingredient name to Spoonacular image URL
+function getIngredientImageUrl(ingredientName: string): string {
+  // Clean up the ingredient name for the URL
+  const cleanName = ingredientName
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/[()]/g, '')
+    .replace(/,.*/, '') // Remove anything after comma
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+  
+  // Use Spoonacular's ingredient image URL pattern
+  return `https://img.spoonacular.com/ingredients_250x250/${cleanName}.jpg`;
+}
+
+// Helper function to get a meal image URL based on meal type and name
+function getMealImageUrl(mealType: string, mealName: string): string {
+  // Use Unsplash Source for food images with relevant keywords
+  const keywords = mealName.toLowerCase()
+    .replace(/\s+/g, ',')
+    .split(',')
+    .slice(0, 3)
+    .join(',');
+  
+  // Return a placeholder food image based on meal type
+  const mealTypeImages: Record<string, string> = {
+    breakfast: `https://source.unsplash.com/400x300/?breakfast,food,${keywords}`,
+    lunch: `https://source.unsplash.com/400x300/?lunch,food,${keywords}`,
+    dinner: `https://source.unsplash.com/400x300/?dinner,food,${keywords}`,
+    snack: `https://source.unsplash.com/400x300/?snack,food,${keywords}`
+  };
+  
+  return mealTypeImages[mealType] || `https://source.unsplash.com/400x300/?food,${keywords}`;
 }
 
 // Enhanced meal plan generator with user food preferences
@@ -350,6 +387,12 @@ function generateMockMealPlan(options: MealPlanGenerationOptions): GeneratedMeal
     const templates = mealTemplates[mealType as keyof typeof mealTemplates];
     const template = templates[dayIndex % templates.length];
 
+    // Generate ingredient image URLs
+    const ingredientImages: Record<string, string> = {};
+    template.ingredients.forEach(ingredient => {
+      ingredientImages[ingredient] = getIngredientImageUrl(ingredient);
+    });
+
     return {
       mealType: mealType as "breakfast" | "lunch" | "dinner" | "snack",
       name: template.name,
@@ -361,7 +404,9 @@ function generateMockMealPlan(options: MealPlanGenerationOptions): GeneratedMeal
       ingredients: template.ingredients,
       instructions: template.instructions,
       prepTime: mealType === "breakfast" ? 10 : mealType === "snack" ? 5 : mealType === "lunch" ? 20 : 30,
-      servings: 1
+      servings: 1,
+      imageUrl: getMealImageUrl(mealType, template.name),
+      ingredientImages
     };
   };
 
@@ -535,11 +580,24 @@ Please ensure each day's meals total approximately ${dailyCalories} calories and
       throw new Error(`Expected ${duration} days, got ${result.days.length}`);
     }
 
-    // Validate each day has meals
+    // Validate each day has meals and add image URLs
     for (const day of result.days) {
       if (!day.meals || !Array.isArray(day.meals) || day.meals.length === 0) {
         throw new Error(`Day ${day.dayNumber} has no meals`);
       }
+      
+      // Add image URLs to each meal
+      day.meals.forEach((meal: any) => {
+        meal.imageUrl = getMealImageUrl(meal.mealType, meal.name);
+        
+        // Add ingredient images
+        if (meal.ingredients && Array.isArray(meal.ingredients)) {
+          meal.ingredientImages = {};
+          meal.ingredients.forEach((ingredient: string) => {
+            meal.ingredientImages[ingredient] = getIngredientImageUrl(ingredient);
+          });
+        }
+      });
     }
 
     return result as GeneratedMealPlan;
@@ -735,7 +793,7 @@ Respond with JSON in this exact format:
       throw new Error("Invalid meal plan structure received from AI");
     }
 
-    // Ensure each day has the required meal types
+    // Ensure each day has the required meal types and add image URLs
     generatedPlan.days.forEach((day: any, dayIndex: number) => {
       if (!day.meals || !Array.isArray(day.meals)) {
         throw new Error(`Day ${dayIndex + 1} is missing meals array`);
@@ -747,6 +805,19 @@ Respond with JSON in this exact format:
       requiredTypes.forEach(type => {
         if (!mealTypes.includes(type)) {
           console.warn(`Day ${dayIndex + 1} is missing ${type} meal`);
+        }
+      });
+      
+      // Add image URLs to each meal
+      day.meals.forEach((meal: any) => {
+        meal.imageUrl = getMealImageUrl(meal.mealType, meal.name);
+        
+        // Add ingredient images
+        if (meal.ingredients && Array.isArray(meal.ingredients)) {
+          meal.ingredientImages = {};
+          meal.ingredients.forEach((ingredient: string) => {
+            meal.ingredientImages[ingredient] = getIngredientImageUrl(ingredient);
+          });
         }
       });
     });
