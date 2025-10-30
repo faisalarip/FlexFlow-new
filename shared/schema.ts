@@ -590,6 +590,8 @@ export const mealPlanMeals = pgTable("meal_plan_meals", {
   instructions: text("instructions").array(),
   prepTime: integer("prep_time"), // minutes
   servings: integer("servings").notNull().default(1),
+  imageUrl: text("image_url"), // URL to meal image
+  ingredientImages: jsonb("ingredient_images"), // Object mapping ingredient names to image URLs
 });
 
 export const userMealPlans = pgTable("user_meal_plans", {
@@ -614,6 +616,7 @@ export const foodItems = pgTable("food_items", {
   fiberPer100g: integer("fiber_per_100g").default(0), // grams
   commonServingSize: text("common_serving_size"), // e.g., "1 medium apple (182g)"
   isCommon: boolean("is_common").default(true), // popular foods shown first
+  imageUrl: text("image_url"), // URL to food item image
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
