@@ -2586,6 +2586,8 @@ export class MemStorage implements IStorage {
           id: mealId,
           mealPlanDayId: dayId,
           ...meal,
+          imageUrl: null,
+          ingredientImages: null,
         };
         this.mealPlanMeals.set(mealId, mealPlanMeal);
       });
@@ -2665,6 +2667,8 @@ export class MemStorage implements IStorage {
           id: mealId,
           mealPlanDayId: dayId,
           ...meal,
+          imageUrl: null,
+          ingredientImages: null,
         };
         this.mealPlanMeals.set(mealId, mealPlanMeal);
       });
@@ -2912,6 +2916,8 @@ export class MemStorage implements IStorage {
           instructions: mealData.instructions || [],
           prepTime: mealData.prepTime,
           servings: mealData.servings,
+          imageUrl: mealData.imageUrl || null,
+          ingredientImages: mealData.ingredientImages || null,
         };
         this.mealPlanMeals.set(mealId, meal);
       }

@@ -563,7 +563,7 @@ Please ensure each day's meals total approximately ${dailyCalories} calories and
         }
       ],
       response_format: { type: "json_object" },
-      max_tokens: 4000,
+      max_completion_tokens: 4000,
     });
 
     const result = JSON.parse(response.choices[0].message.content || "{}");
@@ -776,7 +776,7 @@ Respond with JSON in this exact format:
       ],
       response_format: { type: "json_object" },
       temperature: 0.7,
-      max_tokens: 4000
+      max_completion_tokens: 4000
     });
 
     const content = response.choices[0].message.content;
