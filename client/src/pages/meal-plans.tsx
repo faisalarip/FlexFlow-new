@@ -621,6 +621,19 @@ export default function MealPlans() {
                               <div className="grid md:grid-cols-2 gap-4">
                                 {meals.map((meal: any) => (
                                   <div key={meal.id} className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+                                    {/* Meal Image */}
+                                    {meal.imageUrl && (
+                                      <div className="mb-3 rounded-lg overflow-hidden">
+                                        <img 
+                                          src={meal.imageUrl} 
+                                          alt={meal.name}
+                                          className="w-full h-40 object-cover"
+                                          loading="lazy"
+                                          data-testid={`meal-image-${meal.id}`}
+                                        />
+                                      </div>
+                                    )}
+                                    
                                     <div className="flex items-center justify-between mb-2">
                                       <h5 className="font-medium">{meal.name}</h5>
                                       {meal.prepTime && (
@@ -670,26 +683,54 @@ export default function MealPlans() {
                                             <ChevronDown size={14} className="text-gray-500" />
                                           )}
                                         </button>
-                                        <ul className="text-xs text-gray-600 dark:text-gray-400">
-                                          {expandedIngredients.has(meal.id) ? (
-                                            // Show all ingredients when expanded
-                                            meal.ingredients.map((ingredient: string, idx: number) => (
-                                              <li key={idx} className="py-0.5">• {ingredient}</li>
-                                            ))
-                                          ) : (
-                                            // Show only first 3 when collapsed
-                                            <>
-                                              {meal.ingredients.slice(0, 3).map((ingredient: string, idx: number) => (
-                                                <li key={idx} className="py-0.5">• {ingredient}</li>
-                                              ))}
-                                              {meal.ingredients.length > 3 && (
-                                                <li className="py-0.5 italic text-blue-600 dark:text-blue-400">
-                                                  • Click to see {meal.ingredients.length - 3} more ingredients...
-                                                </li>
-                                              )}
-                                            </>
-                                          )}
-                                        </ul>
+                                        {expandedIngredients.has(meal.id) ? (
+                                          // Show all ingredients with images when expanded
+                                          <div className="grid grid-cols-2 gap-2 mt-2">
+                                            {meal.ingredients.map((ingredient: string, idx: number) => (
+                                              <div key={idx} className="flex items-center gap-2 p-2 bg-white dark:bg-gray-900 rounded">
+                                                {meal.ingredientImages && meal.ingredientImages[ingredient] && (
+                                                  <img 
+                                                    src={meal.ingredientImages[ingredient]} 
+                                                    alt={ingredient}
+                                                    className="w-10 h-10 rounded object-cover flex-shrink-0"
+                                                    loading="lazy"
+                                                    data-testid={`ingredient-image-${idx}`}
+                                                    onError={(e) => {
+                                                      // Hide image if it fails to load
+                                                      e.currentTarget.style.display = 'none';
+                                                    }}
+                                                  />
+                                                )}
+                                                <span className="text-xs text-gray-700 dark:text-gray-300">{ingredient}</span>
+                                              </div>
+                                            ))}
+                                          </div>
+                                        ) : (
+                                          // Show only first 3 when collapsed
+                                          <ul className="text-xs text-gray-600 dark:text-gray-400">
+                                            {meal.ingredients.slice(0, 3).map((ingredient: string, idx: number) => (
+                                              <li key={idx} className="py-0.5 flex items-center gap-2">
+                                                {meal.ingredientImages && meal.ingredientImages[ingredient] && (
+                                                  <img 
+                                                    src={meal.ingredientImages[ingredient]} 
+                                                    alt={ingredient}
+                                                    className="w-6 h-6 rounded object-cover inline-block"
+                                                    loading="lazy"
+                                                    onError={(e) => {
+                                                      e.currentTarget.style.display = 'none';
+                                                    }}
+                                                  />
+                                                )}
+                                                <span>• {ingredient}</span>
+                                              </li>
+                                            ))}
+                                            {meal.ingredients.length > 3 && (
+                                              <li className="py-0.5 italic text-blue-600 dark:text-blue-400">
+                                                • Click to see {meal.ingredients.length - 3} more ingredients...
+                                              </li>
+                                            )}
+                                          </ul>
+                                        )}
                                       </div>
                                     </div>
                                   </div>
