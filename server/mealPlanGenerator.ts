@@ -46,19 +46,17 @@ export interface GeneratedMealPlan {
   }[];
 }
 
-// Helper function to convert ingredient name to Spoonacular image URL
+// Helper function to get ingredient image URL
 function getIngredientImageUrl(ingredientName: string): string {
   // Clean up the ingredient name for the URL
   const cleanName = ingredientName
     .toLowerCase()
-    .replace(/\s+/g, '-')
     .replace(/[()]/g, '')
     .replace(/,.*/, '') // Remove anything after comma
-    .replace(/-+/g, '-')
-    .replace(/^-|-$/g, '');
+    .trim();
   
-  // Use Spoonacular's ingredient image URL pattern
-  return `https://img.spoonacular.com/ingredients_250x250/${cleanName}.jpg`;
+  // Use Unsplash for ingredient images with relevant keywords
+  return `https://source.unsplash.com/200x200/?${encodeURIComponent(cleanName)},ingredient,food`;
 }
 
 // Helper function to get a meal image URL based on meal type and name
