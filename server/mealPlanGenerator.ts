@@ -55,28 +55,18 @@ function getIngredientImageUrl(ingredientName: string): string {
     .replace(/,.*/, '') // Remove anything after comma
     .trim();
   
-  // Use Unsplash for ingredient images with relevant keywords
-  return `https://source.unsplash.com/200x200/?${encodeURIComponent(cleanName)},ingredient,food`;
+  // Use Picsum Photos for ingredient images (random with seed for consistency)
+  const seed = cleanName.replace(/\s+/g, '-');
+  return `https://picsum.photos/seed/${seed}-ingredient/200/200`;
 }
 
 // Helper function to get a meal image URL based on meal type and name
 function getMealImageUrl(mealType: string, mealName: string): string {
-  // Use Unsplash Source for food images with relevant keywords
-  const keywords = mealName.toLowerCase()
-    .replace(/\s+/g, ',')
-    .split(',')
-    .slice(0, 3)
-    .join(',');
+  // Use Picsum Photos with seed for consistent images based on meal name
+  const seed = mealName.toLowerCase().replace(/\s+/g, '-') + '-' + mealType;
   
   // Return a placeholder food image based on meal type
-  const mealTypeImages: Record<string, string> = {
-    breakfast: `https://source.unsplash.com/400x300/?breakfast,food,${keywords}`,
-    lunch: `https://source.unsplash.com/400x300/?lunch,food,${keywords}`,
-    dinner: `https://source.unsplash.com/400x300/?dinner,food,${keywords}`,
-    snack: `https://source.unsplash.com/400x300/?snack,food,${keywords}`
-  };
-  
-  return mealTypeImages[mealType] || `https://source.unsplash.com/400x300/?food,${keywords}`;
+  return `https://picsum.photos/seed/${seed}/400/300`;
 }
 
 // Enhanced meal plan generator with user food preferences
