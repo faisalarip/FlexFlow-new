@@ -75,6 +75,7 @@ function Router() {
             <Route path="/home" component={Home} />
             <Route path="/dashboard" component={Dashboard} />
             <Route path="/subscription" component={UserSubscription} />
+            <Route path="/user/subscription" component={UserSubscription} />
             <Route path="/mile-tracker" component={MileTracker} />
             <Route path="/community" component={Community} />
             <Route path="/meal-plans" component={MealPlans} />
