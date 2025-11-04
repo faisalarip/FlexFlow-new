@@ -29,6 +29,20 @@ FlexFlow is a comprehensive fitness and wellness application built with React an
 - **Image Moderation**: Vision API scans uploaded images for inappropriate visual content
 - **Real-Time Protection**: Content is filtered before posting to maintain community standards
 
+### Apple App Store Connect Integration (November 2025)
+- **Native iOS Subscriptions**: Premium subscriptions handled through App Store Connect with official Apple library (@apple/app-store-server-library)
+- **Receipt Validation**: Backend API validates App Store receipts and syncs subscription status across devices
+- **Webhook Support**: Server Notifications endpoint handles subscription lifecycle events (renewals, expirations, cancellations, refunds)
+- **Transaction Tracking**: Stores Apple original transaction IDs to prevent duplicate subscriptions and enable cross-device sync
+- **Security**: Returns 503 when Apple credentials are missing; gracefully degrades functionality
+- **Required Environment Variables**:
+  - `APPLE_KEY_ID`: App Store Connect API key identifier
+  - `APPLE_ISSUER_ID`: App Store Connect issuer ID
+  - `APPLE_PRIVATE_KEY`: App Store Connect API private key (ES256 format)
+  - `APPLE_BUNDLE_ID`: iOS app bundle identifier (e.g., com.flexflow.app)
+  - `APPLE_APP_ID`: Numeric Apple app ID
+- **User Flow**: Web app directs users to download native iOS app for purchases; subscriptions automatically sync to web after purchase
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
