@@ -38,7 +38,9 @@ import { PREMIUM_FEATURES } from "@shared/schema";
 import { signUpSchema, signInSchema } from "@shared/schema";
 import { ActivityLogger } from "./activity-logger";
 import { badgeService } from "./badge-service";
+import { createAppleStoreService } from "./services/apple-store";
 
+const appleStoreService = createAppleStoreService();
 
 export async function registerRoutes(app: Express): Promise<Server> {
 
@@ -2059,25 +2061,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Activate paid subscription (after free trial or to reactivate)
-  app.post("/api/user/subscription/activate", authenticateToken, async (req, res) => {
+  // Verify Apple App Store receipt and activate subscription
+  app.post("/api/user/subscription/verify-receipt", authenticateToken, async (req, res) => {
     try {
+      if (!appleStoreService) {
+        return res.status(503).json({ 
+          message: "Apple App Store integration not configured. Please contact support.",
+          configured: false
+        });
+      }
+
       const userId = getAuthUserId(req);
       if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
       }
+
+      const { receipt, originalTransactionId } = req.body;
+      if (!receipt && !originalTransactionId) {
+        return res.status(400).json({ message: "Receipt or original transaction ID required" });
+      }
+
       const user = await storage.getUser(userId);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
 
-      const now = new Date();
-      const nextExpiry = new Date(now.getTime() + (30 * 24 * 60 * 60 * 1000)); // 30 days from now for paid subscription
+      let subscriptionInfo;
+      if (receipt) {
+        subscriptionInfo = await appleStoreService.verifyReceipt(receipt);
+      } else if (originalTransactionId) {
+        subscriptionInfo = await appleStoreService.getSubscriptionStatus(originalTransactionId);
+      }
+
+      if (!subscriptionInfo || !subscriptionInfo.isActive) {
+        return res.status(400).json({ 
+          message: "Invalid or expired subscription",
+          isActive: false
+        });
+      }
 
       const updatedUser = await storage.updateUser(userId, {
         subscriptionStatus: "active",
-        lastPaymentDate: now,
-        subscriptionExpiresAt: nextExpiry
+        lastPaymentDate: new Date(),
+        subscriptionExpiresAt: subscriptionInfo.expiresDate || null,
+        appleOriginalTransactionId: subscriptionInfo.originalTransactionId
       });
 
       if (!updatedUser) {
@@ -2085,15 +2112,84 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       res.json({
-        message: "Subscription activated successfully",
+        message: "Subscription verified and activated successfully",
         subscriptionStatus: "active",
-        lastPaymentDate: now,
-        subscriptionExpiresAt: nextExpiry,
-        monthlyFee: 15.99
+        isActive: subscriptionInfo.isActive,
+        expiresDate: subscriptionInfo.expiresDate,
+        productId: subscriptionInfo.productId
       });
     } catch (error) {
-      console.error("Error activating user subscription:", error);
-      res.status(500).json({ message: "Failed to activate subscription" });
+      console.error("Error verifying App Store receipt:", error);
+      res.status(500).json({ 
+        message: "Failed to verify receipt",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
+  // Apple App Store Server Notification Webhook
+  app.post("/api/webhooks/appstore", async (req, res) => {
+    try {
+      if (!appleStoreService) {
+        console.warn('App Store webhook received but service not configured');
+        return res.status(503).json({ message: "Service not configured" });
+      }
+
+      const { signedPayload } = req.body;
+      if (!signedPayload) {
+        return res.status(400).json({ message: "Missing signedPayload" });
+      }
+
+      const notification = await appleStoreService.verifyAndDecodeNotification(signedPayload);
+      const result = await appleStoreService.handleNotification(notification);
+
+      if (result.originalTransactionId) {
+        const usersWithTransaction = await storage.getUsersByAppleTransactionId(result.originalTransactionId);
+        
+        for (const user of usersWithTransaction) {
+          switch (result.action) {
+            case 'renewed':
+              const renewedInfo = await appleStoreService.getSubscriptionStatus(result.originalTransactionId);
+              await storage.updateUser(user.id, {
+                subscriptionStatus: 'active',
+                lastPaymentDate: new Date(),
+                subscriptionExpiresAt: renewedInfo.expiresDate || null
+              });
+              console.log(`Subscription renewed for user ${user.id}`);
+              break;
+
+            case 'expired':
+              await storage.updateUser(user.id, {
+                subscriptionStatus: 'expired'
+              });
+              console.log(`Subscription expired for user ${user.id}`);
+              break;
+
+            case 'cancelled':
+              await storage.updateUser(user.id, {
+                subscriptionStatus: 'inactive'
+              });
+              console.log(`Subscription cancelled for user ${user.id}`);
+              break;
+
+            case 'refunded':
+              await storage.updateUser(user.id, {
+                subscriptionStatus: 'inactive',
+                subscriptionExpiresAt: new Date()
+              });
+              console.log(`Subscription refunded for user ${user.id}`);
+              break;
+          }
+        }
+      }
+
+      res.status(200).json({ message: "Notification processed" });
+    } catch (error) {
+      console.error("Error processing App Store notification:", error);
+      res.status(500).json({ 
+        message: "Failed to process notification",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
     }
   });
 

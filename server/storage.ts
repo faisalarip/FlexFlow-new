@@ -104,6 +104,7 @@ export interface IStorage {
   getUserByEmail(email: string): Promise<User | undefined>;
   getUserByUsernameOrEmail(identifier: string): Promise<User | undefined>;
   verifyUserEmail(userId: string): Promise<User | undefined>;
+  getUsersByAppleTransactionId(transactionId: string): Promise<User[]>;
 
   // Activity logging methods
   createUserActivity(activityData: InsertUserActivityLog): Promise<UserActivityLog>;
@@ -3634,6 +3635,14 @@ export class DatabaseStorage implements IStorage {
       .from(users)
       .where(eq(users.email, email));
     return user;
+  }
+
+  async getUsersByAppleTransactionId(transactionId: string): Promise<User[]> {
+    const usersResult = await db
+      .select()
+      .from(users)
+      .where(eq(users.appleOriginalTransactionId, transactionId));
+    return usersResult;
   }
 
   async getUser(id: string): Promise<User | undefined> {

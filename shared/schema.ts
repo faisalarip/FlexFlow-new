@@ -38,6 +38,7 @@ export const users = pgTable("users", {
   trialEndDate: timestamp("trial_end_date").default(sql`NOW() + INTERVAL '7 days'`),
   stripeCustomerId: varchar("stripe_customer_id"),
   stripeSubscriptionId: varchar("stripe_subscription_id"),
+  appleOriginalTransactionId: varchar("apple_original_transaction_id"),
   personalPlanData: text("personal_plan_data"), // JSON string storing the user's personal plan and onboarding data
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),

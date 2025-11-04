@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Calendar, CheckCircle, XCircle, AlertCircle, Gift, Mail, MessageCircle, Sparkles, Zap, Crown, Star, TrendingUp, Heart, Award, Target } from "lucide-react";
+import { Calendar, CheckCircle, XCircle, AlertCircle, Gift, Sparkles, Zap, Crown, Star, TrendingUp, Heart, Award, Target } from "lucide-react";
 import { format } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -275,7 +275,7 @@ export default function UserSubscription() {
           </div>
         </div>
 
-        {/* Upgrade Section - Redesigned */}
+        {/* Upgrade Section - App Store Integration */}
         {!subscriptionData.isActive && (
           <Card className="border-0 bg-gradient-to-br from-red-600 via-orange-600 to-yellow-600 shadow-2xl overflow-hidden relative lg:desktop-scale-in mobile-bounce-in">
             <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMiIgZmlsbD0iI2ZmZiIgZmlsbC1vcGFjaXR5PSIwLjEiLz48L3N2Zz4=')] opacity-50"></div>
@@ -286,7 +286,7 @@ export default function UserSubscription() {
                 <Sparkles className="w-8 h-8 text-white mobile-pulse" />
               </div>
               <CardDescription className="text-white/90 text-center text-lg">
-                Contact us to unlock all features and supercharge your fitness journey
+                Subscribe through the App Store to unlock all premium features
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6 relative">
@@ -295,7 +295,7 @@ export default function UserSubscription() {
                   <div className="text-5xl font-bold text-white">$15.99</div>
                   <div className="text-white/90">
                     <div className="font-semibold">per month</div>
-                    <div className="text-sm">Unlimited access</div>
+                    <div className="text-sm">Cancel anytime</div>
                   </div>
                 </div>
 
@@ -314,24 +314,37 @@ export default function UserSubscription() {
               </div>
 
               <div className="space-y-4">
-                <p className="text-center text-white font-semibold text-lg">Ready to upgrade?</p>
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <Button asChild className="flex-1 bg-white text-red-600 hover:bg-gray-100 shadow-lg text-lg py-6">
-                    <a href="mailto:support@flexflow.app">
-                      <Mail className="w-5 h-5 mr-2" />
-                      Email Us
-                    </a>
-                  </Button>
-                  <Button asChild className="flex-1 bg-white/20 backdrop-blur-md text-white border-2 border-white hover:bg-white/30 shadow-lg text-lg py-6">
-                    <a href="sms:+1234567890">
-                      <MessageCircle className="w-5 h-5 mr-2" />
-                      Text Us
+                <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
+                  <div className="flex items-start gap-3 mb-4">
+                    <div className="p-2 bg-blue-500 rounded-lg">
+                      <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-white font-semibold mb-2">Native iOS App Required</h3>
+                      <p className="text-sm text-white/90 mb-3">
+                        App Store subscriptions are only available through the native iOS app. Download FlexFlow from the App Store to subscribe with your Apple ID.
+                      </p>
+                      <p className="text-xs text-white/80">
+                        💡 Once you subscribe in the iOS app, your premium features will automatically sync across all your devices including this web app.
+                      </p>
+                    </div>
+                  </div>
+                  <Button 
+                    className="w-full bg-white/20 backdrop-blur-md text-white border-2 border-white hover:bg-white/30 shadow-lg text-base py-6"
+                    data-testid="button-download-ios-app"
+                    asChild
+                  >
+                    <a href="https://apps.apple.com" target="_blank" rel="noopener noreferrer">
+                      <Crown className="w-5 h-5 mr-2" />
+                      Download iOS App
                     </a>
                   </Button>
                 </div>
                 <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20">
                   <p className="text-sm text-white/90 text-center">
-                    💳 We accept Venmo, Cash App, and Zelle. Your account will be upgraded manually within 24 hours of payment.
+                    🔒 Secure payment through Apple. Manage subscription anytime in your App Store settings.
                   </p>
                 </div>
               </div>
