@@ -156,6 +156,109 @@
   .safe-area-inset-bottom {
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
+
+  /* Mobile-native large titles */
+  .mobile-large-title {
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+
+  .mobile-subtitle {
+    font-size: 0.9rem;
+    font-weight: 400;
+    opacity: 0.7;
+    line-height: 1.4;
+  }
+
+  /* Floating Action Button */
+  .fab {
+    @apply fixed bottom-20 right-4 md:bottom-6 md:right-6 w-14 h-14 rounded-full shadow-2xl flex items-center justify-center z-40;
+    @apply bg-gradient-to-br from-primary to-orange-600 text-white;
+    @apply transition-all duration-300 hover:scale-110 active:scale-95;
+  }
+
+  /* Touch ripple effect */
+  @keyframes ripple {
+    0% {
+      transform: scale(0);
+      opacity: 0.6;
+    }
+    100% {
+      transform: scale(2.5);
+      opacity: 0;
+    }
+  }
+
+  .touch-ripple {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .touch-ripple::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    pointer-events: none;
+  }
+
+  .touch-ripple:active::after {
+    animation: ripple 0.6s ease-out;
+  }
+
+  /* Pull to refresh loader */
+  @keyframes pull-refresh-spin {
+    to { transform: rotate(360deg); }
+  }
+
+  .pull-refresh-spinner {
+    animation: pull-refresh-spin 1s linear infinite;
+  }
+
+  /* Mobile card with better touch affordances */
+  .mobile-card {
+    @apply rounded-2xl p-4 shadow-lg;
+    @apply transition-all duration-200 active:scale-[0.98];
+    min-height: 44px; /* iOS minimum touch target */
+  }
+
+  /* Backdrop blur for native feel */
+  .mobile-header-blur {
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    background: rgba(255, 255, 255, 0.8);
+  }
+
+  .dark .mobile-header-blur {
+    background: rgba(0, 0, 0, 0.8);
+  }
+
+  /* 8pt grid spacing system */
+  .spacing-xs { margin: 8px; }
+  .spacing-sm { margin: 16px; }
+  .spacing-md { margin: 24px; }
+  .spacing-lg { margin: 32px; }
+  .spacing-xl { margin: 40px; }
+
+  /* Swipeable item indicator */
+  .swipe-indicator {
+    @apply absolute right-0 top-0 bottom-0 w-20;
+    @apply bg-gradient-to-l from-red-500 to-transparent;
+    @apply flex items-center justify-end pr-4;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+  }
+
+  .swipe-item:hover .swipe-indicator {
+    transform: translateX(0);
+  }
 }
 
 :root {
@@ -263,17 +366,55 @@
     @apply font-sans antialiased bg-background text-foreground;
     -webkit-tap-highlight-color: transparent;
     -webkit-touch-callout: none;
+    overscroll-behavior-y: contain; /* Prevent pull-to-refresh on whole page */
   }
 
-  /* Mobile app styling */
+  /* Mobile-first typography and spacing */
   @media (max-width: 768px) {
     html {
-      font-size: 15px; /* Slightly tighter base font on mobile */
+      font-size: 16px; /* iOS standard */
     }
     
-    /* Reduce default card padding on mobile */
+    body {
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    /* Mobile-optimized headings */
+    h1 {
+      @apply text-3xl font-bold tracking-tight;
+      letter-spacing: -0.02em;
+    }
+
+    h2 {
+      @apply text-2xl font-semibold tracking-tight;
+      letter-spacing: -0.01em;
+    }
+
+    h3 {
+      @apply text-xl font-semibold;
+    }
+
+    /* Better button touch targets */
+    button, a {
+      min-height: 44px; /* iOS minimum touch target */
+      min-width: 44px;
+    }
+
+    /* Improve spacing consistency */
+    .container {
+      @apply px-4;
+    }
+
+    /* Card improvements */
     .card {
-      @apply p-3;
+      @apply rounded-2xl shadow-lg;
+    }
+  }
+
+  /* Desktop refinements */
+  @media (min-width: 769px) {
+    .container {
+      @apply px-8;
     }
   }
 }

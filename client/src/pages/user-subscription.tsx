@@ -145,7 +145,7 @@ export default function UserSubscription() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-red-50 to-orange-50 dark:from-black dark:via-gray-900 dark:to-red-950 p-4 md:p-8 overflow-hidden relative">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-red-50 to-orange-50 dark:from-black dark:via-gray-900 dark:to-red-950 p-4 md:p-6 pb-24 md:pb-8 overflow-hidden relative">
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-72 h-72 bg-red-500/10 rounded-full blur-3xl lg:desktop-fade-in mobile-pulse" style={{ animationDelay: '0s' }}></div>
@@ -153,18 +153,18 @@ export default function UserSubscription() {
         <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl lg:desktop-fade-in mobile-pulse" style={{ animationDelay: '1s' }}></div>
       </div>
 
-      <div className="max-w-6xl mx-auto space-y-8 relative z-10">
-        {/* Hero Header */}
+      <div className="max-w-6xl mx-auto space-y-6 md:space-y-8 relative z-10">
+        {/* Hero Header - mobile-native */}
         <div className="text-center lg:desktop-scale-in mobile-bounce-in">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <Crown className="w-12 h-12 text-yellow-500 lg:desktop-glow mobile-pulse" />
-            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-red-600 via-orange-600 to-yellow-600 bg-clip-text text-transparent">
-              FlexFlow Premium
+          <div className="flex items-center justify-center gap-2 md:gap-3 mb-3 md:mb-4">
+            <Crown className="w-10 h-10 md:w-12 md:h-12 text-yellow-500 lg:desktop-glow mobile-pulse" />
+            <h1 className="mobile-large-title md:text-5xl font-bold bg-gradient-to-r from-red-600 via-orange-600 to-yellow-600 bg-clip-text text-transparent">
+              Premium
             </h1>
-            <Crown className="w-12 h-12 text-yellow-500 lg:desktop-glow mobile-pulse" />
+            <Crown className="w-10 h-10 md:w-12 md:h-12 text-yellow-500 lg:desktop-glow mobile-pulse" />
           </div>
-          <p className="text-lg md:text-xl text-gray-700 dark:text-gray-300 max-w-2xl mx-auto">
-            Unlock the full power of AI-driven fitness and nutrition tracking
+          <p className="mobile-subtitle md:text-xl text-gray-700 dark:text-gray-300 max-w-2xl mx-auto px-4">
+            Unlock AI-powered fitness and nutrition
           </p>
         </div>
 

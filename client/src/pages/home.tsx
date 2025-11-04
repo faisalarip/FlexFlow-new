@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
-import { Link } from "wouter";
-import { Dumbbell, Target, TrendingUp, MapPin, Users, Sparkles, ChevronRight } from "lucide-react";
+import { Link, useLocation } from "wouter";
+import { Dumbbell, Target, TrendingUp, MapPin, Users, Sparkles, ChevronRight, Plus } from "lucide-react";
 import NavigationHeader from "@/components/navigation-header";
 import MobileNavigation from "@/components/mobile-navigation";
 import QuickStats from "@/components/quick-stats";
 import ProfileEditor from "@/components/profile-editor";
 import { useNewAuth } from "@/hooks/useNewAuth";
 import { Card, CardContent } from "@/components/ui/card";
+import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
+import { useQueryClient } from "@tanstack/react-query";
 import heroImage from "@assets/stock_images/men_and_women_workin_dbbf742b.jpg";
 import womanWeights1 from "@assets/stock_images/woman_strength_train_10dee1d1.jpg";
 import womanWeights2 from "@assets/stock_images/woman_strength_train_eff6079d.jpg";
@@ -18,6 +20,21 @@ import groupFitness2 from "@assets/stock_images/people_group_fitness_0fe8a6fd.jp
 export default function Home() {
   const [showProfileEditor, setShowProfileEditor] = useState(false);
   const { user } = useNewAuth();
+  const [, navigate] = useLocation();
+  const queryClient = useQueryClient();
+
+  // Pull to refresh functionality - scoped to home page queries
+  const handleRefresh = async () => {
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: ['/api/stats'] }),
+      queryClient.invalidateQueries({ queryKey: ['/api/notification-preferences'] }),
+      queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] })
+    ]);
+  };
+
+  const { containerRef, PullToRefreshIndicator, isRefreshing } = usePullToRefresh({
+    onRefresh: handleRefresh
+  });
 
   // Auto-open profile editor when user first logs in
   useEffect(() => {
@@ -80,20 +97,32 @@ export default function Home() {
   };
 
   return (
-    <div className="font-inter bg-black text-gray-200 min-h-screen">
+    <div ref={containerRef} className="font-inter bg-black text-gray-200 min-h-screen">
+      <PullToRefreshIndicator />
       <NavigationHeader />
       <MobileNavigation />
       
-      <main className="max-w-6xl mx-auto px-3 sm:px-4 py-4 pb-20 md:pb-8">
-        {/* Welcome Hero */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-red-500 to-red-700 bg-clip-text text-transparent" data-testid="text-welcome">
-            Welcome to FlexFlow
+      <main className="max-w-6xl mx-auto px-4 md:px-6 py-6 pb-24 md:pb-8">
+        {/* Mobile-native header */}
+        <div className="mb-8 md:mb-12">
+          <h1 className="mobile-large-title md:text-5xl bg-gradient-to-r from-red-500 via-orange-500 to-red-700 bg-clip-text text-transparent mb-2 lg:desktop-scale-in mobile-bounce-in" data-testid="text-welcome">
+            Welcome Back
           </h1>
-          <p className="text-xl md:text-2xl text-gray-300 mb-6" data-testid="text-tagline">
-            Your complete fitness tracking companion
+          <p className="mobile-subtitle md:text-xl text-gray-400 lg:desktop-fade-in mobile-slide-up" data-testid="text-tagline">
+            Your complete fitness companion
           </p>
-          <p className="text-lg text-gray-400 max-w-2xl mx-auto mb-8" data-testid="text-description">
+        </div>
+
+        {/* Quick access banner - mobile-optimized */}
+        <div className="mb-6 p-4 bg-gradient-to-r from-red-600 to-orange-600 rounded-2xl shadow-xl lg:desktop-slide-from-left mobile-bounce-in">
+          <p className="text-white font-medium text-sm md:text-base" data-testid="text-description">
+            💪 Ready to crush your goals? Start logging workouts or explore AI-powered plans!
+          </p>
+        </div>
+
+        {/* Image Gallery - hidden on mobile for performance */}
+        <div className="hidden md:grid">
+          <p className="text-lg text-gray-400 max-w-2xl mx-auto mb-8 text-center">
             Track workouts, monitor progress, and use GPS to automatically count your miles. 
             Upgrade to Premium for AI-powered workout and meal recommendations.
           </p>
@@ -161,12 +190,12 @@ export default function Home() {
         {/* Quick Stats Overview */}
         <QuickStats />
 
-        {/* Features Grid */}
-        <div className="mt-12">
-          <h2 className="text-2xl font-bold mb-6 text-center text-red-400" data-testid="text-features-heading">
-            What You Can Do
+        {/* Features Grid - mobile-optimized cards */}
+        <div className="mt-8 md:mt-12">
+          <h2 className="text-2xl md:text-3xl font-bold mb-6 text-red-400 mobile-large-title md:mobile-large-title" data-testid="text-features-heading">
+            Quick Actions
           </h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {features.map((feature, index) => {
               const Icon = feature.icon;
               const isLogWorkouts = feature.title === "Log Workouts";
@@ -175,7 +204,7 @@ export default function Home() {
               return (
                 <Link key={feature.title} href={feature.link}>
                   <Card 
-                    className={`relative overflow-hidden bg-gradient-to-br ${getColorClasses(feature.color)} border-0 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer group h-full lg:desktop-scale-in mobile-bounce-in`}
+                    className={`mobile-card relative overflow-hidden bg-gradient-to-br ${getColorClasses(feature.color)} border-0 shadow-xl hover:shadow-2xl transition-all duration-200 cursor-pointer group h-full touch-ripple lg:desktop-scale-in mobile-bounce-in active:scale-95`}
                     style={{ animationDelay: `${index * 0.1}s` }}
                     data-testid={feature.testId}
                   >
@@ -274,6 +303,16 @@ export default function Home() {
         isOpen={showProfileEditor} 
         setIsOpen={setShowProfileEditor}
       />
+
+      {/* Floating Action Button - mobile-native */}
+      <button
+        onClick={() => navigate("/workouts")}
+        className="fab mobile-pulse"
+        aria-label="Log new workout"
+        data-testid="button-fab-workout"
+      >
+        <Plus size={28} />
+      </button>
     </div>
   );
 }
