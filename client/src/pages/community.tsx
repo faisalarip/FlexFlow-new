@@ -192,111 +192,102 @@ export default function Community() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-red-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-red-900/20 relative overflow-hidden">
-      {/* Animated background elements */}
+      {/* Simplified background for mobile, full effects on desktop */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-purple-400/20 to-pink-400/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-red-400/20 to-orange-400/20 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-60 h-60 bg-gradient-to-br from-blue-400/10 to-purple-400/10 rounded-full blur-2xl animate-spin" style={{animationDuration: '20s'}}></div>
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-purple-400/20 to-pink-400/20 rounded-full blur-3xl hidden md:block animate-pulse"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-red-400/20 to-orange-400/20 rounded-full blur-3xl hidden md:block animate-pulse" style={{animationDelay: '1s'}}></div>
         
-        {/* Floating fitness icons */}
-        <div className="absolute top-20 left-20 animate-bounce" style={{animationDuration: '3s', animationDelay: '0s'}}>
-          <Dumbbell className="w-6 h-6 text-purple-400/60" />
-        </div>
-        <div className="absolute top-40 right-32 animate-bounce" style={{animationDuration: '4s', animationDelay: '1s'}}>
-          <Trophy className="w-8 h-8 text-yellow-400/60" />
-        </div>
-        <div className="absolute bottom-40 left-32 animate-bounce" style={{animationDuration: '3.5s', animationDelay: '2s'}}>
-          <Target className="w-7 h-7 text-green-400/60" />
-        </div>
-        <div className="absolute bottom-20 right-20 animate-bounce" style={{animationDuration: '4.5s', animationDelay: '0.5s'}}>
-          <Zap className="w-6 h-6 text-orange-400/60" />
-        </div>
+        {/* Mobile-friendly gradient */}
+        <div className="absolute inset-0 bg-gradient-to-b from-purple-500/5 via-transparent to-pink-500/5 md:hidden"></div>
         
         {/* Animated gradient lines */}
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 animate-pulse"></div>
-        <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-red-500 via-pink-500 to-purple-500 animate-pulse" style={{animationDelay: '1s'}}></div>
       </div>
       
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
-        <div className="mb-12 text-center">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full mb-6 animate-pulse">
-            <Users className="w-8 h-8 text-white" />
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 relative z-10">
+        {/* Mobile-native header */}
+        <div className="mb-6 md:mb-12">
+          <div className="flex items-center gap-3 mb-4 md:mb-6">
+            <div className="flex items-center justify-center w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full shrink-0">
+              <Users className="w-6 h-6 md:w-8 md:h-8 text-white" />
+            </div>
+            <h1 className="text-[32px] md:text-5xl font-black bg-gradient-to-r from-purple-600 via-pink-600 to-red-600 bg-clip-text text-transparent tracking-tight leading-none">
+              Community Hub
+            </h1>
           </div>
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-red-600 bg-clip-text text-transparent mb-4">
-            Community Hub
-          </h1>
-          <p className="text-xl text-gray-700 dark:text-gray-300 max-w-2xl mx-auto">
-            Join the fitness revolution! Share your victories, inspire others, and get motivated by amazing people like you 🚀
+          <p className="text-base md:text-xl text-gray-700 dark:text-gray-300 mb-4 md:mb-6 leading-snug">
+            Share your victories, inspire others, and get motivated 🚀
           </p>
-          <div className="flex items-center justify-center space-x-8 mt-6">
-            <div className="flex items-center space-x-2 text-purple-600">
-              <Sparkles className="w-5 h-5" />
-              <span className="font-medium">Share Progress</span>
+          <div className="flex flex-wrap gap-3 md:gap-4">
+            <div className="flex items-center gap-1.5 text-purple-600 bg-purple-50 dark:bg-purple-900/20 px-3 py-2 rounded-full">
+              <Sparkles className="w-4 h-4" />
+              <span className="text-sm font-medium">Share</span>
             </div>
-            <div className="flex items-center space-x-2 text-pink-600">
-              <Heart className="w-5 h-5" />
-              <span className="font-medium">Get Motivated</span>
+            <div className="flex items-center gap-1.5 text-pink-600 bg-pink-50 dark:bg-pink-900/20 px-3 py-2 rounded-full">
+              <Heart className="w-4 h-4" />
+              <span className="text-sm font-medium">Motivate</span>
             </div>
-            <div className="flex items-center space-x-2 text-red-600">
-              <TrendingUp className="w-5 h-5" />
-              <span className="font-medium">Level Up</span>
+            <div className="flex items-center gap-1.5 text-red-600 bg-red-50 dark:bg-red-900/20 px-3 py-2 rounded-full">
+              <TrendingUp className="w-4 h-4" />
+              <span className="text-sm font-medium">Level Up</span>
             </div>
           </div>
         </div>
 
         {/* Create Post */}
-        <Card className="mb-12 bg-gradient-to-br from-white to-purple-50/50 dark:from-gray-800 dark:to-purple-900/20 border-purple-200 dark:border-purple-700 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
-          <CardHeader className="bg-gradient-to-r from-purple-500/10 via-pink-500/10 to-red-500/10">
-            <CardTitle className="flex items-center text-2xl">
-              <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center mr-3 animate-pulse">
-                <Sparkles className="w-5 h-5 text-white" />
+        <Card className="mb-6 md:mb-12 bg-gradient-to-br from-white to-purple-50/50 dark:from-gray-800 dark:to-purple-900/20 border-purple-200 dark:border-purple-700 shadow-lg md:shadow-xl">
+          <CardHeader className="bg-gradient-to-r from-purple-500/10 via-pink-500/10 to-red-500/10 p-4 md:p-6">
+            <CardTitle className="flex items-center text-lg md:text-2xl">
+              <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center mr-2 md:mr-3 shrink-0">
+                <Sparkles className="w-4 h-4 md:w-5 md:h-5 text-white" />
               </div>
               <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                 Share Your Journey
               </span>
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-6 p-6">
+          <CardContent className="space-y-4 md:space-y-6 p-4 md:p-6">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2 flex items-center">
+              <label className="block text-sm md:text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2 flex items-center">
                 <Target className="w-4 h-4 mr-2 text-purple-500" />
                 Choose Your Vibe
               </label>
               <Select value={selectedPostType} onValueChange={(value: "message" | "workout_progress" | "goal_achievement") => setSelectedPostType(value)}>
-                <SelectTrigger className="w-full h-10 bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200 hover:border-purple-300 transition-colors text-sm">
+                <SelectTrigger className="w-full min-h-[44px] bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200 hover:border-purple-300 transition-colors text-base" data-testid="select-post-type">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="message" className="cursor-pointer hover:bg-purple-50">
-                    💬 <span className="font-medium">General Thoughts</span> - Share what's on your mind
+                  <SelectItem value="message" className="cursor-pointer hover:bg-purple-50 min-h-[44px] text-base">
+                    💬 <span className="font-medium">General Thoughts</span>
                   </SelectItem>
-                  <SelectItem value="workout_progress" className="cursor-pointer hover:bg-red-50">
-                    💪 <span className="font-medium">Workout Beast Mode</span> - Show off your gains
+                  <SelectItem value="workout_progress" className="cursor-pointer hover:bg-red-50 min-h-[44px] text-base">
+                    💪 <span className="font-medium">Workout Beast Mode</span>
                   </SelectItem>
-                  <SelectItem value="goal_achievement" className="cursor-pointer hover:bg-green-50">
-                    🎯 <span className="font-medium">Goal Crusher</span> - Celebrate your victories
+                  <SelectItem value="goal_achievement" className="cursor-pointer hover:bg-green-50 min-h-[44px] text-base">
+                    🎯 <span className="font-medium">Goal Crusher</span>
                   </SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2 flex items-center">
+              <label className="block text-sm md:text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2 flex items-center">
                 <MessageSquare className="w-4 h-4 mr-2 text-pink-500" />
                 Express Yourself
               </label>
               <Textarea
                 placeholder={
                   selectedPostType === "workout_progress" 
-                    ? "🔥 Just crushed an amazing workout! Tell us about those gains, how it felt, and what you conquered today..."
+                    ? "🔥 Just crushed an amazing workout! Tell us about it..."
                     : selectedPostType === "goal_achievement"
-                    ? "🎉 Goal achieved! Share your victory story - what did you accomplish and how does it feel to crush it?"
-                    : "💭 What's motivating you today? Share your thoughts, ask questions, or drop some inspiration for the community..."
+                    ? "🎉 Goal achieved! Share your victory story..."
+                    : "💭 What's motivating you today?"
                 }
                 value={newPostContent}
                 onChange={(e) => setNewPostContent(e.target.value)}
-                rows={3}
-                className="w-full bg-gradient-to-br from-gray-900 to-gray-800 dark:from-gray-800 dark:to-gray-700 border-purple-200 focus:border-purple-400 focus:ring-purple-400 transition-all duration-200 text-sm text-white"
+                rows={4}
+                className="w-full bg-gradient-to-br from-gray-900 to-gray-800 dark:from-gray-800 dark:to-gray-700 border-purple-200 focus:border-purple-400 focus:ring-purple-400 transition-all duration-200 text-base text-white min-h-[100px]"
+                data-testid="textarea-post-content"
               />
             </div>
 
@@ -347,12 +338,13 @@ export default function Community() {
               <Button 
                 onClick={handleSubmitPost}
                 disabled={!newPostContent.trim() || createPostMutation.isPending}
-                className="px-6 py-2 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 hover:from-purple-600 hover:via-pink-600 hover:to-red-600 text-white font-bold text-sm rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+                className="w-full md:w-auto min-h-[44px] px-6 py-3 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 hover:from-purple-600 hover:via-pink-600 hover:to-red-600 text-white font-bold text-base rounded-full shadow-lg active:scale-95 transition-all duration-200"
+                data-testid="button-submit-post"
               >
                 {createPostMutation.isPending ? (
                   <>
                     <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                    Sharing Magic...
+                    Sharing...
                   </>
                 ) : (
                   <>
@@ -366,22 +358,22 @@ export default function Community() {
         </Card>
 
         {/* Posts Feed */}
-        <div className="space-y-2">
+        <div className="space-y-4 md:space-y-3">
           {isLoading ? (
             Array.from({ length: 3 }).map((_, i) => (
               <Card key={i} className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-700 shadow-lg">
-                <CardContent className="pt-6">
+                <CardContent className="p-4 md:p-6">
                   <div className="animate-pulse space-y-4">
                     <div className="flex items-center space-x-4">
-                      <div className="w-12 h-12 bg-gradient-to-br from-purple-200 to-pink-200 rounded-full animate-pulse"></div>
-                      <div className="space-y-3">
-                        <div className="h-4 bg-gradient-to-r from-purple-200 to-pink-200 rounded-full w-40 animate-pulse"></div>
-                        <div className="h-3 bg-gradient-to-r from-gray-200 to-gray-300 rounded-full w-32 animate-pulse"></div>
+                      <div className="w-12 h-12 bg-gradient-to-br from-purple-200 to-pink-200 rounded-full"></div>
+                      <div className="space-y-3 flex-1">
+                        <div className="h-4 bg-gradient-to-r from-purple-200 to-pink-200 rounded-full w-40"></div>
+                        <div className="h-3 bg-gradient-to-r from-gray-200 to-gray-300 rounded-full w-32"></div>
                       </div>
                     </div>
-                    <div className="space-y-3 pl-16">
-                      <div className="h-5 bg-gradient-to-r from-gray-200 to-gray-300 rounded-full w-full animate-pulse"></div>
-                      <div className="h-5 bg-gradient-to-r from-gray-200 to-gray-300 rounded-full w-3/4 animate-pulse"></div>
+                    <div className="space-y-3">
+                      <div className="h-5 bg-gradient-to-r from-gray-200 to-gray-300 rounded-full w-full"></div>
+                      <div className="h-5 bg-gradient-to-r from-gray-200 to-gray-300 rounded-full w-3/4"></div>
                     </div>
                   </div>
                 </CardContent>
@@ -391,80 +383,69 @@ export default function Community() {
             posts.map((post, index) => (
               <Card 
                 key={post.id} 
-                className="bg-gradient-to-br from-white via-purple-50/30 to-pink-50/30 dark:from-gray-800 dark:via-purple-900/10 dark:to-pink-900/10 shadow-md hover:shadow-lg transition-all duration-300 border-purple-100 dark:border-purple-700/50 overflow-hidden relative group"
-                style={{animationDelay: `${index * 100}ms`}}
+                className="bg-gradient-to-br from-white via-purple-50/30 to-pink-50/30 dark:from-gray-800 dark:via-purple-900/10 dark:to-pink-900/10 shadow-md active:shadow-lg transition-all duration-200 border-purple-100 dark:border-purple-700/50 overflow-hidden"
+                data-testid={`card-post-${post.id}`}
               >
-                {/* Animated gradient overlay on hover */}
-                <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-pink-500/5 to-red-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                
-                <CardContent className="pt-2 pb-2 px-2 relative z-10">
-                  <div className="flex items-start space-x-2">
+                <CardContent className="p-4 md:p-3">
+                  <div className="flex items-start gap-3 md:gap-2">
                     {/* Enhanced Avatar with status ring */}
-                    <div className="relative">
+                    <div className="relative shrink-0">
                       <div className={`absolute -inset-1 rounded-full ${
                         post.user.streak > 0 
-                          ? 'bg-gradient-to-r from-yellow-400 to-orange-400 animate-pulse' 
+                          ? 'bg-gradient-to-r from-yellow-400 to-orange-400' 
                           : 'bg-gradient-to-r from-purple-400 to-pink-400'
                       }`}></div>
-                      <Avatar className="relative w-6 h-6 border border-white shadow-sm">
-                        <AvatarFallback className="bg-gradient-to-br from-purple-500 to-pink-500 text-white text-xs font-bold">
+                      <Avatar className="relative w-10 h-10 md:w-8 md:h-8 border-2 border-white shadow-sm">
+                        <AvatarFallback className="bg-gradient-to-br from-purple-500 to-pink-500 text-white text-base md:text-sm font-bold">
                           {(post.user.firstName?.charAt(0) || post.user.email?.charAt(0) || 'U').toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
                       {/* Status indicator */}
                       {post.user.streak > 0 && (
-                        <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-yellow-500 rounded-full flex items-center justify-center shadow-sm">
-                          <span className="text-xs font-bold text-white" style={{fontSize: '8px'}}>{post.user.streak}</span>
+                        <div className="absolute -bottom-1 -right-1 w-5 h-5 md:w-4 md:h-4 bg-yellow-500 rounded-full flex items-center justify-center shadow-sm border border-white">
+                          <span className="text-xs md:text-[10px] font-bold text-white">{post.user.streak}</span>
                         </div>
                       )}
                     </div>
                     
-                    <div className="flex-1 space-y-1">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-2">
-                          <div>
-                            <p className="text-xs font-bold bg-gradient-to-r from-purple-700 to-pink-700 bg-clip-text text-transparent">
+                    <div className="flex-1 space-y-2 md:space-y-1 min-w-0">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <p className="text-sm md:text-xs font-bold bg-gradient-to-r from-purple-700 to-pink-700 bg-clip-text text-transparent truncate">
                               {post.user.firstName && post.user.lastName 
                                 ? `${post.user.firstName} ${post.user.lastName}`
                                 : 'Fitness Warrior'}
                             </p>
-                            <div className="flex items-center space-x-1 text-xs text-gray-600 dark:text-gray-400" style={{fontSize: '10px'}}>
-                              <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                                {formatTimeAgo(post.createdAt.toString())}
-                              </span>
-                              {post.user.streak > 0 && (
-                                <>
-                                  <span className="text-yellow-400">•</span>
-                                  <div className="flex items-center space-x-1 bg-gradient-to-r from-yellow-500 to-orange-500 px-2 py-1 rounded-full">
-                                    <Trophy size={12} className="text-white" />
-                                    <span className="text-xs font-bold text-white">{post.user.streak} day streak!</span>
-                                  </div>
-                                </>
-                              )}
-                            </div>
+                            {post.user.streak > 0 && (
+                              <div className="flex items-center gap-1 bg-gradient-to-r from-yellow-500 to-orange-500 px-2 py-0.5 rounded-full shrink-0">
+                                <Trophy size={12} className="text-white" />
+                                <span className="text-xs font-bold text-white">{post.user.streak}🔥</span>
+                              </div>
+                            )}
                           </div>
+                          <p className="text-xs md:text-[10px] text-gray-600 dark:text-gray-400">
+                            {formatTimeAgo(post.createdAt.toString())}
+                          </p>
                         </div>
-                        <div className="flex items-center space-x-2">
-                          {getPostTypeBadge(post.postType)}
-                          <div className="w-8 h-8 bg-gradient-to-br from-purple-100 to-pink-100 rounded-full flex items-center justify-center">
-                            {getPostTypeIcon(post.postType)}
-                          </div>
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          <div className="hidden md:block">{getPostTypeBadge(post.postType)}</div>
                           {/* Delete button - only show for user's own posts */}
                           {currentUser && post.userId === currentUser.id && (
                             <Button
                               variant="ghost"
                               size="sm"
                               onClick={() => handleDeletePost(post.id)}
-                              className="h-6 w-6 p-0 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-full"
+                              className="min-h-[44px] min-w-[44px] md:h-7 md:w-7 p-0 text-red-500 hover:text-red-700 hover:bg-red-50 active:scale-95 rounded-full transition-all"
                               data-testid={`button-delete-post-${post.id}`}
                             >
-                              <Trash2 size={12} />
+                              <Trash2 size={16} className="md:w-3 md:h-3" />
                             </Button>
                           )}
                         </div>
                       </div>
                       
-                      <div className="text-gray-800 dark:text-gray-100 whitespace-pre-wrap leading-tight p-1.5 bg-gradient-to-br from-white/50 to-purple-50/50 dark:from-gray-700/50 dark:to-purple-900/20 rounded-md border border-purple-100 dark:border-purple-800" style={{fontSize: '11px'}}>
+                      <div className="text-gray-800 dark:text-gray-100 whitespace-pre-wrap leading-relaxed md:leading-snug p-3 md:p-2 bg-gradient-to-br from-white/50 to-purple-50/50 dark:from-gray-700/50 dark:to-purple-900/20 rounded-lg md:rounded-md border border-purple-100 dark:border-purple-800 text-[15px] md:text-xs">
                         {post.content}
                       </div>
 
@@ -474,7 +455,7 @@ export default function Community() {
                           <img
                             src={post.imageUrl}
                             alt="Post image"
-                            className="w-full max-w-32 h-20 object-cover rounded border border-purple-200 dark:border-purple-700 shadow-sm"
+                            className="w-full max-w-xs h-48 md:max-w-32 md:h-20 object-cover rounded-lg md:rounded border-2 md:border border-purple-200 dark:border-purple-700 shadow-md"
                             data-testid={`img-post-${post.id}`}
                           />
                         </div>
@@ -507,22 +488,22 @@ export default function Community() {
                         </div>
                       )}
                       
-                      <div className="flex items-center justify-between pt-1 border-t border-purple-100 dark:border-purple-800">
-                        <div className="flex items-center space-x-1">
+                      <div className="flex items-center justify-between pt-2 md:pt-1 border-t border-purple-100 dark:border-purple-800">
+                        <div className="flex items-center gap-2">
                           {/* Like Button */}
                           <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => handleLike(post.id)}
                             disabled={likeMutation.isPending}
-                            className="transition-all duration-300 h-6 px-2 text-[10px] text-gray-600 hover:text-red-500 hover:bg-red-50"
+                            className="h-11 md:h-7 px-3 md:px-2 text-sm md:text-xs text-gray-600 hover:text-red-500 hover:bg-red-50 active:scale-95 transition-all"
                             data-testid={`button-like-post-${post.id}`}
                           >
                             <Heart 
-                              className="mr-1 transition-all duration-300 hover:fill-red-200" 
-                              size={10} 
+                              className="mr-1.5 md:mr-1" 
+                              size={16} 
                             />
-                            <span className="font-bold text-[10px]">
+                            <span className="font-bold">
                               Like
                             </span>
                           </Button>
@@ -533,29 +514,29 @@ export default function Community() {
                             size="sm"
                             onClick={() => handleDislike(post.id)}
                             disabled={dislikeMutation.isPending}
-                            className="transition-all duration-300 h-6 px-2 text-[10px] text-gray-600 hover:text-blue-500 hover:bg-blue-50"
+                            className="h-11 md:h-7 px-3 md:px-2 text-sm md:text-xs text-gray-600 hover:text-blue-500 hover:bg-blue-50 active:scale-95 transition-all"
                             data-testid={`button-dislike-post-${post.id}`}
                           >
                             <ThumbsDown 
-                              className="mr-1 transition-all duration-300 hover:fill-blue-200" 
-                              size={10} 
+                              className="mr-1.5 md:mr-1" 
+                              size={16} 
                             />
-                            <span className="font-bold text-[10px]">
+                            <span className="font-bold">
                               Dislike
                             </span>
                           </Button>
                         </div>
                         
-                        <div className="flex items-center space-x-1">
+                        <div className="flex items-center gap-2">
                           {/* Likes Count */}
-                          <div className="bg-gradient-to-r from-red-100 to-pink-100 px-1.5 py-0.5 rounded-full">
-                            <span className="text-[10px] font-bold text-red-700" data-testid={`text-likes-${post.id}`}>
+                          <div className="bg-gradient-to-r from-red-100 to-pink-100 px-2.5 md:px-2 py-1 md:py-0.5 rounded-full">
+                            <span className="text-sm md:text-xs font-bold text-red-700" data-testid={`text-likes-${post.id}`}>
                               {post.likes} ❤️
                             </span>
                           </div>
                           {/* Dislikes Count */}
-                          <div className="bg-gradient-to-r from-blue-100 to-indigo-100 px-1.5 py-0.5 rounded-full">
-                            <span className="text-[10px] font-bold text-blue-700" data-testid={`text-dislikes-${post.id}`}>
+                          <div className="bg-gradient-to-r from-blue-100 to-indigo-100 px-2.5 md:px-2 py-1 md:py-0.5 rounded-full">
+                            <span className="text-sm md:text-xs font-bold text-blue-700" data-testid={`text-dislikes-${post.id}`}>
                               {post.dislikes || 0} 👎
                             </span>
                           </div>
@@ -567,27 +548,26 @@ export default function Community() {
               </Card>
             ))
           ) : (
-            <Card className="bg-gradient-to-br from-purple-50 via-pink-50 to-red-50 dark:from-gray-800 dark:via-purple-900/20 dark:to-red-900/20 shadow-2xl border-purple-200 dark:border-purple-700">
-              <CardContent className="pt-8">
-                <div className="text-center py-16">
-                  <div className="relative mb-8">
-                    <div className="w-24 h-24 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full mx-auto flex items-center justify-center shadow-xl animate-bounce">
-                      <Sparkles className="w-12 h-12 text-white animate-pulse" />
+            <Card className="bg-gradient-to-br from-purple-50 via-pink-50 to-red-50 dark:from-gray-800 dark:via-purple-900/20 dark:to-red-900/20 shadow-lg border-purple-200 dark:border-purple-700">
+              <CardContent className="p-6 md:p-8">
+                <div className="text-center py-8 md:py-16">
+                  <div className="relative mb-6 md:mb-8">
+                    <div className="w-20 h-20 md:w-24 md:h-24 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full mx-auto flex items-center justify-center shadow-xl">
+                      <Sparkles className="w-10 h-10 md:w-12 md:h-12 text-white" />
                     </div>
-                    <div className="absolute -top-2 -right-2 w-8 h-8 bg-yellow-400 rounded-full animate-ping"></div>
-                    <div className="absolute -bottom-2 -left-2 w-6 h-6 bg-red-400 rounded-full animate-ping" style={{animationDelay: '1s'}}></div>
                   </div>
-                  <h3 className="text-3xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-red-600 bg-clip-text text-transparent mb-4">
+                  <h3 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-red-600 bg-clip-text text-transparent mb-3 md:mb-4">
                     Ready to Ignite the Community? 🚀
                   </h3>
-                  <p className="text-xl text-gray-700 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
-                    Be the spark that starts the fire! Share your fitness journey and inspire others to reach their goals.
+                  <p className="text-base md:text-xl text-gray-700 dark:text-gray-300 mb-6 md:mb-8 max-w-2xl mx-auto">
+                    Be the spark that starts the fire! Share your fitness journey and inspire others.
                   </p>
                   <Button 
                     onClick={() => setNewPostContent("Just started my fitness journey and feeling amazing! 💪🔥")}
-                    className="px-8 py-4 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 hover:from-purple-600 hover:via-pink-600 hover:to-red-600 text-white font-bold text-xl rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+                    className="w-full md:w-auto min-h-[44px] px-6 md:px-8 py-3 md:py-4 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 hover:from-purple-600 hover:via-pink-600 hover:to-red-600 text-white font-bold text-base md:text-xl rounded-full shadow-lg active:scale-95 transition-all duration-200"
+                    data-testid="button-start-first-post"
                   >
-                    <Sparkles className="mr-3" size={20} />
+                    <Sparkles className="mr-2 md:mr-3" size={20} />
                     Light Up the Feed! ✨
                   </Button>
                 </div>
