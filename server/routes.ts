@@ -1444,6 +1444,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // News and Announcements Routes
+
+  // Get all news items
+  app.get("/api/news", async (req, res) => {
+    try {
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : undefined;
+      const newsItems = await storage.getNews(limit);
+      res.json(newsItems);
+    } catch (error) {
+      console.error("Error fetching news:", error);
+      res.status(500).json({ message: "Failed to fetch news" });
+    }
+  });
+
+  // Get a specific news item
+  app.get("/api/news/:id", async (req, res) => {
+    try {
+      const newsItem = await storage.getNewsItem(req.params.id);
+      if (!newsItem) {
+        return res.status(404).json({ message: "News item not found" });
+      }
+      res.json(newsItem);
+    } catch (error) {
+      console.error("Error fetching news item:", error);
+      res.status(500).json({ message: "Failed to fetch news item" });
+    }
+  });
+
+  // Create a news item (admin only in production)
+  app.post("/api/news", async (req, res) => {
+    try {
+      const newsItem = await storage.createNews(req.body);
+      res.status(201).json(newsItem);
+    } catch (error) {
+      console.error("Error creating news item:", error);
+      res.status(500).json({ message: "Failed to create news item" });
+    }
+  });
+
   // Progress Photos Routes
 
   // Get progress photos for user
