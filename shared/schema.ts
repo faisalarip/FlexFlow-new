@@ -545,6 +545,7 @@ export type CommunityPostWithUser = CommunityPost & {
     lastName: string;
     email: string;
     streak: number;
+    profileImageUrl: string | null;
   };
   workout?: {
     id: string;

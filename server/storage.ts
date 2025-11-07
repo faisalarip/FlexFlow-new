@@ -2157,6 +2157,7 @@ export class MemStorage implements IStorage {
             lastName: user.lastName || "",
             email: user.email || "",
             streak: user.streak,
+            profileImageUrl: user.profileImageUrl || null,
           }
         };
 
@@ -3796,11 +3797,13 @@ export class DatabaseStorage implements IStorage {
           imageUrl: communityPosts.imageUrl,
           likes: communityPosts.likes,
           createdAt: communityPosts.createdAt,
+          dislikes: communityPosts.dislikes,
           // User data
           userFirstName: users.firstName,
           userLastName: users.lastName,
           userEmail: users.email,
           userStreak: users.streak,
+          userProfileImageUrl: users.profileImageUrl,
         })
         .from(communityPosts)
         .innerJoin(users, eq(communityPosts.userId, users.id))
@@ -3825,7 +3828,9 @@ export class DatabaseStorage implements IStorage {
             lastName: row.userLastName || "",
             email: row.userEmail || "",
             streak: row.userStreak,
-          }
+            profileImageUrl: row.userProfileImageUrl || null,
+          },
+          dislikes: row.dislikes,
         };
 
         // Add workout info if it's a workout progress post

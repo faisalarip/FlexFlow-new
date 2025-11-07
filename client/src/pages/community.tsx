@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { ObjectUploader } from "@/components/ObjectUploader";
@@ -396,6 +396,13 @@ export default function Community() {
                           : 'bg-gradient-to-r from-purple-400 to-pink-400'
                       }`}></div>
                       <Avatar className="relative w-10 h-10 md:w-8 md:h-8 border-2 border-white shadow-sm">
+                        {post.user.profileImageUrl && (
+                          <AvatarImage 
+                            src={post.user.profileImageUrl} 
+                            alt={`${post.user.firstName || 'User'}'s profile`}
+                            className="object-cover"
+                          />
+                        )}
                         <AvatarFallback className="bg-gradient-to-br from-purple-500 to-pink-500 text-white text-base md:text-sm font-bold">
                           {(post.user.firstName?.charAt(0) || post.user.email?.charAt(0) || 'U').toUpperCase()}
                         </AvatarFallback>
