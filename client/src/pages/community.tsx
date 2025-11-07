@@ -192,16 +192,42 @@ export default function Community() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-red-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-red-900/20 relative overflow-hidden">
-      {/* Simplified background for mobile, full effects on desktop */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-purple-400/20 to-pink-400/20 rounded-full blur-3xl hidden md:block animate-pulse"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-red-400/20 to-orange-400/20 rounded-full blur-3xl hidden md:block animate-pulse" style={{animationDelay: '1s'}}></div>
+      {/* Enhanced animated background */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {/* Large animated gradient orbs */}
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-purple-400/30 to-pink-400/30 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-red-400/30 to-orange-400/30 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
         
-        {/* Mobile-friendly gradient */}
-        <div className="absolute inset-0 bg-gradient-to-b from-purple-500/5 via-transparent to-pink-500/5 md:hidden"></div>
+        {/* Floating fitness icons */}
+        <div className="absolute top-20 left-[10%] animate-bounce opacity-40" style={{animationDuration: '3s', animationDelay: '0s'}}>
+          <Dumbbell className="w-8 h-8 text-purple-400" />
+        </div>
+        <div className="absolute top-40 right-[15%] animate-bounce opacity-40" style={{animationDuration: '4s', animationDelay: '1s'}}>
+          <Trophy className="w-10 h-10 text-yellow-400" />
+        </div>
+        <div className="absolute top-[60%] left-[5%] animate-bounce opacity-40" style={{animationDuration: '3.5s', animationDelay: '2s'}}>
+          <Target className="w-9 h-9 text-green-400" />
+        </div>
+        <div className="absolute bottom-32 right-[8%] animate-bounce opacity-40" style={{animationDuration: '4.5s', animationDelay: '0.5s'}}>
+          <Zap className="w-8 h-8 text-orange-400" />
+        </div>
+        <div className="absolute top-[35%] right-[25%] animate-bounce opacity-30" style={{animationDuration: '5s', animationDelay: '1.5s'}}>
+          <Heart className="w-7 h-7 text-pink-400" />
+        </div>
+        <div className="absolute bottom-[45%] left-[20%] animate-bounce opacity-30" style={{animationDuration: '3.8s', animationDelay: '2.5s'}}>
+          <TrendingUp className="w-8 h-8 text-red-400" />
+        </div>
         
         {/* Animated gradient lines */}
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 animate-pulse"></div>
+        <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-red-500 via-pink-500 to-purple-500 animate-pulse" style={{animationDelay: '1s'}}></div>
+        
+        {/* Floating particles */}
+        <div className="absolute top-[25%] left-[30%] w-2 h-2 bg-purple-400 rounded-full animate-ping opacity-20" style={{animationDuration: '3s'}}></div>
+        <div className="absolute top-[70%] right-[35%] w-3 h-3 bg-pink-400 rounded-full animate-ping opacity-20" style={{animationDuration: '4s', animationDelay: '1s'}}></div>
+        <div className="absolute bottom-[30%] left-[40%] w-2 h-2 bg-red-400 rounded-full animate-ping opacity-20" style={{animationDuration: '3.5s', animationDelay: '2s'}}></div>
+        <div className="absolute top-[15%] right-[45%] w-2 h-2 bg-yellow-400 rounded-full animate-ping opacity-20" style={{animationDuration: '5s', animationDelay: '0.5s'}}></div>
       </div>
       
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 relative z-10">
