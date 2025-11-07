@@ -350,6 +350,7 @@ export class MemStorage implements IStorage {
     this.seedFoodItems();
     this.seedCommunityPosts();
     this.seedRealisticLeaderboardData();
+    this.seedNews();
   }
 
   private seedExercises() {
@@ -1763,6 +1764,56 @@ export class MemStorage implements IStorage {
     };
     this.newsItems.set(id, newsItem);
     return newsItem;
+  }
+
+  private seedNews() {
+    const newsData: InsertNews[] = [
+      {
+        title: "Welcome to FlexFlow!",
+        content: "We're excited to have you here. FlexFlow is your all-in-one fitness companion, featuring workout tracking, AI-powered meal planning, progress photos, and much more. Start your fitness journey today!",
+        category: "announcement",
+        isPublished: true
+      },
+      {
+        title: "New Feature: AI Workout Planner",
+        content: "Create personalized 4-week workout plans tailored to your goals, equipment, and fitness level. Our AI generates specific exercises with sets, reps, rest periods, and form cues. Access it from the More menu!",
+        category: "feature",
+        isPublished: true
+      },
+      {
+        title: "Enhanced Meal Planning",
+        content: "Our AI meal planner now generates goal-specific meals with maximum variety. Whether you're aiming for weight loss, muscle gain, or maintenance, you'll get unique meals tailored to your preferences with no repetition across your plan.",
+        category: "feature",
+        isPublished: true
+      },
+      {
+        title: "Community Features Live",
+        content: "Share your fitness journey with the community! Post updates, progress photos, and connect with other fitness enthusiasts. All posts are moderated using AI to ensure a positive environment.",
+        category: "feature",
+        isPublished: true
+      },
+      {
+        title: "iOS App Coming Soon",
+        content: "We're working on a native iOS app that will sync seamlessly with your web account. Premium subscriptions purchased in the app will automatically sync across all your devices!",
+        category: "announcement",
+        isPublished: true
+      }
+    ];
+
+    newsData.forEach(news => {
+      const id = randomUUID();
+      const newsItem: News = {
+        id,
+        title: news.title,
+        content: news.content,
+        category: news.category,
+        imageUrl: null,
+        isPublished: true,
+        publishedAt: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000), // Random date within last week
+        createdAt: new Date()
+      };
+      this.newsItems.set(id, newsItem);
+    });
   }
 
   async seedLeaderboardData(): Promise<void> {

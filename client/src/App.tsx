@@ -15,6 +15,7 @@ import MealTracker from "@/pages/meal-tracker";
 import Landing from "@/pages/landing";
 import Settings from "@/pages/settings";
 import Workouts from "@/pages/workouts";
+import NewsPage from "@/pages/news";
 import Progress from "@/pages/progress";
 import ProgressPhotos from "@/pages/progress-photos";
 import Calendar from "@/pages/calendar";
@@ -86,6 +87,7 @@ function Router() {
             <Route path="/progress" component={Progress} />
             <Route path="/progress-photos" component={ProgressPhotos} />
             <Route path="/calendar" component={Calendar} />
+            <Route path="/news" component={NewsPage} />
           </ProfileCompletionGuard>
         )}
         <Route component={NotFound} />

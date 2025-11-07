@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Home, Dumbbell, TrendingUp, Users, MoreHorizontal, ChefHat, MapPin, Settings, Star, Target, Apple, Camera } from "lucide-react";
+import { Home, Dumbbell, TrendingUp, Users, MoreHorizontal, ChefHat, MapPin, Settings, Star, Target, Apple, Camera, Newspaper } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -25,6 +25,7 @@ export default function BottomNav() {
 
   const moreItems = [
     { path: "/subscription", label: "Premium", icon: Star },
+    { path: "/news", label: "What's New", icon: Newspaper },
     { path: "/meal-plans", label: "Meal Plans", icon: ChefHat },
     { path: "/workout-planner", label: "Workout Planner", icon: Target },
     { path: "/meal-tracker", label: "Barcode Scanner", icon: Apple },
