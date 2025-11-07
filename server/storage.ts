@@ -80,12 +80,14 @@ import {
   type InsertBadge,
   type UserBadge,
   type InsertUserBadge,
-  type UserBadgeWithDetails
+  type UserBadgeWithDetails,
+  type News,
+  type InsertNews
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 import * as bcrypt from "bcrypt";
 import { db } from "./db";
-import { users, communityPosts, workouts, progressPhotos, subscriptionAudit, notificationPreferences, badges, userBadges } from "@shared/schema";
+import { users, communityPosts, workouts, progressPhotos, subscriptionAudit, notificationPreferences, badges, userBadges, news } from "@shared/schema";
 import { eq, or, desc, sql, and } from "drizzle-orm";
 
 export interface IStorage {
@@ -298,6 +300,11 @@ export interface IStorage {
 
   // Leaderboard seeding
   seedLeaderboardData(): Promise<void>;
+  
+  // News and announcements
+  getNews(limit?: number): Promise<News[]>;
+  getNewsItem(id: string): Promise<News | undefined>;
+  createNews(news: InsertNews): Promise<News>;
 }
 
 export class MemStorage implements IStorage {
@@ -334,6 +341,7 @@ export class MemStorage implements IStorage {
   private userBadges: Map<string, UserBadge> = new Map();
   private userActivityLogs: Map<string, UserActivityLog> = new Map();
   private notificationPrefs: Map<string, NotificationPreferences> = new Map();
+  private newsItems: Map<string, News> = new Map();
 
   constructor() {
     this.seedExercises();
@@ -1727,6 +1735,34 @@ export class MemStorage implements IStorage {
 
   async deleteFoodEntry(id: string): Promise<boolean> {
     return this.foodEntries.delete(id);
+  }
+
+  // News and announcements
+  async getNews(limit: number = 50): Promise<News[]> {
+    return Array.from(this.newsItems.values())
+      .filter(item => item.isPublished)
+      .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
+      .slice(0, limit);
+  }
+
+  async getNewsItem(id: string): Promise<News | undefined> {
+    return this.newsItems.get(id);
+  }
+
+  async createNews(insertNews: InsertNews): Promise<News> {
+    const id = randomUUID();
+    const newsItem: News = {
+      id,
+      title: insertNews.title,
+      content: insertNews.content,
+      category: insertNews.category,
+      imageUrl: insertNews.imageUrl || null,
+      isPublished: insertNews.isPublished ?? true,
+      publishedAt: new Date(),
+      createdAt: new Date()
+    };
+    this.newsItems.set(id, newsItem);
+    return newsItem;
   }
 
   async seedLeaderboardData(): Promise<void> {
@@ -4237,6 +4273,11 @@ export class DatabaseStorage implements IStorage {
   async updateUserStripeInfo(userId: string, stripeCustomerId: string, stripeSubscriptionId: string): Promise<User | undefined> { 
     return this.updateUser(userId, { stripeCustomerId, stripeSubscriptionId }); 
   }
+  
+  // News and announcements
+  async getNews(limit?: number): Promise<News[]> { return this.memStorage.getNews(limit); }
+  async getNewsItem(id: string): Promise<News | undefined> { return this.memStorage.getNewsItem(id); }
+  async createNews(newsItem: InsertNews): Promise<News> { return this.memStorage.createNews(newsItem); }
 }
 
 export const storage = new DatabaseStorage();
