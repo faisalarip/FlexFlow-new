@@ -243,6 +243,18 @@ export const userBadges = pgTable("user_badges", {
   earnedAt: timestamp("earned_at").defaultNow().notNull(),
 });
 
+// News and announcements for app updates
+export const news = pgTable("news", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: text("title").notNull(),
+  content: text("content").notNull(),
+  category: varchar("category").notNull(), // update, feature, bug_fix, announcement
+  imageUrl: varchar("image_url"), // optional banner image
+  isPublished: boolean("is_published").notNull().default(true),
+  publishedAt: timestamp("published_at").defaultNow().notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 export type UpsertUser = typeof users.$inferInsert;
 
 // Insert schemas
@@ -310,6 +322,12 @@ export const insertUserActivityLogSchema = createInsertSchema(userActivityLog).o
 export const insertBadgeSchema = createInsertSchema(badges).omit({
   id: true,
   createdAt: true,
+});
+
+export const insertNewsSchema = createInsertSchema(news).omit({
+  id: true,
+  createdAt: true,
+  publishedAt: true,
 });
 
 export const insertUserBadgeSchema = createInsertSchema(userBadges).omit({
@@ -381,6 +399,9 @@ export type Badge = typeof badges.$inferSelect;
 
 export type InsertUserBadge = z.infer<typeof insertUserBadgeSchema>;
 export type UserBadge = typeof userBadges.$inferSelect;
+
+export type InsertNews = z.infer<typeof insertNewsSchema>;
+export type News = typeof news.$inferSelect;
 
 export type InsertPayment = z.infer<typeof insertPaymentSchema>;
 export type Payment = typeof payments.$inferSelect;
