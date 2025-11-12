@@ -42,14 +42,14 @@ import dumbbellShrugsImage from "@assets/generated_images/Woman_performing_dumbb
 import dumbbellStepUpsImage from "@assets/generated_images/Man_performing_dumbbell_step-ups_da98f98d.png";
 import dumbbellThrustersImage from "@assets/generated_images/Woman_performing_dumbbell_thrusters_e6b4460d.png";
 import workoutBgImage from "@assets/stock_images/men_and_women_workin_dbbf742b.jpg";
-import chestMuscleImage from "@assets/stock_images/muscular_chest_anato_9bec9a05.jpg";
-import backMuscleImage from "@assets/stock_images/back_muscles_anatomy_bbd469a6.jpg";
-import shoulderMuscleImage from "@assets/stock_images/shoulder_muscles_ana_edc6957c.jpg";
-import armMuscleImage from "@assets/stock_images/arm_muscles_biceps_t_50cb66a0.jpg";
-import legMuscleImage from "@assets/stock_images/leg_muscles_anatomy__d5c69f66.jpg";
-import coreMuscleImage from "@assets/stock_images/core_muscles_abs_ana_3559ea09.jpg";
-import gluteMuscleImage from "@assets/stock_images/glute_muscles_anatom_715aa88c.jpg";
-import cardioImage from "@assets/stock_images/cardio_running_fitne_05fd7b37.jpg";
+import chestMuscleImage from "@assets/generated_images/Chest_muscles_anatomical_diagram_f5a067d4.png";
+import backMuscleImage from "@assets/generated_images/Back_muscles_anatomical_diagram_018b0191.png";
+import shoulderMuscleImage from "@assets/generated_images/Shoulder_muscles_anatomical_diagram_2d197462.png";
+import armMuscleImage from "@assets/generated_images/Arm_muscles_anatomical_diagram_678a9cd7.png";
+import legMuscleImage from "@assets/generated_images/Leg_muscles_anatomical_diagram_379a469f.png";
+import coreMuscleImage from "@assets/generated_images/Core_muscles_anatomical_diagram_d8154613.png";
+import gluteMuscleImage from "@assets/generated_images/Glute_muscles_anatomical_diagram_3fc6aa31.png";
+import cardioImage from "@assets/generated_images/Cardio_system_anatomical_diagram_4d68f3f5.png";
 
 export default function WorkoutLogger() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -1667,12 +1667,12 @@ export default function WorkoutLogger() {
           <div className="flex items-start gap-4 mb-4">
             {/* Muscle Group Anatomical Image */}
             {muscleGroupImages[selectedMuscleGroup] && (
-              <div className="flex-shrink-0 w-32 h-32 md:w-40 md:h-40 rounded-lg overflow-hidden border-2 border-orange-500/50 shadow-lg shadow-orange-500/30">
+              <div className="flex-shrink-0 w-32 h-32 md:w-40 md:h-40 rounded-lg overflow-hidden border-2 border-orange-500/50 shadow-lg shadow-orange-500/30 bg-white">
                 <img 
                   src={muscleGroupImages[selectedMuscleGroup]} 
-                  alt={`${muscleGroups.find(m => m.id === selectedMuscleGroup)?.name} muscles`}
+                  alt={`Anatomical diagram showing ${muscleGroups.find(m => m.id === selectedMuscleGroup)?.name} highlighted`}
                   loading="lazy"
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain"
                   data-testid={`muscle-image-${selectedMuscleGroup}`}
                 />
               </div>
