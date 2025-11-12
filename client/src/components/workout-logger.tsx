@@ -42,6 +42,14 @@ import dumbbellShrugsImage from "@assets/generated_images/Woman_performing_dumbb
 import dumbbellStepUpsImage from "@assets/generated_images/Man_performing_dumbbell_step-ups_da98f98d.png";
 import dumbbellThrustersImage from "@assets/generated_images/Woman_performing_dumbbell_thrusters_e6b4460d.png";
 import workoutBgImage from "@assets/stock_images/men_and_women_workin_dbbf742b.jpg";
+import chestMuscleImage from "@assets/stock_images/muscular_chest_anato_9bec9a05.jpg";
+import backMuscleImage from "@assets/stock_images/back_muscles_anatomy_bbd469a6.jpg";
+import shoulderMuscleImage from "@assets/stock_images/shoulder_muscles_ana_edc6957c.jpg";
+import armMuscleImage from "@assets/stock_images/arm_muscles_biceps_t_50cb66a0.jpg";
+import legMuscleImage from "@assets/stock_images/leg_muscles_anatomy__d5c69f66.jpg";
+import coreMuscleImage from "@assets/stock_images/core_muscles_abs_ana_3559ea09.jpg";
+import gluteMuscleImage from "@assets/stock_images/glute_muscles_anatom_715aa88c.jpg";
+import cardioImage from "@assets/stock_images/cardio_running_fitne_05fd7b37.jpg";
 
 export default function WorkoutLogger() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -259,6 +267,18 @@ export default function WorkoutLogger() {
     { id: "glutes", name: "Glutes", icon: Activity, color: "pink" },
     { id: "cardio", name: "Cardio", icon: Activity, color: "cyan" },
   ];
+
+  // Muscle group anatomical images
+  const muscleGroupImages: Record<string, string> = {
+    chest: chestMuscleImage,
+    back: backMuscleImage,
+    shoulders: shoulderMuscleImage,
+    arms: armMuscleImage,
+    legs: legMuscleImage,
+    core: coreMuscleImage,
+    glutes: gluteMuscleImage,
+    cardio: cardioImage,
+  };
 
   const quickExercises = [
     // Strength Training - Upper Body
@@ -1644,12 +1664,34 @@ export default function WorkoutLogger() {
       {/* Suggested Exercises for Selected Muscle Group */}
       {selectedMuscleGroup !== "all" && suggestedExercises.length > 0 && (
         <div className="mb-6 bg-gradient-to-r from-orange-900/30 to-red-900/30 border border-orange-500/40 rounded-xl p-5">
-          <div className="flex items-center gap-2 mb-4">
-            <Star className="text-orange-400" size={20} />
-            <h4 className="text-lg font-bold text-white">
-              Suggested {muscleGroups.find(m => m.id === selectedMuscleGroup)?.name} Exercises
-            </h4>
+          <div className="flex items-start gap-4 mb-4">
+            {/* Muscle Group Anatomical Image */}
+            {muscleGroupImages[selectedMuscleGroup] && (
+              <div className="flex-shrink-0 w-32 h-32 md:w-40 md:h-40 rounded-lg overflow-hidden border-2 border-orange-500/50 shadow-lg shadow-orange-500/30">
+                <img 
+                  src={muscleGroupImages[selectedMuscleGroup]} 
+                  alt={`${muscleGroups.find(m => m.id === selectedMuscleGroup)?.name} muscles`}
+                  loading="lazy"
+                  className="w-full h-full object-cover"
+                  data-testid={`muscle-image-${selectedMuscleGroup}`}
+                />
+              </div>
+            )}
+            
+            {/* Header and Description */}
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-2">
+                <Star className="text-orange-400" size={20} />
+                <h4 className="text-lg font-bold text-white">
+                  Suggested {muscleGroups.find(m => m.id === selectedMuscleGroup)?.name} Exercises
+                </h4>
+              </div>
+              <p className="text-sm text-gray-300 mb-3">
+                🎯 Target your {muscleGroups.find(m => m.id === selectedMuscleGroup)?.name.toLowerCase()} with these effective exercises
+              </p>
+            </div>
           </div>
+          
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
             {suggestedExercises.map((exercise) => {
               const IconComponent = exercise.icon;
