@@ -46,6 +46,7 @@ import workoutBgImage from "@assets/stock_images/men_and_women_workin_dbbf742b.j
 export default function WorkoutLogger() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("strength");
+  const [selectedMuscleGroup, setSelectedMuscleGroup] = useState<string>("all");
   const [showAllExercises, setShowAllExercises] = useState(false);
   const [selectedExercise, setSelectedExercise] = useState<any>(null);
   const [difficultyLevel, setDifficultyLevel] = useState([3]);
@@ -247,6 +248,18 @@ export default function WorkoutLogger() {
     { id: "swimming", name: "Swimming", icon: Activity },
   ];
 
+  const muscleGroups = [
+    { id: "all", name: "All Muscles", icon: Activity, color: "gray" },
+    { id: "chest", name: "Chest", icon: Hand, color: "blue" },
+    { id: "back", name: "Back", icon: ArrowUpDown, color: "green" },
+    { id: "shoulders", name: "Shoulders", icon: Weight, color: "yellow" },
+    { id: "arms", name: "Arms", icon: Weight, color: "purple" },
+    { id: "legs", name: "Legs", icon: ArrowUpDown, color: "red" },
+    { id: "core", name: "Core/Abs", icon: Hand, color: "orange" },
+    { id: "glutes", name: "Glutes", icon: Activity, color: "pink" },
+    { id: "cardio", name: "Cardio", icon: Activity, color: "cyan" },
+  ];
+
   const quickExercises = [
     // Strength Training - Upper Body
     { name: "Push-ups", category: "strength", icon: Hand, color: "blue", description: "Upper body strength" },
@@ -333,7 +346,181 @@ export default function WorkoutLogger() {
     { name: "Dumbbell Bulgarian Split Squats", category: "dumbbells", icon: Weight, color: "purple", description: "Single leg focus" },
   ];
 
-  // Filter exercises based on search query
+  // Define exercise instructions first (needed by helper functions)
+  const exerciseInstructions: Record<string, { steps: string[], tips: string[], muscles: string[] }> = {};
+  
+  // Populate exercise instructions after definition
+  Object.assign(exerciseInstructions, {
+    "Push-ups": {
+      steps: [
+        "Start in a plank position with hands shoulder-width apart",
+        "Lower your body until chest nearly touches the floor",
+        "Push back up to starting position",
+        "Keep your core tight throughout the movement"
+      ],
+      tips: ["Keep your body in a straight line", "Don't let your hips sag", "Control the movement"],
+      muscles: ["Chest", "Triceps", "Shoulders", "Core"]
+    },
+    "Pull-ups": {
+      steps: [
+        "Hang from bar with palms facing away",
+        "Pull body up until chin clears the bar",
+        "Lower with control to full arm extension",
+        "Repeat without swinging"
+      ],
+      tips: ["Engage lats", "Don't use momentum", "Full range of motion"],
+      muscles: ["Lats", "Biceps", "Back", "Core"]
+    },
+    "Bench Press": {
+      steps: [
+        "Lie on bench with eyes under the bar",
+        "Grip bar slightly wider than shoulder-width",
+        "Lower bar to chest with control",
+        "Press bar back up to starting position"
+      ],
+      tips: ["Keep feet flat on floor", "Retract shoulder blades", "Control the descent"],
+      muscles: ["Chest", "Triceps", "Shoulders"]
+    },
+    "Squats": {
+      steps: [
+        "Stand with feet shoulder-width apart",
+        "Lower body by bending knees and hips",
+        "Keep chest up and core tight",
+        "Push through heels to return to start"
+      ],
+      tips: ["Keep knees aligned with toes", "Go as low as comfortable", "Maintain neutral spine"],
+      muscles: ["Quadriceps", "Glutes", "Hamstrings", "Core"]
+    },
+    "Deadlifts": {
+      steps: [
+        "Stand with feet hip-width apart, bar over mid-foot",
+        "Bend at hips and knees to grip the bar",
+        "Keep back straight, lift by extending hips and knees",
+        "Lower bar with control to starting position"
+      ],
+      tips: ["Keep bar close to body", "Engage core throughout", "Don't round your back"],
+      muscles: ["Hamstrings", "Glutes", "Back", "Core"]
+    },
+    "Bicep Curls": {
+      steps: [
+        "Stand with dumbbells at sides, palms facing forward",
+        "Curl weights up toward shoulders",
+        "Lower with control to starting position",
+        "Keep elbows stationary"
+      ],
+      tips: ["Don't swing the weights", "Focus on bicep contraction", "Control the movement"],
+      muscles: ["Biceps", "Forearms"]
+    },
+    "Tricep Extensions": {
+      steps: [
+        "Hold weight overhead with both hands",
+        "Lower weight behind head by bending elbows",
+        "Extend arms to lift weight back up",
+        "Keep upper arms stationary"
+      ],
+      tips: ["Keep elbows close to head", "Control the descent", "Full range of motion"],
+      muscles: ["Triceps"]
+    },
+    "Overhead Press": {
+      steps: [
+        "Start with weights at shoulder height",
+        "Press weights overhead until arms are extended",
+        "Lower with control back to shoulders",
+        "Keep core tight throughout"
+      ],
+      tips: ["Don't arch back excessively", "Press in straight line", "Engage core"],
+      muscles: ["Shoulders", "Triceps", "Core"]
+    },
+    "Lunges": {
+      steps: [
+        "Step forward with one leg",
+        "Lower hips until both knees are bent at 90 degrees",
+        "Push back to starting position",
+        "Alternate legs"
+      ],
+      tips: ["Keep front knee over ankle", "Maintain upright torso", "Control the movement"],
+      muscles: ["Quadriceps", "Glutes", "Hamstrings"]
+    },
+    "Plank": {
+      steps: [
+        "Start in push-up position on forearms",
+        "Keep body in straight line from head to heels",
+        "Hold position while breathing steadily",
+        "Engage core throughout"
+      ],
+      tips: ["Don't let hips sag", "Keep neck neutral", "Breathe steadily"],
+      muscles: ["Core", "Shoulders", "Back"]
+    },
+    "Hip Thrusts": {
+      steps: [
+        "Sit on ground with upper back against bench",
+        "Place weight across hips",
+        "Push through heels to lift hips up",
+        "Lower with control"
+      ],
+      tips: ["Squeeze glutes at top", "Keep chin tucked", "Full range of motion"],
+      muscles: ["Glutes", "Hamstrings", "Core"]
+    },
+    "Rows": {
+      steps: [
+        "Bend forward at waist with straight back",
+        "Pull weight toward lower chest/upper abs",
+        "Squeeze shoulder blades together",
+        "Lower with control"
+      ],
+      tips: ["Keep back straight", "Pull with elbows", "Don't jerk the weight"],
+      muscles: ["Back", "Lats", "Biceps"]
+    },
+    "Running": {
+      steps: [
+        "Maintain upright posture",
+        "Land mid-foot, not on heels",
+        "Swing arms naturally",
+        "Breathe rhythmically"
+      ],
+      tips: ["Start slow and build pace", "Stay relaxed", "Focus on form"],
+      muscles: ["Legs", "Cardio", "Core"]
+    },
+    "Cycling": {
+      steps: [
+        "Adjust seat to proper height",
+        "Maintain steady cadence",
+        "Keep upper body relaxed",
+        "Vary resistance for intervals"
+      ],
+      tips: ["Adjust resistance gradually", "Stay hydrated", "Maintain good posture"],
+      muscles: ["Legs", "Cardio", "Core"]
+    },
+  });
+
+  // Helper function to check if exercise targets selected muscle group
+  const exerciseTargetsMuscle = (exerciseName: string, targetMuscle: string) => {
+    if (targetMuscle === "all") return true;
+    
+    const instructions = exerciseInstructions[exerciseName];
+    if (!instructions || !instructions.muscles) return false;
+    
+    const muscles = instructions.muscles.map(m => m.toLowerCase());
+    
+    // Map target muscle to possible matches
+    const muscleMap: Record<string, string[]> = {
+      "chest": ["chest", "pecs", "pectorals"],
+      "back": ["back", "lats", "latissimus", "rhomboids", "traps", "trapezius"],
+      "shoulders": ["shoulders", "deltoids", "delts", "front deltoids", "rear deltoids", "side deltoids"],
+      "arms": ["biceps", "triceps", "forearms", "arms"],
+      "legs": ["quadriceps", "hamstrings", "quads", "legs", "calves"],
+      "core": ["core", "abs", "abdominals", "obliques", "lower abs"],
+      "glutes": ["glutes", "gluteus", "glute"],
+      "cardio": ["cardiovascular", "cardio", "endurance"],
+    };
+    
+    const targetMuscles = muscleMap[targetMuscle] || [targetMuscle];
+    return muscles.some(muscle => 
+      targetMuscles.some(target => muscle.includes(target))
+    );
+  };
+
+  // Filter exercises based on search query and muscle group
   const getFilteredExercises = () => {
     // Use quickExercises as the base and enrich with API data if available
     const exercisesWithProps = quickExercises.map(quickEx => {
@@ -348,23 +535,67 @@ export default function WorkoutLogger() {
       };
     });
     
+    // Apply filters
+    let filtered = exercisesWithProps;
+    
+    // Category filter
     if (!searchQuery.trim()) {
-      return exercisesWithProps.filter(exercise => exercise.category === selectedCategory);
+      filtered = filtered.filter(exercise => exercise.category === selectedCategory);
+    } else {
+      filtered = filtered.filter(exercise => 
+        exercise.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (exercise.description && exercise.description.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        exercise.category.toLowerCase().includes(searchQuery.toLowerCase())
+      );
     }
     
-    return exercisesWithProps.filter(exercise => 
-      exercise.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (exercise.description && exercise.description.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      exercise.category.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    // Muscle group filter
+    if (selectedMuscleGroup !== "all") {
+      filtered = filtered.filter(exercise => 
+        exerciseTargetsMuscle(exercise.name, selectedMuscleGroup)
+      );
+    }
+    
+    return filtered;
   };
 
   const filteredExercises = getFilteredExercises();
+  
+  // Get suggested exercises for selected muscle group
+  const getSuggestedExercises = () => {
+    if (selectedMuscleGroup === "all") return [];
+    
+    return quickExercises
+      .filter(exercise => exerciseTargetsMuscle(exercise.name, selectedMuscleGroup))
+      .slice(0, 6); // Top 6 suggestions
+  };
+  
+  const suggestedExercises = getSuggestedExercises();
 
-  // Exercise instructions database
-  const exerciseInstructions: Record<string, { steps: string[], tips: string[], muscles: string[] }> = {
-    // Strength Training - Upper Body
-    "Push-ups": {
+  // Continue populating exercise instructions with remaining exercises
+  Object.assign(exerciseInstructions, {
+    // Additional exercises (Push-ups already defined above, skipping duplicate)
+    "Chin-ups": {
+      steps: [
+        "Grab bar with palms facing toward you, hands shoulder-width apart",
+        "Start from dead hang with arms fully extended",
+        "Pull yourself up until chin goes over the bar",
+        "Lower yourself slowly to starting position"
+      ],
+      tips: ["Palms toward you targets biceps more", "Don't kip or swing", "Squeeze shoulder blades"],
+      muscles: ["Biceps", "Lats", "Back"]
+    },
+    "Dips": {
+      steps: [
+        "Position hands on parallel bars or bench behind you",
+        "Start with arms extended, supporting your body weight",
+        "Lower body by bending elbows until shoulders are below elbows",
+        "Push back up to starting position"
+      ],
+      tips: ["Keep torso upright", "Don't go too low if shoulders hurt", "Control the descent"],
+      muscles: ["Triceps", "Chest", "Shoulders"]
+    },
+    "Lat Pulldowns": {
       steps: [
         "Start in a plank position with hands shoulder-width apart",
         "Lower your body until chest nearly touches the floor",
@@ -1065,7 +1296,7 @@ export default function WorkoutLogger() {
       tips: ["Don't put too much weight on back foot", "Keep torso upright", "This targets one leg at a time"],
       muscles: ["Quadriceps", "Glutes", "Hamstrings"]
     }
-  };
+  });
 
   const getExerciseInstructions = (exerciseName: string) => {
     return exerciseInstructions[exerciseName] || {
@@ -1379,6 +1610,7 @@ export default function WorkoutLogger() {
               className={selectedCategory === category.id 
                 ? "bg-gradient-to-r from-red-600 to-red-700 text-white border-0 shadow-lg shadow-red-500/50" 
                 : "border-red-500/30 text-gray-300 hover:bg-red-600/20 hover:text-red-400 hover:border-red-500/50"}
+              data-testid={`category-${category.id}`}
             >
               <category.icon className="mr-2" size={16} />
               {category.name}
@@ -1387,6 +1619,61 @@ export default function WorkoutLogger() {
         </div>
       </div>
 
+      {/* Target Muscle Groups */}
+      <div className="mb-6">
+        <p className="text-sm font-medium text-red-400 mb-3">🎯 Target Muscle Group</p>
+        <div className="flex flex-wrap gap-2">
+          {muscleGroups.map((muscle) => (
+            <Button
+              key={muscle.id}
+              variant={selectedMuscleGroup === muscle.id ? "default" : "outline"}
+              size="sm"
+              onClick={() => setSelectedMuscleGroup(muscle.id)}
+              className={selectedMuscleGroup === muscle.id 
+                ? "bg-gradient-to-r from-orange-600 to-red-600 text-white border-0 shadow-lg shadow-orange-500/50" 
+                : "border-orange-500/30 text-gray-300 hover:bg-orange-600/20 hover:text-orange-400 hover:border-orange-500/50"}
+              data-testid={`muscle-${muscle.id}`}
+            >
+              <muscle.icon className="mr-1.5" size={14} />
+              <span className="text-xs">{muscle.name}</span>
+            </Button>
+          ))}
+        </div>
+      </div>
+
+      {/* Suggested Exercises for Selected Muscle Group */}
+      {selectedMuscleGroup !== "all" && suggestedExercises.length > 0 && (
+        <div className="mb-6 bg-gradient-to-r from-orange-900/30 to-red-900/30 border border-orange-500/40 rounded-xl p-5">
+          <div className="flex items-center gap-2 mb-4">
+            <Star className="text-orange-400" size={20} />
+            <h4 className="text-lg font-bold text-white">
+              Suggested {muscleGroups.find(m => m.id === selectedMuscleGroup)?.name} Exercises
+            </h4>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            {suggestedExercises.map((exercise) => {
+              const IconComponent = exercise.icon;
+              return (
+                <button
+                  key={exercise.name}
+                  onClick={() => setSelectedExercise(exercise)}
+                  className="bg-gradient-to-br from-gray-900/80 to-black border border-orange-500/40 rounded-lg p-3 hover:border-orange-500 hover:shadow-lg hover:shadow-orange-500/20 transition-all text-left group"
+                  data-testid={`suggested-${exercise.name.toLowerCase().replace(/\s+/g, '-')}`}
+                >
+                  <div className="flex items-center space-x-2 mb-1">
+                    <IconComponent className="text-orange-400 text-base group-hover:scale-110 transition-transform" />
+                    <span className="font-medium text-white text-sm">{exercise.name}</span>
+                  </div>
+                  <p className="text-xs text-gray-400 line-clamp-1">{exercise.description}</p>
+                </button>
+              );
+            })}
+          </div>
+          <p className="text-xs text-gray-400 mt-3 italic">
+            💡 Tip: These exercises specifically target your {muscleGroups.find(m => m.id === selectedMuscleGroup)?.name.toLowerCase()}
+          </p>
+        </div>
+      )}
 
       {/* Exercise Results */}
       {(searchQuery || filteredExercises.length > 6) ? (
