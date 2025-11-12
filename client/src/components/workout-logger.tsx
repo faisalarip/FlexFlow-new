@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Search, Expand, Hand, Activity, ArrowUpDown, Leaf, Weight, Bike, Dumbbell, X, Play, Star, TrendingUp, Camera, CheckCircle } from "lucide-react";
+import { Search, Expand, Hand, Activity, ArrowUpDown, Leaf, Weight, Bike, Dumbbell, X, Play, Star, TrendingUp, Camera, CheckCircle, ZoomIn } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import type { Exercise } from "@shared/schema";
@@ -63,6 +64,7 @@ export default function WorkoutLogger() {
   const [showWorkoutForm, setShowWorkoutForm] = useState(false);
   const [showProgressPhotoPrompt, setShowProgressPhotoPrompt] = useState(false);
   const [lastCompletedWorkout, setLastCompletedWorkout] = useState<any>(null);
+  const [showMuscleImageModal, setShowMuscleImageModal] = useState(false);
   
   // Exercise-specific input states
   const [exerciseSets, setExerciseSets] = useState(3);
@@ -1667,7 +1669,11 @@ export default function WorkoutLogger() {
           <div className="flex items-start gap-4 mb-4">
             {/* Muscle Group Anatomical Image */}
             {muscleGroupImages[selectedMuscleGroup] && (
-              <div className="flex-shrink-0 w-32 h-32 md:w-40 md:h-40 rounded-lg overflow-hidden border-2 border-orange-500/50 shadow-lg shadow-orange-500/30 bg-white">
+              <div 
+                className="flex-shrink-0 w-32 h-32 md:w-40 md:h-40 rounded-lg overflow-hidden border-2 border-orange-500/50 shadow-lg shadow-orange-500/30 bg-white cursor-pointer hover:border-orange-500 transition-all group relative"
+                onClick={() => setShowMuscleImageModal(true)}
+                data-testid={`muscle-image-container-${selectedMuscleGroup}`}
+              >
                 <img 
                   src={muscleGroupImages[selectedMuscleGroup]} 
                   alt={`Anatomical diagram showing ${muscleGroups.find(m => m.id === selectedMuscleGroup)?.name} highlighted`}
@@ -1675,6 +1681,10 @@ export default function WorkoutLogger() {
                   className="w-full h-full object-contain"
                   data-testid={`muscle-image-${selectedMuscleGroup}`}
                 />
+                {/* Zoom icon overlay */}
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <ZoomIn className="text-white" size={32} />
+                </div>
               </div>
             )}
             
@@ -2117,6 +2127,28 @@ export default function WorkoutLogger() {
           </div>
         </div>
       )}
+
+      {/* Muscle Group Image Modal */}
+      <Dialog open={showMuscleImageModal} onOpenChange={setShowMuscleImageModal}>
+        <DialogContent className="max-w-2xl bg-white dark:bg-gray-900">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold text-gray-900 dark:text-white">
+              {muscleGroups.find(m => m.id === selectedMuscleGroup)?.name} Anatomy
+            </DialogTitle>
+          </DialogHeader>
+          <div className="flex items-center justify-center p-4 bg-white rounded-lg">
+            <img 
+              src={muscleGroupImages[selectedMuscleGroup]} 
+              alt={`Anatomical diagram showing ${muscleGroups.find(m => m.id === selectedMuscleGroup)?.name} highlighted`}
+              className="w-full h-auto max-h-[70vh] object-contain"
+              data-testid="modal-muscle-image"
+            />
+          </div>
+          <p className="text-sm text-gray-600 dark:text-gray-400 text-center">
+            This diagram shows the primary muscles targeted when you select {muscleGroups.find(m => m.id === selectedMuscleGroup)?.name} workouts
+          </p>
+        </DialogContent>
+      </Dialog>
 
       </div>
     </section>
