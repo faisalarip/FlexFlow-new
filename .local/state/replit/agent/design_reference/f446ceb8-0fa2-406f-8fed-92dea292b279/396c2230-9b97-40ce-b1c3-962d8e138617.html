@@ -1,0 +1,618 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitTracker - Your Workout Companion</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1E40AF',
+                        secondary: '#059669',
+                        accent: '#F97316',
+                        muted: '#6B7280'
+                    },
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        };
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body class="font-inter bg-gray-50 text-gray-800">
+    <!-- @COMPONENT: NavigationHeader -->
+    <header class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-dumbbell text-primary text-2xl"></i>
+                        <h1 class="text-xl font-bold text-primary">FitTracker</h1>
+                    </div>
+                </div>
+                
+                <nav class="hidden md:flex space-x-8">
+                    <a href="#dashboard" class="text-primary font-medium border-b-2 border-primary pb-4">Dashboard</a>
+                    <a href="#workouts" class="text-muted hover:text-primary transition-colors">Workouts</a>
+                    <a href="#progress" class="text-muted hover:text-primary transition-colors">Progress</a>
+                    <a href="#calendar" class="text-muted hover:text-primary transition-colors">Calendar</a>
+                </nav>
+
+                <div class="flex items-center space-x-4">
+                    <button class="md:hidden text-muted">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                    <div class="hidden md:flex items-center space-x-3">
+                        <span class="text-sm text-muted" data-bind="user.name">John Doe</span>
+                        <div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+                            <i class="fas fa-user text-white text-sm"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- @END_COMPONENT: NavigationHeader -->
+
+    <!-- @COMPONENT: MobileNavigation -->
+    <div class="md:hidden bg-white border-t border-gray-200 fixed bottom-0 left-0 right-0 z-40">
+        <div class="flex justify-around py-2">
+            <button class="flex flex-col items-center p-2 text-primary">
+                <i class="fas fa-home text-lg"></i>
+                <span class="text-xs mt-1">Home</span>
+            </button>
+            <button class="flex flex-col items-center p-2 text-muted">
+                <i class="fas fa-dumbbell text-lg"></i>
+                <span class="text-xs mt-1">Workouts</span>
+            </button>
+            <button class="flex flex-col items-center p-2 text-muted">
+                <i class="fas fa-chart-line text-lg"></i>
+                <span class="text-xs mt-1">Progress</span>
+            </button>
+            <button class="flex flex-col items-center p-2 text-muted">
+                <i class="fas fa-calendar text-lg"></i>
+                <span class="text-xs mt-1">Calendar</span>
+            </button>
+        </div>
+    </div>
+    <!-- @END_COMPONENT: MobileNavigation -->
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-20 md:pb-6">
+        <!-- @COMPONENT: WelcomeSection -->
+        <section class="mb-8">
+            <div class="bg-gradient-to-r from-primary to-secondary rounded-2xl p-6 text-white relative overflow-hidden">
+                <!-- Motivational workout scene with person exercising -->
+                <div class="absolute inset-0 opacity-20">
+                    <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1200&h=400" alt="Person doing workout" class="w-full h-full object-cover" />
+                </div>
+                <div class="relative z-10">
+                    <h2 class="text-2xl md:text-3xl font-bold mb-2" data-bind="greeting">Good morning, John!</h2>
+                    <p class="text-lg opacity-90 mb-4">Ready to crush your fitness goals today?</p>
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <button class="bg-accent hover:bg-orange-600 text-white px-6 py-3 rounded-xl font-medium transition-colors flex items-center justify-center space-x-2" data-event="click:startWorkout">
+                            <i class="fas fa-plus"></i>
+                            <span>Start Workout</span>
+                        </button>
+                        <div class="bg-white bg-opacity-20 rounded-xl p-3 flex items-center space-x-3">
+                            <i class="fas fa-fire text-accent text-xl"></i>
+                            <div>
+                                <p class="text-sm opacity-80">Current Streak</p>
+                                <p class="font-bold text-lg" data-bind="user.streak">7 days</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- @END_COMPONENT: WelcomeSection -->
+
+        <!-- @COMPONENT: QuickStats -->
+        <section class="mb-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                    <div class="flex items-center space-x-3">
+                        <div class="bg-primary bg-opacity-10 rounded-lg p-2">
+                            <i class="fas fa-dumbbell text-primary"></i>
+                        </div>
+                        <div>
+                            <p class="text-2xl font-bold text-primary" data-bind="stats.totalWorkouts">24</p>
+                            <p class="text-sm text-muted">Workouts</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                    <div class="flex items-center space-x-3">
+                        <div class="bg-secondary bg-opacity-10 rounded-lg p-2">
+                            <i class="fas fa-clock text-secondary"></i>
+                        </div>
+                        <div>
+                            <p class="text-2xl font-bold text-secondary" data-bind="stats.totalHours">18</p>
+                            <p class="text-sm text-muted">Hours</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                    <div class="flex items-center space-x-3">
+                        <div class="bg-accent bg-opacity-10 rounded-lg p-2">
+                            <i class="fas fa-fire text-accent"></i>
+                        </div>
+                        <div>
+                            <p class="text-2xl font-bold text-accent" data-bind="stats.caloriesBurned">3,240</p>
+                            <p class="text-sm text-muted">Calories</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                    <div class="flex items-center space-x-3">
+                        <div class="bg-green-500 bg-opacity-10 rounded-lg p-2">
+                            <i class="fas fa-trophy text-green-500"></i>
+                        </div>
+                        <div>
+                            <p class="text-2xl font-bold text-green-500" data-bind="stats.personalRecords">5</p>
+                            <p class="text-sm text-muted">PRs</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- @END_COMPONENT: QuickStats -->
+
+        <div class="grid lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-2 space-y-8">
+                <!-- @COMPONENT: QuickWorkoutLogger -->
+                <section class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-bold text-gray-800">Log Workout</h3>
+                        <button class="text-primary hover:text-primary/80 transition-colors">
+                            <i class="fas fa-expand-alt"></i>
+                        </button>
+                    </div>
+
+                    <!-- Exercise Search -->
+                    <div class="mb-6">
+                        <div class="relative">
+                            <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-muted"></i>
+                            <input type="text" placeholder="Search exercises (e.g., push-ups, running, yoga)" 
+                                   class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" data-mock="true">
+                        </div>
+                    </div>
+
+                    <!-- Workout Categories -->
+                    <div class="mb-6">
+                        <p class="text-sm font-medium text-muted mb-3">Popular Categories</p>
+                        <div class="flex flex-wrap gap-3">
+                            <button class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                                <i class="fas fa-dumbbell mr-2"></i>Strength
+                            </button>
+                            <button class="bg-gray-100 text-gray-700 hover:bg-gray-200 px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                                <i class="fas fa-running mr-2"></i>Cardio
+                            </button>
+                            <button class="bg-gray-100 text-gray-700 hover:bg-gray-200 px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                                <i class="fas fa-leaf mr-2"></i>Yoga
+                            </button>
+                            <button class="bg-gray-100 text-gray-700 hover:bg-gray-200 px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                                <i class="fas fa-swimmer mr-2"></i>Swimming
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Quick Exercise Buttons -->
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                        <!-- Modern gym with various equipment including dumbbells, barbells, and machines -->
+                        <button class="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-xl p-4 text-left hover:from-blue-100 hover:to-blue-200 transition-all group" data-event="click:selectExercise" data-exercise="push-ups">
+                            <div class="flex items-center space-x-3 mb-2">
+                                <i class="fas fa-hand-paper text-primary text-lg group-hover:scale-110 transition-transform"></i>
+                                <span class="font-medium text-gray-800">Push-ups</span>
+                            </div>
+                            <p class="text-xs text-muted">Upper body strength</p>
+                        </button>
+
+                        <!-- Person running on treadmill in a modern gym setting -->
+                        <button class="bg-gradient-to-br from-green-50 to-green-100 border border-green-200 rounded-xl p-4 text-left hover:from-green-100 hover:to-green-200 transition-all group" data-event="click:selectExercise" data-exercise="running">
+                            <div class="flex items-center space-x-3 mb-2">
+                                <i class="fas fa-running text-secondary text-lg group-hover:scale-110 transition-transform"></i>
+                                <span class="font-medium text-gray-800">Running</span>
+                            </div>
+                            <p class="text-xs text-muted">Cardio endurance</p>
+                        </button>
+
+                        <!-- Person performing squats with proper form in gym environment -->
+                        <button class="bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200 rounded-xl p-4 text-left hover:from-purple-100 hover:to-purple-200 transition-all group" data-event="click:selectExercise" data-exercise="squats">
+                            <div class="flex items-center space-x-3 mb-2">
+                                <i class="fas fa-arrows-alt-v text-purple-600 text-lg group-hover:scale-110 transition-transform"></i>
+                                <span class="font-medium text-gray-800">Squats</span>
+                            </div>
+                            <p class="text-xs text-muted">Lower body power</p>
+                        </button>
+
+                        <!-- Peaceful yoga studio with person in meditation pose -->
+                        <button class="bg-gradient-to-br from-pink-50 to-pink-100 border border-pink-200 rounded-xl p-4 text-left hover:from-pink-100 hover:to-pink-200 transition-all group" data-event="click:selectExercise" data-exercise="yoga">
+                            <div class="flex items-center space-x-3 mb-2">
+                                <i class="fas fa-leaf text-pink-600 text-lg group-hover:scale-110 transition-transform"></i>
+                                <span class="font-medium text-gray-800">Yoga</span>
+                            </div>
+                            <p class="text-xs text-muted">Flexibility & mind</p>
+                        </button>
+
+                        <!-- Person deadlifting with barbell in professional gym -->
+                        <button class="bg-gradient-to-br from-red-50 to-red-100 border border-red-200 rounded-xl p-4 text-left hover:from-red-100 hover:to-red-200 transition-all group" data-event="click:selectExercise" data-exercise="deadlifts">
+                            <div class="flex items-center space-x-3 mb-2">
+                                <i class="fas fa-weight-hanging text-red-600 text-lg group-hover:scale-110 transition-transform"></i>
+                                <span class="font-medium text-gray-800">Deadlifts</span>
+                            </div>
+                            <p class="text-xs text-muted">Full body strength</p>
+                        </button>
+
+                        <!-- Person cycling on stationary bike in modern fitness center -->
+                        <button class="bg-gradient-to-br from-yellow-50 to-yellow-100 border border-yellow-200 rounded-xl p-4 text-left hover:from-yellow-100 hover:to-yellow-200 transition-all group" data-event="click:selectExercise" data-exercise="cycling">
+                            <div class="flex items-center space-x-3 mb-2">
+                                <i class="fas fa-bicycle text-yellow-600 text-lg group-hover:scale-110 transition-transform"></i>
+                                <span class="font-medium text-gray-800">Cycling</span>
+                            </div>
+                            <p class="text-xs text-muted">Leg endurance</p>
+                        </div>
+                    </div>
+                </section>
+                <!-- @END_COMPONENT: QuickWorkoutLogger -->
+
+                <!-- @COMPONENT: RecentWorkouts -->
+                <section class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-bold text-gray-800">Recent Workouts</h3>
+                        <button class="text-primary hover:text-primary/80 text-sm font-medium transition-colors">View All</button>
+                    </div>
+
+                    <div class="space-y-4">
+                        <!-- @MAP: recentWorkouts.map(workout => ( -->
+                        <div class="flex items-center space-x-4 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors" data-mock="true">
+                            <div class="bg-primary bg-opacity-10 rounded-lg p-3">
+                                <i class="fas fa-dumbbell text-primary text-lg"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-medium text-gray-800" data-bind="workout.name">Upper Body Strength</h4>
+                                <p class="text-sm text-muted" data-bind="workout.details">5 exercises • 45 min • 280 calories</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm font-medium text-gray-800" data-bind="workout.date">Today</p>
+                                <p class="text-xs text-muted" data-bind="workout.time">2:30 PM</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center space-x-4 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors" data-mock="true">
+                            <div class="bg-secondary bg-opacity-10 rounded-lg p-3">
+                                <i class="fas fa-running text-secondary text-lg"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-medium text-gray-800" data-bind="workout.name">Morning Run</h4>
+                                <p class="text-sm text-muted" data-bind="workout.details">3.2 miles • 28 min • 310 calories</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm font-medium text-gray-800" data-bind="workout.date">Yesterday</p>
+                                <p class="text-xs text-muted" data-bind="workout.time">7:00 AM</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center space-x-4 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors" data-mock="true">
+                            <div class="bg-pink-500 bg-opacity-10 rounded-lg p-3">
+                                <i class="fas fa-leaf text-pink-500 text-lg"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-medium text-gray-800" data-bind="workout.name">Yoga Flow</h4>
+                                <p class="text-sm text-muted" data-bind="workout.details">6 poses • 30 min • 150 calories</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm font-medium text-gray-800" data-bind="workout.date">2 days ago</p>
+                                <p class="text-xs text-muted" data-bind="workout.time">6:00 PM</p>
+                            </div>
+                        </div>
+                        <!-- @END_MAP )) -->
+                    </div>
+                </section>
+                <!-- @END_COMPONENT: RecentWorkouts -->
+
+                <!-- @COMPONENT: ProgressCharts -->
+                <section class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-bold text-gray-800">Progress Overview</h3>
+                        <select class="text-sm border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none" data-mock="true">
+                            <option>Last 7 days</option>
+                            <option>Last 30 days</option>
+                            <option>Last 3 months</option>
+                        </select>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="font-medium text-gray-800 mb-3">Workout Frequency</h4>
+                            <div class="h-48 bg-gray-50 rounded-xl flex items-center justify-center">
+                                <canvas id="frequencyChart" class="max-w-full max-h-full"></canvas>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="font-medium text-gray-800 mb-3">Weight Progress</h4>
+                            <div class="h-48 bg-gray-50 rounded-xl flex items-center justify-center">
+                                <canvas id="weightChart" class="max-w-full max-h-full"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <!-- @END_COMPONENT: ProgressCharts -->
+            </div>
+
+            <div class="space-y-8">
+                <!-- @COMPONENT: CalendarView -->
+                <section class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-bold text-gray-800">Workout Calendar</h3>
+                        <div class="flex items-center space-x-2">
+                            <button class="text-muted hover:text-primary transition-colors">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <span class="font-medium text-gray-800" data-bind="calendar.currentMonth">December 2024</span>
+                            <button class="text-muted hover:text-primary transition-colors">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Calendar Grid -->
+                    <div class="grid grid-cols-7 gap-1 mb-2">
+                        <div class="text-center text-xs font-medium text-muted py-2">Sun</div>
+                        <div class="text-center text-xs font-medium text-muted py-2">Mon</div>
+                        <div class="text-center text-xs font-medium text-muted py-2">Tue</div>
+                        <div class="text-center text-xs font-medium text-muted py-2">Wed</div>
+                        <div class="text-center text-xs font-medium text-muted py-2">Thu</div>
+                        <div class="text-center text-xs font-medium text-muted py-2">Fri</div>
+                        <div class="text-center text-xs font-medium text-muted py-2">Sat</div>
+                    </div>
+
+                    <div class="grid grid-cols-7 gap-1">
+                        <!-- @MAP: calendarDays.map(day => ( -->
+                        <div class="aspect-square flex flex-col items-center justify-center text-sm border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer" data-mock="true">
+                            <span class="text-muted">1</span>
+                        </div>
+                        <div class="aspect-square flex flex-col items-center justify-center text-sm border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer relative" data-mock="true">
+                            <span class="text-gray-800 font-medium">2</span>
+                            <div class="absolute bottom-1 w-1 h-1 bg-primary rounded-full"></div>
+                        </div>
+                        <div class="aspect-square flex flex-col items-center justify-center text-sm border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer" data-mock="true">
+                            <span class="text-muted">3</span>
+                        </div>
+                        <div class="aspect-square flex flex-col items-center justify-center text-sm border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer relative" data-mock="true">
+                            <span class="text-gray-800 font-medium">4</span>
+                            <div class="absolute bottom-1 w-1 h-1 bg-secondary rounded-full"></div>
+                        </div>
+                        <div class="aspect-square flex flex-col items-center justify-center text-sm border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer" data-mock="true">
+                            <span class="text-muted">5</span>
+                        </div>
+                        <div class="aspect-square flex flex-col items-center justify-center text-sm border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer relative" data-mock="true">
+                            <span class="text-gray-800 font-medium">6</span>
+                            <div class="absolute bottom-1 flex space-x-1">
+                                <div class="w-1 h-1 bg-primary rounded-full"></div>
+                                <div class="w-1 h-1 bg-accent rounded-full"></div>
+                            </div>
+                        </div>
+                        <div class="aspect-square flex flex-col items-center justify-center text-sm border border-primary bg-primary bg-opacity-10 rounded-lg cursor-pointer" data-mock="true">
+                            <span class="text-primary font-bold">7</span>
+                            <div class="absolute bottom-1 w-1 h-1 bg-primary rounded-full"></div>
+                        </div>
+                        <!-- Continue with more days... -->
+                        <!-- @END_MAP )) -->
+                    </div>
+
+                    <div class="mt-4 flex items-center justify-center space-x-4 text-xs">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-2 h-2 bg-primary rounded-full"></div>
+                            <span class="text-muted">Strength</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-2 h-2 bg-secondary rounded-full"></div>
+                            <span class="text-muted">Cardio</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-2 h-2 bg-accent rounded-full"></div>
+                            <span class="text-muted">Yoga</span>
+                        </div>
+                    </div>
+                </section>
+                <!-- @END_COMPONENT: CalendarView -->
+
+                <!-- @COMPONENT: GoalsWidget -->
+                <section class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-bold text-gray-800">Weekly Goals</h3>
+                        <button class="text-primary hover:text-primary/80 text-sm font-medium transition-colors">Edit</button>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-sm font-medium text-gray-800">Workouts</span>
+                                <span class="text-sm text-muted" data-bind="goals.workouts">4/5</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-primary rounded-full h-2 transition-all duration-300" style="width: 80%"></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-sm font-medium text-gray-800">Active Minutes</span>
+                                <span class="text-sm text-muted" data-bind="goals.minutes">180/200</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-secondary rounded-full h-2 transition-all duration-300" style="width: 90%"></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-sm font-medium text-gray-800">Calories Burned</span>
+                                <span class="text-sm text-muted" data-bind="goals.calories">1,420/1,500</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-accent rounded-full h-2 transition-all duration-300" style="width: 95%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 p-4 bg-green-50 border border-green-200 rounded-xl">
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-trophy text-green-500 text-lg"></i>
+                            <div>
+                                <p class="font-medium text-green-800">Great progress!</p>
+                                <p class="text-sm text-green-600">You're on track to exceed your weekly goals.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <!-- @END_COMPONENT: GoalsWidget -->
+
+                <!-- @COMPONENT: WorkoutRecommendations -->
+                <section class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-bold text-gray-800">Recommended Workouts</h3>
+                        <button class="text-primary hover:text-primary/80 text-sm font-medium transition-colors">Refresh</button>
+                    </div>
+
+                    <div class="space-y-3">
+                        <!-- Person doing functional fitness exercises in outdoor setting -->
+                        <div class="flex items-center space-x-4 p-3 bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl hover:from-blue-100 hover:to-blue-200 transition-all cursor-pointer" data-mock="true">
+                            <div class="bg-primary bg-opacity-20 rounded-lg p-2">
+                                <i class="fas fa-dumbbell text-primary"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-medium text-gray-800" data-bind="recommendation.name">Full Body HIIT</h4>
+                                <p class="text-sm text-muted" data-bind="recommendation.details">30 min • High intensity</p>
+                            </div>
+                            <i class="fas fa-chevron-right text-muted"></i>
+                        </div>
+
+                        <!-- People in group fitness class doing aerobic exercises -->
+                        <div class="flex items-center space-x-4 p-3 bg-gradient-to-r from-green-50 to-green-100 rounded-xl hover:from-green-100 hover:to-green-200 transition-all cursor-pointer" data-mock="true">
+                            <div class="bg-secondary bg-opacity-20 rounded-lg p-2">
+                                <i class="fas fa-heartbeat text-secondary"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-medium text-gray-800" data-bind="recommendation.name">Cardio Blast</h4>
+                                <p class="text-sm text-muted" data-bind="recommendation.details">20 min • Moderate intensity</p>
+                            </div>
+                            <i class="fas fa-chevron-right text-muted"></i>
+                        </div>
+
+                        <!-- Serene yoga studio with person doing restorative yoga poses -->
+                        <div class="flex items-center space-x-4 p-3 bg-gradient-to-r from-purple-50 to-purple-100 rounded-xl hover:from-purple-100 hover:to-purple-200 transition-all cursor-pointer" data-mock="true">
+                            <div class="bg-purple-600 bg-opacity-20 rounded-lg p-2">
+                                <i class="fas fa-leaf text-purple-600"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-medium text-gray-800" data-bind="recommendation.name">Recovery Yoga</h4>
+                                <p class="text-sm text-muted" data-bind="recommendation.details">25 min • Low intensity</p>
+                            </div>
+                            <i class="fas fa-chevron-right text-muted"></i>
+                        </div>
+                    </div>
+                </section>
+                <!-- @END_COMPONENT: WorkoutRecommendations -->
+            </div>
+        </div>
+    </main>
+
+    <!-- @COMPONENT: FloatingActionButton -->
+    <button class="fixed bottom-20 md:bottom-6 right-6 bg-accent hover:bg-orange-600 text-white w-14 h-14 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center z-30" data-event="click:quickStart">
+        <i class="fas fa-plus text-xl"></i>
+    </button>
+    <!-- @END_COMPONENT: FloatingActionButton -->
+
+    <script>
+        (function() {
+            // TODO: Replace with real data from API/state management
+            
+            // Initialize charts
+            const frequencyCtx = document.getElementById('frequencyChart');
+            if (frequencyCtx) {
+                new Chart(frequencyCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                        datasets: [{
+                            label: 'Workouts',
+                            data: [1, 0, 2, 1, 0, 1, 2],
+                            borderColor: '#1E40AF',
+                            backgroundColor: 'rgba(30, 64, 175, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            const weightCtx = document.getElementById('weightChart');
+            if (weightCtx) {
+                new Chart(weightCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Bench Press', 'Squats', 'Deadlift', 'Rows'],
+                        datasets: [{
+                            label: 'Max Weight (lbs)',
+                            data: [185, 225, 275, 155],
+                            backgroundColor: [
+                                'rgba(30, 64, 175, 0.8)',
+                                'rgba(5, 150, 105, 0.8)', 
+                                'rgba(249, 115, 22, 0.8)',
+                                'rgba(168, 85, 247, 0.8)'
+                            ],
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            }
+
+            // TODO: Implement form validation for workout entries
+            // TODO: Add event listeners for exercise selection
+            // TODO: Implement calendar interaction
+            // TODO: Add workout timer functionality
+            // TODO: Implement progress tracking logic
+            // TODO: Add data persistence
+        })();
+    </script>
+</body>
+</html>

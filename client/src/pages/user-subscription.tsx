@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
 import { Calendar, CheckCircle, XCircle, AlertCircle, Gift, Sparkles, Zap, Crown, Star, TrendingUp, Heart, Award, Target } from "lucide-react";
 import { format } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -7,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { registerPlugin, Capacitor } from "@capacitor/core";
 
 interface UserSubscriptionStatus {
   subscriptionStatus: string;
@@ -22,6 +24,48 @@ interface UserSubscriptionStatus {
 export default function UserSubscription() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const SubscriptionPlugin = Capacitor.isNativePlatform() ? registerPlugin<any>('SubscriptionPlugin') : null;
+  const [nativeProducts, setNativeProducts] = useState<any[]>([]);
+  const [isPurchasing, setIsPurchasing] = useState(false);
+
+  useEffect(() => {
+    const loadProducts = async () => {
+      if (!Capacitor.isNativePlatform() || !SubscriptionPlugin) return;
+      try {
+        const productIds = ['com.flexflow.app.premium.monthly'];
+        const res = await SubscriptionPlugin.getProducts({ ids: productIds });
+        setNativeProducts(res.products || []);
+      } catch (e) {
+        console.error('Failed to load IAP products', e);
+      }
+    };
+    loadProducts();
+  }, []);
+
+  const handlePurchase = async () => {
+    if (!SubscriptionPlugin) return;
+    try {
+      setIsPurchasing(true);
+      const productId = nativeProducts[0]?.id || 'com.flexflow.app.premium.monthly';
+      const res = await SubscriptionPlugin.purchase({ productId });
+      if (res.status === 'success' && res.originalTransactionId) {
+        const verify = await apiRequest('POST', '/api/user/subscription/verify-receipt', {
+          originalTransactionId: res.originalTransactionId,
+        });
+        await verify.json();
+        queryClient.invalidateQueries({ queryKey: ["/api/user/subscription"] });
+        toast({ title: 'Premium Activated', description: 'Your subscription is now active.' });
+      } else if (res.status === 'cancelled') {
+        toast({ title: 'Purchase Cancelled', description: 'No changes to your subscription.' });
+      } else if (res.status === 'pending') {
+        toast({ title: 'Pending', description: 'Your purchase is pending approval.' });
+      }
+    } catch (e: any) {
+      toast({ title: 'Purchase Failed', description: e?.message || 'Please try again.', variant: 'destructive' });
+    } finally {
+      setIsPurchasing(false);
+    }
+  };
 
   const { data: subscriptionData, isLoading } = useQuery<UserSubscriptionStatus>({
     queryKey: ["/api/user/subscription"],
@@ -275,8 +319,8 @@ export default function UserSubscription() {
           </div>
         </div>
 
-        {/* Upgrade Section - App Store Integration */}
-        {!subscriptionData.isActive && (
+        {/* Upgrade Section - Web only */}
+        {!subscriptionData.isActive && !Capacitor.isNativePlatform() && (
           <Card className="border-0 bg-gradient-to-br from-red-600 via-orange-600 to-yellow-600 shadow-2xl overflow-hidden relative lg:desktop-scale-in mobile-bounce-in">
             <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMiIgZmlsbD0iI2ZmZiIgZmlsbC1vcGFjaXR5PSIwLjEiLz48L3N2Zz4=')] opacity-50"></div>
             <CardHeader className="relative">
@@ -348,6 +392,35 @@ export default function UserSubscription() {
                   </p>
                 </div>
               </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Native IAP Purchase */}
+        {!subscriptionData.isActive && Capacitor.isNativePlatform() && (
+          <Card className="border-0 bg-gradient-to-br from-red-600 via-orange-600 to-yellow-600 shadow-2xl overflow-hidden relative lg:desktop-scale-in mobile-bounce-in">
+            <CardHeader>
+              <CardTitle className="text-white text-center">Subscribe to Premium</CardTitle>
+              <CardDescription className="text-white/90 text-center">
+                Purchase securely with Apple In‑App Purchase
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-center gap-3">
+                <div className="text-3xl font-bold text-white">{nativeProducts[0]?.displayName || 'Premium'}</div>
+                <div className="text-white/90">
+                  <div className="font-semibold">{nativeProducts[0]?.price || '$15.99'}</div>
+                  <div className="text-sm">Auto‑renewable subscription</div>
+                </div>
+              </div>
+              <Button 
+                className="w-full bg-white/20 backdrop-blur-md text-white border-2 border-white hover:bg-white/30 shadow-lg text-base py-6"
+                onClick={handlePurchase}
+                disabled={isPurchasing}
+                data-testid="button-purchase-iap"
+              >
+                {isPurchasing ? 'Purchasing...' : 'Subscribe'}
+              </Button>
             </CardContent>
           </Card>
         )}

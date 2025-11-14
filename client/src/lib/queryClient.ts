@@ -1,4 +1,5 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
+import { Capacitor } from "@capacitor/core";
 
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
@@ -12,6 +13,22 @@ export async function apiRequest(
   url: string,
   data?: unknown | undefined,
 ): Promise<Response> {
+  const resolveUrl = (u: string) => {
+    if (u.startsWith("/")) {
+      const apiBase = (import.meta as any).env?.VITE_API_BASE_URL || "";
+      if (Capacitor.isNativePlatform()) {
+        if (!apiBase) {
+          console.warn("VITE_API_BASE_URL not set for native platform; requests to relative paths will fail.");
+        }
+        return `${apiBase}${u}`;
+      }
+      const origin = typeof window !== "undefined" ? window.location.origin : "";
+      return `${origin}${u}`;
+    }
+    return u;
+  };
+
+  const finalUrl = resolveUrl(url);
   const token = localStorage.getItem('auth-token');
   const headers: Record<string, string> = {};
   
@@ -23,7 +40,7 @@ export async function apiRequest(
     headers["Authorization"] = `Bearer ${token}`;
   }
 
-  const res = await fetch(url, {
+  const res = await fetch(finalUrl, {
     method,
     headers,
     body: data ? JSON.stringify(data) : undefined,
@@ -40,6 +57,21 @@ export const getQueryFn: <T>(options: {
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
+    const resolveUrl = (u: string) => {
+      if (u.startsWith("/")) {
+        const apiBase = (import.meta as any).env?.VITE_API_BASE_URL || "";
+        if (Capacitor.isNativePlatform()) {
+          if (!apiBase) {
+            console.warn("VITE_API_BASE_URL not set for native platform; requests to relative paths will fail.");
+          }
+          return `${apiBase}${u}`;
+        }
+        const origin = typeof window !== "undefined" ? window.location.origin : "";
+        return `${origin}${u}`;
+      }
+      return u;
+    };
+
     const token = localStorage.getItem('auth-token');
     const headers: Record<string, string> = {};
     
@@ -67,7 +99,8 @@ export const getQueryFn: <T>(options: {
       }
     }
 
-    const res = await fetch(url, {
+    const finalUrl = resolveUrl(url);
+    const res = await fetch(finalUrl, {
       headers,
       credentials: "include",
     });

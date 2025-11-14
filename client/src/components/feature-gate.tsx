@@ -1,5 +1,6 @@
 import { Lock, Crown, Calendar, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Capacitor } from "@capacitor/core";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "wouter";
@@ -209,31 +210,33 @@ export default function FeatureGate({ feature, children, fallback }: FeatureGate
             )}
 
             {/* Upgrade Buttons */}
-            <div className="flex flex-col gap-4 pt-4">
-              <Button
-                asChild
-                size="lg"
-                className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold py-6 text-lg shadow-lg shadow-red-500/50 border-2 border-red-500/50"
-                data-testid="upgrade-to-premium"
-              >
-                <Link href="/subscription">
-                  <Crown className="w-5 h-5 mr-3" />
-                  {isExpired ? "Renew Premium Subscription" : "Upgrade to Premium Now"}
-                </Link>
-              </Button>
-              
-              <Button
-                asChild
-                variant="outline"
-                size="lg"
-                className="w-full border-2 border-gray-600 text-white hover:bg-gray-800 hover:text-white py-6 text-lg"
-                data-testid="learn-more-premium"
-              >
-                <Link href="/subscription">
-                  View Premium Features & Pricing
-                </Link>
-              </Button>
-            </div>
+            {!Capacitor.isNativePlatform() && (
+              <div className="flex flex-col gap-4 pt-4">
+                <Button
+                  asChild
+                  size="lg"
+                  className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold py-6 text-lg shadow-lg shadow-red-500/50 border-2 border-red-500/50"
+                  data-testid="upgrade-to-premium"
+                >
+                  <Link href="/subscription">
+                    <Crown className="w-5 h-5 mr-3" />
+                    {isExpired ? "Renew Premium Subscription" : "Upgrade to Premium Now"}
+                  </Link>
+                </Button>
+                
+                <Button
+                  asChild
+                  variant="outline"
+                  size="lg"
+                  className="w-full border-2 border-gray-600 text-white hover:bg-gray-800 hover:text-white py-6 text-lg"
+                  data-testid="learn-more-premium"
+                >
+                  <Link href="/subscription">
+                    View Premium Features & Pricing
+                  </Link>
+                </Button>
+              </div>
+            )}
 
             {/* Premium Benefits */}
             <div className="text-center pt-4 border-t border-gray-700">

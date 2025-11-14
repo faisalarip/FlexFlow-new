@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Settings, CreditCard, Calendar, Crown, Check, X, Trash2, AlertTriangle, Bell, Award, Trophy, Flame, Zap } from "lucide-react";
+import { Capacitor } from "@capacitor/core";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -533,6 +534,7 @@ export default function SettingsPage() {
                     Your trial expires on {formatDate(user?.subscriptionExpiresAt)}. 
                     Upgrade now to continue your fitness journey without interruption.
                   </p>
+                  {!Capacitor.isNativePlatform() && (
                   <Button 
                     className="mt-3" 
                     size="sm"
@@ -542,6 +544,7 @@ export default function SettingsPage() {
                     <CreditCard className="w-4 h-4 mr-2" />
                     Upgrade Now
                   </Button>
+                  )}
                 </div>
               </div>
             </div>
@@ -557,6 +560,7 @@ export default function SettingsPage() {
                     Your subscription expired on {formatDate(user?.subscriptionExpiresAt)}. 
                     Renew your subscription to regain access to premium features and continue tracking your progress.
                   </p>
+                  {!Capacitor.isNativePlatform() && (
                   <Button 
                     className="mt-3" 
                     size="sm"
@@ -566,6 +570,7 @@ export default function SettingsPage() {
                     <CreditCard className="w-4 h-4 mr-2" />
                     Renew Subscription
                   </Button>
+                  )}
                 </div>
               </div>
             </div>
@@ -581,6 +586,7 @@ export default function SettingsPage() {
                     You have full access to all premium features. Your subscription will renew on {formatDate(user?.subscriptionExpiresAt)}.
                   </p>
                   <div className="flex gap-2 mt-3">
+                    {!Capacitor.isNativePlatform() && (
                     <Button 
                       variant="outline" 
                       size="sm"
@@ -590,6 +596,7 @@ export default function SettingsPage() {
                       <Settings className="w-4 h-4 mr-2" />
                       Manage Subscription
                     </Button>
+                    )}
                   </div>
                 </div>
               </div>

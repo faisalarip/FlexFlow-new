@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import type { User } from "@shared/schema";
+import { Capacitor } from "@capacitor/core";
 
 export default function PremiumBadge() {
   const { data: user } = useQuery<User>({
@@ -22,15 +23,17 @@ export default function PremiumBadge() {
   }
 
   return (
-    <Button
-      asChild
-      className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white border-none shadow-sm px-2 py-1 h-auto text-xs"
-      data-testid="upgrade-button"
-    >
-      <Link href="/subscription">
-        <Sparkles className="w-3 h-3 mr-1" />
-        Upgrade
-      </Link>
-    </Button>
+    Capacitor.isNativePlatform() ? null : (
+      <Button
+        asChild
+        className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white border-none shadow-sm px-2 py-1 h-auto text-xs"
+        data-testid="upgrade-button"
+      >
+        <Link href="/subscription">
+          <Sparkles className="w-3 h-3 mr-1" />
+          Upgrade
+        </Link>
+      </Button>
+    )
   );
 }
