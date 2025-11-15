@@ -32,7 +32,10 @@ export default function UserSubscription() {
     const loadProducts = async () => {
       if (!Capacitor.isNativePlatform() || !SubscriptionPlugin) return;
       try {
-        const productIds = ['com.flexflow.app.premium.monthly'];
+        const productIdsEnv = import.meta.env.VITE_IAP_PRODUCT_IDS as string | undefined;
+        const productIds = productIdsEnv
+          ? productIdsEnv.split(',').map(s => s.trim()).filter(Boolean)
+          : ['FlexFlow_Fitness_Premium_monthly_15.99'];
         const res = await SubscriptionPlugin.getProducts({ ids: productIds });
         setNativeProducts(res.products || []);
       } catch (e) {
@@ -46,7 +49,9 @@ export default function UserSubscription() {
     if (!SubscriptionPlugin) return;
     try {
       setIsPurchasing(true);
-      const productId = nativeProducts[0]?.id || 'com.flexflow.app.premium.monthly';
+      const envIds = import.meta.env.VITE_IAP_PRODUCT_IDS as string | undefined;
+      const firstId = envIds ? envIds.split(',').map(s => s.trim()).filter(Boolean)[0] : 'FlexFlow_Fitness_Premium_monthly_15.99';
+      const productId = nativeProducts[0]?.id || firstId;
       const res = await SubscriptionPlugin.purchase({ productId });
       if (res.status === 'success' && res.originalTransactionId) {
         const verify = await apiRequest('POST', '/api/user/subscription/verify-receipt', {
@@ -67,6 +72,29 @@ export default function UserSubscription() {
     }
   };
 
+  const handleRestore = async () => {
+    if (!SubscriptionPlugin) return;
+    try {
+      setIsPurchasing(true);
+      const res = await SubscriptionPlugin.restore();
+      const entitlements = res.entitlements || [];
+      if (entitlements.length > 0 && entitlements[0].originalTransactionId) {
+        const verify = await apiRequest('POST', '/api/user/subscription/verify-receipt', {
+          originalTransactionId: entitlements[0].originalTransactionId,
+        });
+        await verify.json();
+        queryClient.invalidateQueries({ queryKey: ["/api/user/subscription"] });
+        toast({ title: 'Restored', description: 'Your subscription has been restored.' });
+      } else {
+        toast({ title: 'No Purchases', description: 'No active purchases were found.' });
+      }
+    } catch (e: any) {
+      toast({ title: 'Restore Failed', description: e?.message || 'Please try again.', variant: 'destructive' });
+    } finally {
+      setIsPurchasing(false);
+    }
+  };
+  
   const { data: subscriptionData, isLoading } = useQuery<UserSubscriptionStatus>({
     queryKey: ["/api/user/subscription"],
     retry: false,
@@ -420,6 +448,15 @@ export default function UserSubscription() {
                 data-testid="button-purchase-iap"
               >
                 {isPurchasing ? 'Purchasing...' : 'Subscribe'}
+              </Button>
+              <Button 
+                variant="outline"
+                className="w-full bg-white/10 backdrop-blur-md text-white border-2 border-white/60 hover:bg-white/20 shadow text-base py-6"
+                onClick={handleRestore}
+                disabled={isPurchasing}
+                data-testid="button-restore-iap"
+              >
+                Restore Purchases
               </Button>
             </CardContent>
           </Card>
