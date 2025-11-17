@@ -7,7 +7,7 @@ export default function MobileNavigation() {
   const isActive = (path: string) => location === path;
   
   return (
-    <div className="md:hidden bg-white border-t border-gray-200 fixed bottom-0 left-0 right-0 z-40">
+    <div className="md:hidden bg-white border-t border-gray-200 fixed bottom-0 left-0 right-0 z-40 safe-area-inset-bottom">
       <div className="flex justify-around py-2">
         <Link
           href="/"

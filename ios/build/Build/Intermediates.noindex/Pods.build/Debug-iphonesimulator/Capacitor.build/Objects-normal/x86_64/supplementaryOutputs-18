@@ -1,0 +1,30 @@
+{
+  "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/node_modules/@capacitor/ios/Capacitor/Capacitor/KeyValueStore.swift" : {
+    "const-values" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/KeyValueStore.swiftconstvalues",
+    "dependencies" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/KeyValueStore.d",
+    "diagnostics" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/KeyValueStore.dia",
+    "object" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/KeyValueStore.o",
+    "swift-dependencies" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/KeyValueStore.swiftdeps"
+  },
+  "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/node_modules/@capacitor/ios/Capacitor/Capacitor/NotificationHandlerProtocol.swift" : {
+    "const-values" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/NotificationHandlerProtocol.swiftconstvalues",
+    "dependencies" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/NotificationHandlerProtocol.d",
+    "diagnostics" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/NotificationHandlerProtocol.dia",
+    "object" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/NotificationHandlerProtocol.o",
+    "swift-dependencies" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/NotificationHandlerProtocol.swiftdeps"
+  },
+  "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/node_modules/@capacitor/ios/Capacitor/Capacitor/NotificationRouter.swift" : {
+    "const-values" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/NotificationRouter.swiftconstvalues",
+    "dependencies" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/NotificationRouter.d",
+    "diagnostics" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/NotificationRouter.dia",
+    "object" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/NotificationRouter.o",
+    "swift-dependencies" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/NotificationRouter.swiftdeps"
+  },
+  "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/node_modules/@capacitor/ios/Capacitor/Capacitor/PluginCallResult.swift" : {
+    "const-values" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/PluginCallResult.swiftconstvalues",
+    "dependencies" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/PluginCallResult.d",
+    "diagnostics" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/PluginCallResult.dia",
+    "object" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/PluginCallResult.o",
+    "swift-dependencies" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/PluginCallResult.swiftdeps"
+  }
+}

@@ -1,0 +1,22 @@
+moduledependenciestarget: \
+  /Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Products/Debug-iphonesimulator/CapacitorCordova/Cordova.framework/Modules/module.modulemap \
+  /Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Products/Debug-iphonesimulator/CapacitorCordova/Cordova.framework/Headers/CapacitorCordova.h \
+  /Applications/Xcode-26.1.1.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.1.sdk/System/Library/Frameworks/UIKit.framework/Modules/module.modulemap \
+  /Applications/Xcode-26.1.1.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.1.sdk/System/Library/Frameworks/Foundation.framework/Modules/module.modulemap \
+  /Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Products/Debug-iphonesimulator/CapacitorCordova/Cordova.framework/Headers/AppDelegate.h \
+  /Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Products/Debug-iphonesimulator/CapacitorCordova/Cordova.framework/Headers/CDVViewController.h \
+  /Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Products/Debug-iphonesimulator/CapacitorCordova/Cordova.framework/Headers/CDV.h \
+  /Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Products/Debug-iphonesimulator/CapacitorCordova/Cordova.framework/Headers/CDVAvailability.h \
+  /Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Products/Debug-iphonesimulator/CapacitorCordova/Cordova.framework/Headers/CDVPlugin.h \
+  /Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Products/Debug-iphonesimulator/CapacitorCordova/Cordova.framework/Headers/CDVPluginResult.h \
+  /Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Products/Debug-iphonesimulator/CapacitorCordova/Cordova.framework/Headers/CDVCommandDelegate.h \
+  /Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Products/Debug-iphonesimulator/CapacitorCordova/Cordova.framework/Headers/CDVInvokedUrlCommand.h \
+  /Applications/Xcode-26.1.1.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.1.sdk/System/Library/Frameworks/WebKit.framework/Modules/module.modulemap \
+  /Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Products/Debug-iphonesimulator/CapacitorCordova/Cordova.framework/Headers/CDVURLProtocol.h \
+  /Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Products/Debug-iphonesimulator/CapacitorCordova/Cordova.framework/Headers/CDVScreenOrientationDelegate.h \
+  /Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Products/Debug-iphonesimulator/CapacitorCordova/Cordova.framework/Headers/CDVWebViewProcessPoolFactory.h \
+  /Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Products/Debug-iphonesimulator/CapacitorCordova/Cordova.framework/Headers/CDVCommandDelegateImpl.h \
+  /Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Products/Debug-iphonesimulator/CapacitorCordova/Cordova.framework/Headers/CDVPluginManager.h \
+  /Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Products/Debug-iphonesimulator/CapacitorCordova/Cordova.framework/Headers/CDVConfigParser.h \
+  /Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Products/Debug-iphonesimulator/CapacitorCordova/Cordova.framework/Headers/CDVPlugin+Resources.h \
+  /Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Products/Debug-iphonesimulator/CapacitorCordova/Cordova.framework/Headers/NSDictionary+CordovaPreferences.h

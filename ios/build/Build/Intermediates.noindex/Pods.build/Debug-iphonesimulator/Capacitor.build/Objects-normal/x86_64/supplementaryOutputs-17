@@ -1,0 +1,30 @@
+{
+  "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/node_modules/@capacitor/ios/Capacitor/Capacitor/Codable/JSValueDecoder.swift" : {
+    "const-values" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/JSValueDecoder.swiftconstvalues",
+    "dependencies" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/JSValueDecoder.d",
+    "diagnostics" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/JSValueDecoder.dia",
+    "object" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/JSValueDecoder.o",
+    "swift-dependencies" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/JSValueDecoder.swiftdeps"
+  },
+  "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/node_modules/@capacitor/ios/Capacitor/Capacitor/Codable/JSValueEncoder.swift" : {
+    "const-values" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/JSValueEncoder.swiftconstvalues",
+    "dependencies" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/JSValueEncoder.d",
+    "diagnostics" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/JSValueEncoder.dia",
+    "object" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/JSValueEncoder.o",
+    "swift-dependencies" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/JSValueEncoder.swiftdeps"
+  },
+  "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/node_modules/@capacitor/ios/Capacitor/Capacitor/JSTypes.swift" : {
+    "const-values" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/JSTypes.swiftconstvalues",
+    "dependencies" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/JSTypes.d",
+    "diagnostics" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/JSTypes.dia",
+    "object" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/JSTypes.o",
+    "swift-dependencies" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/JSTypes.swiftdeps"
+  },
+  "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/node_modules/@capacitor/ios/Capacitor/Capacitor/KeyPath.swift" : {
+    "const-values" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/KeyPath.swiftconstvalues",
+    "dependencies" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/KeyPath.d",
+    "diagnostics" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/KeyPath.dia",
+    "object" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/KeyPath.o",
+    "swift-dependencies" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/KeyPath.swiftdeps"
+  }
+}

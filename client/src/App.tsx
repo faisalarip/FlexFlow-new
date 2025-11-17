@@ -47,7 +47,7 @@ function Router() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-black">
+    <div className="min-h-screen bg-gray-50 dark:bg-black pt-safe">
       {isAuthenticated && (
         <>
           <Navbar />

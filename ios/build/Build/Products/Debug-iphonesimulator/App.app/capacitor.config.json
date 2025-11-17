@@ -1,0 +1,11 @@
+{
+	"appId": "com.flexflow.app",
+	"appName": "FlexFlow",
+	"webDir": "dist/public",
+	"server": {
+		"iosScheme": "https"
+	},
+	"packageClassList": [
+		"StatusBarPlugin"
+	]
+}

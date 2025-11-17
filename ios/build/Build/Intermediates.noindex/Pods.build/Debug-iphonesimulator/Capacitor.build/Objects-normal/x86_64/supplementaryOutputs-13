@@ -1,0 +1,37 @@
+{
+  "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/node_modules/@capacitor/ios/Capacitor/Capacitor/CAPBridgeDelegate.swift" : {
+    "const-values" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/CAPBridgeDelegate.swiftconstvalues",
+    "dependencies" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/CAPBridgeDelegate.d",
+    "diagnostics" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/CAPBridgeDelegate.dia",
+    "object" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/CAPBridgeDelegate.o",
+    "swift-dependencies" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/CAPBridgeDelegate.swiftdeps"
+  },
+  "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/node_modules/@capacitor/ios/Capacitor/Capacitor/CAPBridgeProtocol.swift" : {
+    "const-values" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/CAPBridgeProtocol.swiftconstvalues",
+    "dependencies" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/CAPBridgeProtocol.d",
+    "diagnostics" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/CAPBridgeProtocol.dia",
+    "object" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/CAPBridgeProtocol.o",
+    "swift-dependencies" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/CAPBridgeProtocol.swiftdeps"
+  },
+  "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/node_modules/@capacitor/ios/Capacitor/Capacitor/CAPBridgeViewController.swift" : {
+    "const-values" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/CAPBridgeViewController.swiftconstvalues",
+    "dependencies" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/CAPBridgeViewController.d",
+    "diagnostics" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/CAPBridgeViewController.dia",
+    "object" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/CAPBridgeViewController.o",
+    "swift-dependencies" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/CAPBridgeViewController.swiftdeps"
+  },
+  "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/node_modules/@capacitor/ios/Capacitor/Capacitor/CAPBridgedPlugin+getMethod.swift" : {
+    "const-values" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/CAPBridgedPlugin+getMethod.swiftconstvalues",
+    "dependencies" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/CAPBridgedPlugin+getMethod.d",
+    "diagnostics" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/CAPBridgedPlugin+getMethod.dia",
+    "object" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/CAPBridgedPlugin+getMethod.o",
+    "swift-dependencies" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/CAPBridgedPlugin+getMethod.swiftdeps"
+  },
+  "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/node_modules/@capacitor/ios/Capacitor/Capacitor/CAPFile.swift" : {
+    "const-values" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/CAPFile.swiftconstvalues",
+    "dependencies" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/CAPFile.d",
+    "diagnostics" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/CAPFile.dia",
+    "object" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/CAPFile.o",
+    "swift-dependencies" : "/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/build/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Capacitor.build/Objects-normal/x86_64/CAPFile.swiftdeps"
+  }
+}

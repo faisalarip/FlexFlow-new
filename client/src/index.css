@@ -4,6 +4,12 @@
 @tailwind utilities;
 
 @layer utilities {
+  /*
+   Safe Area Utilities
+   - Use `.pt-safe` and `.pb-safe` on primary containers to avoid notches, status bars, and home indicators
+   - Apply `.safe-area-inset-top` / `.safe-area-inset-bottom` to fixed headers/footers when needed
+   - These rely on CSS env() variables and gracefully fallback on Android/web (0px)
+  */
   .bg-gradient-radial {
     background-image: radial-gradient(var(--tw-gradient-stops));
   }
@@ -149,10 +155,22 @@
   }
 
   /* Mobile app utilities */
+  .pt-safe {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+  .pl-safe {
+    padding-left: env(safe-area-inset-left, 0px);
+  }
+  .pr-safe {
+    padding-right: env(safe-area-inset-right, 0px);
+  }
   .pb-safe {
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
   
+  .safe-area-inset-top {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
   .safe-area-inset-bottom {
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
