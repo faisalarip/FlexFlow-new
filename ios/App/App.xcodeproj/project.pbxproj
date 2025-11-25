@@ -16,6 +16,7 @@
 		504EC3121FED79650016851F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 504EC3101FED79650016851F /* LaunchScreen.storyboard */; };
 		50B271D11FEDC1A000F3C39B /* public in Resources */ = {isa = PBXBuildFile; fileRef = 50B271D01FEDC1A000F3C39B /* public */; };
 		D82FF4AC2ED60B310091212D /* Products.storekit in Resources */ = {isa = PBXBuildFile; fileRef = D82FF4AB2ED60B310091212D /* Products.storekit */; };
+		D82FF4B02ED6146B0091212D /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D82FF4AF2ED6146B0091212D /* StoreKit.framework */; };
 		D8C338CC2EC70DA800BB4B3F /* SubscriptionPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = D8C338CA2EC70DA800BB4B3F /* SubscriptionPlugin.m */; };
 		D8C338CD2EC70DA800BB4B3F /* SubscriptionPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8C338CB2EC70DA800BB4B3F /* SubscriptionPlugin.swift */; };
 /* End PBXBuildFile section */
@@ -31,6 +32,7 @@
 		504EC3131FED79650016851F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		50B271D01FEDC1A000F3C39B /* public */ = {isa = PBXFileReference; lastKnownFileType = folder; path = public; sourceTree = "<group>"; };
 		D82FF4AB2ED60B310091212D /* Products.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = Products.storekit; sourceTree = "<group>"; };
+		D82FF4AF2ED6146B0091212D /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		D8C338CA2EC70DA800BB4B3F /* SubscriptionPlugin.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SubscriptionPlugin.m; sourceTree = "<group>"; };
 		D8C338CB2EC70DA800BB4B3F /* SubscriptionPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionPlugin.swift; sourceTree = "<group>"; };
 		D8C338CE2EC70DB700BB4B3F /* App-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "App-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -45,6 +47,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				187D5E2319420C2A17A33FFF /* Pods_App.framework in Frameworks */,
+				D82FF4B02ED6146B0091212D /* StoreKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -63,6 +66,7 @@
 		400185F4F95AE6C6D1AD8A29 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				D82FF4AF2ED6146B0091212D /* StoreKit.framework */,
 				F7B7570E4A4E83185F47C8AF /* Pods_App.framework */,
 			);
 			name = Frameworks;
