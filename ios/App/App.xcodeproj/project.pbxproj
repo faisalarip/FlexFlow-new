@@ -15,6 +15,7 @@
 		504EC30F1FED79650016851F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 504EC30E1FED79650016851F /* Assets.xcassets */; };
 		504EC3121FED79650016851F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 504EC3101FED79650016851F /* LaunchScreen.storyboard */; };
 		50B271D11FEDC1A000F3C39B /* public in Resources */ = {isa = PBXBuildFile; fileRef = 50B271D01FEDC1A000F3C39B /* public */; };
+		D82FF4AC2ED60B310091212D /* Products.storekit in Resources */ = {isa = PBXBuildFile; fileRef = D82FF4AB2ED60B310091212D /* Products.storekit */; };
 		D8C338CC2EC70DA800BB4B3F /* SubscriptionPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = D8C338CA2EC70DA800BB4B3F /* SubscriptionPlugin.m */; };
 		D8C338CD2EC70DA800BB4B3F /* SubscriptionPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8C338CB2EC70DA800BB4B3F /* SubscriptionPlugin.swift */; };
 /* End PBXBuildFile section */
@@ -29,6 +30,7 @@
 		504EC3111FED79650016851F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		504EC3131FED79650016851F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		50B271D01FEDC1A000F3C39B /* public */ = {isa = PBXFileReference; lastKnownFileType = folder; path = public; sourceTree = "<group>"; };
+		D82FF4AB2ED60B310091212D /* Products.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = Products.storekit; sourceTree = "<group>"; };
 		D8C338CA2EC70DA800BB4B3F /* SubscriptionPlugin.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SubscriptionPlugin.m; sourceTree = "<group>"; };
 		D8C338CB2EC70DA800BB4B3F /* SubscriptionPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionPlugin.swift; sourceTree = "<group>"; };
 		D8C338CE2EC70DB700BB4B3F /* App-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "App-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -89,6 +91,7 @@
 			children = (
 				D8C338CA2EC70DA800BB4B3F /* SubscriptionPlugin.m */,
 				D8C338CB2EC70DA800BB4B3F /* SubscriptionPlugin.swift */,
+				D82FF4AB2ED60B310091212D /* Products.storekit */,
 				50379B222058CBB4000EE86E /* capacitor.config.json */,
 				504EC3071FED79650016851F /* AppDelegate.swift */,
 				504EC30B1FED79650016851F /* Main.storyboard */,
@@ -168,6 +171,7 @@
 				504EC30F1FED79650016851F /* Assets.xcassets in Resources */,
 				50379B232058CBB4000EE86E /* capacitor.config.json in Resources */,
 				504EC30D1FED79650016851F /* Main.storyboard in Resources */,
+				D82FF4AC2ED60B310091212D /* Products.storekit in Resources */,
 				2FAD9763203C412B000D30F8 /* config.xml in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
