@@ -10,6 +10,24 @@ import { apiRequest } from "@/lib/queryClient";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { registerPlugin, Capacitor } from "@capacitor/core";
 
+interface SubscriptionPluginInterface {
+  getProducts(options: { ids: string[] }): Promise<{ products: any[] }>;
+  purchase(options: { productId: string }): Promise<{ status: string; originalTransactionId?: string; productId?: string }>;
+  restore(): Promise<{ entitlements: any[] }>;
+}
+
+let subscriptionPluginInstance: SubscriptionPluginInterface | null = null;
+
+function getSubscriptionPlugin(): SubscriptionPluginInterface | null {
+  if (!Capacitor.isNativePlatform()) {
+    return null;
+  }
+  if (!subscriptionPluginInstance) {
+    subscriptionPluginInstance = registerPlugin<SubscriptionPluginInterface>('SubscriptionPlugin');
+  }
+  return subscriptionPluginInstance;
+}
+
 interface UserSubscriptionStatus {
   subscriptionStatus: string;
   subscriptionStartDate?: string;
@@ -24,26 +42,35 @@ interface UserSubscriptionStatus {
 export default function UserSubscription() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const SubscriptionPlugin = Capacitor.isNativePlatform() ? registerPlugin<any>('SubscriptionPlugin') : null;
+  const SubscriptionPlugin = getSubscriptionPlugin();
   const [nativeProducts, setNativeProducts] = useState<any[]>([]);
   const [isPurchasing, setIsPurchasing] = useState(false);
+  const [pluginError, setPluginError] = useState<string | null>(null);
 
   useEffect(() => {
     const loadProducts = async () => {
-      if (!Capacitor.isNativePlatform() || !SubscriptionPlugin) return;
+      if (!Capacitor.isNativePlatform() || !SubscriptionPlugin) {
+        console.log('Not on native platform or plugin not available');
+        return;
+      }
       try {
+        console.log('Loading IAP products...');
         const productIdsEnv = import.meta.env.VITE_IAP_PRODUCT_IDS as string | undefined;
         const productIds = productIdsEnv
           ? productIdsEnv.split(',').map(s => s.trim()).filter(Boolean)
           : ['FlexFlow_Fitness_Premium_monthly_15.99'];
+        console.log('Product IDs:', productIds);
         const res = await SubscriptionPlugin.getProducts({ ids: productIds });
+        console.log('Products loaded:', res);
         setNativeProducts(res.products || []);
-      } catch (e) {
+        setPluginError(null);
+      } catch (e: any) {
         console.error('Failed to load IAP products', e);
+        setPluginError(e?.message || e?.code || 'Unknown error');
       }
     };
     loadProducts();
-  }, []);
+  }, [SubscriptionPlugin]);
 
   const handlePurchase = async () => {
     if (!SubscriptionPlugin) return;
