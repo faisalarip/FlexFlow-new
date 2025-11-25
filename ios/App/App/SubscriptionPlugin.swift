@@ -3,14 +3,7 @@ import Capacitor
 import StoreKit
 
 @objc(SubscriptionPlugin)
-public class SubscriptionPlugin: CAPPlugin, CAPBridgedPlugin {
-    public let identifier = "SubscriptionPlugin"
-    public let jsName = "SubscriptionPlugin"
-    public let pluginMethods: [CAPPluginMethod] = [
-        CAPPluginMethod(name: "getProducts", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "purchase", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "restore", returnType: CAPPluginReturnPromise)
-    ]
+public class SubscriptionPlugin: CAPPlugin {
     
     @objc public func getProducts(_ call: CAPPluginCall) {
         guard let ids = call.getArray("ids", String.self), !ids.isEmpty else {
@@ -19,7 +12,7 @@ public class SubscriptionPlugin: CAPPlugin, CAPBridgedPlugin {
         }
         
         if #available(iOS 15.0, *) {
-            Task { @MainActor in
+            Task {
                 do {
                     let products = try await Product.products(for: ids)
                     let mapped = products.map { p in
@@ -30,9 +23,13 @@ public class SubscriptionPlugin: CAPPlugin, CAPBridgedPlugin {
                             "price": p.displayPrice
                         ]
                     }
-                    call.resolve(["products": mapped])
+                    DispatchQueue.main.async {
+                        call.resolve(["products": mapped])
+                    }
                 } catch {
-                    call.reject("Failed to load products: \(error.localizedDescription)")
+                    DispatchQueue.main.async {
+                        call.reject("Failed to load products: \(error.localizedDescription)")
+                    }
                 }
             }
         } else {
@@ -47,11 +44,13 @@ public class SubscriptionPlugin: CAPPlugin, CAPBridgedPlugin {
         }
         
         if #available(iOS 15.0, *) {
-            Task { @MainActor in
+            Task {
                 do {
                     let products = try await Product.products(for: [productId])
                     guard let product = products.first else {
-                        call.reject("Product not found")
+                        DispatchQueue.main.async {
+                            call.reject("Product not found")
+                        }
                         return
                     }
 
@@ -63,23 +62,35 @@ public class SubscriptionPlugin: CAPPlugin, CAPBridgedPlugin {
                             await transaction.finish()
                             let originalId = String(transaction.originalID)
                             let prodId = transaction.productID
-                            call.resolve([
-                                "status": "success",
-                                "originalTransactionId": originalId,
-                                "productId": prodId
-                            ])
+                            DispatchQueue.main.async {
+                                call.resolve([
+                                    "status": "success",
+                                    "originalTransactionId": originalId,
+                                    "productId": prodId
+                                ])
+                            }
                         case .unverified(_, let error):
-                            call.reject("Purchase unverified: \(error.localizedDescription)")
+                            DispatchQueue.main.async {
+                                call.reject("Purchase unverified: \(error.localizedDescription)")
+                            }
                         }
                     case .userCancelled:
-                        call.resolve(["status": "cancelled"])
+                        DispatchQueue.main.async {
+                            call.resolve(["status": "cancelled"])
+                        }
                     case .pending:
-                        call.resolve(["status": "pending"])
+                        DispatchQueue.main.async {
+                            call.resolve(["status": "pending"])
+                        }
                     @unknown default:
-                        call.reject("Unknown purchase result")
+                        DispatchQueue.main.async {
+                            call.reject("Unknown purchase result")
+                        }
                     }
                 } catch {
-                    call.reject("Purchase failed: \(error.localizedDescription)")
+                    DispatchQueue.main.async {
+                        call.reject("Purchase failed: \(error.localizedDescription)")
+                    }
                 }
             }
         } else {
@@ -89,7 +100,7 @@ public class SubscriptionPlugin: CAPPlugin, CAPBridgedPlugin {
 
     @objc public func restore(_ call: CAPPluginCall) {
         if #available(iOS 15.0, *) {
-            Task { @MainActor in
+            Task {
                 var entitlements: [[String: Any]] = []
                 for await result in Transaction.currentEntitlements {
                     switch result {
@@ -103,7 +114,9 @@ public class SubscriptionPlugin: CAPPlugin, CAPBridgedPlugin {
                         continue
                     }
                 }
-                call.resolve(["entitlements": entitlements])
+                DispatchQueue.main.async {
+                    call.resolve(["entitlements": entitlements])
+                }
             }
         } else {
             call.reject("StoreKit 2 requires iOS 15.0 or later")
