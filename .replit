@@ -103,3 +103,8 @@ integrations = ["javascript_openai:1.0.0", "javascript_log_in_with_replit:1.0.0"
 
 [objectStorage]
 defaultBucketID = "replit-objstore-7aa0336d-cbae-4d4f-a179-0b01ca650cd3"
+
+[userenv]
+
+[userenv.shared]
+VITE_API_BASE_URL = "https://816ceb24-1199-437b-af9a-e39baf99ff33-00-2fffvdsrov5is.riker.replit.dev"
