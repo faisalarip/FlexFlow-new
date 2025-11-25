@@ -6,8 +6,11 @@ const config: CapacitorConfig = {
   webDir: 'dist/public',
   server: {
     iosScheme: 'https',
-    url: 'https://816ceb24-1199-437b-af9a-e39baf99ff33-00-2fffvdsrov5is.riker.replit.dev',
-    cleartext: true
+    hostname: '816ceb24-1199-437b-af9a-e39baf99ff33-00-2fffvdsrov5is.riker.replit.dev',
+    androidScheme: 'https'
+  },
+  plugins: {
+    SubscriptionPlugin: {}
   }
 }
 
