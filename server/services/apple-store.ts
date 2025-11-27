@@ -234,19 +234,43 @@ UKqK1drk/NAJBzewdXUh
   }
 }
 
+function formatPrivateKey(key: string): string {
+  let formatted = key
+    .replace(/\\n/g, '\n')
+    .replace(/"/g, '')
+    .trim();
+  
+  if (!formatted.includes('-----BEGIN')) {
+    formatted = `-----BEGIN PRIVATE KEY-----\n${formatted}\n-----END PRIVATE KEY-----`;
+  }
+  
+  if (!formatted.includes('\n')) {
+    const header = '-----BEGIN PRIVATE KEY-----';
+    const footer = '-----END PRIVATE KEY-----';
+    const body = formatted.replace(header, '').replace(footer, '').trim();
+    const chunks = body.match(/.{1,64}/g) || [];
+    formatted = `${header}\n${chunks.join('\n')}\n${footer}`;
+  }
+  
+  return formatted;
+}
+
 export function createAppleStoreService(): AppleStoreService | null {
   try {
-    const privateKey = process.env.APPLE_PRIVATE_KEY;
+    const rawPrivateKey = process.env.APPLE_PRIVATE_KEY;
     const keyId = process.env.APPLE_KEY_ID;
     const issuerId = process.env.APPLE_ISSUER_ID;
     const bundleId = process.env.APPLE_BUNDLE_ID;
     const environment = (process.env.APPLE_ENVIRONMENT || 'sandbox') as 'sandbox' | 'production';
     const appleId = process.env.APPLE_APP_ID;
 
-    if (!privateKey || !keyId || !issuerId || !bundleId) {
+    if (!rawPrivateKey || !keyId || !issuerId || !bundleId) {
       console.warn('Apple App Store credentials not configured. Subscription features will be limited.');
       return null;
     }
+
+    const privateKey = formatPrivateKey(rawPrivateKey);
+    console.log('Apple Store Service: Private key formatted, length:', privateKey.length);
 
     return new AppleStoreService({
       privateKey,
