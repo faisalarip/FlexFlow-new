@@ -3,7 +3,15 @@ import Capacitor
 import StoreKit
 
 @objc(SubscriptionPlugin)
-public class SubscriptionPlugin: CAPPlugin {
+public class SubscriptionPlugin: CAPPlugin, CAPBridgedPlugin {
+    
+    public let identifier = "SubscriptionPlugin"
+    public let jsName = "SubscriptionPlugin"
+    public let pluginMethods: [CAPPluginMethod] = [
+        CAPPluginMethod(name: "getProducts", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "purchase", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "restore", returnType: CAPPluginReturnPromise)
+    ]
     
     @objc public func getProducts(_ call: CAPPluginCall) {
         guard let ids = call.getArray("ids", String.self), !ids.isEmpty else {
