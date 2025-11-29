@@ -6,6 +6,7 @@
 		"iosScheme": "https"
 	},
 	"packageClassList": [
-		"StatusBarPlugin"
+		"StatusBarPlugin",
+		"SubscriptionPlugin"
 	]
 }

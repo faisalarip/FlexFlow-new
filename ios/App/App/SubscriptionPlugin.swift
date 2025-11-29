@@ -4,6 +4,9 @@ import StoreKit
 
 @objc(SubscriptionPlugin)
 public class SubscriptionPlugin: CAPPlugin {
+    public override func load() {
+        NSLog("[SubscriptionPlugin] loaded")
+    }
     
     @objc public func getProducts(_ call: CAPPluginCall) {
         guard let ids = call.getArray("ids", String.self), !ids.isEmpty else {
