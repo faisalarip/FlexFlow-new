@@ -5,8 +5,7 @@ const config: CapacitorConfig = {
   appName: 'FlexFlow',
   webDir: 'dist/public',
   server: {
-    iosScheme: 'https',
-    hostname: '816ceb24-1199-437b-af9a-e39baf99ff33-00-2fffvdsrov5is.riker.replit.dev',
+    iosScheme: 'capacitor',
     androidScheme: 'https'
   },
   plugins: {
