@@ -166,9 +166,10 @@ UKqK1drk/NAJBzewdXUh
         productId: latestTransaction.productId,
         autoRenewStatus: true
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error getting subscription status:', error);
-      throw new Error('Failed to get subscription status');
+      // Preserve the original error with apiError code for sandbox detection
+      throw error;
     }
   }
 
