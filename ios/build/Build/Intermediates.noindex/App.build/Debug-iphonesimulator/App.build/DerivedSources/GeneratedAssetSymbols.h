@@ -9,4 +9,10 @@
 /// The "Splash" asset catalog image resource.
 static NSString * const ACImageNameSplash AC_SWIFT_PRIVATE = @"Splash";
 
+/// The "flex_logo" asset catalog image resource.
+static NSString * const ACImageNameFlexLogo AC_SWIFT_PRIVATE = @"flex_logo";
+
+/// The "flex_logo_new" asset catalog image resource.
+static NSString * const ACImageNameFlexLogoNew AC_SWIFT_PRIVATE = @"flex_logo_new";
+
 #undef AC_SWIFT_PRIVATE

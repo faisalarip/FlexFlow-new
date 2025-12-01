@@ -34,6 +34,12 @@ extension ImageResource {
     /// The "Splash" asset catalog image resource.
     static let splash = ImageResource(name: "Splash", bundle: resourceBundle)
 
+    /// The "flex_logo" asset catalog image resource.
+    static let flexLogo = ImageResource(name: "flex_logo", bundle: resourceBundle)
+
+    /// The "flex_logo_new" asset catalog image resource.
+    static let flexLogoNew = ImageResource(name: "flex_logo_new", bundle: resourceBundle)
+
 }
 
 // MARK: - Backwards Deployment Support -
