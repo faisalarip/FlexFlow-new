@@ -16,6 +16,26 @@
 			<key>swiftSymbol</key>
 			<string>splash</string>
 		</dict>
+		<dict>
+			<key>catalogPath</key>
+			<string>/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/App/App/Assets.xcassets</string>
+			<key>objcSymbol</key>
+			<string>ACImageNameFlexLogo</string>
+			<key>relativePath</key>
+			<string>./flex_logo.imageset</string>
+			<key>swiftSymbol</key>
+			<string>flexLogo</string>
+		</dict>
+		<dict>
+			<key>catalogPath</key>
+			<string>/Users/faisalnurarif/Downloads/projects/FlexFlow-new/ios/App/App/Assets.xcassets</string>
+			<key>objcSymbol</key>
+			<string>ACImageNameFlexLogoNew</string>
+			<key>relativePath</key>
+			<string>./flex_logo_new.imageset</string>
+			<key>swiftSymbol</key>
+			<string>flexLogoNew</string>
+		</dict>
 	</array>
 	<key>symbols</key>
 	<array/>

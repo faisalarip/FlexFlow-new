@@ -326,12 +326,13 @@ SWIFT_CLASS("_TtC3App11AppDelegate")
 @class CAPPluginCall;
 @protocol CAPBridgeProtocol;
 @class NSString;
-SWIFT_CLASS_NAMED("SubscriptionPlugin") SWIFT_AVAILABILITY(ios,introduced=15.0)
+SWIFT_CLASS_NAMED("SubscriptionPlugin")
 @interface SubscriptionPlugin : CAPPlugin
+- (void)load;
 - (void)getProducts:(CAPPluginCall * _Nonnull)call;
 - (void)purchase:(CAPPluginCall * _Nonnull)call;
 - (void)restore:(CAPPluginCall * _Nonnull)call;
-- (nonnull instancetype)initWithBridge:(id <CAPBridgeProtocol> _Nonnull)bridge pluginId:(NSString * _Nonnull)pluginId pluginName:(NSString * _Nonnull)pluginName OBJC_DESIGNATED_INITIALIZER SWIFT_AVAILABILITY(ios,introduced=15.0) SWIFT_DEPRECATED_MSG("This initializer is deprecated and is not suggested for use. Any data set through this init method will be overridden when it is loaded on the bridge.");
+- (nonnull instancetype)initWithBridge:(id <CAPBridgeProtocol> _Nonnull)bridge pluginId:(NSString * _Nonnull)pluginId pluginName:(NSString * _Nonnull)pluginName OBJC_DESIGNATED_INITIALIZER SWIFT_DEPRECATED_MSG("This initializer is deprecated and is not suggested for use. Any data set through this init method will be overridden when it is loaded on the bridge.");
 - (nonnull instancetype)init OBJC_DESIGNATED_INITIALIZER;
 @end
 

@@ -4,5 +4,9 @@
   "webDir": "dist/public",
   "server": {
     "iosScheme": "https"
-  }
+  },
+  "packageClassList": [
+    "StatusBarPlugin",
+    "SubscriptionPlugin"
+  ]
 }

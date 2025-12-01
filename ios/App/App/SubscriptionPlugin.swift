@@ -3,6 +3,7 @@ import Capacitor
 import StoreKit
 
 @objc(SubscriptionPlugin)
+<<<<<<< HEAD
 public class SubscriptionPlugin: CAPPlugin, CAPBridgedPlugin {
     
     public let identifier = "SubscriptionPlugin"
@@ -12,6 +13,12 @@ public class SubscriptionPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "purchase", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "restore", returnType: CAPPluginReturnPromise)
     ]
+=======
+public class SubscriptionPlugin: CAPPlugin {
+    public override func load() {
+        NSLog("[SubscriptionPlugin] loaded")
+    }
+>>>>>>> ed0172fef807a28157014e8bbfb119f29d86259c
     
     @objc public func getProducts(_ call: CAPPluginCall) {
         guard let ids = call.getArray("ids", String.self), !ids.isEmpty else {

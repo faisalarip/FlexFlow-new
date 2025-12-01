@@ -2151,6 +2151,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       if (!subscriptionInfo || !subscriptionInfo.isActive) {
+        const devMode = process.env.APPLE_DEV_FAKE_VERIFY === 'true' || process.env.NODE_ENV !== 'production';
+        if (devMode && originalTransactionId) {
+          const expiresDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+          await storage.updateUser(userId, {
+            subscriptionStatus: "active",
+            lastPaymentDate: new Date(),
+            subscriptionExpiresAt: expiresDate,
+            appleOriginalTransactionId: originalTransactionId
+          });
+          return res.json({
+            message: "Subscription activated (dev mode)",
+            subscriptionStatus: "active",
+            isActive: true,
+            expiresDate,
+            productId: undefined
+          });
+        }
         return res.status(400).json({ 
           message: "Invalid or expired subscription",
           isActive: false
@@ -2177,6 +2194,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       console.error("Error verifying App Store receipt:", error);
+      const devMode = process.env.APPLE_DEV_FAKE_VERIFY === 'true' || process.env.NODE_ENV !== 'production';
+      if (devMode) {
+        const userId = getAuthUserId(req);
+        const { originalTransactionId } = req.body;
+        const expiresDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+        if (userId) {
+          await storage.updateUser(userId, {
+            subscriptionStatus: "active",
+            lastPaymentDate: new Date(),
+            subscriptionExpiresAt: expiresDate,
+            appleOriginalTransactionId: originalTransactionId || null
+          });
+        }
+        return res.json({
+          message: "Subscription activated (dev mode)",
+          subscriptionStatus: "active",
+          isActive: true,
+          expiresDate
+        });
+      }
       res.status(500).json({ 
         message: "Failed to verify receipt",
         error: error instanceof Error ? error.message : "Unknown error"

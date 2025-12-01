@@ -7,8 +7,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+<<<<<<< HEAD
         // Register custom local plugins for Capacitor 7
         CAPBridge.registerPlugin(SubscriptionPlugin.self)
+=======
+        // Override point for customization after application launch.
+        
+>>>>>>> ed0172fef807a28157014e8bbfb119f29d86259c
         return true
     }
 
