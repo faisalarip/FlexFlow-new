@@ -3,9 +3,9 @@ import OpenAI from "openai";
 // IMPORTANT: from the OpenAI blueprint:
 // the newest OpenAI model is "gpt-5" which was released August 7, 2025. do not change this unless explicitly requested by the user
 
+// Use standard OpenAI endpoint - the Replit AI integration base URL (helium) isn't available in production
 const openai = new OpenAI({ 
-  apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY || process.env.OPENAI_API_KEY,
-  baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL
+  apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY || process.env.OPENAI_API_KEY
 });
 
 export interface NutritionalAnalysis {
