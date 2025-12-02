@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
+import { resolveApiUrl } from "@/lib/config";
 
 interface AuthUser {
   id: string;
@@ -32,7 +33,7 @@ export function useNewAuth() {
     queryKey: ["/api/auth/user"],
     queryFn: async () => {
       // Try cookie-based auth first, then fall back to token in localStorage
-      let response = await fetch('/api/auth/status', {
+      let response = await fetch(resolveApiUrl('/api/auth/status'), {
         credentials: 'include' // Include cookies
       });
       
@@ -45,7 +46,7 @@ export function useNewAuth() {
       
       // Fall back to Bearer token if cookie auth failed and we have a stored token
       if (token) {
-        response = await fetch('/api/auth/user', {
+        response = await fetch(resolveApiUrl('/api/auth/user'), {
           headers: {
             'Authorization': `Bearer ${token}`,
           },
@@ -75,7 +76,7 @@ export function useNewAuth() {
   const signOut = async () => {
     try {
       // Call logout endpoint to clear cookie
-      await fetch('/api/auth/logout', {
+      await fetch(resolveApiUrl('/api/auth/logout'), {
         method: 'POST',
         credentials: 'include'
       });

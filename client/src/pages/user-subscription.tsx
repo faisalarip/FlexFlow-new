@@ -49,19 +49,11 @@ export default function UserSubscription() {
 
   useEffect(() => {
     const loadProducts = async () => {
-<<<<<<< HEAD
       if (!Capacitor.isNativePlatform() || !SubscriptionPlugin) {
-        console.log('Not on native platform or plugin not available');
+        console.log('[iap] Not on native platform or plugin not available');
         return;
       }
-=======
-      if (!Capacitor.isNativePlatform() || !SubscriptionPlugin) return;
       console.log('[iap] native platform:', Capacitor.getPlatform());
-      // Capacitor availability check
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      console.log('[iap] plugin available:', Capacitor.isPluginAvailable ? Capacitor.isPluginAvailable('SubscriptionPlugin') : 'unknown');
->>>>>>> ed0172fef807a28157014e8bbfb119f29d86259c
       try {
         console.log('Loading IAP products...');
         const productIdsEnv = import.meta.env.VITE_IAP_PRODUCT_IDS as string | undefined;
