@@ -5,7 +5,8 @@ import OpenAI from "openai";
 
 // Use standard OpenAI endpoint - the Replit AI integration base URL (helium) isn't available in production
 const openai = new OpenAI({ 
-  apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY || process.env.OPENAI_API_KEY
+  apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY || process.env.OPENAI_API_KEY,
+  baseURL: 'https://api.openai.com/v1'
 });
 
 export interface NutritionalAnalysis {
