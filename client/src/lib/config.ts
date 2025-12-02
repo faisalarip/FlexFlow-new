@@ -9,7 +9,7 @@ interface AppConfig {
 }
 
 const STAGING_API_URL = 'https://816ceb24-1199-437b-af9a-e39baf99ff33-00-2fffvdsrov5is.riker.replit.dev';
-const PRODUCTION_API_URL = (import.meta as any).env?.VITE_PRODUCTION_API_URL || STAGING_API_URL;
+const PRODUCTION_API_URL = 'https://1ac00a7f-30a3-44d7-8227-3b2e6182378d.riker.prod.repl.run';
 
 function getEnvironment(): Environment {
   const env = (import.meta as any).env?.VITE_APP_ENV as string | undefined;
