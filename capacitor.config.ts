@@ -10,7 +10,11 @@ const config: CapacitorConfig = {
   },
   plugins: {
     SubscriptionPlugin: {}
-  }
+  },
+  packageClassList: [
+    'StatusBarPlugin',
+    'SubscriptionPlugin'
+  ]
 }
 
 export default config
