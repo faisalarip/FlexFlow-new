@@ -30,9 +30,9 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
       }`}
       data-testid="splash-screen"
     >
-      <div className="flex flex-col items-center space-y-6 animate-in fade-in zoom-in duration-700">
+      <div className="flex flex-col items-center space-y-6">
         <div className="relative">
-          <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full animate-pulse" />
+          <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full" />
           <Dumbbell className="w-20 h-20 text-primary relative z-10" strokeWidth={2.5} />
         </div>
         
@@ -46,9 +46,9 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
         </div>
         
         <div className="flex space-x-1 mt-8">
-          <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-          <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-          <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+          <div className="w-2 h-2 bg-primary rounded-full" />
+          <div className="w-2 h-2 bg-primary rounded-full" />
+          <div className="w-2 h-2 bg-primary rounded-full" />
         </div>
       </div>
     </div>
