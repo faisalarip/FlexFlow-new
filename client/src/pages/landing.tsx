@@ -4,34 +4,34 @@ import { Button } from "@/components/ui/button";
 export default function Landing() {
   return (
     <div className="relative min-h-screen bg-black hexagon-bg hexagon-pattern overflow-hidden">
-      {/* Hexagonal background elements */}
+      {/* Hexagonal background elements - static, no animations */}
       <div className="fixed inset-0 pointer-events-none z-0">
-        <div className="absolute top-20 left-10 w-32 h-28 opacity-20 animate-pulse" style={{animationDuration: '6s'}}>
+        <div className="absolute top-20 left-10 w-32 h-28 opacity-20">
           <svg viewBox="0 0 120 104" className="w-full h-full">
             <polygon points="30,2 90,2 120,52 90,102 30,102 0,52" fill="#dc2626" stroke="#dc2626" strokeWidth="2" opacity="0.3"/>
           </svg>
         </div>
-        <div className="absolute top-40 right-16 w-24 h-21 opacity-15 animate-bounce" style={{animationDuration: '8s'}}>
+        <div className="absolute top-40 right-16 w-24 h-21 opacity-15">
           <svg viewBox="0 0 120 104" className="w-full h-full">
             <polygon points="30,2 90,2 120,52 90,102 30,102 0,52" fill="none" stroke="#dc2626" strokeWidth="1" opacity="0.4"/>
           </svg>
         </div>
-        <div className="absolute top-96 left-1/4 w-28 h-24 opacity-25 animate-ping" style={{animationDuration: '10s'}}>
+        <div className="absolute top-96 left-1/4 w-28 h-24 opacity-25">
           <svg viewBox="0 0 120 104" className="w-full h-full">
             <polygon points="30,2 90,2 120,52 90,102 30,102 0,52" fill="#000000" stroke="#dc2626" strokeWidth="2" opacity="0.6"/>
           </svg>
         </div>
-        <div className="absolute bottom-80 right-1/3 w-20 h-17 opacity-30 animate-bounce" style={{animationDuration: '7s'}}>
+        <div className="absolute bottom-80 right-1/3 w-20 h-17 opacity-30">
           <svg viewBox="0 0 120 104" className="w-full h-full">
             <polygon points="30,2 90,2 120,52 90,102 30,102 0,52" fill="#dc2626" stroke="#000000" strokeWidth="1" opacity="0.5"/>
           </svg>
         </div>
-        <div className="absolute bottom-40 left-20 w-36 h-31 opacity-20 animate-pulse" style={{animationDuration: '9s'}}>
+        <div className="absolute bottom-40 left-20 w-36 h-31 opacity-20">
           <svg viewBox="0 0 120 104" className="w-full h-full">
             <polygon points="30,2 90,2 120,52 90,102 30,102 0,52" fill="none" stroke="#dc2626" strokeWidth="2" opacity="0.3"/>
           </svg>
         </div>
-        <div className="absolute top-1/3 right-1/4 w-26 h-22 opacity-15 animate-ping" style={{animationDuration: '12s'}}>
+        <div className="absolute top-1/3 right-1/4 w-26 h-22 opacity-15">
           <svg viewBox="0 0 120 104" className="w-full h-full">
             <polygon points="30,2 90,2 120,52 90,102 30,102 0,52" fill="#000000" stroke="#dc2626" strokeWidth="1" opacity="0.4"/>
           </svg>
