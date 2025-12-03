@@ -21,19 +21,12 @@
       radial-gradient(circle at 75% 75%, rgba(220, 38, 38, 0.15) 0%, transparent 50%);
     background-size: 120px 104px, 80px 69px, 100px 87px;
     background-position: 0 0, 60px 52px, 30px 26px;
-    animation: hexagon-float 20s ease-in-out infinite;
   }
   
   .hexagon-pattern {
     background-image: url("data:image/svg+xml,%3Csvg width='120' height='104' viewBox='0 0 120 104' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolygon points='30,2 90,2 120,52 90,102 30,102 0,52' fill='none' stroke='%23dc2626' stroke-width='1' opacity='0.1'/%3E%3C/svg%3E");
     background-size: 120px 104px;
     background-repeat: repeat;
-  }
-  
-  @keyframes hexagon-float {
-    0%, 100% { transform: translateY(0px) rotate(0deg); }
-    33% { transform: translateY(-10px) rotate(1deg); }
-    66% { transform: translateY(5px) rotate(-1deg); }
   }
 
   /* Mobile-specific animations (playful, energetic) */
