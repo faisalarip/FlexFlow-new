@@ -1,6 +1,6 @@
 import { Activity } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import workoutVideo from "@assets/generated_videos/intense_athletic_performance_transformation.mp4";
+import workoutVideo from "@assets/generated_videos/intense_workout_commercial_montage.mp4";
 
 export default function Landing() {
   return (
