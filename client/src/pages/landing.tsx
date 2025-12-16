@@ -10,6 +10,8 @@ export default function Landing() {
         autoPlay
         muted
         loop
+        playsInline
+        preload="auto"
         className="absolute inset-0 w-full h-full object-cover z-0"
         style={{ objectFit: "cover" }}
       >
