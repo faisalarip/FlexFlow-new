@@ -44,10 +44,6 @@ app.use((req, res, next) => {
 (async () => {
   const server = await registerRoutes(app);
 
-  // Initialize badges in the database
-  await badgeService.initializeBadges();
-  log("Badges initialized");
-
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
@@ -76,5 +72,10 @@ app.use((req, res, next) => {
     reusePort: true,
   }, () => {
     log(`serving on port ${port}`);
+    
+    // Initialize badges AFTER server is listening (non-blocking for health checks)
+    badgeService.initializeBadges()
+      .then(() => log("Badges initialized"))
+      .catch((err) => console.error("Failed to initialize badges:", err));
   });
 })();

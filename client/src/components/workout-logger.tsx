@@ -617,16 +617,6 @@ export default function WorkoutLogger() {
       tips: ["Keep torso upright", "Don't go too low if shoulders hurt", "Control the descent"],
       muscles: ["Triceps", "Chest", "Shoulders"]
     },
-    "Lat Pulldowns": {
-      steps: [
-        "Start in a plank position with hands shoulder-width apart",
-        "Lower your body until chest nearly touches the floor",
-        "Push back up to starting position",
-        "Keep your core tight throughout the movement"
-      ],
-      tips: ["Keep your body in a straight line", "Don't let your hips sag", "Control the movement"],
-      muscles: ["Chest", "Triceps", "Shoulders", "Core"]
-    },
     "Pull-ups": {
       steps: [
         "Hang from bar with palms facing away",
@@ -636,26 +626,6 @@ export default function WorkoutLogger() {
       ],
       tips: ["Engage lats", "Don't use momentum", "Full range of motion"],
       muscles: ["Lats", "Biceps", "Rhomboids", "Core"]
-    },
-    "Chin-ups": {
-      steps: [
-        "Grab bar with palms facing toward you, hands shoulder-width apart",
-        "Start from dead hang with arms fully extended",
-        "Pull yourself up until chin goes over the bar",
-        "Lower yourself slowly to starting position"
-      ],
-      tips: ["Palms toward you targets biceps more", "Don't kip or swing", "Squeeze shoulder blades"],
-      muscles: ["Biceps", "Lats", "Middle Traps", "Rear Deltoids"]
-    },
-    "Dips": {
-      steps: [
-        "Position hands on parallel bars or bench behind you",
-        "Start with arms extended, supporting your body weight",
-        "Lower body by bending elbows until shoulders are below elbows",
-        "Push back up to starting position"
-      ],
-      tips: ["Keep torso upright", "Don't go too low if shoulders hurt", "Control the descent"],
-      muscles: ["Triceps", "Lower Chest", "Front Deltoids"]
     },
     "Bench Press": {
       steps: [
