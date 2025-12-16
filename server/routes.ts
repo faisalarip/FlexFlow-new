@@ -40,7 +40,14 @@ import { ActivityLogger } from "./activity-logger";
 import { badgeService } from "./badge-service";
 import { createAppleStoreService } from "./services/apple-store";
 
-const appleStoreService = createAppleStoreService();
+// Lazy initialization to avoid blocking cold starts
+let _appleStoreService: ReturnType<typeof createAppleStoreService> | null = null;
+function getAppleStoreService() {
+  if (!_appleStoreService) {
+    _appleStoreService = createAppleStoreService();
+  }
+  return _appleStoreService;
+}
 
 export async function registerRoutes(app: Express, httpServer?: Server): Promise<Server> {
   // Note: Health check endpoints are now registered in index.ts before server starts
@@ -2130,9 +2137,9 @@ export async function registerRoutes(app: Express, httpServer?: Server): Promise
       
       try {
         if (receipt) {
-          subscriptionInfo = await appleStoreService.verifyReceipt(receipt);
+          subscriptionInfo = await getAppleStoreService().verifyReceipt(receipt);
         } else if (originalTransactionId) {
-          subscriptionInfo = await appleStoreService.getSubscriptionStatus(originalTransactionId);
+          subscriptionInfo = await getAppleStoreService().getSubscriptionStatus(originalTransactionId);
         }
       } catch (verifyError: any) {
         // Handle Xcode StoreKit testing - transaction IDs are not real
@@ -2234,8 +2241,8 @@ export async function registerRoutes(app: Express, httpServer?: Server): Promise
         return res.status(400).json({ message: "Missing signedPayload" });
       }
 
-      const notification = await appleStoreService.verifyAndDecodeNotification(signedPayload);
-      const result = await appleStoreService.handleNotification(notification);
+      const notification = await getAppleStoreService().verifyAndDecodeNotification(signedPayload);
+      const result = await getAppleStoreService().handleNotification(notification);
 
       if (result.originalTransactionId) {
         const usersWithTransaction = await storage.getUsersByAppleTransactionId(result.originalTransactionId);
@@ -2243,7 +2250,7 @@ export async function registerRoutes(app: Express, httpServer?: Server): Promise
         for (const user of usersWithTransaction) {
           switch (result.action) {
             case 'renewed':
-              const renewedInfo = await appleStoreService.getSubscriptionStatus(result.originalTransactionId);
+              const renewedInfo = await getAppleStoreService().getSubscriptionStatus(result.originalTransactionId);
               await storage.updateUser(user.id, {
                 subscriptionStatus: 'active',
                 lastPaymentDate: new Date(),

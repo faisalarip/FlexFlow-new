@@ -4261,4 +4261,15 @@ export class DatabaseStorage implements IStorage {
   async hasUserEarnedBadge(userId: string, badgeId: string): Promise<boolean> { return this.memStorage.hasUserEarnedBadge(userId, badgeId); }
 }
 
-export const storage = new DatabaseStorage();
+// Lazy storage initialization to avoid blocking cold starts
+let _storage: DatabaseStorage | null = null;
+
+export const storage: IStorage = new Proxy({} as IStorage, {
+  get(_, prop) {
+    if (!_storage) {
+      console.log("Initializing storage on first access...");
+      _storage = new DatabaseStorage();
+    }
+    return (_storage as any)[prop];
+  }
+});
