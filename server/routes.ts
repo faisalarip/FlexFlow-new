@@ -44,6 +44,20 @@ const appleStoreService = createAppleStoreService();
 
 export async function registerRoutes(app: Express): Promise<Server> {
 
+  // Health check endpoints for deployment - must respond fast
+  app.get('/health', (req, res) => {
+    res.status(200).json({ status: 'ok' });
+  });
+  
+  // Root endpoint health check (used by deployment health checks)
+  app.get('/', (req, res, next) => {
+    // Only handle API-style health checks, let Vite handle browser requests
+    if (req.headers.accept?.includes('text/html')) {
+      return next();
+    }
+    res.status(200).json({ status: 'ok' });
+  });
+
   // Note: Removed Replit Auth integration as requested
 
   // Auth routes
