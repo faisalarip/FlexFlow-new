@@ -4251,6 +4251,14 @@ export class DatabaseStorage implements IStorage {
   async getNews(limit?: number): Promise<News[]> { return this.memStorage.getNews(limit); }
   async getNewsItem(id: string): Promise<News | undefined> { return this.memStorage.getNewsItem(id); }
   async createNews(newsItem: InsertNews): Promise<News> { return this.memStorage.createNews(newsItem); }
+  
+  // Badge methods delegation
+  async createBadgeIfNotExists(badge: InsertBadge): Promise<Badge> { return this.memStorage.createBadgeIfNotExists(badge); }
+  async getAllBadges(): Promise<Badge[]> { return this.memStorage.getAllBadges(); }
+  async getBadge(id: string): Promise<Badge | undefined> { return this.memStorage.getBadge(id); }
+  async getUserBadges(userId: string): Promise<UserBadgeWithDetails[]> { return this.memStorage.getUserBadges(userId); }
+  async awardBadge(userId: string, badgeId: string): Promise<UserBadge> { return this.memStorage.awardBadge(userId, badgeId); }
+  async hasUserEarnedBadge(userId: string, badgeId: string): Promise<boolean> { return this.memStorage.hasUserEarnedBadge(userId, badgeId); }
 }
 
 export const storage = new DatabaseStorage();

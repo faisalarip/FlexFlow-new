@@ -42,23 +42,9 @@ import { createAppleStoreService } from "./services/apple-store";
 
 const appleStoreService = createAppleStoreService();
 
-export async function registerRoutes(app: Express): Promise<Server> {
-
-  // Health check endpoints for deployment - must respond fast
-  app.get('/health', (req, res) => {
-    res.status(200).json({ status: 'ok' });
-  });
-  
-  // Root endpoint health check (used by deployment health checks)
-  app.get('/', (req, res, next) => {
-    // Only handle API-style health checks, let Vite handle browser requests
-    if (req.headers.accept?.includes('text/html')) {
-      return next();
-    }
-    res.status(200).json({ status: 'ok' });
-  });
-
-  // Note: Removed Replit Auth integration as requested
+export async function registerRoutes(app: Express, httpServer?: Server): Promise<Server> {
+  // Note: Health check endpoints are now registered in index.ts before server starts
+  // to ensure immediate response for Autoscale cold starts
 
   // Auth routes
   app.get('/api/auth/user', authenticateToken, async (req: any, res) => {
@@ -2818,8 +2804,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  const httpServer = createServer(app);
-  return httpServer;
+  // Use provided httpServer or create a new one
+  const server = httpServer || createServer(app);
+  return server;
 }
 
 // Helper function to generate a personalized weekly schedule based on user preferences
