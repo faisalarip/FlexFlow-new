@@ -49,9 +49,6 @@ function Camera({ className }: { className?: string }) {
   );
 }
 
-// Premium-only features that require active subscription (no trial access)
-const PREMIUM_ONLY_FEATURES = ['workout_planner', 'meal_tracker'];
-
 export default function FeatureGate({ feature, children, fallback }: FeatureGateProps) {
   const { user } = useNewAuth();
 
@@ -62,10 +59,7 @@ export default function FeatureGate({ feature, children, fallback }: FeatureGate
     // Active premium subscription has access to everything
     if (user.subscriptionStatus === "active") return true;
     
-    // Check if feature is premium-only (requires subscription, no trial access)
-    if (PREMIUM_ONLY_FEATURES.includes(feature)) return false;
-    
-    // For non-premium-only features, free trial users have access if trial hasn't expired
+    // Trial users have FULL ACCESS to all features during the 7-day trial
     if (user.subscriptionStatus === "free_trial") {
       if (!user.trialEndDate) return false;
       const trialEndDate = new Date(user.trialEndDate);
@@ -73,7 +67,7 @@ export default function FeatureGate({ feature, children, fallback }: FeatureGate
       return now <= trialEndDate;
     }
     
-    // All other statuses (expired, inactive, etc.) don't have access
+    // Trial expired or no subscription = no access to any premium features
     return false;
   })();
 
@@ -97,11 +91,10 @@ export default function FeatureGate({ feature, children, fallback }: FeatureGate
     return <>{fallback}</>;
   }
 
-  // Default locked feature UI - Full screen lock page
+  // Default locked feature UI - Full screen lock page (PAYWALL)
   const featureInfo = FEATURE_INFO[feature];
   const isTrialUser = user?.subscriptionStatus === "free_trial";
-  const isExpired = user?.subscriptionStatus === "expired";
-  const isPremiumOnly = PREMIUM_ONLY_FEATURES.includes(feature);
+  const isExpired = user?.subscriptionStatus === "expired" || (isTrialUser && trialDaysRemaining === 0);
 
   return (
     <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4" data-testid={`feature-gate-${feature}`}>
@@ -133,78 +126,34 @@ export default function FeatureGate({ feature, children, fallback }: FeatureGate
           </CardHeader>
           
           <CardContent className="space-y-6">
-            {/* Subscription Status Message */}
-            {isPremiumOnly && isTrialUser && (
-              <div className="text-center p-6 bg-gradient-to-r from-purple-900/50 to-red-900/50 rounded-xl border-2 border-purple-500/50">
-                <Badge className="mb-3 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 text-base">
-                  <Crown className="w-4 h-4 mr-2" />
-                  Premium Subscription Required
-                </Badge>
-                <p className="text-xl font-bold text-white mb-2">
-                  This Feature Requires an Active Subscription
-                </p>
-                <p className="text-base text-gray-300">
-                  {featureInfo.name} is a premium-only feature. Subscribe now to unlock this and other exclusive features.
-                </p>
-              </div>
-            )}
-
+            {/* Trial Expired or Subscription Expired - Show Paywall */}
             {isExpired && (
               <div className="text-center p-6 bg-gradient-to-r from-red-900/50 to-orange-900/50 rounded-xl border-2 border-red-500/50">
                 <Badge className="mb-3 bg-red-600 hover:bg-red-700 text-white px-4 py-2 text-base">
                   <Lock className="w-4 h-4 mr-2" />
-                  Subscription Expired
+                  {isTrialUser ? "Free Trial Ended" : "Subscription Expired"}
                 </Badge>
                 <p className="text-xl font-bold text-white mb-2">
-                  Your Premium Access Has Ended
+                  {isTrialUser ? "Your 7-Day Free Trial Has Ended" : "Your Premium Access Has Ended"}
                 </p>
                 <p className="text-base text-gray-300">
-                  Renew your subscription to continue using {featureInfo.name} and all other premium features.
+                  Subscribe now to continue using {featureInfo.name} and all premium features.
                 </p>
               </div>
             )}
 
-            {!isPremiumOnly && isTrialUser && trialDaysRemaining > 0 && (
-              <div className="text-center p-6 bg-gradient-to-r from-amber-900/50 to-orange-900/50 rounded-xl border-2 border-amber-500/50">
-                <Badge className="mb-3 bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 text-base">
-                  <Calendar className="w-4 h-4 mr-2" />
-                  Trial Ending Soon
-                </Badge>
-                <p className="text-xl font-bold text-white mb-2">
-                  {trialDaysRemaining} {trialDaysRemaining === 1 ? 'Day' : 'Days'} Left in Your Trial
-                </p>
-                <p className="text-base text-gray-300">
-                  Upgrade now to keep using premium features after your trial expires!
-                </p>
-              </div>
-            )}
-
-            {!isPremiumOnly && isTrialUser && trialDaysRemaining === 0 && (
-              <div className="text-center p-6 bg-gradient-to-r from-red-900/50 to-orange-900/50 rounded-xl border-2 border-red-500/50">
-                <Badge className="mb-3 bg-red-600 hover:bg-red-700 text-white px-4 py-2 text-base">
-                  <Lock className="w-4 h-4 mr-2" />
-                  Trial Expired
-                </Badge>
-                <p className="text-xl font-bold text-white mb-2">
-                  Your Free Trial Has Ended
-                </p>
-                <p className="text-base text-gray-300">
-                  Upgrade to premium to continue using {featureInfo.name} and all advanced features.
-                </p>
-              </div>
-            )}
-
-            {!isPremiumOnly && !isTrialUser && !isExpired && (
+            {/* No subscription at all */}
+            {!isTrialUser && !isExpired && (
               <div className="text-center p-6 bg-gradient-to-r from-purple-900/50 to-blue-900/50 rounded-xl border-2 border-purple-500/50">
                 <Badge className="mb-3 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 text-base">
                   <Crown className="w-4 h-4 mr-2" />
                   Premium Feature
                 </Badge>
                 <p className="text-xl font-bold text-white mb-2">
-                  This Feature Requires Premium Access
+                  Subscribe to Unlock This Feature
                 </p>
                 <p className="text-base text-gray-300">
-                  Upgrade to unlock {featureInfo.name} and all other premium features.
+                  Get full access to {featureInfo.name} and all premium features with a subscription.
                 </p>
               </div>
             )}
