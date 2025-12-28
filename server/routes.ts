@@ -240,6 +240,128 @@ export async function registerRoutes(app: Express, httpServer?: Server): Promise
     }
   });
 
+  // Request password reset - sends reset link/token
+  app.post('/api/auth/forgot-password', async (req, res) => {
+    try {
+      const { email } = req.body;
+      
+      if (!email) {
+        return res.status(400).json({ message: "Email is required" });
+      }
+
+      const user = await storage.getUserByEmail(email);
+      
+      // Always return success to prevent email enumeration
+      if (!user) {
+        return res.json({ 
+          message: "If an account exists with this email, you will receive password reset instructions." 
+        });
+      }
+
+      // Generate reset token (6-digit code for simplicity)
+      const resetToken = Math.floor(100000 + Math.random() * 900000).toString();
+      const resetExpires = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
+
+      // Store reset token
+      await storage.updateUser(user.id, {
+        passwordResetToken: resetToken,
+        passwordResetExpires: resetExpires
+      });
+
+      // In production, send email here. For now, we'll return success.
+      // TODO: Integrate email service (SendGrid, AWS SES, etc.)
+      console.log(`[Password Reset] Token for ${email}: ${resetToken}`);
+
+      res.json({ 
+        message: "If an account exists with this email, you will receive password reset instructions."
+      });
+    } catch (error: any) {
+      console.error("Forgot password error:", error);
+      res.status(500).json({ message: "Failed to process password reset request" });
+    }
+  });
+
+  // Verify reset token and reset password
+  app.post('/api/auth/reset-password', async (req, res) => {
+    try {
+      const { email, token, newPassword } = req.body;
+      
+      if (!email || !token || !newPassword) {
+        return res.status(400).json({ 
+          message: "Email, reset code, and new password are required" 
+        });
+      }
+
+      if (newPassword.length < 8) {
+        return res.status(400).json({ 
+          message: "New password must be at least 8 characters long" 
+        });
+      }
+
+      const user = await storage.getUserByEmail(email);
+      
+      if (!user) {
+        return res.status(400).json({ message: "Invalid reset request" });
+      }
+
+      // Check token validity
+      if (!user.passwordResetToken || user.passwordResetToken !== token) {
+        return res.status(400).json({ message: "Invalid or expired reset code" });
+      }
+
+      // Check expiration
+      if (!user.passwordResetExpires || new Date() > new Date(user.passwordResetExpires)) {
+        return res.status(400).json({ message: "Reset code has expired. Please request a new one." });
+      }
+
+      // Hash new password and update
+      const bcrypt = await import('bcrypt');
+      const passwordHash = await bcrypt.hash(newPassword, 10);
+
+      await storage.updateUser(user.id, {
+        passwordHash,
+        passwordResetToken: null,
+        passwordResetExpires: null
+      });
+
+      res.json({ message: "Password reset successfully. You can now sign in with your new password." });
+    } catch (error: any) {
+      console.error("Reset password error:", error);
+      res.status(500).json({ message: "Failed to reset password" });
+    }
+  });
+
+  // Recover username - sends username to email
+  app.post('/api/auth/forgot-username', async (req, res) => {
+    try {
+      const { email } = req.body;
+      
+      if (!email) {
+        return res.status(400).json({ message: "Email is required" });
+      }
+
+      const user = await storage.getUserByEmail(email);
+      
+      // Always return success to prevent email enumeration
+      if (!user || !user.username) {
+        return res.json({ 
+          message: "If an account exists with this email, your username has been sent to you."
+        });
+      }
+
+      // In production, send email here. For now, log it.
+      // TODO: Integrate email service
+      console.log(`[Username Recovery] Username for ${email}: ${user.username}`);
+
+      res.json({ 
+        message: "If an account exists with this email, your username has been sent to you."
+      });
+    } catch (error: any) {
+      console.error("Forgot username error:", error);
+      res.status(500).json({ message: "Failed to process username recovery request" });
+    }
+  });
+
   // Badge routes
   
   // Get all available badges
