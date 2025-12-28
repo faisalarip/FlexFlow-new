@@ -51,9 +51,10 @@ export default function ForgotPassword() {
       const response = await apiRequest("POST", "/api/auth/forgot-password", data);
       return response.json();
     },
-    onSuccess: (_, data) => {
-      setEmail(data.email);
-      resetPasswordForm.setValue("email", data.email);
+    onSuccess: () => {
+      const submittedEmail = forgotPasswordForm.getValues("email");
+      setEmail(submittedEmail);
+      resetPasswordForm.setValue("email", submittedEmail);
       setStep("reset");
       toast({
         title: "Check Your Email",
