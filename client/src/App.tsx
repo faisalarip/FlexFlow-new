@@ -31,6 +31,7 @@ import AuthSelection from "@/pages/auth-selection";
 import Tutorial from "@/pages/tutorial";
 import TermsOfService from "@/pages/terms-of-service";
 import PrivacyPolicy from "@/pages/privacy-policy";
+import ForgotPassword from "@/pages/forgot-password";
 import { useNewAuth } from "@/hooks/useNewAuth";
 import NotificationManager from "@/components/notification-manager";
 import SplashScreen from "@/components/splash-screen";
@@ -60,6 +61,9 @@ function Router() {
         {/* Legal pages - accessible to all users */}
         <Route path="/terms-of-service" component={TermsOfService} />
         <Route path="/privacy-policy" component={PrivacyPolicy} />
+        
+        {/* Account recovery - accessible without auth */}
+        <Route path="/forgot-password" component={ForgotPassword} />
         
         {/* Tutorial page - always available but checks auth internally */}
         <Route path="/tutorial" component={Tutorial} />

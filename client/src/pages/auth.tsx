@@ -205,6 +205,16 @@ export default function AuthPage({ mode = "signup" }: AuthPageProps) {
               >
                 {signInMutation.isPending ? "Signing In..." : "Sign In"}
               </Button>
+              
+              <div className="text-center pt-2">
+                <a
+                  href="/forgot-password"
+                  className="text-sm text-red-600 hover:text-red-700"
+                  data-testid="link-forgot-password"
+                >
+                  Forgot your password or username?
+                </a>
+              </div>
             </form>
           ) : (
             /* Sign Up Form */
