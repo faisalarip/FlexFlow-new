@@ -1,51 +1,8 @@
-import { Activity, Download } from "lucide-react";
+import { Activity } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState, useEffect } from "react";
 import workoutVideo from "@assets/generated_videos/intense_workout_commercial_montage.mp4";
 
-interface BeforeInstallPromptEvent extends Event {
-  prompt: () => Promise<void>;
-  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
-}
-
 export default function Landing() {
-  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
-  const [isInstallable, setIsInstallable] = useState(false);
-  const [isInstalled, setIsInstalled] = useState(false);
-
-  useEffect(() => {
-    // Check if app is already installed
-    if (window.matchMedia("(display-mode: standalone)").matches) {
-      setIsInstalled(true);
-      return;
-    }
-
-    const handleBeforeInstallPrompt = (e: Event) => {
-      e.preventDefault();
-      setDeferredPrompt(e as BeforeInstallPromptEvent);
-      setIsInstallable(true);
-    };
-
-    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
-
-    return () => {
-      window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
-    };
-  }, []);
-
-  const handleInstallClick = async () => {
-    if (!deferredPrompt) return;
-    
-    await deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    
-    if (outcome === "accepted") {
-      setIsInstalled(true);
-    }
-    setDeferredPrompt(null);
-    setIsInstallable(false);
-  };
-
   return (
     <div className="relative min-h-screen bg-black overflow-hidden flex flex-col items-center justify-center">
       {/* Background Video - Optimized for Mobile and Desktop */}
@@ -88,28 +45,6 @@ export default function Landing() {
             <a href="/auth-selection">I HAVE AN ACCOUNT</a>
           </Button>
         </div>
-
-        {/* Install App Button */}
-        {!isInstalled && (
-          <div className="pt-4">
-            {isInstallable ? (
-              <Button
-                size="lg"
-                variant="ghost"
-                className="text-sm md:text-base text-white/80 hover:text-white hover:bg-white/10"
-                onClick={handleInstallClick}
-                data-testid="button-install-app"
-              >
-                <Download className="w-4 h-4 mr-2" />
-                Install App
-              </Button>
-            ) : (
-              <p className="text-xs md:text-sm text-white/60">
-                Tip: Add to your home screen for the best experience
-              </p>
-            )}
-          </div>
-        )}
       </div>
     </div>
   );

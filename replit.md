@@ -29,15 +29,6 @@ FlexFlow is a comprehensive fitness and wellness application built with React an
 - **Image Moderation**: Vision API scans uploaded images for inappropriate visual content
 - **Real-Time Protection**: Content is filtered before posting to maintain community standards
 
-### Progressive Web App (PWA) (December 2025)
-- **Installable**: Users can install FlexFlow to their home screen on mobile or desktop
-- **Offline Support**: Workbox service worker caches assets for offline functionality
-- **App Icons**: Custom 192x192 and 512x512 icons for all platforms
-- **Apple Support**: Full iOS/Safari support with apple-touch-icon and meta tags
-- **Auto Updates**: Service worker auto-updates when new versions are deployed
-- **Configuration**: vite-plugin-pwa handles manifest generation and service worker registration
-- **Note**: PWA features only work in production builds; development mode doesn't generate the manifest
-
 ### Apple App Store Connect Integration (November 2025)
 - **Native iOS Subscriptions**: Premium subscriptions handled through App Store Connect with official Apple library (@apple/app-store-server-library)
 - **Receipt Validation**: Backend API validates App Store receipts and syncs subscription status across devices
